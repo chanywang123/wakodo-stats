@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 v3.0</title>
+  <title>和光堂戰情室 v3.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -29,6 +29,10 @@
     .chk-label:hover { background: #f9fafb; }
     .chk-label input:checked + span { font-weight: bold; color: #2563eb; }
     .chk-label.checked { border-color: #2563eb; background: #eff6ff; }
+    /* Admin elements hidden by default */
+    .admin-only { display: none; } 
+    .admin-visible .admin-only { display: table-cell; } /* For table cells */
+    .admin-visible div.admin-only { display: block; }   /* For block elements */
   </style>
 </head>
 <body class="text-gray-800">
@@ -39,13 +43,13 @@
     <div class="flex items-center gap-3">
       <h1 class="text-2xl font-bold text-gray-900 tracking-tight">👓 和光堂戰情室</h1>
       <div class="flex flex-col text-[10px] text-blue-600 font-bold leading-tight border-l-2 border-blue-200 pl-2">
-        <span>v3.0 Last Update</span>
+        <span>v3.2 Last Update</span>
         <span id="updateTime">2026-01-13</span>
       </div>
     </div>
     <div class="flex items-center gap-3">
       <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
-      <button onclick="toggleAdmin()" class="text-gray-400 hover:text-gray-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+      <button onclick="toggleAdmin()" class="text-gray-400 hover:text-gray-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></button>
     </div>
   </div>
 
@@ -53,9 +57,9 @@
   <div class="card mb-6 flex flex-wrap gap-3 items-center bg-white">
     <div class="flex items-center border rounded px-2 bg-gray-50">
       <span class="text-gray-400 text-xs mr-2">期間</span>
-      <input type="date" id="qFrom" class="bg-transparent py-1 text-sm outline-none" value="2026-01-01">
+      <input type="date" id="qFrom" class="bg-transparent py-1 text-sm outline-none">
       <span class="text-gray-400 mx-1">-</span>
-      <input type="date" id="qTo" class="bg-transparent py-1 text-sm outline-none" value="2026-12-31">
+      <input type="date" id="qTo" class="bg-transparent py-1 text-sm outline-none">
     </div>
     <div class="flex-grow relative">
       <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="w-full border rounded pl-8 pr-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
@@ -78,19 +82,16 @@
       <div class="text-sm text-gray-500 mb-1">南科店</div>
       <div class="text-3xl font-bold text-green-600" id="statNanKe">0</div>
     </div>
-    <!-- 預留分店位置 (隱藏) -->
-    <div class="hidden"></div> 
+    <div class="hidden"></div>
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <!-- 左側：客源 -->
     <div class="card h-[450px] flex flex-col">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold text-gray-700">客源分析</h3>
         <select id="sourceFilter" onchange="filterSource()" class="border rounded px-2 py-1 text-sm bg-gray-50">
           <option value="ALL">顯示全部客源</option>
-          <!-- JS will populate -->
         </select>
       </div>
       <div class="flex-grow relative h-full">
@@ -102,7 +103,6 @@
       </div>
     </div>
 
-    <!-- 右側：目的 -->
     <div class="card h-[450px] flex flex-col">
       <h3 class="font-bold text-gray-700 mb-4">來店目的</h3>
       <div class="flex-grow relative h-full">
@@ -125,7 +125,7 @@
             <th class="p-3">姓名</th>
             <th class="p-3">客源</th>
             <th class="p-3">目的</th>
-            <th class="p-3 hidden admin-only">操作</th>
+            <th class="p-3 admin-only">操作</th>
           </tr>
         </thead>
         <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
@@ -152,7 +152,6 @@
   <div class="modal-content">
     <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 text-2xl">&times;</button>
     <h2 id="modalTitle" class="text-xl font-bold mb-6 text-gray-800">新增資料</h2>
-    
     <div class="space-y-4">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs font-bold text-gray-500">日期</label><input type="date" id="mDate" class="w-full border rounded p-2"></div>
@@ -187,69 +186,43 @@
           <span class="text-sm font-bold text-gray-700">是台南人</span>
         </label>
       </div>
-      
-      <div>
-        <label class="text-xs font-bold text-gray-500 mb-1 block">客源 (複選)</label>
-        <div class="chk-grid" id="chkSources"></div>
-      </div>
-
-      <div id="keywordBox" class="hidden bg-yellow-50 p-2 rounded border border-yellow-200">
-        <input type="text" id="mKeyword" class="w-full bg-transparent text-sm outline-none" placeholder="輸入 Google 搜尋關鍵字...">
-      </div>
-
-      <div>
-        <label class="text-xs font-bold text-gray-500 mb-1 block">目的 (複選)</label>
-        <div class="chk-grid" id="chkPurposes"></div>
-      </div>
-
-      <div>
-        <label class="text-xs font-bold text-gray-500">備註</label>
-        <textarea id="mDetail" class="w-full border rounded p-2 text-sm h-20" placeholder="詳細描述..."></textarea>
-      </div>
-
+      <div><label class="text-xs font-bold text-gray-500 mb-1 block">客源 (複選)</label><div class="chk-grid" id="chkSources"></div></div>
+      <div id="keywordBox" class="hidden bg-yellow-50 p-2 rounded border border-yellow-200"><input type="text" id="mKeyword" class="w-full bg-transparent text-sm outline-none" placeholder="輸入 Google 搜尋關鍵字..."></div>
+      <div><label class="text-xs font-bold text-gray-500 mb-1 block">目的 (複選)</label><div class="chk-grid" id="chkPurposes"></div></div>
+      <div><label class="text-xs font-bold text-gray-500">備註</label><textarea id="mDetail" class="w-full border rounded p-2 text-sm h-20" placeholder="詳細描述..."></textarea></div>
       <button id="btnSave" onclick="saveData()" class="w-full btn-primary py-3 font-bold text-lg mt-2">儲存資料</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Config
   const SOURCES = ["Google 搜尋", "Google Map", "親友介紹", "老客回購", "老客-未購", "途經路過", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "PTT", "其他"];
   const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "購買其他商品"];
   
-  // State
-  let visits = [];
-  let stats = {};
-  let currentStore = '全部';
-  let charts = {};
+  let visits = [], stats = {}, currentStore = '全部', charts = {};
 
-  // Init
   document.getElementById('updateTime').textContent = new Date().toISOString().split('T')[0];
   
   window.onload = () => {
+    // 1. 初始化日期：從 2024-01-01 到 今天
+    document.getElementById('qFrom').value = "2024-01-01";
+    document.getElementById('qTo').value = new Date().toISOString().split('T')[0];
+
     initCheckboxes('chkSources', SOURCES);
     initCheckboxes('chkPurposes', PURPOSES);
-    
-    // Populate Source Filter
-    const sSelect = document.getElementById('sourceFilter');
     SOURCES.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s; opt.textContent = s;
-      sSelect.appendChild(opt);
+      const opt = document.createElement('option'); opt.value = s; opt.textContent = s;
+      document.getElementById('sourceFilter').appendChild(opt);
     });
 
-    const savedStore = localStorage.getItem('store') || '全部';
-    setStore(savedStore);
+    setStore('全部');
+    checkAuth();
   };
 
   function initCheckboxes(id, list) {
     document.getElementById(id).innerHTML = list.map(item => `
-      <label class="chk-label">
-        <input type="checkbox" value="${item}" class="mr-2 hidden" onchange="this.parentElement.classList.toggle('checked', this.checked)">
-        <span>${item}</span>
-      </label>
+      <label class="chk-label"><input type="checkbox" value="${item}" class="mr-2 hidden" onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>${item}</span></label>
     `).join('');
-    
     if(id === 'chkSources') {
       document.getElementById(id).addEventListener('change', () => {
         const hasGoogle = Array.from(document.querySelectorAll('#chkSources input:checked')).some(i => i.value.includes('Google'));
@@ -260,14 +233,10 @@
 
   window.setStore = (storeName) => {
     currentStore = storeName;
-    localStorage.setItem('store', storeName);
-    
-    // UI Update
     document.querySelectorAll('.btn-stat').forEach(b => b.classList.remove('active'));
     if(storeName === '全部') document.getElementById('btnTotal').classList.add('active');
     if(storeName === '臨安店') document.getElementById('btnLinAn').classList.add('active');
     if(storeName === '南科店') document.getElementById('btnNanKe').classList.add('active');
-
     fetchData();
   };
 
@@ -276,35 +245,18 @@
     const to = document.getElementById('qTo').value;
     const keyword = document.getElementById('qSearch').value;
     
-    // 1. Get List
-    const { data: listData } = await supabase.rpc('get_visits_public', {
-      start_date: from, end_date: to, keyword: keyword, store_filter: currentStore
-    });
-
-    // 2. Get Stats
-    const { data: statData } = await supabase.rpc('get_stats_public', {
-      start_date: from, end_date: to, store_filter: currentStore
-    });
+    const { data: listData } = await supabase.rpc('get_visits_public', { start_date: from, end_date: to, keyword: keyword, store_filter: currentStore });
+    const { data: statData } = await supabase.rpc('get_stats_public', { start_date: from, end_date: to, store_filter: currentStore });
 
     if(listData && statData) {
-      visits = listData;
-      stats = statData;
-      
-      // Update Button Numbers (Needs a separate query ideally, but here we can approx or use raw list for small data)
-      // Note: To get accurate counts for ALL stores even when filtered, we might need a separate call.
-      // But for now, let's use the current filtered list count for the ACTIVE button, and keep others static or simple.
-      // Better approach: Let's do a quick count call for all stores to keep buttons accurate.
+      visits = listData; stats = statData;
       updateButtonCounts(from, to);
-
       renderAll();
     }
   };
 
   async function updateButtonCounts(from, to) {
-    // This is a bit heavy but ensures accuracy. In prod, optimize this.
-    const { data } = await supabase.from('visits').select('store_branch')
-      .gte('form_date', from).lte('form_date', to);
-    
+    const { data } = await supabase.from('visits').select('store_branch').gte('form_date', from).lte('form_date', to);
     if(data) {
       document.getElementById('statTotal').textContent = data.length;
       document.getElementById('statLinAn').textContent = data.filter(r => r.store_branch === '臨安店').length;
@@ -315,12 +267,9 @@
   function renderAll() {
     renderChart('chartSource', 'bar', stats.sources, 'tag');
     renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
-    
-    // Reset filter UI
     document.getElementById('sourceFilter').value = 'ALL';
     document.getElementById('trendBox').classList.add('hidden');
 
-    // List
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = visits.map(v => `
       <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
@@ -329,211 +278,82 @@
         <td class="p-3 font-medium text-gray-800">${v.customer_name}</td>
         <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.source_tags||[]).join(', ')}</td>
         <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.visit_purposes||[]).join(', ')}</td>
-        <td class="p-3 hidden admin-only"><button class="text-red-400 hover:text-red-600">刪</button></td>
+        <td class="p-3 admin-only"><button onclick="deleteData('${v.id}', event)" class="text-red-400 hover:text-red-600 font-bold px-2">刪</button></td>
       </tr>
     `).join('');
   }
 
   window.filterSource = () => {
     const selected = document.getElementById('sourceFilter').value;
-    
     if(selected === 'ALL') {
-      // Restore original
       renderChart('chartSource', 'bar', stats.sources, 'tag');
       renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
       document.getElementById('trendBox').classList.add('hidden');
     } else {
-      // 1. Filter Source Chart (Highlight one)
-      const filteredSources = stats.sources.map(s => ({...s, c: s.tag===selected ? s.c : 0 })); 
-      // Actually, user wants to SELECT one. Maybe just show that one? Or highlight?
-      // Let's show only that one to be clear, or better, keep context but highlight.
-      // Requirement: "Select one... chart updates"
-      
-      // Let's show the Trend for this source
       showTrendMini(selected);
-
-      // 2. Filter Purpose Chart (Based on customers who came from this Source)
-      // We need to client-side filter the purposes based on the visits list (since backend stat is agg)
-      // This is accurate enough for the current loaded list (Top 100). For full accuracy, backend need support.
-      // Let's use the full client list 'visits' if possible, but 'visits' is limited to 100.
-      // We will use a rough approximation from the 'visits' data we have.
       const relatedVisits = visits.filter(v => (v.source_tags||[]).includes(selected));
       const purposeCounts = {};
-      relatedVisits.forEach(v => {
-        (v.visit_purposes||[]).forEach(p => purposeCounts[p] = (purposeCounts[p]||0)+1);
-      });
-      const purposeData = Object.entries(purposeCounts)
-        .map(([k,v]) => ({purpose: k, c: v}))
-        .sort((a,b) => b.c - a.c);
-      
+      relatedVisits.forEach(v => (v.visit_purposes||[]).forEach(p => purposeCounts[p] = (purposeCounts[p]||0)+1));
+      const purposeData = Object.entries(purposeCounts).map(([k,v]) => ({purpose: k, c: v})).sort((a,b) => b.c - a.c);
       renderChart('chartPurpose', 'doughnut', purposeData, 'purpose');
     }
   };
 
   function showTrendMini(sourceName) {
     document.getElementById('trendBox').classList.remove('hidden');
-    
     const timeline = stats.timeline || [];
     const dateMap = {};
-    timeline.forEach(t => {
-      if(t.source_tags && t.source_tags.includes(sourceName)) {
-        dateMap[t.form_date] = (dateMap[t.form_date] || 0) + 1;
-      }
-    });
+    timeline.forEach(t => { if(t.source_tags && t.source_tags.includes(sourceName)) dateMap[t.form_date] = (dateMap[t.form_date] || 0) + 1; });
     const dates = Object.keys(dateMap).sort();
     const counts = dates.map(d => dateMap[d]);
-
     const ctx = document.getElementById('chartTrendMini').getContext('2d');
     if(charts['trend']) charts['trend'].destroy();
-
-    charts['trend'] = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: dates,
-        datasets: [{
-          label: sourceName,
-          data: counts,
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
-          fill: true,
-          tension: 0.4,
-          pointRadius: 2
-        }]
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { display: false }, y: { display: false } }
-      }
-    });
+    charts['trend'] = new Chart(ctx, { type: 'line', data: { labels: dates, datasets: [{ label: sourceName, data: counts, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4, pointRadius: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
   }
 
   function renderChart(id, type, data, key) {
     const ctx = document.getElementById(id).getContext('2d');
     if(charts[id]) charts[id].destroy();
-
-    charts[id] = new Chart(ctx, {
-      type: type,
-      data: {
-        labels: data.map(d => d[key]),
-        datasets: [{
-          data: data.map(d => d.c),
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
-          borderRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: type === 'doughnut', position: 'right' } }
-      }
-    });
+    charts[id] = new Chart(ctx, { type: type, data: { labels: data.map(d => d[key]), datasets: [{ data: data.map(d => d.c), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'doughnut', position: 'right' } } } });
   }
 
-  // Modal & Other functions (Same as before)
-  window.openAddModal = () => {
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('modalTitle').textContent = '新增資料';
-    document.getElementById('mDate').valueAsDate = new Date();
-    document.getElementById('mStore').value = currentStore === '全部' ? '臨安店' : currentStore;
-    document.getElementById('mName').value = '';
-    document.getElementById('mDetail').value = '';
-    document.getElementById('mKeyword').value = '';
-    document.querySelectorAll('#modal input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); });
-    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false);
-    document.getElementById('btnSave').classList.remove('hidden');
-  };
-
-  window.showDetail = (date, name) => {
-    const item = visits.find(v => v.form_date === date && v.customer_name === name);
-    if(!item) return;
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('modalTitle').textContent = '詳細資料';
-    document.getElementById('mDate').value = item.form_date;
-    document.getElementById('mStore').value = item.store_branch;
-    document.getElementById('mName').value = item.customer_name;
-    document.getElementById('mGender').value = item.gender;
-    document.getElementById('mAge').value = item.age_group;
-    document.getElementById('mTainan').checked = item.is_tainan;
-    document.getElementById('mDetail').value = item.detail_desc;
-    document.getElementById('mKeyword').value = item.search_keyword || '';
-    
-    document.querySelectorAll('#chkSources input').forEach(c => { 
-      c.checked = (item.source_tags||[]).includes(c.value); 
-      c.parentElement.classList.toggle('checked', c.checked);
-    });
-    document.querySelectorAll('#chkPurposes input').forEach(c => { 
-      c.checked = (item.visit_purposes||[]).includes(c.value); 
-      c.parentElement.classList.toggle('checked', c.checked);
-    });
-    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true);
-    document.getElementById('btnSave').classList.add('hidden');
-  };
-
-  window.closeModal = () => document.getElementById('modal').style.display = 'none';
-
-  window.saveData = async () => {
-    const btn = document.getElementById('btnSave');
-    btn.textContent = '儲存中...'; btn.disabled = true;
-    const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
-    
-    const payload = {
-      p_date: document.getElementById('mDate').value,
-      p_store: document.getElementById('mStore').value,
-      p_name: document.getElementById('mName').value,
-      p_gender: document.getElementById('mGender').value,
-      p_age: document.getElementById('mAge').value,
-      p_tainan: document.getElementById('mTainan').checked,
-      p_sources: getArr('chkSources'),
-      p_purposes: getArr('chkPurposes'),
-      p_keyword: document.getElementById('mKeyword').value,
-      p_detail: document.getElementById('mDetail').value
-    };
-
-    if(!payload.p_date || !payload.p_name) {
-      alert('日期與姓名必填');
-      btn.textContent = '儲存資料'; btn.disabled = false;
-      return;
-    }
-
-    const { error } = await supabase.rpc('submit_visit', payload);
-    if(error) alert('Error: ' + error.message);
-    else {
-      closeModal();
-      fetchData();
-    }
-    btn.textContent = '儲存資料'; btn.disabled = false;
-  };
-
+  // Admin & Auth
   window.toggleAdmin = () => document.getElementById('adminPanel').classList.toggle('hidden');
+  
   window.login = async () => {
     const { error } = await supabase.auth.signInWithPassword({ email: 'chanywang92@gmail.com', password: document.getElementById('admPwd').value });
     if(!error) checkAuth(); else alert('登入失敗');
   }
+  
   window.logout = async () => { await supabase.auth.signOut(); checkAuth(); }
+  
   async function checkAuth() {
     const { data } = await supabase.auth.getSession();
+    const body = document.body;
     if(data.session) {
       document.getElementById('loginForm').classList.add('hidden');
       document.getElementById('adminActions').classList.remove('hidden');
-      document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
+      body.classList.add('admin-visible'); // CSS will reveal .admin-only items
     } else {
       document.getElementById('loginForm').classList.remove('hidden');
       document.getElementById('adminActions').classList.add('hidden');
-      document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
+      body.classList.remove('admin-visible');
     }
   }
-  checkAuth();
-  
-  window.exportCSV = () => {
-    const csv = Papa.unparse(visits);
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `wakodo_export_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
+
+  window.deleteData = async (id, event) => {
+    event.stopPropagation();
+    if(!confirm('確定要刪除這筆資料嗎？')) return;
+    const { error } = await supabase.from('visits').delete().eq('id', id);
+    if(error) alert('刪除失敗'); else fetchData();
   };
+
+  // ... (Other modal functions remain same) ...
+  window.openAddModal = () => { document.getElementById('modal').style.display = 'flex'; document.getElementById('modalTitle').textContent = '新增資料'; document.getElementById('mDate').valueAsDate = new Date(); document.getElementById('mStore').value = currentStore === '全部' ? '臨安店' : currentStore; document.getElementById('mName').value = ''; document.getElementById('mDetail').value = ''; document.getElementById('mKeyword').value = ''; document.querySelectorAll('#modal input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); }); document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false); document.getElementById('btnSave').classList.remove('hidden'); };
+  window.showDetail = (date, name) => { const item = visits.find(v => v.form_date === date && v.customer_name === name); if(!item) return; document.getElementById('modal').style.display = 'flex'; document.getElementById('modalTitle').textContent = '詳細資料'; document.getElementById('mDate').value = item.form_date; document.getElementById('mStore').value = item.store_branch; document.getElementById('mName').value = item.customer_name; document.getElementById('mGender').value = item.gender; document.getElementById('mAge').value = item.age_group; document.getElementById('mTainan').checked = item.is_tainan; document.getElementById('mDetail').value = item.detail_desc; document.getElementById('mKeyword').value = item.search_keyword || ''; document.querySelectorAll('#chkSources input').forEach(c => { c.checked = (item.source_tags||[]).includes(c.value); c.parentElement.classList.toggle('checked', c.checked); }); document.querySelectorAll('#chkPurposes input').forEach(c => { c.checked = (item.visit_purposes||[]).includes(c.value); c.parentElement.classList.toggle('checked', c.checked); }); document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true); document.getElementById('btnSave').classList.add('hidden'); };
+  window.closeModal = () => document.getElementById('modal').style.display = 'none';
+  window.saveData = async () => { const btn = document.getElementById('btnSave'); btn.textContent = '儲存中...'; btn.disabled = true; const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value); const payload = { p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value, p_name: document.getElementById('mName').value, p_gender: document.getElementById('mGender').value, p_age: document.getElementById('mAge').value, p_tainan: document.getElementById('mTainan').checked, p_sources: getArr('chkSources'), p_purposes: getArr('chkPurposes'), p_keyword: document.getElementById('mKeyword').value, p_detail: document.getElementById('mDetail').value }; if(!payload.p_date || !payload.p_name) { alert('日期與姓名必填'); btn.textContent = '儲存資料'; btn.disabled = false; return; } const { error } = await supabase.rpc('submit_visit', payload); if(error) alert('Error: ' + error.message); else { closeModal(); fetchData(); } btn.textContent = '儲存資料'; btn.disabled = false; };
+  window.exportCSV = () => { const csv = Papa.unparse(visits); const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `wakodo_export_${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 </script>
 </body>
 </html>
