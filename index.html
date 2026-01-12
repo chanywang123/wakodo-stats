@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V4.2 (Clean Import)</title>
+  <title>和光堂戰情室 V5.0 Tactical</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -15,48 +15,60 @@
     );
   </script>
   <style>
-    body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; transition: 0.2s; }
+    /* BASE THEME (LIGHT) */
+    :root { --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --subtext: #6b7280; --border: #e5e7eb; --accent: #2563eb; --accent-hover: #1d4ed8; }
+    
+    /* TACTICAL THEME (DARK/MILITARY) */
+    body.tactical { --bg: #1a1a1a; --card: #262626; --text: #e5e7eb; --subtext: #9ca3af; --border: #404040; --accent: #eab308; --accent-hover: #ca8a04; }
+    
+    body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: 0.3s; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; }
+    
+    /* Buttons & Inputs */
+    .btn-primary { background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .input-std { background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 8px; outline: none; width: 100%; }
+    .input-std:focus { border-color: var(--accent); ring: 1px; ring-color: var(--accent); }
+    
+    /* Stats Cards */
     .btn-stat { cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-    .btn-stat:hover { transform: translateY(-2px); shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .btn-stat.active { border-color: #3b82f6; background-color: #eff6ff; }
-    .btn-primary { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; transition: 0.2s; }
-    .btn-primary:hover { background: #1d4ed8; }
+    .btn-stat:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .btn-stat.active { border-color: var(--accent); background: rgba(var(--accent), 0.1); }
     
-    .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
-    .chk-label { display: flex; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 13px; transition: 0.1s; }
-    .chk-label:hover { background: #f9fafb; }
-    .chk-label input:checked + span { font-weight: bold; color: #2563eb; }
-    .chk-label.checked { border-color: #2563eb; background: #eff6ff; }
-    
+    /* Tactical Overrides */
+    body.tactical .btn-stat.active { background: #333; border-color: #eab308; color: #eab308; }
+    body.tactical .text-blue-600 { color: #eab308 !important; } 
+    body.tactical .bg-blue-100 { background-color: #422006 !important; color: #eab308 !important; }
+    body.tactical .bg-green-100 { background-color: #064e3b !important; color: #34d399 !important; }
+    body.tactical tr:hover { background-color: #333 !important; }
+
+    /* Admin & Modal */
     .admin-only { display: none !important; }
     body.is-admin .admin-only { display: flex !important; }
-    body.is-admin .admin-inline { display: inline-block !important; }
-    body.is-admin .admin-cell { display: table-cell !important; }
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; }
-    .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-content { background: var(--card); color: var(--text); border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; border: 1px solid var(--border); }
     
-    .detail-row { display: flex; border-bottom: 1px solid #f3f4f6; padding: 12px 0; align-items: center; }
-    .detail-label { width: 100px; font-weight: bold; color: #6b7280; font-size: 14px; }
-    .detail-val { flex: 1; color: #1f2937; font-size: 14px; }
-    .detail-input { width: 100%; border: 1px solid #d1d5db; padding: 6px; border-radius: 4px; font-size: 14px; }
+    .detail-row { display: flex; border-bottom: 1px solid var(--border); padding: 12px 0; align-items: center; }
+    .detail-label { width: 100px; font-weight: bold; color: var(--subtext); font-size: 14px; }
+    .detail-val { flex: 1; font-size: 14px; }
   </style>
 </head>
-<body class="text-gray-800">
+<body class="">
 
 <div class="max-w-7xl mx-auto p-4">
   <!-- Header -->
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <div class="flex items-center gap-3">
-      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">👓 和光堂戰情室</h1>
-      <div class="flex flex-col text-[10px] text-blue-600 font-bold leading-tight border-l-2 border-blue-200 pl-2">
-        <span>V4.2 Clean Import</span>
-        <span id="updateTime">2026-01-13</span>
-      </div>
+      <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+        <span>👓 和光堂戰情室</span>
+        <span class="text-xs px-2 py-0.5 rounded border border-current opacity-60">V5.0</span>
+      </h1>
     </div>
     <div class="flex items-center gap-3">
-      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition" title="管理員設定">
+      <button onclick="toggleTheme()" class="p-2 rounded-full border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 transition" title="切換主題">
+        🎨
+      </button>
+      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full transition" title="管理員設定">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
       <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
@@ -64,226 +76,230 @@
   </div>
 
   <!-- Admin Panel -->
-  <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white border border-gray-700">
+  <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white border-0">
     <div id="loginForm" class="flex flex-col md:flex-row gap-3 items-center">
-      <div class="flex-grow w-full md:w-auto"><label class="text-xs text-gray-400 mb-1 block">Email</label><input type="email" id="admEmail" value="chanywang92@gmail.com" class="w-full text-gray-800 p-2 rounded text-sm" placeholder="Email"></div>
-      <div class="flex-grow w-full md:w-auto"><label class="text-xs text-gray-400 mb-1 block">密碼</label><input type="password" id="admPwd" class="w-full text-gray-800 p-2 rounded text-sm" placeholder="Password"></div>
-      <button onclick="login()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold mt-4 md:mt-0">登入</button>
+      <input type="email" id="admEmail" value="chanywang92@gmail.com" class="input-std text-gray-800" placeholder="Email">
+      <input type="password" id="admPwd" class="input-std text-gray-800" placeholder="Password">
+      <button onclick="login()" class="btn-primary">登入</button>
     </div>
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
-      <div class="flex items-center gap-2 text-green-400 font-bold"><span>✅ 管理員已登入</span></div>
+      <div class="font-bold text-green-400">✅ 管理員已登入</div>
       <div class="flex gap-2">
-        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-          <span>匯入 CSV</span>
+        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 transition text-white">
+          <span>📂 匯入 CSV</span>
           <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="previewCSV(this)">
         </label>
-        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded text-sm transition">匯出 CSV</button>
-        <button onclick="logout()" class="bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm transition">登出</button>
+        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm">匯出 CSV</button>
+        <button onclick="logout()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-sm">登出</button>
       </div>
-      <div class="border-l border-gray-600 pl-4">
-        <button onclick="wipeData()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-bold flex items-center gap-1 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          一鍵清空 (自動備份)
-        </button>
-      </div>
+      <button onclick="wipeData()" class="text-red-400 hover:text-red-300 text-sm font-bold border border-red-400 px-3 py-1 rounded">⚠️ 清空資料庫</button>
     </div>
   </div>
 
   <!-- Filter -->
-  <div class="card mb-6 flex flex-wrap gap-3 items-center bg-white sticky top-2 z-30 shadow-sm border border-gray-100">
-    <div class="flex items-center border rounded px-2 bg-gray-50 py-1">
-      <span class="text-gray-400 text-xs mr-2 font-bold">期間</span>
-      <input type="date" id="qFrom" class="bg-transparent text-sm outline-none w-28">
-      <span class="text-gray-400 mx-1">-</span>
-      <input type="date" id="qTo" class="bg-transparent text-sm outline-none w-28">
+  <div class="card mb-6 flex flex-wrap gap-3 items-center sticky top-2 z-30 shadow-md">
+    <div class="flex items-center border border-gray-300 rounded px-2 bg-opacity-50 py-1">
+      <span class="text-xs font-bold mr-2 opacity-60">期間</span>
+      <input type="date" id="qFrom" class="bg-transparent text-sm outline-none w-28 text-current">
+      <span class="mx-1">-</span>
+      <input type="date" id="qTo" class="bg-transparent text-sm outline-none w-28 text-current">
     </div>
     <div class="flex-grow relative group">
-      <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="w-full border rounded pl-9 pr-8 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-      <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-600">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
+      <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="input-std pl-9 pr-8">
+      <svg class="w-4 h-4 opacity-50 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2.5 opacity-50 hover:opacity-100">✕</button>
     </div>
-    <button onclick="fetchData()" class="bg-gray-800 text-white px-5 py-1.5 rounded text-sm hover:bg-gray-700 font-medium transition">查詢</button>
+    <button onclick="fetchData()" class="btn-primary">查詢</button>
   </div>
 
   <!-- Stats -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6"><div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">總客數</div><div class="text-4xl font-extrabold text-gray-800" id="statTotal">--</div></div>
-    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">臨安店</div><div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div></div>
-    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">南科店</div><div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div></div>
+    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6"><div class="text-xs font-bold opacity-60 uppercase tracking-wider mb-1">總客數</div><div class="text-4xl font-extrabold" id="statTotal">--</div></div>
+    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold opacity-60 uppercase tracking-wider mb-1">臨安店</div><div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div></div>
+    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold opacity-60 uppercase tracking-wider mb-1">南科店</div><div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div></div>
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="card h-[480px] flex flex-col">
-      <div class="flex justify-between items-center mb-4 border-b pb-2"><h3 class="font-bold text-gray-800">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="border rounded px-2 py-1 text-xs bg-gray-50 outline-none"><option value="ALL">顯示全部客源</option></select></div>
+      <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2"><h3 class="font-bold">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="input-std w-auto text-xs py-1"><option value="ALL">顯示全部客源</option></select></div>
       <div class="flex-grow relative w-full h-full min-h-0"><canvas id="chartSource"></canvas></div>
-      <div id="trendBox" class="h-[120px] mt-4 hidden bg-blue-50/50 rounded-lg p-2 border border-blue-100"><div class="flex justify-between items-center mb-1"><div class="text-xs font-bold text-blue-800 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-600"></span><span id="trendLabel"></span> 趨勢</div></div><div class="relative h-[80px] w-full"><canvas id="chartTrendMini"></canvas></div></div>
     </div>
     <div class="card h-[480px] flex flex-col">
-      <div class="flex justify-between items-center mb-4 border-b pb-2"><div class="flex items-center gap-2"><h3 class="font-bold text-gray-800">來店目的</h3><span id="purposeSubtitle" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">(全部)</span></div></div>
+      <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2"><div class="flex items-center gap-2"><h3 class="font-bold">來店目的</h3><span id="purposeSubtitle" class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">(全部)</span></div></div>
       <div class="flex-grow relative w-full h-full min-h-0 flex justify-center"><canvas id="chartPurpose"></canvas></div>
     </div>
   </div>
 
   <!-- Table -->
   <div class="card overflow-hidden">
-    <div class="flex justify-between items-center mb-4 px-2"><h3 class="font-bold text-gray-800 flex items-center gap-2">最新來客紀錄 <span class="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Top 50</span></h3></div>
+    <div class="flex justify-between items-center mb-4 px-2"><h3 class="font-bold">最新來客紀錄 <span class="text-xs font-normal opacity-60 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">Top 50</span></h3></div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left whitespace-nowrap">
-        <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
-          <tr><th class="p-3 pl-4">日期</th><th class="p-3">分店</th><th class="p-3">姓名</th><th class="p-3">客源</th><th class="p-3">目的</th><th class="p-3 pr-4 admin-cell hidden">操作</th></tr>
+        <thead class="bg-gray-50 dark:bg-gray-800 opacity-80 font-semibold border-b border-gray-200 dark:border-gray-700">
+          <tr><th class="p-3 pl-4">日期</th><th class="p-3">分店</th><th class="p-3">姓名</th><th class="p-3">客源</th><th class="p-3">目的</th><th class="p-3 pr-4 admin-only text-right">操作</th></tr>
         </thead>
-        <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+        <tbody id="tableBody" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- Add Modal -->
+<!-- Modals -->
 <div id="modal" class="modal-overlay">
   <div class="modal-content shadow-2xl">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
-    <h2 id="modalTitle" class="text-xl font-bold mb-6 text-gray-800 border-b pb-2">新增資料</h2>
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl opacity-50 hover:opacity-100">&times;</button>
+    <h2 class="text-xl font-bold mb-6 border-b pb-2">新增資料</h2>
     <div class="space-y-4">
-      <div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-bold text-gray-500 mb-1 block">日期</label><input type="date" id="mDate" class="w-full border border-gray-300 rounded p-2 outline-none"></div><div><label class="text-xs font-bold text-gray-500 mb-1 block">分店</label><select id="mStore" class="w-full border border-gray-300 rounded p-2 bg-gray-50"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">姓名 <span class="text-red-500">*</span></label><input type="text" id="mName" class="w-full border border-gray-300 rounded p-2" placeholder="顧客姓名"></div>
-      <div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-bold text-gray-500 mb-1 block">性別</label><select id="mGender" class="w-full border border-gray-300 rounded p-2"><option value="">未選擇</option><option value="男">男</option><option value="女">女</option></select></div><div><label class="text-xs font-bold text-gray-500 mb-1 block">年齡層</label><select id="mAge" class="w-full border border-gray-300 rounded p-2"><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="18-24">18-24</option><option value="45-54">45-54</option><option value="55歲以上">55歲以上</option><option value="18歲以下">18歲以下</option></select></div></div>
-      <div><label class="flex items-center gap-2 p-3 border border-blue-100 bg-blue-50 rounded cursor-pointer"><input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600"><span class="text-sm font-bold text-blue-800">居住在台南</span></label></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-2 block">客源 (複選)</label><div class="chk-grid" id="chkSources"></div><div id="keywordBox" class="hidden bg-yellow-50 p-3 rounded-lg border border-yellow-200 mt-2"><label class="text-xs font-bold text-yellow-700 mb-1 block">Google 搜尋了什麼？</label><input type="text" id="mKeyword" class="w-full bg-white border border-yellow-300 rounded p-1 text-sm outline-none"></div></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-2 block mt-2">來店目的 (複選)</label><div class="chk-grid" id="chkPurposes"></div></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">備註</label><textarea id="mDetail" class="w-full border border-gray-300 rounded p-2 text-sm h-20 resize-none" placeholder="客人描述..."></textarea></div>
-      <button id="btnSave" onclick="saveData()" class="w-full btn-primary py-3 font-bold text-lg shadow-md mt-4">儲存資料</button>
+      <div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-bold opacity-60 mb-1 block">日期</label><input type="date" id="mDate" class="input-std"></div><div><label class="text-xs font-bold opacity-60 mb-1 block">分店</label><select id="mStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div></div>
+      <div><label class="text-xs font-bold opacity-60 mb-1 block">姓名</label><input type="text" id="mName" class="input-std" placeholder="顧客姓名"></div>
+      <button onclick="saveData()" class="btn-primary w-full py-3">儲存</button>
     </div>
   </div>
 </div>
 
-<!-- DETAIL & EDIT MODAL -->
 <div id="detailModal" class="modal-overlay">
-  <div class="modal-content shadow-2xl relative">
-    <button onclick="document.getElementById('detailModal').style.display='none'" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
+  <div class="modal-content shadow-2xl">
+    <button onclick="document.getElementById('detailModal').style.display='none'" class="absolute top-4 right-4 text-2xl opacity-50 hover:opacity-100">&times;</button>
     <div class="flex justify-between items-center mb-4 border-b pb-2 pr-10">
-      <h2 class="text-xl font-bold text-gray-800">📋 詳細資料</h2>
+      <h2 class="text-xl font-bold">📋 詳細資料</h2>
       <button onclick="toggleEditMode()" class="admin-only bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-bold hover:bg-blue-200 transition">✏️ 編輯</button>
     </div>
     <div id="detailView" class="block"><div id="detailContent"></div></div>
     <div id="detailEdit" class="hidden space-y-3">
       <input type="hidden" id="eId">
-      <div class="detail-row"><div class="detail-label">日期</div><input type="date" id="eDate" class="detail-input"></div>
-      <div class="detail-row"><div class="detail-label">分店</div><select id="eStore" class="detail-input"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
-      <div class="detail-row"><div class="detail-label">姓名</div><input type="text" id="eName" class="detail-input"></div>
-      <div class="detail-row"><div class="detail-label">性別</div><select id="eGender" class="detail-input"><option value="男">男</option><option value="女">女</option></select></div>
-      <div class="detail-row"><div class="detail-label">客源</div><input type="text" id="eSources" class="detail-input" placeholder="逗號分隔"></div>
-      <div class="detail-row"><div class="detail-label">目的</div><input type="text" id="ePurposes" class="detail-input" placeholder="逗號分隔"></div>
-      <div class="detail-row"><div class="detail-label">描述</div><textarea id="eDetail" class="detail-input h-24 resize-none"></textarea></div>
-      <button onclick="saveEdit()" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 transition">儲存修改</button>
+      <div class="detail-row"><div class="detail-label">日期</div><input type="date" id="eDate" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">分店</div><select id="eStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
+      <div class="detail-row"><div class="detail-label">姓名</div><input type="text" id="eName" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">性別</div><input type="text" id="eGender" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">客源</div><input type="text" id="eSources" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">目的</div><input type="text" id="ePurposes" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">描述</div><textarea id="eDetail" class="input-std h-24"></textarea></div>
+      <button onclick="saveEdit()" class="btn-primary w-full">儲存修改</button>
     </div>
   </div>
 </div>
 
 <script>
-  // --- HELPERS: Clean dirty JSON strings ---
-  function cleanArray(strOrArr) {
-    if(!strOrArr) return [];
-    if(Array.isArray(strOrArr)) return strOrArr;
-    // Remove { } " [ ] and split
-    let clean = strOrArr.toString().replace(/[{}"\[\]]/g, ''); 
-    return clean.split(/,|，|、/).filter(x => x && x.trim() !== '');
-  }
-
-  const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"];
-  const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
-  let visits = [], stats = {}, currentStore = '全部', charts = {};
-
-  document.getElementById('updateTime').textContent = new Date().toISOString().split('T')[0];
+  let visits = [], stats = {}, currentStore = '全部', savedSourceFilter = 'ALL';
   const searchInput = document.getElementById('qSearch');
   const clearBtn = document.getElementById('btnClearSearch');
   searchInput.addEventListener('input', () => clearBtn.classList.toggle('hidden', !searchInput.value));
   window.clearSearch = () => { searchInput.value = ''; clearBtn.classList.add('hidden'); fetchData(); };
 
-  window.onload = () => {
-    // 1. EXTEND DEFAULT DATE RANGE
-    document.getElementById('qFrom').value = "2023-01-01"; 
-    document.getElementById('qTo').value = new Date().toISOString().split('T')[0];
-    initCheckboxes('chkSources', SOURCES); initCheckboxes('chkPurposes', PURPOSES);
-    SOURCES.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.textContent = s; document.getElementById('sourceFilter').appendChild(opt); });
-    setStore('全部'); checkAuth();
+  // --- THEME LOGIC ---
+  window.toggleTheme = () => { document.body.classList.toggle('tactical'); };
+
+  // --- MAIN LOGIC ---
+  window.onload = async () => {
+    // 1. Fetch range first to solve the "44 records" issue
+    const { data: range } = await supabase.from('visits').select('form_date').order('form_date', { ascending: true }).limit(1);
+    const { data: rangeEnd } = await supabase.from('visits').select('form_date').order('form_date', { ascending: false }).limit(1);
+    
+    if(range && range.length > 0) document.getElementById('qFrom').value = range[0].form_date;
+    else document.getElementById('qFrom').value = '2023-01-01'; // Fallback
+
+    if(rangeEnd && rangeEnd.length > 0) document.getElementById('qTo').value = rangeEnd[0].form_date;
+    else document.getElementById('qTo').value = new Date().toISOString().split('T')[0];
+
+    checkAuth();
+    fetchData(); // Initial load
   };
 
-  function initCheckboxes(id, list) {
-    document.getElementById(id).innerHTML = list.map(item => `<label class="chk-label select-none"><input type="checkbox" value="${item}" class="mr-2 hidden" onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>${item}</span></label>`).join('');
-    if(id === 'chkSources') { document.getElementById(id).addEventListener('change', () => { const hasGoogle = Array.from(document.querySelectorAll('#chkSources input:checked')).some(i => i.value.includes('Google')); document.getElementById('keywordBox').classList.toggle('hidden', !hasGoogle); }); }
-  }
-
-  window.setStore = (store) => { currentStore = store; document.querySelectorAll('.btn-stat').forEach(b => b.classList.remove('active')); if(store==='全部')document.getElementById('btnTotal').classList.add('active'); if(store==='臨安店')document.getElementById('btnLinAn').classList.add('active'); if(store==='南科店')document.getElementById('btnNanKe').classList.add('active'); fetchData(); };
+  window.setStore = (store) => { 
+    currentStore = store; 
+    document.querySelectorAll('.btn-stat').forEach(b => b.classList.remove('active')); 
+    if(store==='全部')document.getElementById('btnTotal').classList.add('active'); 
+    if(store==='臨安店')document.getElementById('btnLinAn').classList.add('active'); 
+    if(store==='南科店')document.getElementById('btnNanKe').classList.add('active'); 
+    fetchData(); 
+  };
 
   window.fetchData = async () => {
     const from = document.getElementById('qFrom').value; const to = document.getElementById('qTo').value; const keyword = document.getElementById('qSearch').value;
+    
+    // Get Counts
     const { data: allData } = await supabase.from('visits').select('store_branch').gte('form_date', from).lte('form_date', to);
-    if(allData) { document.getElementById('statTotal').textContent=allData.length; document.getElementById('statLinAn').textContent=allData.filter(r=>r.store_branch==='臨安店').length; document.getElementById('statNanKe').textContent=allData.filter(r=>r.store_branch==='南科店').length; }
+    if(allData) {
+      document.getElementById('statTotal').textContent=allData.length; 
+      document.getElementById('statLinAn').textContent=allData.filter(r=>r.store_branch==='臨安店').length; 
+      document.getElementById('statNanKe').textContent=allData.filter(r=>r.store_branch==='南科店').length; 
+    }
     
-    // FETCH CLEAN DATA
-    let { data: list } = await supabase.rpc('get_visits_public', { start_date: from, end_date: to, keyword: keyword, store_filter: currentStore });
-    
-    // Manual Cleaning of fetched data (Double Safety)
+    // Get List & Stats
+    const { data: list } = await supabase.rpc('get_visits_public', { start_date: from, end_date: to, keyword: keyword, store_filter: currentStore });
     if(list) {
-      list = list.map(v => ({
-        ...v,
-        source_tags: cleanArray(v.source_tags),
-        visit_purposes: cleanArray(v.visit_purposes)
-      }));
       visits = list;
-      
-      // Re-calculate stats on client side to ensure sync with clean data
+      // Calc stats locally to ensure accuracy
       const sMap = {}, pMap = {};
       list.forEach(v => {
-        v.source_tags.forEach(s => sMap[s] = (sMap[s]||0)+1);
-        v.visit_purposes.forEach(p => pMap[p] = (pMap[p]||0)+1);
+        (v.source_tags||[]).forEach(s => sMap[s] = (sMap[s]||0)+1);
+        (v.visit_purposes||[]).forEach(p => pMap[p] = (pMap[p]||0)+1);
       });
       stats = {
         sources: Object.entries(sMap).map(([k,v])=>({tag:k,c:v})).sort((a,b)=>b.c-a.c),
-        purposes: Object.entries(pMap).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c),
-        timeline: list // Simplified for trend
+        purposes: Object.entries(pMap).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c)
       };
-      renderAll(); 
+      
+      // Update Source Dropdown
+      const sel = document.getElementById('sourceFilter');
+      sel.innerHTML = '<option value="ALL">顯示全部客源</option>';
+      stats.sources.forEach(s => {
+        const opt = document.createElement('option'); opt.value = s.tag; opt.textContent = s.tag;
+        sel.appendChild(opt);
+      });
+      sel.value = savedSourceFilter; // Restore selection
+
+      renderAll();
     }
   };
 
   function renderAll() {
-    document.getElementById('sourceFilter').value='ALL'; document.getElementById('trendBox').classList.add('hidden');
+    // If filter is active, filter data for charts
+    let chartVisits = visits;
+    if(savedSourceFilter !== 'ALL') {
+      chartVisits = visits.filter(v => (v.source_tags||[]).includes(savedSourceFilter));
+      document.getElementById('purposeSubtitle').textContent = `(來自: ${savedSourceFilter})`;
+    } else {
+      document.getElementById('purposeSubtitle').textContent = '(全部)';
+    }
+
+    // Recalc purposes for chart based on filter
+    const pMap = {};
+    chartVisits.forEach(v => (v.visit_purposes||[]).forEach(p => pMap[p] = (pMap[p]||0)+1));
+    const pData = Object.entries(pMap).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c);
+
     renderChart('chartSource', 'bar', stats.sources, 'tag', '客源數量');
-    renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose', '目的分佈');
+    renderChart('chartPurpose', 'doughnut', pData, 'purpose', '目的分佈');
+
     document.getElementById('tableBody').innerHTML = visits.map(v => `
-      <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0 group" onclick="showDetail('${v.id}')">
-        <td class="p-3 pl-4 text-gray-600 font-mono text-xs">${v.form_date.slice(5)}</td>
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition border-b border-gray-100 dark:border-gray-700" onclick="showDetail('${v.id}')">
+        <td class="p-3 pl-4 font-mono text-xs opacity-80">${v.form_date.slice(5)}</td>
         <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-        <td class="p-3 font-bold text-gray-800">${v.customer_name}</td>
-        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate"><div class="flex gap-1 flex-wrap">${(v.source_tags||[]).map(t=>`<span class="bg-gray-100 px-1 rounded">${t}</span>`).join('')}</div></td>
-        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
-        <td class="p-3 pr-4 admin-cell hidden text-right"><button onclick="deleteData('${v.id}', event)" class="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 p-1.5 rounded transition">刪</button></td>
+        <td class="p-3 font-bold">${v.customer_name}</td>
+        <td class="p-3 text-xs opacity-60 max-w-[100px] truncate">${(v.source_tags||[]).join(',')}</td>
+        <td class="p-3 text-xs opacity-60 max-w-[100px] truncate">${(v.visit_purposes||[]).join(',')}</td>
+        <td class="p-3 pr-4 admin-only text-right"><button onclick="deleteData('${v.id}', event)" class="text-red-500 hover:text-red-700 p-1.5">刪</button></td>
       </tr>
     `).join('');
   }
 
-  // --- DETAIL & EDIT (Fixed click issue) ---
+  // --- DETAIL POPUP (Direct ID Lookup) ---
   window.showDetail = (id) => {
     const v = visits.find(x => x.id === id); if(!v) return;
-    document.getElementById('detailView').classList.remove('hidden');
-    document.getElementById('detailEdit').classList.add('hidden');
+    document.getElementById('detailView').classList.remove('hidden'); document.getElementById('detailEdit').classList.add('hidden');
     
     document.getElementById('detailContent').innerHTML = `
       <div class="detail-row"><div class="detail-label">日期</div><div class="detail-val">${v.form_date}</div></div>
       <div class="detail-row"><div class="detail-label">分店</div><div class="detail-val">${v.store_branch}</div></div>
-      <div class="detail-row"><div class="detail-label">姓名</div><div class="detail-val font-bold">${v.customer_name}</div></div>
+      <div class="detail-row"><div class="detail-label">姓名</div><div class="detail-val font-bold text-lg">${v.customer_name}</div></div>
       <div class="detail-row"><div class="detail-label">性別</div><div class="detail-val">${v.gender||'-'}</div></div>
-      <div class="detail-row"><div class="detail-label">客源</div><div class="detail-val flex flex-wrap gap-1">${(v.source_tags||[]).map(x=>`<span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-bold">${x}</span>`).join('')}</div></div>
-      <div class="detail-row"><div class="detail-label">目的</div><div class="detail-val flex flex-wrap gap-1">${(v.visit_purposes||[]).map(x=>`<span class="bg-green-50 text-green-600 px-2 py-0.5 rounded text-xs font-bold">${x}</span>`).join('')}</div></div>
-      <div class="detail-row border-0"><div class="detail-label">描述</div><div class="detail-val whitespace-pre-wrap bg-gray-50 p-3 rounded text-sm">${v.detail_desc||'無'}</div></div>
+      <div class="detail-row"><div class="detail-label">客源</div><div class="detail-val flex flex-wrap gap-1">${(v.source_tags||[]).map(x=>`<span class="bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded text-xs">${x}</span>`).join('')}</div></div>
+      <div class="detail-row"><div class="detail-label">目的</div><div class="detail-val flex flex-wrap gap-1">${(v.visit_purposes||[]).map(x=>`<span class="bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded text-xs">${x}</span>`).join('')}</div></div>
+      <div class="detail-row border-0"><div class="detail-label">描述</div><div class="detail-val whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm border border-gray-100 dark:border-gray-700">${v.detail_desc||'無'}</div></div>
     `;
     
-    // Fill Edit
+    // Fill Edit Form
     document.getElementById('eId').value = v.id;
     document.getElementById('eDate').value = v.form_date;
     document.getElementById('eStore').value = v.store_branch;
@@ -292,7 +308,7 @@
     document.getElementById('eSources').value = (v.source_tags||[]).join(',');
     document.getElementById('ePurposes').value = (v.visit_purposes||[]).join(',');
     document.getElementById('eDetail').value = v.detail_desc||'';
-
+    
     document.getElementById('detailModal').style.display = 'flex';
   };
 
@@ -307,94 +323,79 @@
       p_detail: document.getElementById('eDetail').value
     };
     const { error } = await supabase.from('visits').update({
-      form_date: payload.p_date, store_branch: payload.p_store, customer_name: payload.p_name, gender: payload.p_gender,
-      source_tags: payload.p_sources, visit_purposes: payload.p_purposes, detail_desc: payload.p_detail
+      form_date: payload.p_date, store_branch: payload.p_store, customer_name: payload.p_name,
+      gender: payload.p_gender, source_tags: payload.p_sources, visit_purposes: payload.p_purposes,
+      detail_desc: payload.p_detail
     }).eq('id', id);
-    if(error) alert('更新失敗: '+error.message); else { alert('已更新'); document.getElementById('detailModal').style.display='none'; fetchData(); }
+    if(error) alert('失敗: '+error.message); else { alert('更新成功'); document.getElementById('detailModal').style.display='none'; fetchData(); }
   };
 
-  // --- CHART LOGIC ---
-  window.filterSource = () => {
-    const sel = document.getElementById('sourceFilter').value; if(sel==='ALL') { renderAll(); return; }
-    document.getElementById('trendBox').classList.remove('hidden'); document.getElementById('trendLabel').textContent=sel;
-    const map={}; visits.forEach(t=>{ if(t.source_tags.includes(sel)) map[t.form_date]=(map[t.form_date]||0)+1; });
-    const dates = Object.keys(map).sort();
-    const ctxT = document.getElementById('chartTrendMini').getContext('2d'); if(charts['trend'])charts['trend'].destroy();
-    charts['trend'] = new Chart(ctxT, { type:'line', data:{labels:dates,datasets:[{data:dates.map(d=>map[d]),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,tension:0.4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}} });
-    
-    const rel = visits.filter(v=>v.source_tags.includes(sel)); const pc={}; rel.forEach(v=>v.visit_purposes.forEach(p=>pc[p]=(pc[p]||0)+1));
-    const pd = Object.entries(pc).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c);
-    renderChart('chartPurpose','doughnut',pd,'purpose','目的佔比'); document.getElementById('purposeSubtitle').textContent=`(來自: ${sel})`;
-  };
+  // --- FILTER LOGIC (Keep selection) ---
+  window.filterSource = () => { savedSourceFilter = document.getElementById('sourceFilter').value; renderAll(); };
 
-  function renderChart(id,t,d,k,l) {
+  // --- CHARTS (Enhanced Tooltips) ---
+  let charts = {};
+  function renderChart(id, t, d, k, l) {
     const ctx=document.getElementById(id).getContext('2d'); if(charts[id])charts[id].destroy();
-    charts[id]=new Chart(ctx,{type:t,data:{labels:d.map(x=>x[k]),datasets:[{label:l,data:d.map(x=>x.c),backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#6366f1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:t==='doughnut',position:'right'}},scales:t==='bar'?{y:{beginAtZero:true,grid:{color:'#f3f4f6'}},x:{grid:{display:false}}}:{}}});
-  }
+    
+    // Theme Colors
+    const isDark = document.body.classList.contains('tactical');
+    const colors = isDark 
+      ? ['#eab308', '#22c55e', '#3b82f6', '#f97316', '#a855f7'] // Tactical
+      : ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']; // Standard
+    const txtColor = isDark ? '#e5e7eb' : '#374151';
 
-  // --- IMPORT WITH CONFIRMATION & CLEANING ---
-  let pendingImportData = [];
-  
-  window.previewCSV = (input) => {
-    const f = input.files[0]; if(!f) return;
-    Papa.parse(f, {
-      header: true, skipEmptyLines: true,
-      complete: (results) => {
-        if(results.data.length === 0) { alert('檔案是空的或格式錯誤'); return; }
-        pendingImportData = results.data;
-        if(confirm(`解析完成！\n\n共找到 ${results.data.length} 筆資料。\n\n按「確定」開始匯入\n按「取消」放棄`)) {
-          startImport();
-        } else {
-          input.value = ''; // Reset
-        }
+    charts[id]=new Chart(ctx,{
+      type:t,
+      data:{labels:d.map(x=>x[k]),datasets:[{label:l,data:d.map(x=>x.c),backgroundColor:colors,borderWidth:0}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:t==='doughnut',position:'right',labels:{color:txtColor}},
+          tooltip:{
+            callbacks:{
+              label: function(ctx) {
+                let label = ctx.dataset.label || '';
+                if (label) label += ': ';
+                let value = ctx.raw;
+                let total = ctx.chart._metasets[ctx.datasetIndex].total;
+                let percentage = Math.round((value / total) * 100) + '%';
+                return `${label}${value} 筆 (${percentage})`;
+              }
+            }
+          }
+        },
+        scales:t==='bar'?{y:{ticks:{color:txtColor},grid:{color:isDark?'#404040':'#e5e7eb'}},x:{ticks:{color:txtColor},grid:{display:false}}}:{}
       }
     });
-  };
-
-  async function startImport() {
-    let count = 0;
-    for(let r of pendingImportData) {
-      const d = r['form_date'] || r['填表日期'];
-      let n = r['customer_name'] || r['顧客姓名'];
-      if(!d || !n) continue;
-      
-      // Clean Data Here
-      const p = cleanArray(r['visit_purposes'] || r['來店目的']);
-      const s = cleanArray(r['source_tags'] || r['來源統計']);
-      
-      const { data: records } = await supabase.from('visits').select('customer_name').eq('form_date', d.replace(/\//g,'-')).like('customer_name', `%${n}%`);
-      if(records && records.length > 0) {
-         const base = n.replace(/^\(\d+\)/, '');
-         const c = records.filter(x => x.customer_name.includes(base)).length;
-         if(c > 0) n = `(${c+1})${base}`;
-      }
-
-      const payload = {
-        p_date: d.replace(/\//g,'-'),
-        p_store: r['store_branch'] || r['門店'] || '臨安店',
-        p_name: n,
-        p_gender: r['gender'] || r['性別'] || '',
-        p_age: r['age_group'] || r['年齡範圍'] || '',
-        p_tainan: (r['is_tainan'] === 'true' || r['是否為台南人'] === '是'),
-        p_sources: s,
-        p_purposes: p,
-        p_keyword: r['search_keyword'] || r['搜尋關鍵字'] || '',
-        p_detail: r['detail_desc'] || r['詳細描述'] || ''
-      };
-      
-      const { error } = await supabase.rpc('submit_visit', payload);
-      if(!error) count++;
-    }
-    alert(`匯入完成！成功新增 ${count} 筆資料`);
-    fetchData();
   }
 
-  // --- OTHER ---
-  window.saveData=async()=>{ const n=document.getElementById('mName').value.trim(); if(!n)return alert('請填名'); const d=document.getElementById('mDate').value; const p=Array.from(document.querySelectorAll('#chkPurposes input:checked')).map(i=>i.value); const btn=document.getElementById('btnSave'); btn.disabled=true; const pl={p_date:d,p_store:document.getElementById('mStore').value,p_name:n,p_gender:document.getElementById('mGender').value,p_age:document.getElementById('mAge').value,p_tainan:document.getElementById('mTainan').checked,p_sources:Array.from(document.querySelectorAll('#chkSources input:checked')).map(i=>i.value),p_purposes:p,p_keyword:document.getElementById('mKeyword').value,p_detail:document.getElementById('mDetail').value}; const {error}=await supabase.rpc('submit_visit',pl); if(error)alert(error.message); else {alert('成功');closeModal();fetchData();} btn.disabled=false; };
-  window.wipeData=async()=>{ exportCSV(); setTimeout(async()=>{ const pwd=prompt("備份已下載。\n\n請輸入密碼確認清空："); if(!pwd)return; const{error}=await supabase.auth.signInWithPassword({email:document.getElementById('admEmail').value,password:pwd}); if(error){alert('密碼錯誤');return;} const{error:delErr}=await supabase.from('visits').delete().neq('id',0); if(delErr)alert(delErr.message); else{alert('已清空');fetchData();} },1000); };
-  window.openAddModal=()=>{document.getElementById('modal').style.display='flex';document.getElementById('mDate').value=new Date().toISOString().split('T')[0];}; window.closeModal=()=>{document.getElementById('modal').style.display='none';}; window.deleteData=async(id,e)=>{e.stopPropagation();if(!confirm('刪除?'))return;const{error}=await supabase.from('visits').delete().eq('id',id);if(!error)fetchData();};
+  // --- IMPORT & ADMIN ---
+  window.previewCSV = (input) => {
+    const f=input.files[0]; if(!f)return;
+    Papa.parse(f,{header:true,skipEmptyLines:true,complete:(res)=>{
+      if(confirm(`解析到 ${res.data.length} 筆資料。確定匯入？`)) startImport(res.data);
+      input.value='';
+    }});
+  };
+  async function startImport(data) {
+    let count=0;
+    for(let r of data) {
+      const d=r['form_date']||r['填表日期']; let n=r['customer_name']||r['顧客姓名'];
+      if(!d||!n)continue;
+      const s=(r['來源統計']||r['source_tags']||'').split(',');
+      const p=(r['來店目的']||r['visit_purposes']||'').split(',');
+      const pl={p_date:d.replace(/\//g,'-'),p_store:r['store_branch']||r['門店']||'臨安店',p_name:n,p_gender:r['gender']||r['性別']||'',p_age:'',p_tainan:false,p_sources:s,p_purposes:p,p_keyword:'',p_detail:r['detail_desc']||r['詳細描述']||''};
+      const {error}=await supabase.rpc('submit_visit',pl);
+      if(!error)count++;
+    }
+    alert(`成功匯入 ${count} 筆`); fetchData();
+  }
+
+  window.wipeData=async()=>{const pwd=prompt("⚠️ 危險！請輸入密碼：");if(!pwd)return;const{error}=await supabase.auth.signInWithPassword({email:document.getElementById('admEmail').value,password:pwd});if(error){alert('密碼錯誤');return;}const{error:delErr}=await supabase.from('visits').delete().neq('id',0);if(!delErr){alert('已清空');fetchData();}};
   window.toggleAdminPanel=()=>{document.getElementById('adminPanel').classList.toggle('hidden');}; window.login=async()=>{const e=document.getElementById('admEmail').value;const p=document.getElementById('admPwd').value;const{error}=await supabase.auth.signInWithPassword({email:e,password:p});if(error)alert(error.message);else checkAuth();}; window.logout=async()=>{await supabase.auth.signOut();checkAuth();}; async function checkAuth(){const{data}=await supabase.auth.getSession();if(data.session){document.getElementById('loginForm').classList.add('hidden');document.getElementById('adminActions').classList.remove('hidden');document.body.classList.add('is-admin');}else{document.getElementById('loginForm').classList.remove('hidden');document.getElementById('adminActions').classList.add('hidden');document.body.classList.remove('is-admin');}}
-  window.exportCSV=()=>{if(visits.length===0)return;const c=Papa.unparse(visits);const b=new Blob([c],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`wakodo_backup_${new Date().getTime()}.csv`;a.click();};
+  window.exportCSV=()=>{if(visits.length===0)return;const c=Papa.unparse(visits);const b=new Blob([c],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`wakodo_data.csv`;a.click();};
+  window.openAddModal=()=>{document.getElementById('modal').style.display='flex';document.getElementById('mDate').value=new Date().toISOString().split('T')[0];}; window.closeModal=()=>{document.getElementById('modal').style.display='none';}; window.deleteData=async(id,e)=>{e.stopPropagation();if(!confirm('刪除?'))return;const{error}=await supabase.from('visits').delete().eq('id',id);if(!error)fetchData();};
 </script>
 </body>
 </html>
