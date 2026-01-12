@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>快速登記 - 和光堂</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    window.supabase = createClient(
+      "https://yxalpzculcyhzvnyvecb.supabase.co", 
+      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+    );
+  </script>
+  <style>
+    body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: 100px; }
+    
+    /* 卡片樣式 */
+    .customer-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 24px; position: relative; border: 1px solid #e5e7eb; }
+    .customer-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; }
+    .card-num { background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; margin-right: 8px; }
+
+    /* 平鋪按鈕群組 (Radio Group Look) */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-btn { 
+      padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 50px; font-size: 14px; color: #4b5563; cursor: pointer; transition: 0.1s; user-select: none; background: white;
+    }
+    .radio-btn:active { transform: scale(0.95); }
+    .radio-btn.selected { background-color: #3b82f6; color: white; border-color: #3b82f6; font-weight: 500; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); }
+
+    /* Checkbox Grid (Grid Layout) */
+    .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+    .chk-btn { 
+      padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; color: #4b5563; cursor: pointer; transition: 0.1s; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 44px; background: white;
+    }
+    .chk-btn.checked { background-color: #eff6ff; color: #2563eb; border-color: #2563eb; font-weight: bold; }
+
+    /* Input Fields */
+    .input-base { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; outline: none; transition: 0.2s; }
+    .input-base:focus { border-color: #3b82f6; ring: 2px; ring-color: #93c5fd; }
+
+    /* Action Bar (Bottom Fixed) */
+    .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 12px 16px; box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 12px; z-index: 50; }
+    .btn-add { flex: 1; background: white; color: #3b82f6; border: 1px solid #3b82f6; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; }
+    .btn-submit { flex: 2; background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+    .btn-submit:disabled { background: #9ca3af; box-shadow: none; }
+  </style>
+</head>
+<body>
+
+<div class="max-w-2xl mx-auto p-4">
+  <!-- Global Settings -->
+  <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
+    <div class="flex items-center gap-2">
+      <h1 class="font-bold text-lg">📝 顧客登記</h1>
+      <span id="formDateDisplay" class="text-xs bg-blue-500 px-2 py-1 rounded"></span>
+    </div>
+    <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+      <button onclick="setGlobalStore('臨安店')" id="gStoreLinAn" class="px-3 py-1 rounded text-sm font-bold bg-white text-blue-700 transition">臨安店</button>
+      <button onclick="setGlobalStore('南科店')" id="gStoreNanKe" class="px-3 py-1 rounded text-sm font-bold text-blue-200 hover:text-white transition">南科店</button>
+    </div>
+  </div>
+
+  <!-- Container for Customer Cards -->
+  <div id="cardsContainer"></div>
+  
+  <!-- Empty Spacer for Fixed Bottom Bar -->
+  <div style="height: 80px;"></div>
+</div>
+
+<!-- Bottom Action Bar -->
+<div class="action-bar max-w-2xl mx-auto left-0 right-0">
+  <button onclick="addCard()" class="btn-add">+ 增加一位</button>
+  <button onclick="submitAll()" id="btnSubmit" class="btn-submit">確認送出</button>
+</div>
+
+<script>
+  // --- DATA CONFIG ---
+  const SOURCES = ["Google 搜尋", "Google Map", "親友介紹", "老客回購", "老客-未購", "途經路過", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "PTT", "其他"];
+  const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "購買其他商品"];
+  const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+  
+  let globalStore = '臨安店';
+  let cardCount = 0;
+
+  window.onload = () => {
+    // 日期顯示
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('formDateDisplay').textContent = today;
+    
+    // 初始化第一張卡片
+    addCard();
+  };
+
+  window.setGlobalStore = (store) => {
+    globalStore = store;
+    const btnL = document.getElementById('gStoreLinAn');
+    const btnN = document.getElementById('gStoreNanKe');
+    
+    if(store === '臨安店') {
+      btnL.className = 'px-3 py-1 rounded text-sm font-bold bg-white text-blue-700 transition';
+      btnN.className = 'px-3 py-1 rounded text-sm font-bold text-blue-200 hover:text-white transition';
+    } else {
+      btnN.className = 'px-3 py-1 rounded text-sm font-bold bg-white text-blue-700 transition';
+      btnL.className = 'px-3 py-1 rounded text-sm font-bold text-blue-200 hover:text-white transition';
+    }
+  };
+
+  window.addCard = () => {
+    cardCount++;
+    const id = `card-${cardCount}`;
+    const container = document.getElementById('cardsContainer');
+    
+    const cardHtml = `
+      <div class="customer-card" id="${id}">
+        <div class="customer-card-header">
+          <div class="flex items-center">
+            <span class="card-num">${cardCount}</span>
+            <span class="font-bold text-gray-700">顧客資料</span>
+          </div>
+          ${cardCount > 1 ? `<button onclick="removeCard('${id}')" class="text-red-400 text-sm font-bold px-2">移除 ✕</button>` : ''}
+        </div>
+
+        <div class="space-y-5">
+          <!-- 姓名 -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">姓名 <span class="text-red-500">*</span></label>
+            <input type="text" class="input-base name-input" placeholder="輸入姓名">
+          </div>
+
+          <!-- 性別 & 居住地 -->
+          <div class="flex justify-between items-center gap-4">
+            <div class="radio-group" id="${id}-gender">
+              <div class="radio-btn" onclick="selectRadio('${id}-gender', '男', this)">男</div>
+              <div class="radio-btn" onclick="selectRadio('${id}-gender', '女', this)">女</div>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+              <input type="checkbox" class="w-4 h-4 text-blue-600 tainan-check">
+              <span class="text-sm font-bold text-blue-800">住台南</span>
+            </label>
+          </div>
+
+          <!-- 年齡層 -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">年齡層</label>
+            <div class="radio-group" id="${id}-age">
+              ${AGES.map(age => `<div class="radio-btn" onclick="selectRadio('${id}-age', '${age}', this)">${age}</div>`).join('')}
+            </div>
+          </div>
+
+          <!-- 客源 -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">客源 (複選)</label>
+            <div class="chk-grid" id="${id}-sources">
+              ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}', '${id}')">${s}</div>`).join('')}
+            </div>
+            <!-- Google 關鍵字 -->
+            <div id="${id}-keyword-box" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
+              <input type="text" class="input-base border-yellow-400 text-sm keyword-input" placeholder="例如：驗光推薦...">
+            </div>
+          </div>
+
+          <!-- 目的 -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">目的 (複選)</label>
+            <div class="chk-grid source-container">
+              ${PURPOSES.map(p => `<div class="chk-btn purpose-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('')}
+            </div>
+          </div>
+
+          <!-- 備註 -->
+          <div>
+            <textarea class="input-base h-20 resize-none detail-input" placeholder="備註..."></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', cardHtml);
+    // 自動捲動到底部
+    if(cardCount > 1) {
+      setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+    }
+  };
+
+  window.removeCard = (id) => {
+    document.getElementById(id).remove();
+    // 重新編號
+    const cards = document.querySelectorAll('.customer-card');
+    cards.forEach((card, index) => {
+      card.querySelector('.card-num').textContent = index + 1;
+    });
+    cardCount = cards.length;
+  };
+
+  // --- UI INTERACTION ---
+  window.selectRadio = (groupId, value, el) => {
+    const container = document.getElementById(groupId);
+    // 清除同群組的選取
+    container.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    // 選取當前
+    el.classList.add('selected');
+    el.dataset.value = value;
+  };
+
+  window.toggleChk = (el, value, cardId) => {
+    el.classList.toggle('checked');
+    el.dataset.checked = el.classList.contains('checked');
+    
+    // 如果是客源且有點擊，檢查 Google 關鍵字欄位
+    if(cardId) { // 只有客源區塊有傳 cardId
+      const container = document.getElementById(`${cardId}-sources`);
+      const hasGoogle = Array.from(container.querySelectorAll('.chk-btn.checked'))
+                             .some(btn => btn.innerText.includes('Google'));
+      document.getElementById(`${cardId}-keyword-box`).classList.toggle('hidden', !hasGoogle);
+    }
+  };
+
+  // --- SUBMIT LOGIC ---
+  window.submitAll = async () => {
+    const cards = document.querySelectorAll('.customer-card');
+    const btn = document.getElementById('btnSubmit');
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 1. 驗證所有卡片都有填寫姓名
+    let isValid = true;
+    cards.forEach((card, index) => {
+      const name = card.querySelector('.name-input').value.trim();
+      if(!name) {
+        alert(`第 ${index+1} 筆資料的姓名未填寫！`);
+        isValid = false;
+      }
+    });
+    if(!isValid) return;
+
+    btn.disabled = true;
+    btn.textContent = '傳送中...';
+
+    let successCount = 0;
+    
+    // 2. 逐筆送出
+    for(const card of cards) {
+      const name = card.querySelector('.name-input').value.trim();
+      const genderEl = card.querySelector(`#${card.id}-gender .selected`);
+      const ageEl = card.querySelector(`#${card.id}-age .selected`);
+      const isTainan = card.querySelector('.tainan-check').checked;
+      
+      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .checked`)).map(el => el.innerText);
+      const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked')).map(el => el.innerText);
+      const keyword = card.querySelector('.keyword-input').value;
+      const detail = card.querySelector('.detail-input').value;
+
+      const payload = {
+        p_date: today,
+        p_store: globalStore,
+        p_name: name,
+        p_gender: genderEl ? genderEl.dataset.value : '',
+        p_age: ageEl ? ageEl.dataset.value : '',
+        p_tainan: isTainan,
+        p_sources: sources,
+        p_purposes: purposes,
+        p_keyword: keyword,
+        p_detail: detail
+      };
+
+      const { error } = await supabase.rpc('submit_visit', payload);
+      if(!error) successCount++;
+    }
+
+    // 3. 完成後處理
+    if(successCount === cards.length) {
+      if(confirm(`🎉 成功新增 ${successCount} 筆資料！\n\n按「確定」返回儀表板查看\n按「取消」繼續留在這裡新增`)) {
+        window.location.href = "index.html";
+      } else {
+        // 重置頁面
+        document.getElementById('cardsContainer').innerHTML = '';
+        cardCount = 0;
+        addCard();
+        btn.disabled = false;
+        btn.textContent = '確認送出';
+        window.scrollTo(0, 0);
+      }
+    } else {
+      alert(`⚠️ 部分資料上傳失敗 (成功: ${successCount}/${cards.length})，請檢查網路後重試。`);
+      btn.disabled = false;
+      btn.textContent = '確認送出';
+    }
+  };
+</script>
+</body>
+</html>
