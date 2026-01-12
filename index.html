@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V3.3</title>
+  <title>和光堂戰情室 V3.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -22,114 +22,144 @@
     .btn-stat.active { border-color: #3b82f6; background-color: #eff6ff; }
     .btn-primary { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; transition: 0.2s; }
     .btn-primary:hover { background: #1d4ed8; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; }
-    .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
+    
+    /* Checkbox Grid */
     .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
     .chk-label { display: flex; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 13px; transition: 0.1s; }
     .chk-label:hover { background: #f9fafb; }
     .chk-label input:checked + span { font-weight: bold; color: #2563eb; }
     .chk-label.checked { border-color: #2563eb; background: #eff6ff; }
     
-    /* Admin Styling */
+    /* Admin Visibility */
     .admin-only { display: none !important; }
     body.is-admin .admin-only { display: table-cell !important; }
-    body.is-admin div.admin-only { display: block !important; }
-    body.is-admin button.admin-only { display: inline-block !important; }
+    body.is-admin div.admin-only, body.is-admin button.admin-only { display: inline-block !important; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
   </style>
 </head>
 <body class="text-gray-800">
 
 <div class="max-w-7xl mx-auto p-4">
-  <!-- Header -->
+  <!-- Top Header -->
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <div class="flex items-center gap-3">
       <h1 class="text-2xl font-bold text-gray-900 tracking-tight">👓 和光堂戰情室</h1>
       <div class="flex flex-col text-[10px] text-blue-600 font-bold leading-tight border-l-2 border-blue-200 pl-2">
-        <span>V3.3 Last Update</span>
+        <span>V3.4 Stable</span>
         <span id="updateTime">2026-01-13</span>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <!-- Admin Gear Icon (Always Visible) -->
-      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
+      <!-- Admin Gear Icon -->
+      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition" title="管理員設定">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
       <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
     </div>
   </div>
 
-  <!-- Admin Login / Actions Panel (Hidden by default) -->
-  <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white">
-    <div id="loginForm" class="flex flex-col md:flex-row gap-2">
-      <input type="email" id="admEmail" placeholder="Email (chanywang92@gmail.com)" class="text-gray-800 p-2 rounded flex-grow" value="chanywang92@gmail.com">
-      <input type="password" id="admPwd" placeholder="密碼" class="text-gray-800 p-2 rounded flex-grow">
-      <button onclick="login()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded font-bold">登入</button>
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white border border-gray-700">
+    <!-- Login -->
+    <div id="loginForm" class="flex flex-col md:flex-row gap-3 items-center">
+      <div class="flex-grow w-full md:w-auto">
+        <label class="text-xs text-gray-400 mb-1 block">Email</label>
+        <input type="email" id="admEmail" value="chanywang92@gmail.com" class="w-full text-gray-800 p-2 rounded text-sm" placeholder="Email">
+      </div>
+      <div class="flex-grow w-full md:w-auto">
+        <label class="text-xs text-gray-400 mb-1 block">密碼</label>
+        <input type="password" id="admPwd" class="w-full text-gray-800 p-2 rounded text-sm" placeholder="Password">
+      </div>
+      <button onclick="login()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold mt-4 md:mt-0">登入</button>
     </div>
-    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between">
-      <span class="font-bold text-green-400">✅ 管理員已登入</span>
+    <!-- Actions -->
+    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
+      <div class="flex items-center gap-2 text-green-400 font-bold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>已登入管理模式</span>
+      </div>
       <div class="flex gap-2">
-        <label class="cursor-pointer bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm flex items-center gap-1">
-          <span>📥 匯入 CSV</span>
+        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+          <span>匯入 CSV</span>
           <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="importCSV(this)">
         </label>
-        <button onclick="exportCSV()" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">📤 匯出 CSV</button>
-        <button onclick="logout()" class="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-sm">登出</button>
+        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded text-sm transition">匯出 CSV</button>
+        <button onclick="logout()" class="bg-red-600 hover:bg-red-500 px-3 py-1.5 rounded text-sm transition">登出</button>
       </div>
     </div>
   </div>
 
-  <!-- Filter -->
-  <div class="card mb-6 flex flex-wrap gap-3 items-center bg-white">
-    <div class="flex items-center border rounded px-2 bg-gray-50">
-      <span class="text-gray-400 text-xs mr-2">期間</span>
-      <input type="date" id="qFrom" class="bg-transparent py-1 text-sm outline-none">
+  <!-- Filter Bar -->
+  <div class="card mb-6 flex flex-wrap gap-3 items-center bg-white sticky top-2 z-30 shadow-sm border border-gray-100">
+    <div class="flex items-center border rounded px-2 bg-gray-50 py-1">
+      <span class="text-gray-400 text-xs mr-2 font-bold">期間</span>
+      <input type="date" id="qFrom" class="bg-transparent text-sm outline-none w-28">
       <span class="text-gray-400 mx-1">-</span>
-      <input type="date" id="qTo" class="bg-transparent py-1 text-sm outline-none">
+      <input type="date" id="qTo" class="bg-transparent text-sm outline-none w-28">
     </div>
     <div class="flex-grow relative">
-      <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="w-full border rounded pl-8 pr-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-      <svg class="w-4 h-4 text-gray-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="w-full border rounded pl-9 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+      <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
     </div>
-    <button onclick="fetchData()" class="bg-gray-800 text-white px-4 py-1 rounded text-sm hover:bg-gray-700">查詢</button>
+    <button onclick="fetchData()" class="bg-gray-800 text-white px-5 py-1.5 rounded text-sm hover:bg-gray-700 font-medium transition">查詢</button>
   </div>
 
-  <!-- Store Buttons -->
+  <!-- Stats -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active">
-      <div class="text-sm text-gray-500 mb-1">總客數 (全部)</div>
-      <div class="text-3xl font-bold text-gray-800" id="statTotal">0</div>
+    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6">
+      <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">總客數</div>
+      <div class="text-4xl font-extrabold text-gray-800" id="statTotal">--</div>
     </div>
-    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center">
-      <div class="text-sm text-gray-500 mb-1">臨安店</div>
-      <div class="text-3xl font-bold text-blue-600" id="statLinAn">0</div>
+    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6">
+      <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">臨安店</div>
+      <div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div>
     </div>
-    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center">
-      <div class="text-sm text-gray-500 mb-1">南科店</div>
-      <div class="text-3xl font-bold text-green-600" id="statNanKe">0</div>
+    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6">
+      <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">南科店</div>
+      <div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div>
     </div>
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <div class="card h-[450px] flex flex-col">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-gray-700">客源分析</h3>
-        <select id="sourceFilter" onchange="filterSource()" class="border rounded px-2 py-1 text-sm bg-gray-50">
+    <!-- Source Chart -->
+    <div class="card h-[480px] flex flex-col">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="font-bold text-gray-800">客源分析</h3>
+        <select id="sourceFilter" onchange="filterSource()" class="border rounded px-2 py-1 text-xs bg-gray-50 outline-none focus:border-blue-500">
           <option value="ALL">顯示全部客源</option>
         </select>
       </div>
-      <div class="flex-grow relative h-full">
+      <div class="flex-grow relative w-full h-full min-h-0">
         <canvas id="chartSource"></canvas>
       </div>
-      <div id="trendBox" class="h-[100px] mt-4 hidden border-t pt-2">
-        <div class="text-xs text-gray-500 mb-1 font-bold">趨勢走勢 (<span id="trendLabel"></span>)</div>
-        <div class="h-full relative"><canvas id="chartTrendMini"></canvas></div>
+      <!-- Trend (Hidden) -->
+      <div id="trendBox" class="h-[120px] mt-4 hidden bg-blue-50/50 rounded-lg p-2 border border-blue-100">
+        <div class="flex justify-between items-center mb-1">
+          <div class="text-xs font-bold text-blue-800 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+            <span id="trendLabel"></span> 趨勢
+          </div>
+        </div>
+        <div class="relative h-[80px] w-full">
+          <canvas id="chartTrendMini"></canvas>
+        </div>
       </div>
     </div>
 
-    <div class="card h-[450px] flex flex-col">
-      <h3 class="font-bold text-gray-700 mb-4">來店目的 <span id="purposeSubtitle" class="text-sm font-normal text-gray-500"></span></h3>
-      <div class="flex-grow relative h-full">
+    <!-- Purpose Chart -->
+    <div class="card h-[480px] flex flex-col">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <div class="flex items-center gap-2">
+          <h3 class="font-bold text-gray-800">來店目的</h3>
+          <span id="purposeSubtitle" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">(全部)</span>
+        </div>
+      </div>
+      <div class="flex-grow relative w-full h-full min-h-0 flex justify-center">
         <canvas id="chartPurpose"></canvas>
       </div>
     </div>
@@ -137,19 +167,19 @@
 
   <!-- Table -->
   <div class="card overflow-hidden">
-    <div class="flex justify-between items-center mb-4 px-1">
-      <h3 class="font-bold text-gray-700">最新來客紀錄 (Top 50)</h3>
+    <div class="flex justify-between items-center mb-4 px-2">
+      <h3 class="font-bold text-gray-800 flex items-center gap-2">最新來客紀錄 <span class="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Top 50</span></h3>
     </div>
     <div class="overflow-x-auto">
-      <table class="w-full text-sm text-left">
-        <thead class="bg-gray-50 text-gray-500 font-medium border-b">
+      <table class="w-full text-sm text-left whitespace-nowrap">
+        <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
           <tr>
-            <th class="p-3">日期</th>
+            <th class="p-3 pl-4">日期</th>
             <th class="p-3">分店</th>
             <th class="p-3">姓名</th>
             <th class="p-3">客源</th>
             <th class="p-3">目的</th>
-            <th class="p-3 admin-only">操作</th>
+            <th class="p-3 pr-4 admin-only text-right">操作</th>
           </tr>
         </thead>
         <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
@@ -160,52 +190,41 @@
 
 <!-- Modal -->
 <div id="modal" class="modal-overlay">
-  <div class="modal-content">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 text-2xl">&times;</button>
-    <h2 id="modalTitle" class="text-xl font-bold mb-6 text-gray-800">新增資料</h2>
+  <div class="modal-content shadow-2xl">
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
+    <h2 id="modalTitle" class="text-xl font-bold mb-6 text-gray-800 border-b pb-2">新增資料</h2>
     <div class="space-y-4">
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="text-xs font-bold text-gray-500">日期</label><input type="date" id="mDate" class="w-full border rounded p-2"></div>
-        <div>
-          <label class="text-xs font-bold text-gray-500">分店</label>
-          <select id="mStore" class="w-full border rounded p-2 bg-gray-50"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select>
-        </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-xs font-bold text-gray-500 mb-1 block">日期</label><input type="date" id="mDate" class="w-full border border-gray-300 rounded p-2 focus:border-blue-500 outline-none"></div>
+        <div><label class="text-xs font-bold text-gray-500 mb-1 block">分店</label><select id="mStore" class="w-full border border-gray-300 rounded p-2 bg-gray-50"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="text-xs font-bold text-gray-500">姓名</label><input type="text" id="mName" class="w-full border rounded p-2" placeholder="顧客姓名"></div>
-        <div>
-          <label class="text-xs font-bold text-gray-500">性別</label>
-          <select id="mGender" class="w-full border rounded p-2"><option value="">未選擇</option><option value="男">男</option><option value="女">女</option></select>
-        </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-xs font-bold text-gray-500 mb-1 block">姓名</label><input type="text" id="mName" class="w-full border border-gray-300 rounded p-2" placeholder="顧客姓名"></div>
+        <div><label class="text-xs font-bold text-gray-500 mb-1 block">性別</label><select id="mGender" class="w-full border border-gray-300 rounded p-2"><option value="">未選擇</option><option value="男">男</option><option value="女">女</option></select></div>
       </div>
-      <div class="grid grid-cols-2 gap-3 items-end">
-        <div>
-          <label class="text-xs font-bold text-gray-500">年齡層</label>
-          <select id="mAge" class="w-full border rounded p-2"><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="18-24">18-24</option><option value="45-54">45-54</option><option value="55歲以上">55歲以上</option><option value="18歲以下">18歲以下</option></select>
-        </div>
-        <label class="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-          <input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600"><span class="text-sm font-bold text-gray-700">是台南人</span>
-        </label>
+      <div class="grid grid-cols-2 gap-4 items-end">
+        <div><label class="text-xs font-bold text-gray-500 mb-1 block">年齡層</label><select id="mAge" class="w-full border border-gray-300 rounded p-2"><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="18-24">18-24</option><option value="45-54">45-54</option><option value="55歲以上">55歲以上</option><option value="18歲以下">18歲以下</option></select></div>
+        <label class="flex items-center gap-2 p-2 border border-gray-200 rounded cursor-pointer hover:bg-gray-50 transition h-[42px]"><input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600 rounded"><span class="text-sm font-bold text-gray-700">是台南人</span></label>
       </div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">客源 (複選)</label><div class="chk-grid" id="chkSources"></div></div>
-      <div id="keywordBox" class="hidden bg-yellow-50 p-2 rounded border border-yellow-200"><input type="text" id="mKeyword" class="w-full bg-transparent text-sm outline-none" placeholder="輸入 Google 搜尋關鍵字..."></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">目的 (複選)</label><div class="chk-grid" id="chkPurposes"></div></div>
-      <div><label class="text-xs font-bold text-gray-500">備註</label><textarea id="mDetail" class="w-full border rounded p-2 text-sm h-20" placeholder="詳細描述..."></textarea></div>
-      <button id="btnSave" onclick="saveData()" class="w-full btn-primary py-3 font-bold text-lg mt-2">儲存資料</button>
+      <div><label class="text-xs font-bold text-gray-500 mb-2 block">客源 (複選)</label><div class="chk-grid" id="chkSources"></div></div>
+      <div id="keywordBox" class="hidden bg-yellow-50 p-3 rounded-lg border border-yellow-200 mt-2"><label class="text-xs font-bold text-yellow-700 mb-1 block">Google 搜尋關鍵字</label><input type="text" id="mKeyword" class="w-full bg-white border border-yellow-300 rounded p-1 text-sm outline-none" placeholder="例如：台南眼鏡行..."></div>
+      <div><label class="text-xs font-bold text-gray-500 mb-2 block mt-2">目的 (複選)</label><div class="chk-grid" id="chkPurposes"></div></div>
+      <div><label class="text-xs font-bold text-gray-500 mb-1 block">備註</label><textarea id="mDetail" class="w-full border border-gray-300 rounded p-2 text-sm h-20 resize-none" placeholder="詳細描述..."></textarea></div>
+      <button id="btnSave" onclick="saveData()" class="w-full btn-primary py-3 font-bold text-lg shadow-md hover:shadow-lg mt-4">儲存資料</button>
     </div>
   </div>
 </div>
 
 <script>
+  // --- CONFIG ---
   const SOURCES = ["Google 搜尋", "Google Map", "親友介紹", "老客回購", "老客-未購", "途經路過", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "PTT", "其他"];
   const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "購買其他商品"];
-  
   let visits = [], stats = {}, currentStore = '全部', charts = {};
 
   document.getElementById('updateTime').textContent = new Date().toISOString().split('T')[0];
-  
+
   window.onload = () => {
-    // 時間跨度預設：2024-01-01 ~ 今天
+    // 時間預設：2024-01-01 ~ 今天
     document.getElementById('qFrom').value = "2024-01-01";
     document.getElementById('qTo').value = new Date().toISOString().split('T')[0];
 
@@ -222,7 +241,10 @@
 
   function initCheckboxes(id, list) {
     document.getElementById(id).innerHTML = list.map(item => `
-      <label class="chk-label"><input type="checkbox" value="${item}" class="mr-2 hidden" onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>${item}</span></label>
+      <label class="chk-label select-none">
+        <input type="checkbox" value="${item}" class="mr-2 hidden" onchange="this.parentElement.classList.toggle('checked', this.checked)">
+        <span>${item}</span>
+      </label>
     `).join('');
     if(id === 'chkSources') {
       document.getElementById(id).addEventListener('change', () => {
@@ -232,6 +254,7 @@
     }
   }
 
+  // --- LOGIC ---
   window.setStore = (storeName) => {
     currentStore = storeName;
     document.querySelectorAll('.btn-stat').forEach(b => b.classList.remove('active'));
@@ -246,60 +269,49 @@
     const to = document.getElementById('qTo').value;
     const keyword = document.getElementById('qSearch').value;
     
-    // Get Data
     const { data: listData } = await supabase.rpc('get_visits_public', { start_date: from, end_date: to, keyword: keyword, store_filter: currentStore });
     const { data: statData } = await supabase.rpc('get_stats_public', { start_date: from, end_date: to, store_filter: currentStore });
 
     if(listData && statData) {
       visits = listData; stats = statData;
       
-      // Update Button Numbers
       const { data: countData } = await supabase.from('visits').select('store_branch').gte('form_date', from).lte('form_date', to);
       if(countData) {
         document.getElementById('statTotal').textContent = countData.length;
         document.getElementById('statLinAn').textContent = countData.filter(r => r.store_branch === '臨安店').length;
         document.getElementById('statNanKe').textContent = countData.filter(r => r.store_branch === '南科店').length;
       }
-
       renderAll();
     }
   };
 
   function renderAll() {
-    // 1. Reset Filters
     document.getElementById('sourceFilter').value = 'ALL';
     document.getElementById('trendBox').classList.add('hidden');
-    document.getElementById('purposeSubtitle').textContent = '(全部客源)';
-
-    // 2. Charts
-    renderChart('chartSource', 'bar', stats.sources, 'tag');
-    renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
+    document.getElementById('purposeSubtitle').textContent = '(全部)';
     
-    // 3. Table
+    renderChart('chartSource', 'bar', stats.sources, 'tag', '客源數量');
+    renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose', '目的分佈');
+    
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = visits.map(v => `
-      <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
-        <td class="p-3 text-gray-600">${v.form_date.slice(5)}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-        <td class="p-3 font-medium text-gray-800">${v.customer_name}</td>
-        <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.source_tags||[]).join(', ')}</td>
-        <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.visit_purposes||[]).join(', ')}</td>
-        <td class="p-3 admin-only"><button onclick="deleteData('${v.id}', event)" class="text-red-400 hover:text-red-600 font-bold px-2">刪</button></td>
+      <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0 group" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
+        <td class="p-3 pl-4 text-gray-600 font-mono text-xs">${v.form_date.slice(5)}</td>
+        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
+        <td class="p-3 font-bold text-gray-800">${v.customer_name}</td>
+        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate"><div class="flex gap-1 flex-wrap">${(v.source_tags||[]).map(t=>`<span class="bg-gray-100 px-1 rounded">${t}</span>`).join('')}</div></td>
+        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
+        <td class="p-3 pr-4 admin-only text-right"><button onclick="deleteData('${v.id}', event)" class="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 p-1.5 rounded transition" title="刪除">刪</button></td>
       </tr>
     `).join('');
   }
 
-  // Filter Logic (Key Fix)
+  // --- FILTERING ---
   window.filterSource = () => {
     const selected = document.getElementById('sourceFilter').value;
-    
     if(selected === 'ALL') {
-      renderChart('chartSource', 'bar', stats.sources, 'tag');
-      renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
-      document.getElementById('trendBox').classList.add('hidden');
-      document.getElementById('purposeSubtitle').textContent = '(全部客源)';
+      renderAll();
     } else {
-      // 1. Show Trend
       document.getElementById('trendBox').classList.remove('hidden');
       document.getElementById('trendLabel').textContent = selected;
       
@@ -311,43 +323,39 @@
       
       const ctxT = document.getElementById('chartTrendMini').getContext('2d');
       if(charts['trend']) charts['trend'].destroy();
-      charts['trend'] = new Chart(ctxT, { type: 'line', data: { labels: dates, datasets: [{ label: selected, data: counts, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
+      charts['trend'] = new Chart(ctxT, {
+        type: 'line', data: { labels: dates, datasets: [{ label: selected, data: counts, borderColor: '#2563eb', backgroundColor: (ctx) => { const grad = ctx.chart.ctx.createLinearGradient(0,0,0,100); grad.addColorStop(0, 'rgba(37,99,235,0.2)'); grad.addColorStop(1, 'rgba(37,99,235,0)'); return grad; }, fill: true, tension: 0.4, pointRadius: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+      });
 
-      // 2. Filter Purpose Chart
-      // We need to filter purposes specifically for visits that have this source tag
-      // Since 'visits' variable only holds top 50, we should ideally fetch again or use a broader local dataset.
-      // But for UI responsiveness, we will use the visits list we have, assuming it's representative enough or fetch if needed.
-      // To be accurate, let's just filter the 'visits' array we have on client side (Top 100).
-      
       const relatedVisits = visits.filter(v => (v.source_tags||[]).includes(selected));
       const purposeCounts = {};
       relatedVisits.forEach(v => (v.visit_purposes||[]).forEach(p => purposeCounts[p] = (purposeCounts[p]||0)+1));
-      
       const purposeData = Object.entries(purposeCounts).map(([k,v]) => ({purpose: k, c: v})).sort((a,b) => b.c - a.c);
       
-      // Update Purpose Chart
-      renderChart('chartPurpose', 'doughnut', purposeData, 'purpose');
+      renderChart('chartPurpose', 'doughnut', purposeData, 'purpose', '目的佔比');
       document.getElementById('purposeSubtitle').textContent = `(來自: ${selected})`;
     }
   };
 
-  function renderChart(id, type, data, key) {
+  function renderChart(id, type, data, key, label) {
     const ctx = document.getElementById(id).getContext('2d');
     if(charts[id]) charts[id].destroy();
-    charts[id] = new Chart(ctx, { type: type, data: { labels: data.map(d => d[key]), datasets: [{ label: '數量', data: data.map(d => d.c), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'doughnut', position: 'right' } } } });
+    charts[id] = new Chart(ctx, {
+      type: type, data: { labels: data.map(d => d[key]), datasets: [{ label: label, data: data.map(d => d.c), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'], borderRadius: 4, borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'doughnut', position: 'right' } }, scales: type === 'bar' ? { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } : {} }
+    });
   }
 
-  // Admin & Auth
-  window.toggleAdminPanel = () => {
-    const panel = document.getElementById('adminPanel');
-    panel.classList.toggle('hidden');
-  };
+  // --- ADMIN & IMPORT ---
+  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
   
   window.login = async () => {
     const email = document.getElementById('admEmail').value;
     const pwd = document.getElementById('admPwd').value;
-    const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
-    if(!error) checkAuth(); else alert('登入失敗');
+    if(!email || !pwd) { alert('請輸入帳號密碼'); return; }
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    if(error) alert('登入失敗：' + error.message); else checkAuth();
   }
   
   window.logout = async () => { await supabase.auth.signOut(); checkAuth(); }
@@ -357,65 +365,50 @@
     if(data.session) {
       document.getElementById('loginForm').classList.add('hidden');
       document.getElementById('adminActions').classList.remove('hidden');
-      document.body.classList.add('is-admin'); // Toggle global admin class
+      document.body.classList.add('is-admin');
     } else {
       document.getElementById('loginForm').classList.remove('hidden');
       document.getElementById('adminActions').classList.add('hidden');
       document.body.classList.remove('is-admin');
     }
   }
-  
-  // Import / Export
-  window.exportCSV = () => {
-    const csv = Papa.unparse(visits);
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `wakodo_export_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-  };
 
   window.importCSV = (input) => {
     const file = input.files[0];
     if(!file) return;
-    
+    if(!confirm('即將匯入資料，請確保 CSV 格式正確。')) return;
+
     Papa.parse(file, {
-      header: true,
+      header: true, skipEmptyLines: true,
       complete: async (results) => {
-        let successCount = 0;
-        // Process each row
+        let count = 0;
         for(let row of results.data) {
           if(!row.form_date || !row.customer_name) continue;
-          
-          // Basic mapping (adjust fields as needed based on your CSV structure)
           const payload = {
-            p_date: row.form_date,
-            p_store: row.store_branch || '臨安店',
-            p_name: row.customer_name,
-            p_gender: row.gender || '',
-            p_age: row.age_group || '',
-            p_tainan: row.is_tainan === 'true' || row.is_tainan === 'TRUE',
-            p_sources: row.source_tags ? row.source_tags.split(',') : [],
-            p_purposes: row.visit_purposes ? row.visit_purposes.split(',') : [],
-            p_keyword: row.search_keyword || '',
-            p_detail: row.detail_desc || ''
+            p_date: row.form_date, p_store: row.store_branch || '臨安店', p_name: row.customer_name,
+            p_gender: row.gender || '', p_age: row.age_group || '', p_tainan: (row.is_tainan === 'true' || row.is_tainan === 'TRUE'),
+            p_sources: row.source_tags ? row.source_tags.split(',') : [], p_purposes: row.visit_purposes ? row.visit_purposes.split(',') : [],
+            p_keyword: row.search_keyword || '', p_detail: row.detail_desc || ''
           };
-          
-          const { error } = await supabase.rpc('submit_visit', payload);
-          if(!error) successCount++;
+          await supabase.rpc('submit_visit', payload); count++;
         }
-        alert(`匯入完成！成功匯入 ${successCount} 筆資料。`);
-        fetchData();
+        alert(`成功匯入 ${count} 筆資料！`); fetchData();
       }
     });
   };
 
-  // ... (Modal Functions same as before) ...
+  window.exportCSV = () => {
+    if(visits.length === 0) { alert('無資料'); return; }
+    const csv = Papa.unparse(visits);
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `wakodo_export_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  };
+  
+  window.deleteData = async (id, event) => { event.stopPropagation(); if(!confirm('⚠️ 確定刪除？')) return; const { error } = await supabase.from('visits').delete().eq('id', id); if(!error) fetchData(); };
   window.openAddModal = () => { document.getElementById('modal').style.display = 'flex'; document.getElementById('modalTitle').textContent = '新增資料'; document.getElementById('mDate').valueAsDate = new Date(); document.getElementById('mStore').value = currentStore === '全部' ? '臨安店' : currentStore; document.getElementById('mName').value = ''; document.getElementById('mDetail').value = ''; document.getElementById('mKeyword').value = ''; document.querySelectorAll('#modal input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); }); document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false); document.getElementById('btnSave').classList.remove('hidden'); };
   window.showDetail = (date, name) => { const item = visits.find(v => v.form_date === date && v.customer_name === name); if(!item) return; document.getElementById('modal').style.display = 'flex'; document.getElementById('modalTitle').textContent = '詳細資料'; document.getElementById('mDate').value = item.form_date; document.getElementById('mStore').value = item.store_branch; document.getElementById('mName').value = item.customer_name; document.getElementById('mGender').value = item.gender; document.getElementById('mAge').value = item.age_group; document.getElementById('mTainan').checked = item.is_tainan; document.getElementById('mDetail').value = item.detail_desc; document.getElementById('mKeyword').value = item.search_keyword || ''; document.querySelectorAll('#chkSources input').forEach(c => { c.checked = (item.source_tags||[]).includes(c.value); c.parentElement.classList.toggle('checked', c.checked); }); document.querySelectorAll('#chkPurposes input').forEach(c => { c.checked = (item.visit_purposes||[]).includes(c.value); c.parentElement.classList.toggle('checked', c.checked); }); document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true); document.getElementById('btnSave').classList.add('hidden'); };
   window.closeModal = () => document.getElementById('modal').style.display = 'none';
-  window.saveData = async () => { const btn = document.getElementById('btnSave'); btn.textContent = '儲存中...'; btn.disabled = true; const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value); const payload = { p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value, p_name: document.getElementById('mName').value, p_gender: document.getElementById('mGender').value, p_age: document.getElementById('mAge').value, p_tainan: document.getElementById('mTainan').checked, p_sources: getArr('chkSources'), p_purposes: getArr('chkPurposes'), p_keyword: document.getElementById('mKeyword').value, p_detail: document.getElementById('mDetail').value }; if(!payload.p_date || !payload.p_name) { alert('日期與姓名必填'); btn.textContent = '儲存資料'; btn.disabled = false; return; } const { error } = await supabase.rpc('submit_visit', payload); if(error) alert('Error: ' + error.message); else { closeModal(); fetchData(); } btn.textContent = '儲存資料'; btn.disabled = false; };
-  window.deleteData = async (id, event) => { event.stopPropagation(); if(!confirm('確定要刪除？')) return; const { error } = await supabase.from('visits').delete().eq('id', id); if(!error) fetchData(); };
+  window.saveData = async () => { const btn = document.getElementById('btnSave'); btn.textContent = '處理中...'; btn.disabled = true; const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value); const payload = { p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value, p_name: document.getElementById('mName').value, p_gender: document.getElementById('mGender').value, p_age: document.getElementById('mAge').value, p_tainan: document.getElementById('mTainan').checked, p_sources: getArr('chkSources'), p_purposes: getArr('chkPurposes'), p_keyword: document.getElementById('mKeyword').value, p_detail: document.getElementById('mDetail').value }; if(!payload.p_date || !payload.p_name) { alert('請填寫日期與姓名'); btn.textContent = '儲存資料'; btn.disabled = false; return; } const { error } = await supabase.rpc('submit_visit', payload); if(error) alert('儲存失敗: ' + error.message); else { closeModal(); fetchData(); } btn.textContent = '儲存資料'; btn.disabled = false; };
 </script>
 </body>
 </html>
