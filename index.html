@@ -1,495 +1,562 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>光堂眼鏡 - 顧客戰情室</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>光堂眼鏡戰情室 v2.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    window.supabase = createClient(
+      "https://yxalpzculcyhzvnyvecb.supabase.co", 
+      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+    );
+  </script>
   <style>
-    :root { --primary: #212b36; --accent: #007bff; --bg: #f4f6f8; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-    
-    /* Layout */
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    /* Controls */
-    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    input, select, button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    button { cursor: pointer; font-weight: 600; background: #fff; transition: 0.2s; }
-    button:hover { background: #f9f9f9; }
-    
-    .btn-primary { background: var(--primary); color: #fff; border: none; }
-    .btn-primary:hover { background: #333; }
-    .btn-danger { color: #d32f2f; border-color: #ffcdd2; background: #fff; }
-    .btn-danger:hover { background: #ffebee; }
-    
-    /* Admin Area (Hidden by default) */
-    .admin-only { display: none; border: 2px dashed #ccc; padding: 15px; margin-top: 20px; border-radius: 8px; background: #fafafa; }
-    .admin-badge { background: #d32f2f; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; vertical-align: middle; }
-
-    /* Charts */
-    .chart-container { position: relative; height: 300px; }
-    .chart-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-
-    /* Table */
-    .table-responsive { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; white-space: nowrap; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #f8f9fa; font-weight: 600; color: #555; position: sticky; top: 0; }
-    tr:hover { background: #f1f1f1; cursor: pointer; }
-    
-    /* Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: #fff; width: 90%; max-width: 500px; padding: 25px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
-    .modal h3 { margin-top: 0; }
-    .form-row { margin-bottom: 15px; }
-    .form-row label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #666; }
-    .form-row textarea { width: 100%; min-height: 80px; box-sizing: border-box; }
-    .close-modal { float: right; cursor: pointer; font-size: 20px; color: #999; }
-    
-    /* Checkbox Group */
-    .chk-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chk-item { padding: 4px 10px; background: #f0f0f0; border-radius: 15px; font-size: 12px; cursor: pointer; user-select: none; }
-    .chk-item input { display: none; }
-    .chk-item.checked { background: var(--primary); color: #fff; }
-
-    .tag { display: inline-block; padding: 2px 6px; background: #e9ecef; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+    body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; }
+    .btn-primary { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; transition: 0.2s; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; background: #e5e7eb; color: #374151; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
+    .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .chk-label { display: flex; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+    .chk-label:hover { background: #f9fafb; }
+    .chk-label input:checked + span { font-weight: bold; color: #2563eb; }
+    .chk-label.checked { border-color: #2563eb; background: #eff6ff; }
   </style>
 </head>
-<body>
+<body class="text-gray-800">
 
-<div class="container">
+<div class="max-w-7xl mx-auto p-4">
   <!-- Header -->
-  <div class="header">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <h2>👓 光堂眼鏡戰情室</h2>
-      <button id="btnAdd" class="btn-primary">＋ 新增資料</button>
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div class="flex items-center gap-4">
+      <h1 class="text-2xl font-bold text-gray-900">👓 光堂眼鏡戰情室</h1>
+      <select id="storeSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="全部">全部店舖</option>
+        <option value="臨安店" selected>臨安店</option>
+        <option value="南科店">南科店</option>
+      </select>
     </div>
-    <div class="controls">
-      <input type="date" id="qFrom" value="2026-01-01">
-      <span>~</span>
-      <input type="date" id="qTo" value="2026-12-31">
-      <input type="text" id="qSearch" placeholder="搜尋姓名/備註/關鍵字..." style="width: 180px;">
-      <button id="btnRefresh">🔍 查詢</button>
-      <button id="btnAdminToggle" style="font-size:12px; color:#666;">管理員登入</button>
+    <div class="flex items-center gap-2">
+      <button onclick="openAddModal()" class="btn-primary flex items-center gap-2">
+        <span>+ 新增資料</span>
+      </button>
+      <button onclick="toggleAdmin()" class="text-gray-500 text-sm hover:text-gray-700 px-2">管理員</button>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="card mb-6 flex flex-wrap gap-3 items-center">
+    <input type="date" id="qFrom" class="border rounded px-2 py-1" value="2026-01-01">
+    <span class="text-gray-400">至</span>
+    <input type="date" id="qTo" class="border rounded px-2 py-1" value="2026-12-31">
+    <input type="text" id="qSearch" placeholder="搜尋姓名/關鍵字..." class="border rounded px-2 py-1 flex-grow">
+    <button onclick="fetchData()" class="btn-primary">查詢</button>
+  </div>
+
+  <!-- Old Guest Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="card bg-blue-50 border-l-4 border-blue-500">
+      <div class="text-gray-500 text-sm">老客總數 (Total)</div>
+      <div class="text-3xl font-bold text-blue-700" id="statOldTotal">0</div>
+    </div>
+    <div class="card bg-green-50 border-l-4 border-green-500">
+      <div class="text-gray-500 text-sm">老客回購 (Bought)</div>
+      <div class="text-3xl font-bold text-green-700" id="statOldBuy">0</div>
+    </div>
+    <div class="card bg-orange-50 border-l-4 border-orange-500">
+      <div class="text-gray-500 text-sm">老客未購 (No Buy)</div>
+      <div class="text-3xl font-bold text-orange-700" id="statOldNoBuy">0</div>
     </div>
   </div>
 
   <!-- Charts -->
-  <div class="grid-2">
-    <div class="card">
-      <div class="chart-header">
-        <strong>客源分析 (Sources)</strong>
-        <select onchange="updateChartType('source', this.value)">
-          <option value="bar">長條圖 (Bar)</option>
-          <option value="pie">圓餅圖 (Pie)</option>
-          <option value="line">折線圖 (Line)</option>
-        </select>
-      </div>
-      <div class="chart-container"><canvas id="chartSource"></canvas></div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="card" style="height: 400px;">
+      <h3 class="font-bold mb-4 flex justify-between">
+        客源分析 (Sources)
+        <span class="text-xs text-gray-400 font-normal">點擊圖表可篩選時間軸</span>
+      </h3>
+      <canvas id="chartSource"></canvas>
     </div>
-    <div class="card">
-      <div class="chart-header">
-        <strong>來訪目的 (Purposes)</strong>
-        <select onchange="updateChartType('purpose', this.value)">
-          <option value="pie">圓餅圖 (Pie)</option>
-          <option value="bar">長條圖 (Bar)</option>
-          <option value="doughnut">甜甜圈 (Doughnut)</option>
-        </select>
-      </div>
-      <div class="chart-container"><canvas id="chartPurpose"></canvas></div>
+    <div class="card" style="height: 400px;">
+      <h3 class="font-bold mb-4">來訪目的 (Purposes)</h3>
+      <canvas id="chartPurpose"></canvas>
     </div>
   </div>
 
-  <!-- Data Table -->
-  <div class="card">
-    <h3>詳細資料列表 <span style="font-size:12px; font-weight:normal; color:#666;">(點擊行可查看詳細描述)</span></h3>
-    <div class="table-responsive">
-      <table id="dataTable">
-        <thead>
+  <!-- Timeline (Hidden by default, shown when filtering) -->
+  <div id="timelineCard" class="card mb-6 hidden">
+    <h3 class="font-bold mb-4" id="timelineTitle">客源趨勢分析</h3>
+    <div style="height: 300px;"><canvas id="chartTimeline"></canvas></div>
+  </div>
+
+  <!-- Table -->
+  <div class="card overflow-hidden">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-bold">最新資料列表 (Last 20)</h3>
+      <span class="text-xs text-gray-500">點擊姓名可查看詳情</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 font-medium border-b">
           <tr>
-            <th>日期</th>
-            <th>姓名</th>
-            <th>來源</th>
-            <th>目的</th>
-            <th>備註摘要</th>
-            <th class="admin-only-col" style="display:none;">管理</th>
+            <th class="p-3">日期</th>
+            <th class="p-3">分店</th>
+            <th class="p-3">姓名</th>
+            <th class="p-3">客源</th>
+            <th class="p-3">目的</th>
+            <th class="p-3 admin-only hidden">操作</th>
           </tr>
         </thead>
-        <tbody><!-- Render by JS --></tbody>
+        <tbody id="tableBody" class="divide-y divide-gray-100">
+          <!-- JS Render -->
+        </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Admin Area -->
-  <div id="adminArea" class="admin-only">
-    <h3>🔧 管理員專區</h3>
-    <div class="row" style="display:flex; gap:10px; align-items:center;">
-      <button id="btnExport">⬇️ 匯出目前查詢結果 (CSV)</button>
-      <span style="border-left:1px solid #ccc; height:20px; margin:0 10px;"></span>
-      <input type="file" id="csvFile" accept=".csv" />
-      <button id="btnParse">解析 CSV</button>
-      <button id="btnImport" class="btn-primary" disabled>確認匯入</button>
-      <span id="importStatus" style="font-size:13px; color:#666;"></span>
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="card mt-6 hidden border-2 border-dashed border-gray-300">
+    <h3 class="font-bold mb-4 text-red-600">🔧 管理員後台</h3>
+    <div id="loginForm" class="flex gap-2">
+      <input type="text" id="admEmail" placeholder="Email" class="border p-2 rounded" value="chanywang92@gmail.com">
+      <input type="password" id="admPwd" placeholder="Password" class="border p-2 rounded">
+      <button onclick="login()" class="btn-primary">登入</button>
     </div>
-    <div id="loginForm" style="margin-top:10px;">
-      <input id="admEmail" placeholder="Email" value="chanywang92@gmail.com">
-      <input id="admPwd" type="password" placeholder="Password">
-      <button id="btnLogin" class="btn-primary">登入驗證</button>
-      <button id="btnLogout" style="display:none;">登出</button>
-      <span id="authMsg" style="font-size:12px; margin-left:10px;"></span>
+    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
+      <div class="text-green-600 font-medium">已登入</div>
+      <button onclick="logout()" class="text-sm underline">登出</button>
+      <div class="h-6 w-px bg-gray-300 mx-2"></div>
+      <button onclick="exportCSV()" class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">匯出 CSV</button>
+      <div class="flex gap-2 items-center border p-2 rounded bg-gray-50">
+        <input type="file" id="csvFile" accept=".csv" class="text-xs">
+        <button onclick="parseCSV()" class="bg-green-600 text-white px-3 py-1 rounded text-xs">匯入 CSV</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Modal: Detail & Add -->
+<!-- Modal: Add / Edit / View -->
 <div id="modal" class="modal-overlay">
-  <div class="modal">
-    <span class="close-modal" onclick="closeModal()">&times;</span>
-    <h3 id="modalTitle">新增資料</h3>
+  <div class="modal-content">
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+    <h2 id="modalTitle" class="text-xl font-bold mb-6">新增客源資料</h2>
     
-    <div class="form-row">
-      <label>日期 *</label>
-      <input type="date" id="mDate">
-    </div>
-    <div class="form-row">
-      <label>姓名 *</label>
-      <input type="text" id="mName" placeholder="顧客姓名">
-    </div>
-    
-    <div class="form-row">
-      <label>來源 (多選)</label>
-      <div class="chk-group" id="mSources">
-        <label class="chk-item"><input type="checkbox" value="親友介紹">親友介紹</label>
-        <label class="chk-item"><input type="checkbox" value="Google地圖">Google地圖</label>
-        <label class="chk-item"><input type="checkbox" value="FB廣告">FB廣告</label>
-        <label class="chk-item"><input type="checkbox" value="IG">IG</label>
-        <label class="chk-item"><input type="checkbox" value="過路客">過路客</label>
-        <label class="chk-item"><input type="checkbox" value="舊客">舊客</label>
+    <div class="space-y-4">
+      <!-- Basic Info -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">日期 *</label>
+          <input type="date" id="mDate" class="w-full border p-2 rounded">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">分店 *</label>
+          <select id="mStore" class="w-full border p-2 rounded bg-gray-50">
+            <option value="臨安店">臨安店</option>
+            <option value="南科店">南科店</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="form-row">
-      <label>目的 (多選)</label>
-      <div class="chk-group" id="mPurposes">
-        <label class="chk-item"><input type="checkbox" value="驗光配鏡">驗光配鏡</label>
-        <label class="chk-item"><input type="checkbox" value="維修調整">維修調整</label>
-        <label class="chk-item"><input type="checkbox" value="隱形眼鏡">隱形眼鏡</label>
-        <label class="chk-item"><input type="checkbox" value="購買墨鏡">購買墨鏡</label>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">姓名 *</label>
+          <input type="text" id="mName" class="w-full border p-2 rounded" placeholder="顧客姓名">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">性別</label>
+          <select id="mGender" class="w-full border p-2 rounded">
+            <option value="">未選擇</option>
+            <option value="男">男</option>
+            <option value="女">女</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="form-row">
-      <label>詳細描述 / 備註</label>
-      <textarea id="mDetail" placeholder="請輸入詳細對話紀錄或備註..."></textarea>
-    </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">年齡層</label>
+          <select id="mAge" class="w-full border p-2 rounded">
+            <option value="18歲以下">18歲以下</option>
+            <option value="18-24">18-24</option>
+            <option value="25-34" selected>25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45-54">45-54</option>
+            <option value="55歲以上">55歲以上</option>
+          </select>
+        </div>
+        <div class="flex items-center pt-5">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="mTainan" class="w-5 h-5 text-blue-600">
+            <span class="font-bold text-gray-700">是台南人</span>
+          </label>
+        </div>
+      </div>
 
-    <div style="text-align:right;">
-      <button id="btnSave" class="btn-primary">儲存資料</button>
+      <hr class="border-gray-100">
+
+      <!-- Sources (Checkbox Grid) -->
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-2">得知本店來源 (可複選)</label>
+        <div class="chk-grid" id="chkSources">
+          <!-- JS Generate -->
+        </div>
+      </div>
+
+      <!-- Keyword -->
+      <div id="keywordBox" class="hidden bg-yellow-50 p-3 rounded border border-yellow-200">
+        <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋關鍵字</label>
+        <input type="text" id="mKeyword" class="w-full border p-2 rounded text-sm" placeholder="例如：台南眼鏡行、配鏡推薦...">
+      </div>
+
+      <!-- Purposes -->
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-2">來店目的 (可複選)</label>
+        <div class="chk-grid" id="chkPurposes">
+          <!-- JS Generate -->
+        </div>
+      </div>
+
+      <!-- Detail -->
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1">客人簡述 / 備註</label>
+        <textarea id="mDetail" class="w-full border p-2 rounded h-20 text-sm" placeholder="輸入詳細描述..."></textarea>
+      </div>
+
+      <button id="btnSave" onclick="saveData()" class="w-full btn-primary py-3 text-lg mt-4 shadow-lg">確認送出</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-  const SB_URL = "https://yxalpzculcyhzvnyvecb.supabase.co";
-  const SB_KEY = "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k";
-  const supabase = createClient(SB_URL, SB_KEY);
+<script>
+  // Config
+  const SOURCES = [
+    "Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", 
+    "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT",
+    "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", 
+    "老客-未購", "廣告看板", "FB 社團文"
+  ];
+  const PURPOSES = [
+    "驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢",
+    "單純看看", "購買其他商品", "住戶視力檢查"
+  ];
 
   // State
-  let visitsData = [];
-  let statsData = { sources: [], purposes: [] };
+  let visits = [];
+  let stats = {};
   let isAdmin = false;
-  let charts = {}; // Store chart instances
-  let parsedRows = []; // For CSV import
 
-  // DOM Elements
-  const el = id => document.getElementById(id);
-
-  // --- Initialize ---
+  // Init
   window.onload = () => {
-    checkAuth(); // Check if admin is logged in
-    fetchData(); // Load public data
+    // Generate Checkboxes
+    renderCheckboxes('chkSources', SOURCES);
+    renderCheckboxes('chkPurposes', PURPOSES);
+    
+    // Auto Select Store from localStorage
+    const savedStore = localStorage.getItem('store');
+    if(savedStore) document.getElementById('storeSelect').value = savedStore;
+
+    // Load Data
+    fetchData();
+    
+    // Check Keyword Input Visibility
+    document.getElementById('chkSources').addEventListener('change', checkKeywordVisibility);
   };
 
-  // --- Data Fetching (Public) ---
-  async function fetchData() {
-    const from = el('qFrom').value;
-    const to = el('qTo').value;
-    const keyword = el('qSearch').value.trim();
-
-    // 1. Fetch List
-    const { data: list, error: err1 } = await supabase.rpc('get_visits_public', { 
-      start_date: from, end_date: to, keyword: keyword 
+  function renderCheckboxes(id, list) {
+    const container = document.getElementById(id);
+    container.innerHTML = list.map(item => `
+      <label class="chk-label">
+        <input type="checkbox" value="${item}" class="mr-2">
+        <span>${item}</span>
+      </label>
+    `).join('');
+    // Add click effect
+    container.querySelectorAll('input').forEach(input => {
+      input.addEventListener('change', e => {
+        e.target.parentElement.classList.toggle('checked', e.target.checked);
+      });
     });
-    
-    // 2. Fetch Stats
-    const { data: stats, error: err2 } = await supabase.rpc('get_stats_public', { 
-      start_date: from, end_date: to 
-    });
-
-    if(err1 || err2) return alert('讀取失敗');
-
-    visitsData = list || [];
-    statsData = stats || { sources: [], purposes: [] };
-
-    renderTable();
-    initCharts();
   }
 
-  el('btnRefresh').onclick = fetchData;
+  function checkKeywordVisibility() {
+    const inputs = document.querySelectorAll('#chkSources input:checked');
+    const hasGoogle = Array.from(inputs).some(i => i.value.includes('Google 搜尋'));
+    document.getElementById('keywordBox').classList.toggle('hidden', !hasGoogle);
+  }
 
-  // --- Rendering ---
-  function renderTable() {
-    const tbody = el('dataTable').querySelector('tbody');
-    if(!visitsData.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#999;">查無資料</td></tr>';
-      return;
+  // API Call
+  window.fetchData = async () => {
+    const from = document.getElementById('qFrom').value;
+    const to = document.getElementById('qTo').value;
+    const store = document.getElementById('storeSelect').value;
+    const keyword = document.getElementById('qSearch').value;
+
+    localStorage.setItem('store', store); // Remember selection
+
+    // 1. Stats
+    const { data: statData } = await supabase.rpc('get_stats_public', {
+      start_date: from, end_date: to, store_filter: store
+    });
+    
+    // 2. List
+    const { data: listData } = await supabase.rpc('get_visits_public', {
+      start_date: from, end_date: to, keyword: keyword, store_filter: store
+    });
+
+    if(statData && listData) {
+      stats = statData;
+      visits = listData;
+      renderAll();
     }
+  };
 
-    tbody.innerHTML = visitsData.map(r => `
-      <tr onclick="showDetail('${r.form_date}', '${r.customer_name}')">
-        <td>${r.form_date}</td>
-        <td>${r.customer_name}</td>
-        <td>${(r.source_tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</td>
-        <td>${(r.visit_purposes||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</td>
-        <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">${(r.detail_desc||'').substring(0,30)}...</td>
-        <td class="admin-only-col" style="display:${isAdmin?'table-cell':'none'}">
-          <button class="btn-danger" style="font-size:12px; padding:4px;" onclick="deleteVisit(event, '${r.form_date}', '${r.customer_name}')">刪除</button>
+  function renderAll() {
+    // 1. Old Guest Stats
+    const old = stats.old_guests || {total:0, bought:0, not_bought:0};
+    document.getElementById('statOldTotal').textContent = old.total;
+    document.getElementById('statOldBuy').textContent = old.bought;
+    document.getElementById('statOldNoBuy').textContent = old.not_bought;
+
+    // 2. Charts
+    renderChart('chartSource', 'bar', stats.sources, 'tag');
+    renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
+
+    // 3. Table
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = visits.map(v => `
+      <tr class="hover:bg-blue-50 cursor-pointer transition" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
+        <td class="p-3">${v.form_date}</td>
+        <td class="p-3"><span class="px-2 py-1 rounded text-xs ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch||'臨安店'}</span></td>
+        <td class="p-3 font-medium text-blue-600 hover:underline">${v.customer_name}</td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[150px]">${(v.source_tags||[]).join(', ')}</td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[150px]">${(v.visit_purposes||[]).join(', ')}</td>
+        <td class="p-3 admin-only ${isAdmin?'':'hidden'}">
+          <button onclick="event.stopPropagation(); deleteVisit('${v.form_date}', '${v.customer_name}')" class="text-red-500 hover:text-red-700">刪除</button>
         </td>
       </tr>
     `).join('');
   }
 
-  // --- Charts Logic ---
-  function initCharts() {
-    renderChart('chartSource', 'bar', statsData.sources, 'tag');
-    renderChart('chartPurpose', 'pie', statsData.purposes, 'purpose');
-  }
+  // Chart Logic
+  let charts = {};
+  function renderChart(id, type, data, key) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if(charts[id]) charts[id].destroy();
 
-  window.updateChartType = (key, type) => {
-    const data = key === 'source' ? statsData.sources : statsData.purposes;
-    const keyName = key === 'source' ? 'tag' : 'purpose';
-    const canvasId = key === 'source' ? 'chartSource' : 'chartPurpose';
-    renderChart(canvasId, type, data, keyName);
-  };
+    const total = data.reduce((sum, d) => sum + d.c, 0);
 
-  function renderChart(canvasId, type, data, keyName) {
-    const ctx = el(canvasId).getContext('2d');
-    if(charts[canvasId]) charts[canvasId].destroy();
-
-    charts[canvasId] = new Chart(ctx, {
+    charts[id] = new Chart(ctx, {
       type: type,
       data: {
-        labels: data.map(d => d[keyName]),
+        labels: data.map(d => d[key]),
         datasets: [{
-          label: '人數',
           data: data.map(d => d.c),
           backgroundColor: [
-            '#212b36', '#007bff', '#28a745', '#ffc107', '#dc3545', '#6610f2', '#fd7e14'
+            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'
           ],
           borderRadius: 4
         }]
       },
-      options: { 
-        responsive: true, 
+      options: {
+        responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
+        plugins: {
+          legend: { position: 'right', display: type==='doughnut' },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const val = ctx.raw;
+                const pct = total ? ((val/total)*100).toFixed(1) + '%' : '0%';
+                return `${ctx.label}: ${val}人 (${pct})`;
+              }
+            }
+          }
+        },
+        onClick: (evt, elements) => {
+          if(id === 'chartSource' && elements.length > 0) {
+            const idx = elements[0].index;
+            const label = data[idx][key];
+            showTimeline(label);
+          }
+        }
       }
     });
   }
 
-  // --- Modal Logic (Add / Detail) ---
-  window.openModal = () => { el('modal').style.display = 'flex'; };
-  window.closeModal = () => { el('modal').style.display = 'none'; };
-
-  // Add New
-  el('btnAdd').onclick = () => {
-    el('modalTitle').textContent = "新增資料";
-    el('mDate').valueAsDate = new Date();
-    el('mName').value = "";
-    el('mDetail').value = "";
-    document.querySelectorAll('.chk-item').forEach(c => {
-      c.classList.remove('checked');
-      c.querySelector('input').checked = false;
-    });
-    el('mDate').disabled = false;
-    el('mName').disabled = false;
-    el('btnSave').style.display = 'inline-block';
-    openModal();
-  };
-
-  // Checkbox UI interaction
-  document.querySelectorAll('.chk-item').forEach(item => {
-    item.onclick = (e) => {
-      if(el('btnSave').style.display === 'none') return; // Read only
-      const input = item.querySelector('input');
-      input.checked = !input.checked;
-      item.classList.toggle('checked', input.checked);
-    };
-  });
-
-  // Save (Public Insert)
-  el('btnSave').onclick = async () => {
-    const date = el('mDate').value;
-    const name = el('mName').value;
-    if(!date || !name) return alert('日期與姓名為必填');
-
-    const getVals = (id) => Array.from(el(id).querySelectorAll('input:checked')).map(i=>i.value);
+  function showTimeline(sourceTag) {
+    document.getElementById('timelineCard').classList.remove('hidden');
+    document.getElementById('timelineTitle').textContent = `趨勢分析：${sourceTag}`;
     
-    el('btnSave').textContent = "儲存中...";
-    el('btnSave').disabled = true;
-
-    const { error } = await supabase.rpc('submit_visit', {
-      p_date: date,
-      p_name: name,
-      p_sources: getVals('mSources'),
-      p_purposes: getVals('mPurposes'),
-      p_detail: el('mDetail').value
+    // Process Data
+    const timeline = stats.timeline || [];
+    // Group by Date
+    const daily = {};
+    timeline.forEach(item => {
+      if(item.source_tags && item.source_tags.includes(sourceTag)) {
+        daily[item.form_date] = (daily[item.form_date] || 0) + 1;
+      }
     });
+    
+    const dates = Object.keys(daily).sort();
+    const counts = dates.map(d => daily[d]);
 
-    el('btnSave').textContent = "儲存資料";
-    el('btnSave').disabled = false;
+    const ctx = document.getElementById('chartTimeline').getContext('2d');
+    if(charts['timeline']) charts['timeline'].destroy();
 
-    if(error) alert('儲存失敗：' + error.message);
-    else {
-      closeModal();
-      fetchData(); // Reload
-    }
+    charts['timeline'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: sourceTag,
+          data: counts,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+    
+    // Scroll to view
+    document.getElementById('timelineCard').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Modal Actions
+  window.openAddModal = () => {
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modalTitle').textContent = '新增客源資料';
+    document.getElementById('mDate').valueAsDate = new Date();
+    document.getElementById('mStore').value = document.getElementById('storeSelect').value === '全部' ? '臨安店' : document.getElementById('storeSelect').value;
+    document.getElementById('mName').value = '';
+    document.getElementById('mDetail').value = '';
+    document.getElementById('mKeyword').value = '';
+    document.getElementById('mTainan').checked = false;
+    
+    document.querySelectorAll('input[type="checkbox"]').forEach(i => {
+      i.checked = false; 
+      i.parentElement.classList.remove('checked');
+    });
+    
+    // Enable inputs
+    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false);
+    document.getElementById('btnSave').classList.remove('hidden');
   };
 
-  // Show Detail
   window.showDetail = (date, name) => {
-    const item = visitsData.find(v => v.form_date === date && v.customer_name === name);
+    const item = visits.find(v => v.form_date === date && v.customer_name === name);
     if(!item) return;
 
-    el('modalTitle').textContent = "詳細資料檢視";
-    el('mDate').value = item.form_date;
-    el('mName').value = item.customer_name;
-    el('mDetail').value = item.detail_desc || "";
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modalTitle').textContent = '詳細資料';
     
-    // Read Only Mode
-    el('mDate').disabled = true;
-    el('mName').disabled = true;
-    el('btnSave').style.display = 'none';
+    // Fill Data
+    document.getElementById('mDate').value = item.form_date;
+    document.getElementById('mStore').value = item.store_branch || '臨安店';
+    document.getElementById('mName').value = item.customer_name;
+    document.getElementById('mGender').value = item.gender || '';
+    document.getElementById('mAge').value = item.age_group || '25-34';
+    document.getElementById('mTainan').checked = item.is_tainan;
+    document.getElementById('mDetail').value = (item.detail_desc || '') + (item.search_keyword ? `\n[關鍵字]: ${item.search_keyword}` : '');
     
-    // Fill tags
-    const setTags = (pid, tags) => {
-      el(pid).querySelectorAll('.chk-item').forEach(div => {
-        const val = div.querySelector('input').value;
-        const checked = (tags||[]).includes(val);
-        div.classList.toggle('checked', checked);
-        div.querySelector('input').checked = checked;
+    // Checkboxes
+    const setChecked = (id, tags) => {
+      document.querySelectorAll(`#${id} input`).forEach(i => {
+        const checked = (tags||[]).includes(i.value);
+        i.checked = checked;
+        i.parentElement.classList.toggle('checked', checked);
       });
     };
-    setTags('mSources', item.source_tags);
-    setTags('mPurposes', item.visit_purposes);
+    setChecked('chkSources', item.source_tags);
+    setChecked('chkPurposes', item.visit_purposes);
 
-    openModal();
+    // Read Only
+    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true);
+    document.getElementById('btnSave').classList.add('hidden');
   };
 
-  // --- Admin Logic ---
-  el('btnAdminToggle').onclick = () => {
-    const area = el('adminArea');
-    area.style.display = area.style.display === 'none' ? 'block' : 'none';
-    if(area.style.display === 'block') area.scrollIntoView({ behavior: 'smooth' });
+  window.closeModal = () => { document.getElementById('modal').style.display = 'none'; };
+
+  window.saveData = async () => {
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true; btn.textContent = '儲存中...';
+
+    const getVals = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value);
+
+    const payload = {
+      p_date: document.getElementById('mDate').value,
+      p_store: document.getElementById('mStore').value,
+      p_name: document.getElementById('mName').value,
+      p_gender: document.getElementById('mGender').value,
+      p_age: document.getElementById('mAge').value,
+      p_tainan: document.getElementById('mTainan').checked,
+      p_sources: getVals('chkSources'),
+      p_purposes: getVals('chkPurposes'),
+      p_keyword: document.getElementById('mKeyword').value,
+      p_detail: document.getElementById('mDetail').value
+    };
+
+    if(!payload.p_date || !payload.p_name) {
+      alert('日期與姓名為必填');
+      btn.disabled = false; btn.textContent = '確認送出';
+      return;
+    }
+
+    const { error } = await supabase.rpc('submit_visit', payload);
+
+    if(error) alert('Error: ' + error.message);
+    else {
+      closeModal();
+      fetchData();
+    }
+    btn.disabled = false; btn.textContent = '確認送出';
   };
+
+  // Admin
+  window.toggleAdmin = () => { document.getElementById('adminPanel').classList.toggle('hidden'); };
+  
+  window.login = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById('admEmail').value,
+      password: document.getElementById('admPwd').value
+    });
+    if(error) alert('登入失敗');
+    else checkAuth();
+  };
+
+  window.logout = async () => { await supabase.auth.signOut(); checkAuth(); };
 
   async function checkAuth() {
     const { data } = await supabase.auth.getSession();
-    if(data?.session) {
-      isAdmin = true;
-      el('authMsg').textContent = `已登入：${data.session.user.email}`;
-      el('authMsg').className = 'ok';
-      el('loginForm').querySelector('#btnLogin').style.display = 'none';
-      el('loginForm').querySelector('#btnLogout').style.display = 'inline-block';
-      el('btnImport').disabled = true; // Wait for parse
-      
-      // Show admin cols
-      document.querySelectorAll('.admin-only-col').forEach(e => e.style.display = 'table-cell');
+    isAdmin = !!data.session;
+    if(isAdmin) {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('adminActions').classList.remove('hidden');
+      document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
     } else {
-      isAdmin = false;
-      el('authMsg').textContent = "未登入";
-      el('loginForm').querySelector('#btnLogin').style.display = 'inline-block';
-      el('loginForm').querySelector('#btnLogout').style.display = 'none';
-      document.querySelectorAll('.admin-only-col').forEach(e => e.style.display = 'none');
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('adminActions').classList.add('hidden');
+      document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
     }
   }
-
-  el('btnLogin').onclick = async () => {
-    const email = el('admEmail').value;
-    const pwd = el('admPwd').value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-    if(error) alert(error.message);
-    else {
-      await checkAuth();
-      fetchData(); // Refresh to show delete buttons
-    }
-  };
-
-  el('btnLogout').onclick = async () => {
-    await supabase.auth.signOut();
-    location.reload();
-  };
-
-  window.deleteVisit = async (e, date, name) => {
-    e.stopPropagation(); // Stop row click
-    if(!confirm(`確定刪除 ${date} ${name}?`)) return;
-    const { error } = await supabase.rpc('delete_visit', { p_date: date, p_name: name });
-    if(error) alert('刪除失敗 (權限不足?)');
-    else fetchData();
-  };
-
-  // Import/Export
-  el('btnExport').onclick = () => {
-    if(!visitsData.length) return alert('無資料');
-    const csv = Papa.unparse(visitsData);
+  checkAuth();
+  
+  // CSV Import/Export
+  window.exportCSV = () => {
+    const csv = Papa.unparse(visits);
     const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `visits_export.csv`;
     document.body.appendChild(a); a.click(); a.remove();
-  };
-
-  const parseArr = s => (String(s).trim().startsWith('{')) ? String(s).slice(1,-1).split(',') : String(s).split(/,|，/);
-
-  el('btnParse').onclick = () => {
-    const f = el('csvFile').files[0];
-    if(!f) return alert('請選檔案');
-    Papa.parse(f, {
-      header: true, skipEmptyLines: true,
-      complete: res => {
-        const rawMap = new Map();
-        res.data.forEach(r => {
-          const d = r['form_date']||r['日期'], n = r['customer_name']||r['姓名'];
-          if(d && n) rawMap.set(d+'_'+n, {
-            form_date: d, customer_name: n,
-            visit_purposes: parseArr(r['visit_purposes']||r['來訪目的']||''),
-            source_tags: parseArr(r['source_tags']||r['來源標籤']||''),
-            detail_desc: r['detail_desc']||r['備註']||''
-          });
-        });
-        parsedRows = Array.from(rawMap.values());
-        el('importStatus').textContent = `解析 ${parsedRows.length} 筆 (已去重)`;
-        el('btnImport').disabled = !parsedRows.length;
-      }
-    });
-  };
-
-  el('btnImport').onclick = async () => {
-    el('importStatus').textContent = "匯入中...";
-    const { data, error } = await supabase.rpc('import_visits_json', { rows: parsedRows });
-    if(error) el('importStatus').textContent = "失敗: " + error.message;
-    else {
-      el('importStatus').textContent = `成功匯入 ${data.count} 筆`;
-      fetchData();
-    }
   };
 </script>
 </body>
