@@ -39,20 +39,24 @@
     .date-picker-custom { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 2px 8px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; }
     .date-picker-custom::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     
-    /* Store Button Styles */
     .store-btn { padding: 4px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; }
     .store-btn.active { background: white; color: #1d4ed8; }
     .store-btn.inactive { background: transparent; color: #bfdbfe; border: 1px solid rgba(255,255,255,0.3); }
-    .store-btn.inactive:hover { color: white; border-color: white; }
+
+    .required-mark { color: #ef4444; margin-left: 2px; }
+    .hint-text { font-size: 11px; color: #ef4444; font-weight: bold; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
 
 <div class="max-w-2xl mx-auto p-4">
   <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
-    <div class="flex items-center gap-2">
-      <h1 class="font-bold text-lg">📝 顧客登記</h1>
-      <input type="date" id="globalDate" class="date-picker-custom">
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="font-bold text-lg">📝 顧客登記</h1>
+        <input type="date" id="globalDate" class="date-picker-custom">
+      </div>
+      <span class="text-[10px] text-blue-200 block mt-1">⚠️ 請務必確認日期是否正確</span>
     </div>
     <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
       <button onclick="setGlobalStore('臨安店')" id="gStoreLinAn" class="store-btn inactive">臨安店</button>
@@ -70,7 +74,6 @@
 </div>
 
 <script>
-  // --- COMPLETE DATA CONFIG ---
   const SOURCES = [
     "Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", 
     "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", 
@@ -83,24 +86,20 @@
   
   const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
   
-  let globalStore = ''; // Default empty
+  let globalStore = '';
   let cardCount = 0;
 
   window.onload = () => {
-    // 1. Date Init
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('globalDate').value = today;
     
-    // 2. Store Cache Init
     const cachedStore = localStorage.getItem('wakodo_last_store');
     if(cachedStore && (cachedStore === '臨安店' || cachedStore === '南科店')) {
       setGlobalStore(cachedStore);
     } else {
-      // No default store, buttons remain inactive state
       renderStoreButtons();
     }
     
-    // 3. Card Init
     addCard();
   };
 
@@ -113,7 +112,6 @@
   function renderStoreButtons() {
     const btnL = document.getElementById('gStoreLinAn');
     const btnN = document.getElementById('gStoreNanKe');
-    
     btnL.className = globalStore === '臨安店' ? 'store-btn active' : 'store-btn inactive';
     btnN.className = globalStore === '南科店' ? 'store-btn active' : 'store-btn inactive';
   }
@@ -136,25 +134,32 @@
         <div class="space-y-5">
           <!-- Name -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 mb-1">姓名 <span class="text-red-500">*</span></label>
+            <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
             <input type="text" class="input-base name-input" placeholder="輸入姓名">
           </div>
 
           <!-- Gender & Tainan -->
-          <div class="flex justify-between items-center gap-4">
-            <div class="radio-group" id="${id}-gender">
-              <div class="radio-btn" onclick="selectRadio('${id}-gender', '男', this)">男</div>
-              <div class="radio-btn" onclick="selectRadio('${id}-gender', '女', this)">女</div>
+          <div class="flex justify-between items-start gap-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
+              <div class="radio-group" id="${id}-gender">
+                <div class="radio-btn" onclick="selectRadio('${id}-gender', '男', this)">男</div>
+                <div class="radio-btn" onclick="selectRadio('${id}-gender', '女', this)">女</div>
+              </div>
             </div>
-            <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-              <input type="checkbox" class="w-4 h-4 text-blue-600 tainan-check">
-              <span class="text-sm font-bold text-blue-800">住台南</span>
-            </label>
+            
+            <div class="flex flex-col items-end">
+              <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                <input type="checkbox" class="w-4 h-4 text-blue-600 tainan-check" checked>
+                <span class="text-sm font-bold text-blue-800">住台南</span>
+              </label>
+              <span class="hint-text">非台南人請取消勾選</span>
+            </div>
           </div>
 
           <!-- Age -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 mb-2">年齡層</label>
+            <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
             <div class="radio-group" id="${id}-age">
               ${AGES.map(age => `<div class="radio-btn" onclick="selectRadio('${id}-age', '${age}', this)">${age}</div>`).join('')}
             </div>
@@ -162,7 +167,7 @@
 
           <!-- Source -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 mb-2">客源 (複選)</label>
+            <label class="block text-xs font-bold text-gray-500 mb-2">客源 <span class="required-mark">*</span></label>
             <div class="chk-grid" id="${id}-sources">
               ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}', '${id}')">${s}</div>`).join('')}
             </div>
@@ -174,15 +179,16 @@
 
           <!-- Purpose -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 mb-2">目的 (複選)</label>
-            <div class="chk-grid source-container">
+            <label class="block text-xs font-bold text-gray-500 mb-2">目的 <span class="required-mark">*</span></label>
+            <div class="chk-grid purpose-container">
               ${PURPOSES.map(p => `<div class="chk-btn purpose-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('')}
             </div>
           </div>
 
           <!-- Detail -->
           <div>
-            <textarea class="input-base h-20 resize-none detail-input" placeholder="備註..."></textarea>
+            <label class="block text-xs font-bold text-gray-500 mb-1">備註 <span class="required-mark">*</span></label>
+            <textarea class="input-base h-20 resize-none detail-input" placeholder="客人描述..."></textarea>
           </div>
         </div>
       </div>
@@ -214,18 +220,29 @@
   };
 
   window.submitAll = async () => {
-    // Check Store Selection
     if(!globalStore) { alert('⚠️ 請先選擇分店 (點選上方的 臨安店 或 南科店)'); window.scrollTo(0,0); return; }
 
     const cards = document.querySelectorAll('.customer-card');
     const btn = document.getElementById('btnSubmit');
     const selectedDate = document.getElementById('globalDate').value;
     
+    // Validate All Fields
     let isValid = true;
-    cards.forEach((card, index) => {
+    for(let i=0; i<cards.length; i++) {
+      const card = cards[i];
       const name = card.querySelector('.name-input').value.trim();
-      if(!name) { alert(`第 ${index+1} 筆資料的姓名未填寫！`); isValid = false; }
-    });
+      const gender = card.querySelector(`#${card.id}-gender .selected`);
+      const age = card.querySelector(`#${card.id}-age .selected`);
+      const sources = card.querySelectorAll(`#${card.id}-sources .checked`).length;
+      const purposes = card.querySelectorAll('.purpose-btn.checked').length;
+      const detail = card.querySelector('.detail-input').value.trim();
+
+      if(!name || !gender || !age || sources === 0 || purposes === 0 || !detail) {
+        alert(`⚠️ 第 ${i+1} 筆資料有缺漏！\n\n請檢查：姓名、性別、年齡、客源、目的、備註 都要填寫。`);
+        isValid = false;
+        break;
+      }
+    }
     if(!isValid) return;
 
     btn.disabled = true; btn.textContent = '傳送中...';
@@ -244,7 +261,7 @@
 
       const payload = {
         p_date: selectedDate, p_store: globalStore, p_name: name,
-        p_gender: genderEl ? genderEl.dataset.value : '', p_age: ageEl ? ageEl.dataset.value : '',
+        p_gender: genderEl.dataset.value, p_age: ageEl.dataset.value,
         p_tainan: isTainan, p_sources: sources, p_purposes: purposes,
         p_keyword: keyword, p_detail: detail
       };
