@@ -279,4 +279,212 @@
         <div class="text-xl font-bold text-gray-700">${nankeCount} <span class="text-xs font-normal text-gray-400">/ ${totalCount}</span></div>
       </div>
       <!-- Future expansion slot -->
-      <div class="card border border-dashed border-g
+      <div class="card border border-dashed border-gray-200 p-4 flex items-center justify-center text-gray-300 text-xs">
+        預留分店欄位
+      </div>
+    `;
+    document.getElementById('storeStatsGrid').innerHTML = storeStatsHtml;
+
+    // 2. Charts
+    renderChart('chartSource', 'bar', stats.sources, 'tag');
+    renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
+
+    // 3. List
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = visits.map(v => `
+      <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
+        <td class="p-3 text-gray-600">${v.form_date.slice(5)}</td>
+        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
+        <td class="p-3 font-medium text-gray-800">${v.customer_name}</td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.source_tags||[]).join(', ')}</td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[120px]">${(v.visit_purposes||[]).join(', ')}</td>
+        <td class="p-3 hidden admin-only"><button class="text-red-400 hover:text-red-600">刪</button></td>
+      </tr>
+    `).join('');
+  }
+
+  let charts = {};
+  function renderChart(id, type, data, key) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if(charts[id]) charts[id].destroy();
+
+    charts[id] = new Chart(ctx, {
+      type: type,
+      data: {
+        labels: data.map(d => d[key]),
+        datasets: [{
+          data: data.map(d => d.c),
+          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: type === 'doughnut', position: 'right' } },
+        onClick: (evt, activeElements) => {
+          if (activeElements.length > 0 && id === 'chartSource') {
+            const index = activeElements[0].index;
+            const label = data[index][key];
+            showTrend(label);
+          }
+        }
+      }
+    });
+  }
+
+  function showTrend(sourceName) {
+    document.getElementById('trendCard').classList.remove('hidden');
+    document.getElementById('trendTitle').textContent = `"${sourceName}" 趨勢分析`;
+    
+    // Process timeline data
+    const timeline = stats.timeline || [];
+    const dateMap = {};
+    
+    timeline.forEach(t => {
+      if(t.source_tags && t.source_tags.includes(sourceName)) {
+        dateMap[t.form_date] = (dateMap[t.form_date] || 0) + 1;
+      }
+    });
+
+    const dates = Object.keys(dateMap).sort();
+    const counts = dates.map(d => dateMap[d]);
+
+    const ctx = document.getElementById('chartTrend').getContext('2d');
+    if(charts['trend']) charts['trend'].destroy();
+
+    charts['trend'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: sourceName,
+          data: counts,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    document.getElementById('trendCard').scrollIntoView({behavior: 'smooth'});
+  }
+
+  // Modal Functions
+  window.openAddModal = () => {
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modalTitle').textContent = '新增資料';
+    document.getElementById('mDate').valueAsDate = new Date();
+    document.getElementById('mStore').value = document.getElementById('storeSelect').value === '全部' ? '臨安店' : document.getElementById('storeSelect').value;
+    document.getElementById('mName').value = '';
+    document.getElementById('mDetail').value = '';
+    document.getElementById('mKeyword').value = '';
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); });
+    
+    // Enable inputs
+    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false);
+    document.getElementById('btnSave').classList.remove('hidden');
+  };
+
+  window.showDetail = (date, name) => {
+    const item = visits.find(v => v.form_date === date && v.customer_name === name);
+    if(!item) return;
+    
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modalTitle').textContent = '詳細資料';
+    document.getElementById('mDate').value = item.form_date;
+    document.getElementById('mStore').value = item.store_branch;
+    document.getElementById('mName').value = item.customer_name;
+    document.getElementById('mGender').value = item.gender;
+    document.getElementById('mAge').value = item.age_group;
+    document.getElementById('mTainan').checked = item.is_tainan;
+    document.getElementById('mDetail').value = item.detail_desc;
+    document.getElementById('mKeyword').value = item.search_keyword || '';
+
+    // Checkboxes
+    document.querySelectorAll('#chkSources input').forEach(c => { 
+      c.checked = (item.source_tags||[]).includes(c.value); 
+      c.parentElement.classList.toggle('checked', c.checked);
+    });
+    document.querySelectorAll('#chkPurposes input').forEach(c => { 
+      c.checked = (item.visit_purposes||[]).includes(c.value); 
+      c.parentElement.classList.toggle('checked', c.checked);
+    });
+
+    // Disable inputs
+    document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true);
+    document.getElementById('btnSave').classList.add('hidden');
+  };
+
+  window.closeModal = () => document.getElementById('modal').style.display = 'none';
+
+  window.saveData = async () => {
+    const btn = document.getElementById('btnSave');
+    btn.textContent = '儲存中...'; btn.disabled = true;
+
+    const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
+    
+    const payload = {
+      p_date: document.getElementById('mDate').value,
+      p_store: document.getElementById('mStore').value,
+      p_name: document.getElementById('mName').value,
+      p_gender: document.getElementById('mGender').value,
+      p_age: document.getElementById('mAge').value,
+      p_tainan: document.getElementById('mTainan').checked,
+      p_sources: getArr('chkSources'),
+      p_purposes: getArr('chkPurposes'),
+      p_keyword: document.getElementById('mKeyword').value,
+      p_detail: document.getElementById('mDetail').value
+    };
+
+    if(!payload.p_date || !payload.p_name) {
+      alert('日期與姓名必填');
+      btn.textContent = '儲存資料'; btn.disabled = false;
+      return;
+    }
+
+    const { error } = await supabase.rpc('submit_visit', payload);
+    if(error) alert('Error: ' + error.message);
+    else {
+      closeModal();
+      fetchData();
+    }
+    btn.textContent = '儲存資料'; btn.disabled = false;
+  };
+
+  window.toggleAdmin = () => document.getElementById('adminPanel').classList.toggle('hidden');
+  window.login = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'chanywang92@gmail.com', password: document.getElementById('admPwd').value
+    });
+    if(!error) checkAuth();
+    else alert('登入失敗');
+  }
+  window.logout = async () => { await supabase.auth.signOut(); checkAuth(); }
+  async function checkAuth() {
+    const { data } = await supabase.auth.getSession();
+    if(data.session) {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('adminActions').classList.remove('hidden');
+      document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
+    } else {
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('adminActions').classList.add('hidden');
+      document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
+    }
+  }
+  checkAuth();
+  
+  window.exportCSV = () => {
+    const csv = Papa.unparse(visits);
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `wakodo_export_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  };
+</script>
+</body>
+</html>
