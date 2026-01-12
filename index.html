@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室</title>
+  <title>和光堂戰情室 v3.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -17,6 +17,9 @@
   <style>
     body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; transition: 0.2s; }
+    .btn-stat { cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+    .btn-stat:hover { transform: translateY(-2px); shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .btn-stat.active { border-color: #3b82f6; background-color: #eff6ff; }
     .btn-primary { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; transition: 0.2s; }
     .btn-primary:hover { background: #1d4ed8; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; }
@@ -36,16 +39,11 @@
     <div class="flex items-center gap-3">
       <h1 class="text-2xl font-bold text-gray-900 tracking-tight">👓 和光堂戰情室</h1>
       <div class="flex flex-col text-[10px] text-blue-600 font-bold leading-tight border-l-2 border-blue-200 pl-2">
-        <span>v2.1 Last Update</span>
+        <span>v3.0 Last Update</span>
         <span id="updateTime">2026-01-13</span>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <select id="storeSelect" onchange="fetchData()" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium shadow-sm focus:ring-2 focus:ring-blue-500">
-        <option value="全部">全部店舖</option>
-        <option value="臨安店" selected>臨安店</option>
-        <option value="南科店">南科店</option>
-      </select>
       <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
       <button onclick="toggleAdmin()" class="text-gray-400 hover:text-gray-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
     </div>
@@ -66,32 +64,51 @@
     <button onclick="fetchData()" class="bg-gray-800 text-white px-4 py-1 rounded text-sm hover:bg-gray-700">查詢</button>
   </div>
 
-  <!-- Store Stats (Dynamic) -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="storeStatsGrid">
-    <!-- JS will populate this -->
+  <!-- Store Buttons -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active">
+      <div class="text-sm text-gray-500 mb-1">總客數 (全部)</div>
+      <div class="text-3xl font-bold text-gray-800" id="statTotal">0</div>
+    </div>
+    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center">
+      <div class="text-sm text-gray-500 mb-1">臨安店</div>
+      <div class="text-3xl font-bold text-blue-600" id="statLinAn">0</div>
+    </div>
+    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center">
+      <div class="text-sm text-gray-500 mb-1">南科店</div>
+      <div class="text-3xl font-bold text-green-600" id="statNanKe">0</div>
+    </div>
+    <!-- 預留分店位置 (隱藏) -->
+    <div class="hidden"></div> 
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <div class="card h-[400px]">
+    <!-- 左側：客源 -->
+    <div class="card h-[450px] flex flex-col">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-gray-700">客源分析 (點擊長條看趨勢)</h3>
+        <h3 class="font-bold text-gray-700">客源分析</h3>
+        <select id="sourceFilter" onchange="filterSource()" class="border rounded px-2 py-1 text-sm bg-gray-50">
+          <option value="ALL">顯示全部客源</option>
+          <!-- JS will populate -->
+        </select>
       </div>
-      <div class="h-[320px]"><canvas id="chartSource"></canvas></div>
+      <div class="flex-grow relative h-full">
+        <canvas id="chartSource"></canvas>
+      </div>
+      <div id="trendBox" class="h-[100px] mt-4 hidden border-t pt-2">
+        <div class="text-xs text-gray-500 mb-1 font-bold">走勢圖</div>
+        <canvas id="chartTrendMini"></canvas>
+      </div>
     </div>
-    <div class="card h-[400px]">
-      <h3 class="font-bold text-gray-700 mb-4">來訪目的</h3>
-      <div class="h-[320px]"><canvas id="chartPurpose"></canvas></div>
-    </div>
-  </div>
 
-  <!-- Trend Chart (Hidden by default) -->
-  <div id="trendCard" class="card mb-6 hidden">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-bold text-blue-700" id="trendTitle">趨勢分析</h3>
-      <button onclick="document.getElementById('trendCard').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <!-- 右側：目的 -->
+    <div class="card h-[450px] flex flex-col">
+      <h3 class="font-bold text-gray-700 mb-4">來店目的</h3>
+      <div class="flex-grow relative h-full">
+        <canvas id="chartPurpose"></canvas>
+      </div>
     </div>
-    <div class="h-[300px]"><canvas id="chartTrend"></canvas></div>
   </div>
 
   <!-- Table -->
@@ -203,7 +220,8 @@
   // State
   let visits = [];
   let stats = {};
-  let isAdmin = false;
+  let currentStore = '全部';
+  let charts = {};
 
   // Init
   document.getElementById('updateTime').textContent = new Date().toISOString().split('T')[0];
@@ -211,9 +229,17 @@
   window.onload = () => {
     initCheckboxes('chkSources', SOURCES);
     initCheckboxes('chkPurposes', PURPOSES);
-    const savedStore = localStorage.getItem('store');
-    if(savedStore) document.getElementById('storeSelect').value = savedStore;
-    fetchData();
+    
+    // Populate Source Filter
+    const sSelect = document.getElementById('sourceFilter');
+    SOURCES.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sSelect.appendChild(opt);
+    });
+
+    const savedStore = localStorage.getItem('store') || '全部';
+    setStore(savedStore);
   };
 
   function initCheckboxes(id, list) {
@@ -224,7 +250,6 @@
       </label>
     `).join('');
     
-    // Keyword toggle
     if(id === 'chkSources') {
       document.getElementById(id).addEventListener('change', () => {
         const hasGoogle = Array.from(document.querySelectorAll('#chkSources input:checked')).some(i => i.value.includes('Google'));
@@ -233,63 +258,69 @@
     }
   }
 
+  window.setStore = (storeName) => {
+    currentStore = storeName;
+    localStorage.setItem('store', storeName);
+    
+    // UI Update
+    document.querySelectorAll('.btn-stat').forEach(b => b.classList.remove('active'));
+    if(storeName === '全部') document.getElementById('btnTotal').classList.add('active');
+    if(storeName === '臨安店') document.getElementById('btnLinAn').classList.add('active');
+    if(storeName === '南科店') document.getElementById('btnNanKe').classList.add('active');
+
+    fetchData();
+  };
+
   window.fetchData = async () => {
     const from = document.getElementById('qFrom').value;
     const to = document.getElementById('qTo').value;
-    const store = document.getElementById('storeSelect').value;
     const keyword = document.getElementById('qSearch').value;
     
-    localStorage.setItem('store', store);
-
     // 1. Get List
     const { data: listData } = await supabase.rpc('get_visits_public', {
-      start_date: from, end_date: to, keyword: keyword, store_filter: store
+      start_date: from, end_date: to, keyword: keyword, store_filter: currentStore
     });
 
     // 2. Get Stats
     const { data: statData } = await supabase.rpc('get_stats_public', {
-      start_date: from, end_date: to, store_filter: store
+      start_date: from, end_date: to, store_filter: currentStore
     });
 
     if(listData && statData) {
       visits = listData;
       stats = statData;
+      
+      // Update Button Numbers (Needs a separate query ideally, but here we can approx or use raw list for small data)
+      // Note: To get accurate counts for ALL stores even when filtered, we might need a separate call.
+      // But for now, let's use the current filtered list count for the ACTIVE button, and keep others static or simple.
+      // Better approach: Let's do a quick count call for all stores to keep buttons accurate.
+      updateButtonCounts(from, to);
+
       renderAll();
     }
   };
 
-  function renderAll() {
-    // 1. Store Stats (Total, LinAn, NanKe)
-    // 這裡我們動態計算，即使未來有新分店也不怕
-    const totalCount = visits.length; // 當前篩選下的總數
-    const linanCount = visits.filter(v => v.store_branch === '臨安店').length;
-    const nankeCount = visits.filter(v => v.store_branch === '南科店').length;
+  async function updateButtonCounts(from, to) {
+    // This is a bit heavy but ensures accuracy. In prod, optimize this.
+    const { data } = await supabase.from('visits').select('store_branch')
+      .gte('form_date', from).lte('form_date', to);
     
-    const storeStatsHtml = `
-      <div class="card bg-blue-50 border-l-4 border-blue-500 p-4">
-        <div class="text-xs text-gray-500 mb-1">總客數 (目前篩選)</div>
-        <div class="text-2xl font-bold text-blue-700">${totalCount}</div>
-      </div>
-      <div class="card bg-white border border-gray-100 p-4">
-        <div class="text-xs text-gray-400 mb-1">臨安店佔比</div>
-        <div class="text-xl font-bold text-gray-700">${linanCount} <span class="text-xs font-normal text-gray-400">/ ${totalCount}</span></div>
-      </div>
-      <div class="card bg-white border border-gray-100 p-4">
-        <div class="text-xs text-gray-400 mb-1">南科店佔比</div>
-        <div class="text-xl font-bold text-gray-700">${nankeCount} <span class="text-xs font-normal text-gray-400">/ ${totalCount}</span></div>
-      </div>
-      <!-- Future expansion slot -->
-      <div class="card border border-dashed border-gray-200 p-4 flex items-center justify-center text-gray-300 text-xs">
-        預留分店欄位
-      </div>
-    `;
-    document.getElementById('storeStatsGrid').innerHTML = storeStatsHtml;
+    if(data) {
+      document.getElementById('statTotal').textContent = data.length;
+      document.getElementById('statLinAn').textContent = data.filter(r => r.store_branch === '臨安店').length;
+      document.getElementById('statNanKe').textContent = data.filter(r => r.store_branch === '南科店').length;
+    }
+  }
 
-    // 2. Charts
+  function renderAll() {
     renderChart('chartSource', 'bar', stats.sources, 'tag');
     renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
+    
+    // Reset filter UI
+    document.getElementById('sourceFilter').value = 'ALL';
+    document.getElementById('trendBox').classList.add('hidden');
 
-    // 3. List
+    // List
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = visits.map(v => `
       <tr class="hover:bg-blue-50 cursor-pointer transition border-b border-gray-50 last:border-0" onclick="showDetail('${v.form_date}', '${v.customer_name}')">
@@ -303,7 +334,81 @@
     `).join('');
   }
 
-  let charts = {};
+  window.filterSource = () => {
+    const selected = document.getElementById('sourceFilter').value;
+    
+    if(selected === 'ALL') {
+      // Restore original
+      renderChart('chartSource', 'bar', stats.sources, 'tag');
+      renderChart('chartPurpose', 'doughnut', stats.purposes, 'purpose');
+      document.getElementById('trendBox').classList.add('hidden');
+    } else {
+      // 1. Filter Source Chart (Highlight one)
+      const filteredSources = stats.sources.map(s => ({...s, c: s.tag===selected ? s.c : 0 })); 
+      // Actually, user wants to SELECT one. Maybe just show that one? Or highlight?
+      // Let's show only that one to be clear, or better, keep context but highlight.
+      // Requirement: "Select one... chart updates"
+      
+      // Let's show the Trend for this source
+      showTrendMini(selected);
+
+      // 2. Filter Purpose Chart (Based on customers who came from this Source)
+      // We need to client-side filter the purposes based on the visits list (since backend stat is agg)
+      // This is accurate enough for the current loaded list (Top 100). For full accuracy, backend need support.
+      // Let's use the full client list 'visits' if possible, but 'visits' is limited to 100.
+      // We will use a rough approximation from the 'visits' data we have.
+      const relatedVisits = visits.filter(v => (v.source_tags||[]).includes(selected));
+      const purposeCounts = {};
+      relatedVisits.forEach(v => {
+        (v.visit_purposes||[]).forEach(p => purposeCounts[p] = (purposeCounts[p]||0)+1);
+      });
+      const purposeData = Object.entries(purposeCounts)
+        .map(([k,v]) => ({purpose: k, c: v}))
+        .sort((a,b) => b.c - a.c);
+      
+      renderChart('chartPurpose', 'doughnut', purposeData, 'purpose');
+    }
+  };
+
+  function showTrendMini(sourceName) {
+    document.getElementById('trendBox').classList.remove('hidden');
+    
+    const timeline = stats.timeline || [];
+    const dateMap = {};
+    timeline.forEach(t => {
+      if(t.source_tags && t.source_tags.includes(sourceName)) {
+        dateMap[t.form_date] = (dateMap[t.form_date] || 0) + 1;
+      }
+    });
+    const dates = Object.keys(dateMap).sort();
+    const counts = dates.map(d => dateMap[d]);
+
+    const ctx = document.getElementById('chartTrendMini').getContext('2d');
+    if(charts['trend']) charts['trend'].destroy();
+
+    charts['trend'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: sourceName,
+          data: counts,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 2
+        }]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { display: false }, y: { display: false } }
+      }
+    });
+  }
+
   function renderChart(id, type, data, key) {
     const ctx = document.getElementById(id).getContext('2d');
     if(charts[id]) charts[id].destroy();
@@ -321,69 +426,21 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: type === 'doughnut', position: 'right' } },
-        onClick: (evt, activeElements) => {
-          if (activeElements.length > 0 && id === 'chartSource') {
-            const index = activeElements[0].index;
-            const label = data[index][key];
-            showTrend(label);
-          }
-        }
+        plugins: { legend: { display: type === 'doughnut', position: 'right' } }
       }
     });
   }
 
-  function showTrend(sourceName) {
-    document.getElementById('trendCard').classList.remove('hidden');
-    document.getElementById('trendTitle').textContent = `"${sourceName}" 趨勢分析`;
-    
-    // Process timeline data
-    const timeline = stats.timeline || [];
-    const dateMap = {};
-    
-    timeline.forEach(t => {
-      if(t.source_tags && t.source_tags.includes(sourceName)) {
-        dateMap[t.form_date] = (dateMap[t.form_date] || 0) + 1;
-      }
-    });
-
-    const dates = Object.keys(dateMap).sort();
-    const counts = dates.map(d => dateMap[d]);
-
-    const ctx = document.getElementById('chartTrend').getContext('2d');
-    if(charts['trend']) charts['trend'].destroy();
-
-    charts['trend'] = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: dates,
-        datasets: [{
-          label: sourceName,
-          data: counts,
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-
-    document.getElementById('trendCard').scrollIntoView({behavior: 'smooth'});
-  }
-
-  // Modal Functions
+  // Modal & Other functions (Same as before)
   window.openAddModal = () => {
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('modalTitle').textContent = '新增資料';
     document.getElementById('mDate').valueAsDate = new Date();
-    document.getElementById('mStore').value = document.getElementById('storeSelect').value === '全部' ? '臨安店' : document.getElementById('storeSelect').value;
+    document.getElementById('mStore').value = currentStore === '全部' ? '臨安店' : currentStore;
     document.getElementById('mName').value = '';
     document.getElementById('mDetail').value = '';
     document.getElementById('mKeyword').value = '';
-    document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); });
-    
-    // Enable inputs
+    document.querySelectorAll('#modal input[type="checkbox"]').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); });
     document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = false);
     document.getElementById('btnSave').classList.remove('hidden');
   };
@@ -391,7 +448,6 @@
   window.showDetail = (date, name) => {
     const item = visits.find(v => v.form_date === date && v.customer_name === name);
     if(!item) return;
-    
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('modalTitle').textContent = '詳細資料';
     document.getElementById('mDate').value = item.form_date;
@@ -402,8 +458,7 @@
     document.getElementById('mTainan').checked = item.is_tainan;
     document.getElementById('mDetail').value = item.detail_desc;
     document.getElementById('mKeyword').value = item.search_keyword || '';
-
-    // Checkboxes
+    
     document.querySelectorAll('#chkSources input').forEach(c => { 
       c.checked = (item.source_tags||[]).includes(c.value); 
       c.parentElement.classList.toggle('checked', c.checked);
@@ -412,8 +467,6 @@
       c.checked = (item.visit_purposes||[]).includes(c.value); 
       c.parentElement.classList.toggle('checked', c.checked);
     });
-
-    // Disable inputs
     document.querySelectorAll('#modal input, #modal select, #modal textarea').forEach(i => i.disabled = true);
     document.getElementById('btnSave').classList.add('hidden');
   };
@@ -423,7 +476,6 @@
   window.saveData = async () => {
     const btn = document.getElementById('btnSave');
     btn.textContent = '儲存中...'; btn.disabled = true;
-
     const getArr = (id) => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
     
     const payload = {
@@ -456,11 +508,8 @@
 
   window.toggleAdmin = () => document.getElementById('adminPanel').classList.toggle('hidden');
   window.login = async () => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: 'chanywang92@gmail.com', password: document.getElementById('admPwd').value
-    });
-    if(!error) checkAuth();
-    else alert('登入失敗');
+    const { error } = await supabase.auth.signInWithPassword({ email: 'chanywang92@gmail.com', password: document.getElementById('admPwd').value });
+    if(!error) checkAuth(); else alert('登入失敗');
   }
   window.logout = async () => { await supabase.auth.signOut(); checkAuth(); }
   async function checkAuth() {
