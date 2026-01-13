@@ -1,1 +1,539 @@
-[上面的完整代碼]
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>快速登記 - 和光堂</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    window.supabase = createClient(
+      "https://yxalpzculcyhzvnyvecb.supabase.co", 
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aGh6dm55dmVjYiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzM0NTI3MjU3LCJleHAiOjIwNTAxMDMyNTd9.NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+    );
+  </script>
+  <style>
+    body { 
+      background-color: #f3f4f6; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+      padding-bottom: 100px; 
+    }
+    
+    .customer-card { 
+      background: white; 
+      border-radius: 16px; 
+      padding: 20px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+      margin-bottom: 24px; 
+      position: relative; 
+      border: 1px solid #e5e7eb; 
+    }
+    
+    .customer-card-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 16px; 
+      padding-bottom: 12px; 
+      border-bottom: 1px solid #f3f4f6; 
+    }
+    
+    .card-num { 
+      background: #3b82f6; 
+      color: white; 
+      width: 28px; 
+      height: 28px; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: bold; 
+      font-size: 14px; 
+      margin-right: 8px; 
+    }
+
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-btn { 
+      padding: 8px 16px; 
+      border: 1px solid #e5e7eb; 
+      border-radius: 50px; 
+      font-size: 14px; 
+      color: #4b5563; 
+      cursor: pointer; 
+      transition: 0.1s; 
+      user-select: none; 
+      background: white; 
+    }
+    .radio-btn:active { transform: scale(0.95); }
+    .radio-btn.selected { 
+      background-color: #3b82f6; 
+      color: white; 
+      border-color: #3b82f6; 
+      font-weight: 500; 
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); 
+    }
+
+    .chk-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+      gap: 8px; 
+    }
+    .chk-btn { 
+      padding: 10px; 
+      border: 1px solid #e5e7eb; 
+      border-radius: 8px; 
+      font-size: 13px; 
+      color: #4b5563; 
+      cursor: pointer; 
+      transition: 0.1s; 
+      text-align: center; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 44px; 
+      background: white; 
+    }
+    .chk-btn.checked { 
+      background-color: #eff6ff; 
+      color: #2563eb; 
+      border-color: #2563eb; 
+      font-weight: bold; 
+    }
+
+    .input-base { 
+      width: 100%; 
+      padding: 10px 12px; 
+      border: 1px solid #d1d5db; 
+      border-radius: 8px; 
+      font-size: 16px; 
+      outline: none; 
+      transition: 0.2s; 
+    }
+    .input-base:focus { 
+      border-color: #3b82f6; 
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); 
+    }
+
+    .action-bar { 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      background: white; 
+      padding: 12px 16px; 
+      box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05); 
+      display: flex; 
+      gap: 12px; 
+      z-index: 50; 
+    }
+    .btn-add { 
+      flex: 1; 
+      background: white; 
+      color: #3b82f6; 
+      border: 1px solid #3b82f6; 
+      padding: 12px; 
+      border-radius: 10px; 
+      font-weight: bold; 
+      font-size: 16px; 
+    }
+    .btn-submit { 
+      flex: 2; 
+      background: #3b82f6; 
+      color: white; 
+      border: none; 
+      padding: 12px; 
+      border-radius: 10px; 
+      font-weight: bold; 
+      font-size: 16px; 
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); 
+    }
+    .btn-submit:disabled { 
+      background: #9ca3af; 
+      box-shadow: none; 
+    }
+    
+    .date-picker-custom { 
+      background: rgba(255, 255, 255, 0.2); 
+      border: 1px solid rgba(255, 255, 255, 0.3); 
+      color: white; 
+      padding: 2px 8px; 
+      border-radius: 6px; 
+      font-size: 13px; 
+      outline: none; 
+      cursor: pointer; 
+    }
+    .date-picker-custom::-webkit-calendar-picker-indicator { 
+      filter: invert(1); 
+      cursor: pointer; 
+    }
+    
+    .store-btn { 
+      padding: 6px 14px; 
+      border-radius: 8px; 
+      font-size: 14px; 
+      font-weight: bold; 
+      transition: 0.2s; 
+      cursor: pointer; 
+      border: 1px solid transparent; 
+    }
+    .store-btn.active { 
+      background: white; 
+      color: #1d4ed8; 
+    }
+    .store-btn.inactive { 
+      background: transparent; 
+      color: #bfdbfe; 
+      border: 1px solid rgba(255,255,255,0.3); 
+    }
+    
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(251, 191, 36, 0.8); }
+      50% { border-color: rgba(251, 191, 36, 0.3); }
+    }
+    .store-btn.need-select { 
+      animation: pulse-border 1.5s ease-in-out infinite;
+      border-width: 2px;
+    }
+
+    .required-mark { color: #ef4444; margin-left: 2px; }
+    .hint-text { 
+      font-size: 11px; 
+      color: #ef4444; 
+      font-weight: bold; 
+      margin-top: 4px; 
+      display: block; 
+    }
+    
+    .toast { 
+      position: fixed; 
+      top: 80px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: rgba(0, 0, 0, 0.85); 
+      color: white; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      z-index: 9999; 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<div class="max-w-2xl mx-auto p-4">
+  <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="font-bold text-lg">📝 顧客登記</h1>
+        <input type="date" id="globalDate" class="date-picker-custom">
+      </div>
+      <span class="text-[10px] text-blue-200 block mt-1">⚠️ 請確保欄位皆正確填寫</span>
+    </div>
+    <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+      <button onclick="setGlobalStore('臨安店')" id="gStoreLinAn" class="store-btn inactive">臨安店</button>
+      <button onclick="setGlobalStore('南科店')" id="gStoreNanKe" class="store-btn inactive">南科店</button>
+    </div>
+  </div>
+
+  <div id="cardsContainer"></div>
+  <div style="height: 80px;"></div>
+</div>
+
+<div class="action-bar max-w-2xl mx-auto left-0 right-0">
+  <button onclick="addCard()" class="btn-add">+ 增加一位</button>
+  <button onclick="submitAll()" id="btnSubmit" class="btn-submit">確認送出</button>
+</div>
+
+<script>
+  const SOURCES = [
+    "Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", 
+    "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", 
+    "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"
+  ];
+  
+  const PURPOSES = [
+    "驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"
+  ];
+  
+  const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+  
+  let globalStore = '';
+  let cardCount = 0;
+  let isFirstVisit = true;
+
+  function showToast(message, duration = 2000) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), duration);
+  }
+
+  window.onload = () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('globalDate').value = today;
+    
+    const cachedStore = localStorage.getItem('wakodo_last_store');
+    if(cachedStore && (cachedStore === '臨安店' || cachedStore === '南科店')) {
+      setGlobalStore(cachedStore);
+      isFirstVisit = false;
+      showToast(`✓ 已自動選擇 ${cachedStore}`);
+    } else {
+      isFirstVisit = true;
+      document.getElementById('gStoreLinAn').classList.add('need-select');
+      document.getElementById('gStoreNanKe').classList.add('need-select');
+      setTimeout(() => showToast('👆 請先選擇您所在的分店', 3000), 500);
+    }
+    
+    addCard();
+  };
+
+  window.setGlobalStore = (store) => {
+    globalStore = store;
+    localStorage.setItem('wakodo_last_store', store);
+    
+    document.getElementById('gStoreLinAn').classList.remove('need-select');
+    document.getElementById('gStoreNanKe').classList.remove('need-select');
+    
+    renderStoreButtons();
+    
+    if(isFirstVisit) {
+      showToast(`✓ 已選擇 ${store}，下次將自動記住`);
+      isFirstVisit = false;
+    }
+  };
+
+  function renderStoreButtons() {
+    const btnL = document.getElementById('gStoreLinAn');
+    const btnN = document.getElementById('gStoreNanKe');
+    btnL.className = globalStore === '臨安店' ? 'store-btn active' : 'store-btn inactive';
+    btnN.className = globalStore === '南科店' ? 'store-btn active' : 'store-btn inactive';
+  }
+
+  window.addCard = () => {
+    cardCount++;
+    const id = `card-${cardCount}`;
+    const container = document.getElementById('cardsContainer');
+    
+    const cardHtml = `
+      <div class="customer-card" id="${id}">
+        <div class="customer-card-header">
+          <div class="flex items-center">
+            <span class="card-num">${cardCount}</span>
+            <span class="font-bold text-gray-700">顧客資料</span>
+          </div>
+          ${cardCount > 1 ? `<button onclick="removeCard('${id}')" class="text-red-400 text-sm font-bold px-2">移除 ✕</button>` : ''}
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
+            <input type="text" class="input-base name-input" placeholder="輸入姓名">
+          </div>
+
+          <div class="flex justify-between items-start gap-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
+              <div class="radio-group" id="${id}-gender">
+                <div class="radio-btn" onclick="selectRadio('${id}-gender', '男', this)">男</div>
+                <div class="radio-btn" onclick="selectRadio('${id}-gender', '女', this)">女</div>
+              </div>
+            </div>
+            
+            <div class="flex flex-col items-end">
+              <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                <input type="checkbox" class="w-4 h-4 text-blue-600 tainan-check" checked>
+                <span class="text-sm font-bold text-blue-800">住台南</span>
+              </label>
+              <span class="hint-text">非台南人請取消勾選</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
+            <div class="radio-group" id="${id}-age">
+              ${AGES.map(age => `<div class="radio-btn" onclick="selectRadio('${id}-age', '${age}', this)">${age}</div>`).join('')}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
+            <div class="chk-grid" id="${id}-sources">
+              ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}', '${id}')">${s}</div>`).join('')}
+            </div>
+            <div id="${id}-keyword-box" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？<span class="required-mark">*</span></label>
+              <input type="text" class="input-base border-yellow-400 text-sm keyword-input" placeholder="例如：台南驗光推薦...">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
+            <div class="chk-grid purpose-container">
+              ${PURPOSES.map(p => `<div class="chk-btn purpose-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('')}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-1">備註 <span class="required-mark">*</span></label>
+            <textarea class="input-base h-20 resize-none detail-input" placeholder="客人描述..."></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', cardHtml);
+    
+    if(cardCount > 1) {
+      setTimeout(() => {
+        const newCard = document.getElementById(id);
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
+
+  window.removeCard = (id) => {
+    document.getElementById(id).remove();
+    const cards = document.querySelectorAll('.customer-card');
+    cards.forEach((card, index) => { 
+      card.querySelector('.card-num').textContent = index + 1; 
+    });
+    cardCount = cards.length;
+    showToast('已移除該筆資料');
+  };
+
+  window.selectRadio = (groupId, value, el) => {
+    const container = document.getElementById(groupId);
+    container.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected'); 
+    el.dataset.value = value;
+  };
+
+  window.toggleChk = (el, value, cardId) => {
+    el.classList.toggle('checked'); 
+    el.dataset.checked = el.classList.contains('checked');
+    
+    if(cardId) {
+      const container = document.getElementById(`${cardId}-sources`);
+      const hasGoogle = Array.from(container.querySelectorAll('.chk-btn.checked'))
+        .some(btn => btn.innerText.includes('Google'));
+      document.getElementById(`${cardId}-keyword-box`).classList.toggle('hidden', !hasGoogle);
+    }
+  };
+
+  window.submitAll = async () => {
+    if(!globalStore) { 
+      showToast('⚠️ 請先選擇分店！', 3000);
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      return; 
+    }
+
+    const cards = document.querySelectorAll('.customer-card');
+    const btn = document.getElementById('btnSubmit');
+    const selectedDate = document.getElementById('globalDate').value;
+    
+    let errorMessages = [];
+    
+    for(let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const cardNum = i + 1;
+      
+      const name = card.querySelector('.name-input').value.trim();
+      const gender = card.querySelector(`#${card.id}-gender .selected`);
+      const age = card.querySelector(`#${card.id}-age .selected`);
+      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .checked`));
+      const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked'));
+      const detail = card.querySelector('.detail-input').value.trim();
+      
+      const hasGoogle = sources.some(btn => btn.innerText.includes('Google'));
+      const keyword = card.querySelector('.keyword-input').value.trim();
+      
+      if(!name) errorMessages.push(`第 ${cardNum} 筆：未填寫姓名`);
+      if(!gender) errorMessages.push(`第 ${cardNum} 筆：未選擇性別`);
+      if(!age) errorMessages.push(`第 ${cardNum} 筆：未選擇年齡層`);
+      if(sources.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇客源`);
+      if(purposes.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇目的`);
+      if(!detail) errorMessages.push(`第 ${cardNum} 筆：未填寫備註`);
+      if(hasGoogle && !keyword) errorMessages.push(`第 ${cardNum} 筆：選擇了 Google 但未填寫搜尋關鍵字`);
+    }
+    
+    if(errorMessages.length > 0) {
+      alert('⚠️ 資料有缺漏！\n\n' + errorMessages.join('\n'));
+      return;
+    }
+
+    btn.disabled = true; 
+    btn.textContent = '傳送中...';
+    
+    let successCount = 0;
+    let failedItems = [];
+    
+    for(let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const name = card.querySelector('.name-input').value.trim();
+      const genderEl = card.querySelector(`#${card.id}-gender .selected`);
+      const ageEl = card.querySelector(`#${card.id}-age .selected`);
+      const isTainan = card.querySelector('.tainan-check').checked;
+      
+      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .checked`))
+        .map(el => el.innerText);
+      const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked'))
+        .map(el => el.innerText);
+      const keywords = card.querySelector('.keyword-input').value.trim();
+      const detail = card.querySelector('.detail-input').value.trim();
+
+      const payload = {
+        p_date: selectedDate, 
+        p_store: globalStore, 
+        p_name: name,
+        p_gender: genderEl.dataset.value, 
+        p_age: ageEl.dataset.value,
+        p_is_local: isTainan,
+        p_sources: sources, 
+        p_purposes: purposes,
+        p_keywords: keywords,
+        p_detail: detail
+      };
+
+      try {
+        const { error } = await supabase.rpc('submit_visit_v7', payload);
+        if(error) throw error;
+        successCount++;
+      } catch(err) {
+        console.error('上傳失敗:', err);
+        failedItems.push({ index: i+1, name, error: err.message });
+      }
+    }
+
+    if(successCount === cards.length) {
+      if(confirm(`🎉 成功新增 ${successCount} 筆資料！\n\n按「確定」返回儀表板查看\n按「取消」繼續留在這裡新增`)) {
+        window.location.href = "index.html";
+      } else {
+        document.getElementById('cardsContainer').innerHTML = ''; 
+        cardCount = 0; 
+        addCard();
+        btn.disabled = false; 
+        btn.textContent = '確認送出'; 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      const failMsg = failedItems.map(item => 
+        `• 第 ${item.index} 筆 (${item.name}): ${item.error}`
+      ).join('\n');
+      
+      alert(`⚠️ 部分資料上傳失敗\n\n成功: ${successCount} / ${cards.length}\n\n失敗項目:\n${failMsg}`);
+      
+      btn.disabled = false; 
+      btn.textContent = '確認送出';
+    }
+  };
+</script>
+</body>
+</html>
