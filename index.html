@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V5.5</title>
+  <title>和光堂戰情室 V6.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- Flatpickr (Agoda Style) -->
+  <!-- Flatpickr -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
@@ -21,19 +21,12 @@
   </script>
   <style>
     :root { 
-      --bg: #f3f4f6; 
-      --card: #ffffff; 
-      --text: #1f2937; 
-      --accent: #2563eb; 
-      --table-header-bg: #fcd34d; 
-      --table-header-text: #000000;
-      --row-hover: #fef9c3; 
+      --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --accent: #2563eb; 
+      --table-header-bg: #fcd34d; --table-header-text: #000000; --row-hover: #fef9c3; 
     }
-    
     body { background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
     .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 20px; }
     
-    /* Agoda Style Date Picker */
     .date-range-container {
       display: flex; align-items: center; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
@@ -62,30 +55,31 @@
     .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
     .detail-label { width: 100px; font-weight: bold; color: #666; }
     
-    /* Load More Button Style */
+    /* Load More Button (Triangle) */
     .load-more-btn {
         width: 100%; padding: 12px;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        color: #6b7280; font-weight: 600; font-size: 13px;
+        display: flex; align-items: center; justify-content: center;
         background: #f9fafb; border: none; border-top: 1px solid #e5e7eb;
-        cursor: pointer; transition: 0.2s;
+        cursor: pointer; transition: 0.2s; color: #9ca3af;
     }
     .load-more-btn:hover { background: #f3f4f6; color: var(--accent); }
     .arrow-down { 
         width: 0; height: 0; 
-        border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; 
+        border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid currentColor; 
     }
   </style>
 </head>
 <body>
 
 <div class="max-w-7xl mx-auto p-4">
-  <!-- Header -->
+  <!-- Header V6.0 -->
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <div class="flex items-center gap-3">
       <h1 class="text-2xl font-bold tracking-tight text-blue-600 flex items-center gap-2">
         <span>👓 和光堂戰情室</span>
-        <span class="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">V5.5 • 2026/01/13</span>
+        <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded border border-blue-100 tracking-wide">
+          V6.0 • 2026/01/13
+        </span>
       </h1>
     </div>
     <div class="flex items-center gap-3">
@@ -104,10 +98,7 @@
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
       <div class="font-bold text-green-400 flex items-center gap-2">✅ 管理員 <span class="text-xs text-gray-400 font-normal">(已登入)</span></div>
       <div class="flex gap-2">
-        <!-- 匯出 CSV 按鈕 -->
-        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1">
-            ⬇️ 匯出 CSV
-        </button>
+        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1 font-bold">⬇️ 匯出 CSV</button>
         <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 text-white">
           <span>📂 匯入 CSV</span>
           <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="previewCSV(this)">
@@ -124,13 +115,12 @@
       <span class="pl-3 text-gray-400">📅</span>
       <input type="text" id="dateRange" class="date-range-input" placeholder="載入中..." readonly>
     </div>
-    
     <div class="flex-grow relative">
-      <input type="text" id="qSearch" placeholder="搜尋姓名、手機、備註..." class="input-std pl-9" onkeyup="if(event.key==='Enter') fetchData()">
+      <input type="text" id="qSearch" placeholder="搜尋姓名、手機、備註..." class="input-std pl-9" onkeyup="if(event.key==='Enter') reloadAll()">
       <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
       <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2.5 text-gray-400 font-bold">✕</button>
     </div>
-    <button onclick="fetchData()" class="btn-primary">查詢</button>
+    <button onclick="reloadAll()" class="btn-primary">查詢</button>
   </div>
 
   <!-- Stats -->
@@ -143,13 +133,12 @@
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="card h-[450px] flex flex-col">
-      <div class="flex justify-between mb-4"><h3 class="font-bold">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="border rounded text-xs p-1"><option value="ALL">全部</option></select></div>
-      <div class="flex-grow relative">anvas id="chartSource"></canvas></div>
-      <div id="trendBox" class="hidden mt-4 h-24 w-full"><div class="text-xs font-bold text-gray-400">趨勢: <span id="trendLabel"></span></div><div class="relative w-full h-full">anvas id="chartTrend"></canvas></div></div>
+      <div class="flex justify-between mb-4"><h3 class="font-bold">客源分析</h3></div>
+      <div class="flex-grow relative w-full h-full"><canvas id="chartSource"></canvas></div>
     </div>
     <div class="card h-[450px] flex flex-col">
       <div class="flex justify-between mb-4"><h3 class="font-bold">來店目的</h3></div>
-      <div class="flex-grow relative flex justify-center">anvas id="chartPurpose"></canvas></div>
+      <div class="flex-grow relative flex justify-center w-full h-full"><canvas id="chartPurpose"></canvas></div>
     </div>
   </div>
 
@@ -157,7 +146,7 @@
   <div class="card overflow-hidden shadow-lg border-0 p-0">
     <div class="p-4 bg-white border-b flex justify-between">
       <h3 class="font-bold text-lg text-gray-800">最新來客紀錄</h3>
-      <span class="text-xs text-gray-400" id="recordCountDisplay">--</span>
+      <span class="text-xs text-gray-400" id="pageInfoDisplay">--</span>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left whitespace-nowrap">
@@ -174,9 +163,8 @@
         <tbody id="tableBody" class="bg-white"></tbody>
       </table>
     </div>
-    <!-- Load More Button (美化版) -->
-    <button onclick="loadMore()" id="btnLoadMore" class="load-more-btn hidden">
-        <span>顯示更多</span>
+    <!-- Load More Button -->
+    <button onclick="loadNextPage()" id="btnLoadMore" class="load-more-btn hidden" title="載入更多">
         <div class="arrow-down"></div>
     </button>
   </div>
@@ -192,16 +180,14 @@
         <button onclick="closeDetailModal()" class="text-2xl text-gray-400">&times;</button>
       </div>
     </div>
-    <!-- View Mode -->
     <div id="detailView"></div>
-    <!-- Edit Mode -->
     <div id="detailEdit" class="hidden space-y-3">
       <input type="hidden" id="eId">
       <div class="detail-row"><div class="detail-label">日期</div><input type="date" id="eDate" class="input-std"></div>
       <div class="detail-row"><div class="detail-label">分店</div><select id="eStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
       <div class="detail-row"><div class="detail-label">姓名</div><input type="text" id="eName" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">客源(逗號隔開)</div><input type="text" id="eSources" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">目的(逗號隔開)</div><input type="text" id="ePurposes" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">客源</div><input type="text" id="eSources" class="input-std" placeholder="逗號分隔"></div>
+      <div class="detail-row"><div class="detail-label">目的</div><input type="text" id="ePurposes" class="input-std" placeholder="逗號分隔"></div>
       <div class="detail-row flex-col items-start"><div class="detail-label mb-2">備註</div><textarea id="eDetail" class="input-std h-24"></textarea></div>
       <button onclick="saveEdit()" class="btn-primary w-full bg-green-600 hover:bg-green-700">💾 儲存修改</button>
     </div>
@@ -216,8 +202,8 @@
       <input type="date" id="mDate" class="input-std">
       <select id="mStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select>
       <input type="text" id="mName" class="input-std" placeholder="姓名">
-      <input type="text" id="mSources" class="input-std" placeholder="客源 (可複選)">
-      <input type="text" id="mPurposes" class="input-std" placeholder="目的 (可複選)">
+      <input type="text" id="mSources" class="input-std" placeholder="客源 (可複選, 逗號分隔)">
+      <input type="text" id="mPurposes" class="input-std" placeholder="目的 (可複選, 逗號分隔)">
       <textarea id="mDetail" class="input-std" placeholder="備註"></textarea>
       <button onclick="saveData()" class="btn-primary w-full">儲存</button>
       <button onclick="closeModal()" class="w-full text-center text-sm text-gray-500 mt-2">取消</button>
@@ -226,313 +212,242 @@
 </div>
 
 <script>
-  let visits = [], stats = {}, currentStore = '全部', savedSourceFilter = 'ALL', charts = {};
-  let currentLimit = 10;
-  let datePicker;
+  // Global State (V6.0)
+  let currentPage = 1, currentStore = '全部', charts = {}, datePicker;
+  let cachedParams = {}; // To freeze params during pagination
 
   window.onload = async () => {
-    // 1. 初始化 Flatpickr，先給一個空的，等抓到極值再 update
-    datePicker = flatpickr("#dateRange", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        locale: "zh_tw",
-        onChange: function(selectedDates) {
-            // 只有當選滿兩個日期時才觸發查詢
-            if(selectedDates.length === 2) fetchData();
-        }
-    });
-
-    // 2. 自動抓取資料庫「最早」與「最晚」日期來設定預設值
-    await initDateRange();
-
-    // 3. 檢查管理員登入
+    // 1. DatePicker Init
+    datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", onChange: (d) => { if(d.length===2) reloadAll(); } });
+    
+    // 2. Auth Check
     const { data: { session } } = await supabase.auth.getSession();
-    if(session) {
-        document.body.classList.add('is-admin');
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('adminActions').classList.remove('hidden');
-    }
-
-    // 4. 首次載入
-    fetchData();
+    if(session) { document.body.classList.add('is-admin'); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden'); }
+    
+    // 3. Auto Range
+    await initDateRange();
+    
+    // 4. Initial Load
+    reloadAll();
   };
 
   async function initDateRange() {
-      // 查詢最早的一筆
       const { data: minData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:true}).limit(1);
-      // 查詢最晚的一筆 (通常是今天，但為了保險)
       const { data: maxData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:false}).limit(1);
-
       let minDate = minData?.[0]?.form_date || '2023-01-01';
       let maxDate = maxData?.[0]?.form_date || new Date().toISOString().split('T')[0];
-      
-      // 更新 Flatpickr
       datePicker.setDate([minDate, maxDate]);
-      console.log(`Auto Date Range Set: ${minDate} to ${maxDate}`);
   }
 
-  window.fetchData = async () => {
-    // 修正：從 Flatpickr 的 selectedDates 陣列取值，而不是解析 input字串
-    // 如果使用者還沒選，就用預設的
+  // --- CORE: CLOUD FETCH (V6.0 Logic) ---
+  window.reloadAll = async () => {
+    currentPage = 1;
+    document.getElementById('tableBody').innerHTML = ''; // Clear table
+    
+    // Update Params Cache
     const dates = datePicker.selectedDates;
-    let from, to;
-    
-    if (dates.length === 2) {
-        // Flatpickr 給的是 Date 物件，轉成 YYYY-MM-DD，並考慮時區問題
-        // 簡單做法：利用 text input 的值來切，因為 flatpickr 會自動 format 好
-        const rawStr = document.getElementById('dateRange').value; 
-        const parts = rawStr.split(' to '); // 這是最穩的，直接切字串
-        from = parts[0];
-        to = parts[1];
-    } else {
-        // Fallback
-        from = '2023-01-01';
-        to = new Date().toISOString().split('T')[0];
-    }
-    
-    // 如果切出來是 undefined (例如還沒選好)，就暫時不查
-    if(!from || !to) return;
+    cachedParams = {
+      start: dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '2020-01-01',
+      end: dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2030-12-31',
+      key: document.getElementById('qSearch').value,
+      store: currentStore
+    };
 
-    const key = document.getElementById('qSearch').value;
-    if(key) document.getElementById('btnClearSearch').classList.remove('hidden');
-    
-    document.getElementById('statTotal').innerText = '...';
-
-    // 呼叫 RPC
-    const { data, error } = await supabase.rpc('get_visits_public', { 
-        start_date: from, 
-        end_date: to, 
-        keyword: key, 
-        store_filter: currentStore 
-    });
-
-    if(error) {
-        // 隱藏詳細錯誤給使用者，但 log 出來
-        console.error("Fetch Error:", error);
-        if(error.message.includes('invalid input syntax')) {
-            alert('日期格式錯誤，系統正在嘗試自動修正，請重試一次。');
-        } else {
-            alert('讀取失敗: ' + error.message);
-        }
-        return;
-    }
-
-    if(data) {
-      visits = data;
-      document.getElementById('statTotal').innerText = visits.length;
-      document.getElementById('statLinAn').innerText = visits.filter(x=>x.store_branch=='臨安店').length;
-      document.getElementById('statNanKe').innerText = visits.filter(x=>x.store_branch=='南科店').length;
-      
-      currentLimit = 10;
-      renderAll();
-    }
+    // Parallel Fetch (Dashboard Stats + First Page)
+    await Promise.all([fetchDashboardStats(), fetchTablePage()]);
   };
 
-  function renderAll() {
-    let list = visits;
-    if(savedSourceFilter !== 'ALL') {
-      list = visits.filter(v => (v.source_tags||[]).includes(savedSourceFilter));
-      document.getElementById('trendBox').classList.remove('hidden');
-      document.getElementById('trendLabel').innerText = savedSourceFilter;
-      renderTrend(savedSourceFilter);
-    } else {
-      document.getElementById('trendBox').classList.add('hidden');
-    }
-
-    const sMap = {}, pMap = {};
-    list.forEach(v => {
-      (v.source_tags||[]).forEach(x => sMap[x] = (sMap[x]||0)+1);
-      (v.visit_purposes||[]).forEach(x => pMap[x] = (pMap[x]||0)+1);
+  async function fetchDashboardStats() {
+    const p = cachedParams;
+    // Call V6.0 RPC
+    const { data, error } = await supabase.rpc('get_dashboard_data_v6', {
+      start_date: p.start, end_date: p.end, search_keyword: p.key, store_filter: p.store
     });
 
-    const sortedSource = Object.entries(sMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
-    const sortedPurpose = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0, 8);
+    if(error) { console.error("Stats Error:", error); return; }
+    
+    // Update Stats UI
+    const stats = data.stats || {total:0, linan:0, nanke:0};
+    document.getElementById('statTotal').innerText = stats.total;
+    document.getElementById('statLinAn').innerText = stats.linan;
+    document.getElementById('statNanKe').innerText = stats.nanke;
 
-    renderChart('chartSource', 'bar', sortedSource, '客源Top15');
-    renderChart('chartPurpose', 'doughnut', sortedPurpose, '目的分佈');
-
-    const sel = document.getElementById('sourceFilter');
-    if(sel.options.length <= 1 || savedSourceFilter === 'ALL') {
-        sel.innerHTML = '<option value="ALL">全部</option>';
-        Object.keys(sMap).sort().forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`);
-        sel.value = savedSourceFilter;
-    }
-
-    renderTableList();
+    // Render Charts
+    renderChart('chartSource', 'bar', data.sources || {}, '客源');
+    renderChart('chartPurpose', 'doughnut', data.purposes || {}, '目的');
   }
 
-  function renderTableList() {
+  async function fetchTablePage() {
+    const p = cachedParams;
+    // Call V6.0 Paged RPC
+    const { data, error } = await supabase.rpc('get_visits_paged_v6', {
+      page_no: currentPage, page_size: 20,
+      start_date: p.start, end_date: p.end, search_keyword: p.key, store_filter: p.store
+    });
+
+    if(error) { console.error("Table Error:", error); return; }
+
     const tbody = document.getElementById('tableBody');
-    const sortedVisits = [...visits].sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
-    const visibleData = sortedVisits.slice(0, currentLimit);
-
-    tbody.innerHTML = visibleData.map(v => `
-      <tr data-id="${v.id}" onclick="showDetail(${v.id})">
-        <td class="p-3 pl-4 font-mono text-gray-500">${v.form_date.slice(5)}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
-        <td class="p-3 font-bold text-gray-900">${v.customer_name}</td>
-        <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]" title="${(v.source_tags||[]).join(',')}">${(v.source_tags||[]).join(',')}</td>
-        <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]" title="${(v.visit_purposes||[]).join(',')}">${(v.visit_purposes||[]).join(',')}</td>
-        <td class="p-3 pr-4 admin-only text-right" onclick="event.stopPropagation()">
-            <button class="text-red-500 hover:bg-red-50 p-2 rounded font-bold" onclick="deleteData(${v.id})">刪</button>
-        </td>
-      </tr>
-    `).join('');
-
-    document.getElementById('recordCountDisplay').innerText = `顯示 ${visibleData.length} / ${visits.length} 筆`;
     
-    // 美化後的按鈕邏輯
-    const btn = document.getElementById('btnLoadMore');
-    if(visibleData.length >= visits.length) {
-        btn.classList.add('hidden');
+    if(data && data.length > 0) {
+      data.forEach(v => {
+        // Safe join for arrays (handles null)
+        const sources = Array.isArray(v.source_tags) ? v.source_tags.join(',') : '';
+        const purposes = Array.isArray(v.visit_purposes) ? v.visit_purposes.join(',') : '';
+        
+        tbody.innerHTML += `
+          <tr class="border-b hover:bg-yellow-50 cursor-pointer" onclick="showDetail(${v.id})">
+            <td class="p-3 pl-4 font-mono text-gray-500">${(v.form_date||'').slice(5)}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
+            <td class="p-3 font-bold text-gray-900">${v.customer_name}</td>
+            <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]">${sources}</td>
+            <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]">${purposes}</td>
+            <td class="p-3 pr-4 admin-only text-right" onclick="event.stopPropagation()">
+                <button class="text-red-500 hover:bg-red-50 p-2 rounded font-bold" onclick="deleteData(${v.id})">刪</button>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('btnLoadMore').classList.remove('hidden');
     } else {
-        btn.classList.remove('hidden');
+      document.getElementById('btnLoadMore').classList.add('hidden');
     }
+    document.getElementById('pageInfoDisplay').innerText = `目前顯示至第 ${currentPage} 頁`;
   }
 
-  window.loadMore = () => { currentLimit += 20; renderTableList(); };
+  window.loadNextPage = () => { currentPage++; fetchTablePage(); };
+  window.setStore = (s) => { 
+      currentStore = s; 
+      document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active')); 
+      if(s=='全部')document.getElementById('btnTotal').classList.add('active'); 
+      if(s=='臨安店')document.getElementById('btnLinAn').classList.add('active'); 
+      if(s=='南科店')document.getElementById('btnNanKe').classList.add('active'); 
+      reloadAll(); 
+  };
+  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnClearSearch').classList.add('hidden'); reloadAll(); };
 
-  window.showDetail = (id) => {
-    const v = visits.find(x => x.id == id);
-    if(!v) return;
+  // --- CHART RENDERER ---
+  function renderChart(id, type, jsonMap, label) {
+    const canvas = document.getElementById(id);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if(charts[id]) charts[id].destroy();
     
+    // Sort Desc
+    const entries = Object.entries(jsonMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
+    
+    charts[id] = new Chart(ctx, {
+      type: type,
+      data: {
+        labels: entries.map(x=>x[0]),
+        datasets: [{ label: label, data: entries.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'], borderRadius:4 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } }
+    });
+  }
+
+  // --- DETAIL & EDIT ---
+  window.showDetail = async (id) => {
+    // We need to fetch single item detail because grid might not have full info
+    const { data, error } = await supabase.from('visits').select('*').eq('id', id).single();
+    if(error || !data) return;
+    
+    const v = data;
+    const sources = Array.isArray(v.source_tags) ? v.source_tags : (v.source_tags||'').split(',');
+    const purposes = Array.isArray(v.visit_purposes) ? v.visit_purposes : (v.visit_purposes||'').split(',');
+
     document.getElementById('detailView').innerHTML = `
       <div class="detail-row"><div class="detail-label">日期</div><div>${v.form_date}</div></div>
       <div class="detail-row"><div class="detail-label">分店</div><div>${v.store_branch}</div></div>
       <div class="detail-row"><div class="detail-label">姓名</div><div class="text-2xl font-bold text-blue-600">${v.customer_name}</div></div>
-      <div class="detail-row"><div class="detail-label">客源</div><div class="flex flex-wrap gap-1">${(v.source_tags||[]).map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
-      <div class="detail-row"><div class="detail-label">目的</div><div class="flex flex-wrap gap-1">${(v.visit_purposes||[]).map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
+      <div class="detail-row"><div class="detail-label">客源</div><div class="flex flex-wrap gap-1">${sources.map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
+      <div class="detail-row"><div class="detail-label">目的</div><div class="flex flex-wrap gap-1">${purposes.map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
       <div class="mt-4 p-4 bg-gray-50 rounded text-sm text-gray-600 whitespace-pre-wrap">${v.detail_desc||'無備註'}</div>
     `;
+    
+    // Fill Edit Form
     document.getElementById('eId').value = v.id;
     document.getElementById('eDate').value = v.form_date;
     document.getElementById('eStore').value = v.store_branch;
     document.getElementById('eName').value = v.customer_name;
-    document.getElementById('eSources').value = (v.source_tags||[]).join(',');
-    document.getElementById('ePurposes').value = (v.visit_purposes||[]).join(',');
+    document.getElementById('eSources').value = sources.join(',');
+    document.getElementById('ePurposes').value = purposes.join(',');
     document.getElementById('eDetail').value = v.detail_desc||'';
-    
+
     document.getElementById('detailView').classList.remove('hidden');
     document.getElementById('detailEdit').classList.add('hidden');
     document.getElementById('detailModal').style.display = 'flex';
   };
-  window.closeDetailModal = () => document.getElementById('detailModal').style.display='none';
-
-  // --- CHART ---
-  function renderChart(id, type, data, label) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if(charts[id]) charts[id].destroy();
-    charts[id] = new Chart(ctx, {
-      type: type,
-      data: {
-        labels: data.map(x=>x[0]),
-        datasets: [{ label: label, data: data.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#6366f1','#ec4899'], borderWidth:1, borderRadius: 4 }]
-      },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right', labels: {boxWidth: 12}} } }
-    });
-  }
-
-  function renderTrend(tag) {
-    const ctx = document.getElementById('chartTrend').getContext('2d');
-    if(charts.trend) charts.trend.destroy();
-    const map = {};
-    visits.filter(v=>(v.source_tags||[]).includes(tag)).forEach(v => { const m = v.form_date.slice(0,7); map[m] = (map[m]||0)+1; });
-    const lbls = Object.keys(map).sort();
-    charts.trend = new Chart(ctx, {
-      type: 'line',
-      data: { labels: lbls, datasets: [{ label:'數量', data:lbls.map(k=>map[k]), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.1)', fill:true, tension: 0.3 }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }
-    });
-  }
-
-  // --- IMPORT / EXPORT / ADMIN ---
-  window.exportCSV = () => {
-      // 使用 PapaParse 將 visits 陣列轉為 CSV
-      const csv = Papa.unparse(visits);
-      const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'}); // 加 BOM 避免 Excel 亂碼
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", `visits_export_${new Date().toISOString().slice(0,10)}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  
+  // Save Edit (Direct Update)
+  window.saveEdit = async () => {
+    const id = document.getElementById('eId').value;
+    const updates = {
+      form_date: document.getElementById('eDate').value,
+      store_branch: document.getElementById('eStore').value,
+      customer_name: document.getElementById('eName').value,
+      source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
+      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
+      detail_desc: document.getElementById('eDetail').value
+    };
+    const { error } = await supabase.from('visits').update(updates).eq('id', id);
+    if(error) alert('更新失敗: '+error.message); else { alert('更新成功'); document.getElementById('detailModal').style.display='none'; reloadAll(); }
   };
 
+  // --- CRUD (Admin) ---
+  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
+  window.openAddModal = () => { document.getElementById('mDate').value=new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display='flex'; };
+  window.closeModal = () => document.getElementById('modal').style.display='none';
+  window.toggleEditMode = () => { document.getElementById('detailView').classList.toggle('hidden'); document.getElementById('detailEdit').classList.toggle('hidden'); };
+  window.closeDetailModal = () => document.getElementById('detailModal').style.display='none';
+
+  window.login = async () => { const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('admEmail').value, password: document.getElementById('admPwd').value }); if(!error) location.reload(); };
+  window.logout = async () => { await supabase.auth.signOut(); location.reload(); };
+  window.wipeData = async () => { if(prompt('輸入 admin 確認清空') === 'admin') { await supabase.from('visits').delete().neq('id', 0); reloadAll(); } };
+  window.deleteData = async (id) => { if(confirm('刪除?')) { await supabase.from('visits').delete().eq('id', id); reloadAll(); } };
+
+  // New Save Data (Uses RPC for consistency)
+  window.saveData = async () => {
+      const { error } = await supabase.rpc('submit_visit', {
+          p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value,
+          p_name: document.getElementById('mName').value, 
+          p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x), 
+          p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), 
+          p_detail: document.getElementById('mDetail').value,
+          p_gender:'', p_age:'', p_tainan:false, p_keyword:''
+      });
+      if(error) alert('失敗: '+error.message); else { closeModal(); reloadAll(); }
+  };
+  
+  // CSV Import (Client-side Parse -> RPC Loop)
   window.previewCSV = (input) => {
     const f = input.files[0]; if(!f) return;
-    const label = input.parentElement.querySelector('span');
-    const oldText = label.innerText;
-    label.innerText = '處理中...';
-    Papa.parse(f, {
-      header: true, skipEmptyLines: true,
-      complete: async (res) => {
-        if(!confirm(`準備匯入 ${res.data.length} 筆資料？`)) { label.innerText=oldText; return; }
-        let success = 0;
-        const chunkSize = 50; 
+    const label = input.parentElement.querySelector('span'); const oldText = label.innerText; label.innerText = '處理中...';
+    Papa.parse(f, { header: true, skipEmptyLines: true, complete: async (res) => {
+        if(!confirm(`匯入 ${res.data.length} 筆?`)) { label.innerText=oldText; return; }
+        let success = 0; const chunkSize = 50;
         for (let i = 0; i < res.data.length; i += chunkSize) {
             const chunk = res.data.slice(i, i + chunkSize);
             const promises = chunk.map(r => {
-                const d = r['form_date']||r['填表日期']; 
-                const n = r['customer_name']||r['顧客姓名'];
-                if(!d || !n) return null;
+                const d = r['form_date']||r['填表日期']; const n = r['customer_name']||r['顧客姓名']; if(!d || !n) return null;
                 const s = (r['來源統計']||r['source_tags']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
                 const p = (r['來店目的']||r['visit_purposes']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
                 return supabase.rpc('submit_visit', { p_date: d.replace(/\//g,'-'), p_store: r['store_branch']||r['門店']||'臨安店', p_name: n, p_sources: s, p_purposes: p, p_gender:'', p_age:'', p_tainan:false, p_keyword:'', p_detail: r['detail_desc']||r['詳細描述']||'' });
             }).filter(p=>p);
-            const results = await Promise.all(promises);
-            success += results.filter(x => x && !x.error).length;
-            label.innerText = `匯入中...${i}/${res.data.length}`;
+            const results = await Promise.all(promises); success += results.filter(x => x && !x.error).length; label.innerText = `匯入中...${i}/${res.data.length}`;
         }
-        alert(`匯入完成！成功: ${success} 筆`);
-        label.innerText = oldText;
-        input.value = '';
-        fetchData();
-      }
-    });
-  };
-
-  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
-  window.login = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('admEmail').value, password: document.getElementById('admPwd').value });
-    if(error) alert(error.message);
-    else { 
-        document.body.classList.add('is-admin'); document.getElementById('adminPanel').classList.add('hidden'); 
-        document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden');
-        alert("登入成功！"); fetchData();
-    }
-  };
-  window.logout = async () => { await supabase.auth.signOut(); document.body.classList.remove('is-admin'); document.getElementById('adminActions').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); alert("已登出"); };
-  window.wipeData = async () => { if(prompt('輸入 admin 確認清空') === 'admin') { await supabase.from('visits').delete().neq('id', 0); alert('資料已清空'); fetchData(); } };
-  window.deleteData = async (id) => { if(confirm('刪除無法復原，確定？')) { await supabase.from('visits').delete().eq('id', id); visits = visits.filter(v => v.id != id); renderAll(); } };
-  
-  // --- HELPERS ---
-  window.setStore = s => { currentStore=s; document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active')); if(s=='全部')document.getElementById('btnTotal').classList.add('active'); if(s=='臨安店')document.getElementById('btnLinAn').classList.add('active'); if(s=='南科店')document.getElementById('btnNanKe').classList.add('active'); fetchData(); };
-  window.filterSource = () => { savedSourceFilter=document.getElementById('sourceFilter').value; renderAll(); };
-  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnClearSearch').classList.add('hidden'); fetchData(); };
-  window.openAddModal = () => { document.getElementById('mDate').value=new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display='flex'; };
-  window.closeModal = () => document.getElementById('modal').style.display='none';
-  window.toggleEditMode = () => { document.getElementById('detailView').classList.toggle('hidden'); document.getElementById('detailEdit').classList.toggle('hidden'); };
-  
-  window.saveEdit = async () => {
-    const id = document.getElementById('eId').value;
-    const updates = {
-      form_date: document.getElementById('eDate').value, store_branch: document.getElementById('eStore').value,
-      customer_name: document.getElementById('eName').value, source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
-      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x), detail_desc: document.getElementById('eDetail').value
-    };
-    const { error } = await supabase.from('visits').update(updates).eq('id', id);
-    if(error) alert('更新失敗: ' + error.message); else { alert('更新成功'); const idx = visits.findIndex(v => v.id == id); if(idx !== -1) visits[idx] = { ...visits[idx], ...updates }; document.getElementById('detailModal').style.display='none'; renderAll(); }
+        alert(`完成！成功: ${success}`); label.innerText = oldText; input.value = ''; reloadAll();
+    }});
   };
   
-  window.saveData = async () => {
-    const { error } = await supabase.rpc('submit_visit', {
-      p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value,
-      p_name: document.getElementById('mName').value, p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x),
-      p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), p_detail: document.getElementById('mDetail').value, p_gender:'', p_age:'', p_tainan:false, p_keyword:''
-    });
-    if(error) alert('新增失敗: '+error.message); else { alert('新增成功'); closeModal(); fetchData(); }
+  window.exportCSV = async () => {
+     // Fetch ALL data for export (using raw select because RPC is paged)
+     // Be careful with large data, but for 2000 rows it's fine.
+     const { data } = await supabase.from('visits').select('*').order('form_date', {ascending:false});
+     if(!data) return;
+     const csv = Papa.unparse(data);
+     const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
+     const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `export.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 </script>
 </body>
