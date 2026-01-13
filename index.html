@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V7.0</title>
+  <title>和光堂戰情室 V7.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -19,24 +19,19 @@
     :root { --bg: #f3f4f6; --card-bg: rgba(255, 255, 255, 0.85); --accent: #3b82f6; }
     body { background: var(--bg); font-family: system-ui, -apple-system, sans-serif; color: #1e293b; }
     
-    /* Glassmorphism Card */
     .glass-card {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 16px;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
 
-    /* KPI Cards */
     .kpi-card { cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; border: 2px solid transparent; }
     .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2); }
     .kpi-card.active { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: var(--accent); }
     .kpi-card.active::after { content:"●"; position:absolute; top:12px; right:12px; color:var(--accent); font-size:8px; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-    /* Hover Preview Tooltip */
     #hoverPreview {
         position: fixed; pointer-events: none; z-index: 9999;
         background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
@@ -47,25 +42,31 @@
         display: none; transition: opacity 0.1s;
     }
 
-    /* Date Picker Shortcuts */
-    .flatpickr-calendar.hasTime .flatpickr-time { border-top: 1px solid #e6e6e6; }
-    .date-shortcuts { display: flex; justify-content: space-around; padding: 8px; border-top: 1px solid #eee; background: #fafafa; }
-    .date-shortcuts button { font-size: 12px; color: #2563eb; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
-    .date-shortcuts button:hover { background: #eff6ff; }
-
-    /* Table Styles */
     thead th { background: #fef9c3; color: #000; padding: 14px; font-weight: 800; border-bottom: 2px solid #fde047; font-size: 0.9rem; }
-    tbody tr { border-bottom: 1px solid #f1f5f9; transition: 0.15s; }
+    tbody tr { border-bottom: 1px solid #f1f5f9; transition: 0.15s; cursor: pointer; }
     tbody tr:hover { background: #fefce8; transform: scale-[1.005]; }
 
     .btn-primary { background: var(--accent); color: white; padding: 8px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); transition: 0.2s; }
     .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+
+    /* Import Process Overlay */
+    #importOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; color: white; flex-direction: column; }
+    .progress-bar { width: 300px; height: 10px; background: #334155; border-radius: 5px; overflow: hidden; margin-top: 15px; }
+    .progress-fill { height: 100%; background: #22c55e; width: 0%; transition: width 0.2s; }
   </style>
 </head>
 <body>
 
 <!-- Hover Tooltip -->
 <div id="hoverPreview"></div>
+
+<!-- Import Progress Overlay -->
+<div id="importOverlay">
+  <div class="text-2xl font-bold mb-2">資料匯入中...</div>
+  <div id="importStatus" class="text-sm text-gray-400">正在準備...</div>
+  <div class="progress-bar"><div id="importProgress" class="progress-fill"></div></div>
+  <div id="importErrors" class="mt-4 text-xs text-red-400 max-h-40 overflow-y-auto w-[90%] max-w-md bg-slate-800 p-2 rounded hidden"></div>
+</div>
 
 <div class="max-w-7xl mx-auto p-4 space-y-6">
   
@@ -74,9 +75,11 @@
     <div>
       <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         👓 和光堂戰情室
-        <span class="text-xs font-mono bg-slate-200 text-slate-600 px-2 py-1 rounded">V7.0</span>
+        <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
+          <div class="text-sm font-bold text-slate-600">V7.2</div>
+          <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
+        </div>
       </h1>
-      <div class="text-xs font-bold text-slate-400 mt-1 ml-1">AI-Powered Analytics Dashboard</div>
     </div>
     <div class="flex gap-3">
       <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">⚙️</button>
@@ -90,7 +93,7 @@
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
       <span class="text-green-400 font-bold">✓ 管理員模式</span>
       <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 匯出資料</button>
-      <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">📂 匯入 CSV (V7版) <input type="file" class="hidden" onchange="previewCSV(this)"></label>
+      <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">📂 匯入 CSV (V7.2) <input type="file" class="hidden" onchange="previewCSV(this)"></label>
       <button onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition">⚠ 清空資料庫</button>
     </div>
   </div>
@@ -99,7 +102,18 @@
   <div class="glass-card p-2 flex flex-wrap gap-2 items-center sticky top-2 z-40 shadow-lg border-blue-200/50">
     <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
       <span class="text-xl mr-2">📅</span>
-      <input id="dateRange" class="bg-transparent border-0 p-2 w-56 font-bold text-gray-700 focus:ring-0" placeholder="選擇日期範圍">
+      <!-- Quick Selectors -->
+      <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
+      <span class="text-slate-300">/</span>
+      <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
+         <option value="">月份</option>
+         <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+         <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+         <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+      </select>
+      <!-- Date Picker (Hidden) -->
+      <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
+      <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
     </div>
     <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
       <span class="text-gray-400 mr-2">🔍</span>
@@ -148,7 +162,6 @@
         <h4 class="absolute top-0 left-0 text-xs font-bold text-slate-400">來店目的佔比</h4>
         <div class="w-full h-full relative">
           <canvas id="chartPurpose"></canvas>
-          <!-- Center Text for Doughnut -->
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center">
               <div class="text-xs text-slate-400 font-bold">TOP 1</div>
@@ -171,11 +184,11 @@
   <!-- Demographics -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div class="glass-card p-6 flex flex-col">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈</h3>
+       <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈 <span id="demoFilterBadge" class="text-xs font-normal text-blue-500 ml-2"></span></h3>
        <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
     </div>
     <div class="glass-card p-6 flex flex-col md:col-span-2">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈</h3>
+       <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈 <span id="demoFilterBadge2" class="text-xs font-normal text-blue-500 ml-2"></span></h3>
        <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
     </div>
   </div>
@@ -196,8 +209,7 @@
   </div>
 </div>
 
-<!-- Modals (Detail / Add) -->
-<!-- Detail Modal -->
+<!-- Modals -->
 <div id="detailModal" class="modal-overlay" onclick="if(event.target===this)closeDetail()">
   <div class="modal-content relative animate-fade-in-up">
     <button onclick="closeDetail()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600">×</button>
@@ -206,7 +218,6 @@
        <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm">刪除此筆</button>
        <button onclick="enableEdit()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold text-sm ml-auto">編輯資料</button>
     </div>
-    <!-- Edit Form -->
     <div id="editForm" class="hidden mt-4 space-y-3">
        <input type="hidden" id="eId">
        <div class="grid grid-cols-2 gap-3">
@@ -223,7 +234,6 @@
   </div>
 </div>
 
-<!-- Add Modal -->
 <div id="addModal" class="modal-overlay">
   <div class="modal-content">
     <h2 class="text-xl font-bold mb-4">新增資料</h2>
@@ -248,7 +258,6 @@
 </div>
 
 <script>
-  // --- Global State ---
   let rawData = [];
   let filteredData = [];
   let displayLimit = 20;
@@ -258,27 +267,17 @@
   let datePicker;
   let isAdmin = false;
 
-  // --- Init ---
   window.onload = async () => {
     Chart.register(ChartDataLabels);
     
-    // 1. Force Chinese Months & Shortcuts
+    // Header Date
+    document.getElementById('currentDateDisp').innerText = new Date().toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
+
     flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
     
     datePicker = flatpickr("#dateRange", { 
         mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: 'static',
-        onChange: (d) => { if(d.length===2) applyFilter(); },
-        onReady: (d, inp, fp) => {
-            const container = fp.calendarContainer;
-            const shortcuts = document.createElement('div');
-            shortcuts.className = 'date-shortcuts';
-            shortcuts.innerHTML = `
-              <button onclick="setDateRange('month')">本月</button>
-              <button onclick="setDateRange('lastMonth')">上月</button>
-              <button onclick="setDateRange('year')">今年</button>
-            `;
-            container.appendChild(shortcuts);
-        }
+        onChange: (d) => { if(d.length===2) applyFilter(); }
     });
 
     document.getElementById('qSearch').addEventListener('input', function() {
@@ -291,13 +290,23 @@
     await fetchAllData();
   };
 
-  window.setDateRange = (type) => {
-      const now = new Date();
-      let start, end;
-      if(type==='month') { start = new Date(now.getFullYear(), now.getMonth(), 1); end = new Date(now.getFullYear(), now.getMonth()+1, 0); }
-      if(type==='lastMonth') { start = new Date(now.getFullYear(), now.getMonth()-1, 1); end = new Date(now.getFullYear(), now.getMonth(), 0); }
-      if(type==='year') { start = new Date(now.getFullYear(), 0, 1); end = new Date(now.getFullYear(), 11, 31); }
-      datePicker.setDate([start, end]);
+  window.quickSelectDate = () => {
+      const y = document.getElementById('selYear').value;
+      const m = document.getElementById('selMonth').value;
+      if(y && m) {
+          const start = new Date(y, m-1, 1);
+          const end = new Date(y, m, 0); 
+          datePicker.setDate([start, end]);
+          applyFilter();
+      }
+  };
+
+  window.resetDate = () => {
+      if(rawData.length > 0) {
+          const dates = rawData.map(d => d.form_date).sort();
+          datePicker.setDate([dates[0], dates[dates.length-1]]);
+      }
+      document.getElementById('selMonth').value = "";
       applyFilter();
   };
   
@@ -307,7 +316,6 @@
     let allRows = []; let page = 0; const pageSize = 1000;
     document.getElementById('valTotal').innerText = '...';
     while(true) {
-        // V7: Fetch new columns
         const { data, error } = await supabase.from('visits').select('*').range(page*pageSize, (page+1)*pageSize-1);
         if(error || !data || data.length === 0) break;
         allRows = allRows.concat(data);
@@ -315,7 +323,14 @@
         page++;
     }
     rawData = allRows.sort((a,b) => new Date(b.form_date) - new Date(a.form_date));
-    if(rawData.length > 0) { const dates = rawData.map(d => d.form_date).sort(); datePicker.setDate([dates[0], dates[dates.length-1]]); }
+    
+    if(rawData.length > 0) {
+        const years = [...new Set(rawData.map(d => d.form_date.slice(0,4)))].sort().reverse();
+        const ySel = document.getElementById('selYear');
+        ySel.innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('');
+        const dates = rawData.map(d => d.form_date).sort();
+        datePicker.setDate([dates[0], dates[dates.length-1]]);
+    }
     applyFilter();
   }
 
@@ -326,15 +341,10 @@
     const end = dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2100-12-31';
     const q = document.getElementById('qSearch').value.toLowerCase();
 
-    // KPI Base (Time only)
     const timeData = rawData.filter(v => v.form_date >= start && v.form_date <= end);
     document.getElementById('valTotal').innerText = timeData.length;
     document.getElementById('valLinAn').innerText = timeData.filter(v=>v.store_branch=='臨安店').length;
     document.getElementById('valNanKe').innerText = timeData.filter(v=>v.store_branch=='南科店').length;
-
-    // Smart Lock: Check if lockedSource still exists in current store data?
-    // Actually, user wants lock to PERSIST even if data changes, so we don't null it here.
-    // Unless we want to auto-unlock if 0 results? Let's keep it sticky for now.
 
     filteredData = timeData.filter(v => {
         if(currentStore !== '全部' && v.store_branch !== currentStore) return false;
@@ -370,9 +380,78 @@
         }
     });
 
-    // 2. Demographics (Gender & Age) - V7 Schema Support
+    updateCrossCharts(lockedSource);
+  }
+
+  function updateCrossCharts(sourceFilter) {
+    let subset = filteredData;
+    const badge1 = document.getElementById('demoFilterBadge');
+    const badge2 = document.getElementById('demoFilterBadge2');
+    
+    if(sourceFilter) {
+        subset = filteredData.filter(v => (v.source_tags||[]).includes(sourceFilter));
+        badge1.innerText = badge2.innerText = `(${sourceFilter})`;
+    } else {
+        badge1.innerText = badge2.innerText = '';
+    }
+
+    // Purpose - Big Doughnut with Percentage in Legend
+    const pMap = {}; subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
+    const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const totalP = sortedP.reduce((a,b)=>a+b[1],0);
+    
+    document.getElementById('topPurposeVal').innerText = sortedP.length ? sortedP[0][0] : '--';
+
+    if(charts.purpose) charts.purpose.destroy();
+    charts.purpose = new Chart(document.getElementById('chartPurpose'), {
+        type: 'doughnut',
+        data: { 
+            labels: sortedP.map(x=>x[0]), 
+            datasets:[{ 
+                data:sortedP.map(x=>x[1]), 
+                backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }] 
+        },
+        options: { 
+            maintainAspectRatio: false, cutout: '60%',
+            layout: { padding: 20 },
+            plugins:{ 
+                legend:{
+                    display: true, position: 'right', 
+                    labels:{
+                        boxWidth:12, usePointStyle:true,
+                        generateLabels: (chart) => {
+                             const data = chart.data;
+                             return data.labels.map((label, i) => {
+                                 const val = data.datasets[0].data[i];
+                                 const pct = totalP ? Math.round(val/totalP*100) : 0;
+                                 return { text: `${label} (${pct}%)`, fillStyle: data.datasets[0].backgroundColor[i], hidden: false, index: i };
+                             });
+                        }
+                    }
+                }, 
+                datalabels: { display: false },
+                tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/totalP*100)}%)` } }
+            } 
+        }
+    });
+
+    // Trend
+    const tMap = {}; subset.forEach(v => { const m = v.form_date.slice(0,7); tMap[m]=(tMap[m]||0)+1; });
+    const sortedT = Object.keys(tMap).sort();
+    
+    if(charts.trend) charts.trend.destroy();
+    charts.trend = new Chart(document.getElementById('chartTrend'), {
+        type: 'line',
+        data: { labels: sortedT, datasets:[{ data:sortedT.map(k=>tMap[k]), borderColor:'#f59e0b', borderWidth:3, pointBackgroundColor:'#fff', pointBorderColor:'#f59e0b', pointRadius:4, tension:0.4, fill:true, backgroundColor:'rgba(245,158,11,0.1)' }] },
+        options: { maintainAspectRatio: false, scales:{x:{grid:{display:false}}, y:{grid:{borderDash:[5,5]}}}, plugins:{legend:{display:false}} }
+    });
+    
+    // Demographics - Synced
     const gMap = { '男':0, '女':0, '其他':0 }; const aMap = {};
-    data.forEach(v => {
+    subset.forEach(v => {
         const g = v.gender || '其他';
         const a = v.age_range || '未填';
         if(gMap.hasOwnProperty(g)) gMap[g]++; else gMap['其他']++;
@@ -392,53 +471,6 @@
         data: { labels: Object.keys(aMap).sort(), datasets: [{ label:'人數', data: Object.values(aMap), backgroundColor:'#cbd5e1', borderRadius:4 }] },
         options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend:{display:false} } }
     });
-
-    updateCrossCharts(lockedSource);
-  }
-
-  function updateCrossCharts(sourceFilter) {
-    let subset = filteredData;
-    if(sourceFilter) subset = filteredData.filter(v => (v.source_tags||[]).includes(sourceFilter));
-
-    // Purpose - Big Doughnut
-    const pMap = {}; subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
-    const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    
-    // Update Top 1 Label
-    document.getElementById('topPurposeVal').innerText = sortedP.length ? sortedP[0][0] : '--';
-
-    if(charts.purpose) charts.purpose.destroy();
-    charts.purpose = new Chart(document.getElementById('chartPurpose'), {
-        type: 'doughnut',
-        data: { 
-            labels: sortedP.map(x=>x[0]), 
-            datasets:[{ 
-                data:sortedP.map(x=>x[1]), 
-                backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'],
-                borderWidth: 0,
-                hoverOffset: 10
-            }] 
-        },
-        options: { 
-            maintainAspectRatio: false, cutout: '60%',
-            layout: { padding: 20 },
-            plugins:{ 
-                legend:{display: true, position: 'right', labels:{boxWidth:12, usePointStyle:true}}, 
-                datalabels: { display: false } // Clean look, use Legend
-            } 
-        }
-    });
-
-    // Trend - Bottom
-    const tMap = {}; subset.forEach(v => { const m = v.form_date.slice(0,7); tMap[m]=(tMap[m]||0)+1; });
-    const sortedT = Object.keys(tMap).sort();
-    
-    if(charts.trend) charts.trend.destroy();
-    charts.trend = new Chart(document.getElementById('chartTrend'), {
-        type: 'line',
-        data: { labels: sortedT, datasets:[{ data:sortedT.map(k=>tMap[k]), borderColor:'#f59e0b', borderWidth:3, pointBackgroundColor:'#fff', pointBorderColor:'#f59e0b', pointRadius:4, tension:0.4, fill:true, backgroundColor:'rgba(245,158,11,0.1)' }] },
-        options: { maintainAspectRatio: false, scales:{x:{grid:{display:false}}, y:{grid:{borderDash:[5,5]}}}, plugins:{legend:{display:false}} }
-    });
   }
 
   function updateLockBadge() {
@@ -451,23 +483,34 @@
      }
   }
 
-  // --- Table & Preview ---
+  // --- Table (Event Listener Fix) ---
   function renderTable() {
       const tbody = document.getElementById('tableBody');
       const page = filteredData.slice(0, displayLimit);
-      tbody.innerHTML = page.map(v => `
-        <tr onclick="showDetail(${v.id})" 
-            onmouseenter="showPreview(event, '${(v.detail_desc||'').replace(/'/g, "\\'").replace(/\n/g, ' ')}')" 
-            onmouseleave="hidePreview()">
-          <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
-          <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-          <td class="font-bold text-slate-800">${v.customer_name}</td>
-          <td class="text-xs text-slate-500">${v.gender||'-'} / ${v.age_range||'-'}</td>
-          <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags||[]).join(',')}</td>
-          <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes||[]).join(',')}</td>
-          <td class="text-slate-300">›</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = '';
+      
+      page.forEach(v => {
+          const tr = document.createElement('tr');
+          const safeDesc = (v.detail_desc||'').replace(/'/g, "\\'").replace(/\n/g, ' ');
+          
+          tr.dataset.id = v.id;
+          
+          tr.innerHTML = `
+             <td class="pl-6 py-3 font-mono text-slate-500 pointer-events-none">${v.form_date}</td>
+             <td class="pointer-events-none"><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
+             <td class="font-bold text-slate-800 pointer-events-none">${v.customer_name}</td>
+             <td class="text-xs text-slate-500 pointer-events-none">${v.gender||'-'} / ${v.age_range||'-'}</td>
+             <td class="text-xs text-slate-500 max-w-[120px] truncate pointer-events-none">${(v.source_tags||[]).join(',')}</td>
+             <td class="text-xs text-slate-500 max-w-[120px] truncate pointer-events-none">${(v.visit_purposes||[]).join(',')}</td>
+             <td class="text-slate-300">›</td>
+          `;
+          
+          tr.addEventListener('click', () => showDetail(v.id));
+          tr.addEventListener('mouseenter', (e) => showPreview(e, safeDesc));
+          tr.addEventListener('mouseleave', hidePreview);
+          
+          tbody.appendChild(tr);
+      });
       
       document.getElementById('listCounter').innerText = `${page.length} / ${filteredData.length}`;
       if(page.length >= filteredData.length) document.getElementById('btnLoadMore').classList.add('hidden');
@@ -484,16 +527,27 @@
   };
   window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
 
-  // --- CSV Import V7 (Smart Mapping) ---
+  // --- CSV Import ---
   window.previewCSV = (input) => {
     const f = input.files[0];
     Papa.parse(f, { header:true, skipEmptyLines:true, complete: async (res) => {
-       if(!confirm(`準備匯入 ${res.data.length} 筆資料到 V7 資料庫?`)) return;
+       const total = res.data.length;
+       if(!confirm(`即將匯入 ${total} 筆資料到 V7.2 資料庫?`)) return;
+       
+       const overlay = document.getElementById('importOverlay');
+       const progress = document.getElementById('importProgress');
+       const status = document.getElementById('importStatus');
+       const errLog = document.getElementById('importErrors');
+       overlay.style.display = 'flex';
+       errLog.innerHTML = ''; errLog.classList.add('hidden');
        
        const cleanData = res.data.map(row => {
-          const d = row['form_date']||row['填表日期']; 
+          let d = row['form_date']||row['填表日期']; 
+          if(!d) return null;
+          d = d.replace(/\//g, '-');
+          
           const n = row['customer_name']||row['顧客姓名'];
-          if(!d || !n) return null;
+          if(!n) return null;
           
           let sRaw = row['source_tags']||row['來源統計']||'';
           sRaw = sRaw.replace(/，/g, ',').replace(/、/g, ','); 
@@ -515,24 +569,71 @@
           };
        }).filter(x=>x);
 
-       const batchSize = 20;
+       const batchSize = 10;
+       let processed = 0;
+       let errors = [];
+
        for(let i=0; i<cleanData.length; i+=batchSize) {
           const chunk = cleanData.slice(i, i+batchSize);
-          await Promise.all(chunk.map(r => supabase.rpc('submit_visit_v7', r)));
+          const results = await Promise.allSettled(chunk.map(r => supabase.rpc('submit_visit_v7', r)));
+          
+          results.forEach((res, idx) => {
+              if(res.status === 'rejected' || (res.value && res.value.error)) {
+                  const errRow = chunk[idx];
+                  errors.push(`${errRow.p_date} ${errRow.p_name}: ${res.reason || res.value.error}`);
+              }
+          });
+
+          processed += chunk.length;
+          const pct = Math.round(processed/total*100);
+          progress.style.width = pct + '%';
+          status.innerText = `處理中... ${processed} / ${total}`;
        }
-       alert('V7 匯入完成！資料庫已全面更新。');
-       location.reload();
+       
+       status.innerText = `完成！成功: ${total - errors.length} | 失敗: ${errors.length}`;
+       if(errors.length > 0) {
+           errLog.classList.remove('hidden');
+           errLog.innerHTML = errors.map(e => `<div>${e}</div>`).join('');
+       }
+       
+       setTimeout(() => { 
+           if(errors.length === 0) { overlay.style.display='none'; location.reload(); }
+           else { alert('匯入完成但有部分錯誤，請查看日誌。'); }
+       }, 1000);
     }});
   };
 
-  // Utils (Save/Edit V7)
+  // --- Admin Wipe Force Backup ---
+  window.wipeData = async () => { 
+      alert('安全機制：系統將強制為您下載一份備份 CSV，下載開始後才能繼續。');
+      exportCSV(); // 1. Force Download
+      
+      // 2. Wait for download trigger
+      setTimeout(async () => {
+          if(!confirm('備份已下載。您確定要清空所有資料嗎？此動作無法復原！')) return;
+          
+          const pwd = prompt('請輸入管理員密碼確認：');
+          if(pwd === '628599') { // Corrected Password
+              const { error } = await supabase.from('visits').delete().neq('id', 0);
+              if(error) alert('清空失敗: ' + error.message);
+              else {
+                  alert('資料庫已清空。');
+                  location.reload();
+              }
+          } else {
+              alert('密碼錯誤！');
+          }
+      }, 1500); 
+  };
+
+  // Utils
   window.saveData = async () => {
      const r = {
         p_date: document.getElementById('mDate').value,
         p_store: document.getElementById('mStore').value,
         p_name: document.getElementById('mName').value,
         p_gender: document.getElementById('mGender').value,
-        p_age: '', // Manual add usually ignores age range or needs input
+        p_age: '', 
         p_is_local: false,
         p_sources: document.getElementById('mSources').value.replace(/，/g,',').split(',').filter(x=>x),
         p_purposes: document.getElementById('mPurposes').value.replace(/，/g,',').split(',').filter(x=>x),
@@ -543,17 +644,15 @@
      document.getElementById('addModal').style.display='none'; fetchAllData();
   };
 
-  // Re-use logic
   window.setStore = (s) => { currentStore = s; document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); if(s=='全部')document.getElementById('kpiTotal').classList.add('active'); if(s=='臨安店')document.getElementById('kpiLinAn').classList.add('active'); if(s=='南科店')document.getElementById('kpiNanKe').classList.add('active'); applyFilter(); };
   window.loadMore = () => { displayLimit+=20; renderTable(); };
   window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
   window.openAddModal = () => document.getElementById('addModal').style.display='flex';
-  window.showDetail = (id) => { const v = rawData.find(x => x.id === id); if(!v) return; document.getElementById('detailContent').innerHTML=`<h2 class="font-bold text-xl mb-2">${v.customer_name}</h2><p class="text-sm text-gray-500 mb-4">${v.form_date} @ ${v.store_branch} (${v.gender||''})</p><div class="bg-slate-50 p-4 rounded text-sm text-slate-700 whitespace-pre-wrap">${v.detail_desc||'無描述'}</div>`; document.getElementById('eId').value=v.id; document.getElementById('detailModal').style.display='flex'; document.getElementById('detailActions').classList.remove('hidden'); };
+  window.showDetail = (id) => { const v = rawData.find(x => x.id === parseInt(id)); if(!v) return; document.getElementById('detailContent').innerHTML=`<h2 class="font-bold text-xl mb-2">${v.customer_name}</h2><p class="text-sm text-gray-500 mb-4">${v.form_date} @ ${v.store_branch} (${v.gender||''})</p><div class="bg-slate-50 p-4 rounded text-sm text-slate-700 whitespace-pre-wrap">${v.detail_desc||'無描述'}</div>`; document.getElementById('eId').value=v.id; document.getElementById('detailModal').style.display='flex'; document.getElementById('detailActions').classList.remove('hidden'); };
   window.closeDetail = () => document.getElementById('detailModal').style.display='none';
   window.enableEdit = () => { document.getElementById('detailContent').innerHTML=''; document.getElementById('editForm').classList.remove('hidden'); document.getElementById('detailActions').classList.add('hidden'); };
   function enableAdminUI() { isAdmin = true; document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden'); }
   window.login = () => { if(document.getElementById('admPwd').value==='admin') enableAdminUI(); };
-  window.wipeData = async () => { if(confirm('⚠️ 警告：這將清空所有資料！確定嗎？')) { const pwd=prompt('請輸入密碼確認：'); if(pwd==='admin888') { await supabase.from('visits').delete().neq('id',0); location.reload(); } } };
   window.exportCSV = () => { const csv = Papa.unparse(rawData); const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'})); link.download = `backup_v7_${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(link); link.click(); };
 </script>
 </body>
