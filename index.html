@@ -3,407 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V5.2 Light Pro</title>
+  <title>和光堂戰情室 V5.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- 引入 Flatpickr (Agoda 風格日期選擇器) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
+
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    // 請確認您的 URL 和 Key 是正確的
     window.supabase = createClient(
       "https://yxalpzculcyhzvnyvecb.supabase.co", 
       "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
     );
   </script>
   <style>
-    /* VARIABLES (Pure Light Theme) */
     :root { 
-      --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --subtext: #4b5563; 
-      --border: #e5e7eb; --accent: #2563eb; --accent-hover: #1d4ed8; 
-      
-      /* Table Colors (Requested) */
-      --table-header-bg: #fcd34d; /* Yellow-300 */
+      --bg: #f3f4f6; 
+      --card: #ffffff; 
+      --text: #1f2937; 
+      --accent: #2563eb; 
+      --table-header-bg: #fcd34d; /* 鵝黃色標題 */
       --table-header-text: #000000;
-      --row-hover: #fef3c7; /* Yellow-100 (Goose Yellow) */
+      --row-hover: #fef9c3; /* 淺黃色 hover */
     }
     
     body { background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 20px; }
+    .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 20px; }
     
-    /* INPUTS (Booking Style - Preserved) */
-    .date-range-group {
-      display: flex; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
-      transition: 0.2s;
+    /* Agoda Style Date Picker Input */
+    .date-range-container {
+      display: flex; align-items: center; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer;
     }
-    .date-range-group:focus-within { border-color: var(--accent); ring: 2px solid var(--accent); }
-    .date-input { 
-      background: transparent; border: none; color: var(--text); padding: 8px 12px; outline: none; font-size: 14px; width: 130px; 
+    .date-range-input {
+      border: none; padding: 10px 12px; font-size: 14px; outline: none; width: 220px; text-align: center; font-weight: 500; cursor: pointer;
     }
     
-    .input-std { background: #fff; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 8px; outline: none; width: 100%; }
-    
-    /* BUTTONS */
-    .btn-primary { background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    
-    /* STATS */
+    .input-std { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; width: 100%; }
+    .btn-primary { background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
     .btn-stat { cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
     .btn-stat.active { border-color: var(--accent); background: #eff6ff; }
 
-    /* TABLE STYLES (Fixed) */
-    .table-header { background-color: var(--table-header-bg) !important; color: var(--table-header-text) !important; font-weight: 800; border-bottom: 2px solid #fbbf24; }
-    tr { transition: background-color 0.15s; border-bottom: 1px solid #f3f4f6; }
-    tr:hover { background-color: var(--row-hover) !important; }
+    /* Table Styles */
+    thead tr th { background-color: var(--table-header-bg) !important; color: var(--table-header-text) !important; font-weight: 800; }
+    tbody tr { transition: background-color 0.1s; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
+    tbody tr:hover { background-color: var(--row-hover) !important; }
     
-    /* ADMIN */
+    /* Admin Visibility */
     .admin-only { display: none !important; }
     body.is-admin .admin-only { display: flex !important; }
-    
-    /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
-    .modal-content { background: #fff; color: #000; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; border: 1px solid #e5e7eb; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    
-    .detail-row { display: flex; border-bottom: 1px solid #e5e7eb; padding: 12px 0; align-items: center; }
-    .detail-label { width: 100px; font-weight: bold; color: #6b7280; }
-    
-    /* Trend Chart Box */
-    #trendBox { height: 100px; width: 100%; margin-top: 16px; display: none; }
+    /* Table cell fix for admin buttons */
+    body.is-admin td.admin-only { display: table-cell !important; } 
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 999; }
+    .modal-content { background: #fff; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: 12px; }
+    .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
+    .detail-label { width: 100px; font-weight: bold; color: #666; }
   </style>
 </head>
-<body class="">
+<body>
 
 <div class="max-w-7xl mx-auto p-4">
-  <!-- Header -->
+  <!-- 1. Header & Version -->
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <div class="flex items-center gap-3">
-      <h1 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
+      <h1 class="text-2xl font-bold tracking-tight text-blue-600 flex items-center gap-2">
         <span>👓 和光堂戰情室</span>
-        <span class="text-xs px-2 py-0.5 rounded border border-gray-400 text-gray-500">V5.2</span>
+        <!-- 版本號：藍色字體 + 日期 -->
+        <span class="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">V5.4 • 2026/01/13</span>
       </h1>
     </div>
     <div class="flex items-center gap-3">
-      <!-- Admin Button -->
-      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-800 p-2 transition" title="管理員">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-      </button>
+      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-800 p-2" title="管理員">⚙️</button>
       <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
     </div>
   </div>
 
   <!-- Admin Panel -->
   <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white border-0 shadow-xl">
-    <div id="loginForm" class="flex flex-col md:flex-row gap-3 items-center">
+    <div id="loginForm" class="flex gap-3 items-center">
       <input type="email" id="admEmail" value="chanywang92@gmail.com" class="input-std text-black" placeholder="Email">
       <input type="password" id="admPwd" class="input-std text-black" placeholder="Password">
-      <button onclick="login()" class="btn-primary ring-2 ring-offset-2 ring-blue-500">登入</button>
+      <button onclick="login()" class="btn-primary">登入</button>
     </div>
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
-      <div class="font-bold text-green-400 flex items-center gap-2">
-        <span class="w-2 h-2 bg-green-400 rounded-full"></span> 管理員已登入
-      </div>
+      <div class="font-bold text-green-400">✅ 管理員模式</div>
       <div class="flex gap-2">
-        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 transition text-white">
-          <span>📂 匯入 CSV</span>
+        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 text-white">
+          <span>📂 匯入 CSV (穩健版)</span>
           <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="previewCSV(this)">
         </label>
-        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm">匯出 CSV</button>
-        <button onclick="logout()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-sm">登出</button>
+        <button onclick="logout()" class="bg-red-600 text-white px-3 py-1.5 rounded text-sm">登出</button>
       </div>
-      <button onclick="wipeData()" class="text-red-400 hover:text-red-300 text-sm font-bold border border-red-400 px-3 py-1 rounded">⚠️ 清空資料庫</button>
+      <button onclick="wipeData()" class="text-red-400 text-sm border border-red-400 px-3 py-1 rounded">⚠️ 清空資料庫</button>
     </div>
   </div>
 
-  <!-- Filter Bar (Preserved Booking Style) -->
+  <!-- 2. Filter Bar (Agoda Style) -->
   <div class="card mb-6 flex flex-wrap gap-3 items-center sticky top-2 z-30 shadow-md">
-    <div class="date-range-group shadow-sm">
-      <div class="px-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Check-in</div>
-      <input type="date" id="qFrom" class="date-input font-medium text-gray-700">
-      <div class="px-2 text-gray-300">➝</div>
-      <div class="px-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Check-out</div>
-      <input type="date" id="qTo" class="date-input font-medium text-gray-700">
+    <div class="date-range-container">
+      <span class="pl-3 text-gray-400">📅</span>
+      <!-- 這裡綁定 Flatpickr -->
+      <input type="text" id="dateRange" class="date-range-input" placeholder="選擇日期區間">
     </div>
     
-    <div class="flex-grow relative group">
-      <input type="text" id="qSearch" placeholder="搜尋姓名、電話或備註..." class="input-std pl-9 pr-8 shadow-inner bg-gray-50 focus:bg-white transition">
-      <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2.5 text-gray-400 hover:text-gray-600">✕</button>
+    <div class="flex-grow relative">
+      <input type="text" id="qSearch" placeholder="搜尋姓名、手機、備註..." class="input-std pl-9" onkeyup="if(event.key==='Enter') fetchData()">
+      <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+      <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2.5 text-gray-400 font-bold">✕</button>
     </div>
-    <button onclick="fetchData()" class="btn-primary shadow-md">查詢</button>
+    <button onclick="fetchData()" class="btn-primary">查詢</button>
   </div>
 
   <!-- Stats -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6"><div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">總客數</div><div class="text-4xl font-extrabold text-gray-800" id="statTotal">--</div></div>
-    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">臨安店</div><div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div></div>
-    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">南科店</div><div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div></div>
+    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6"><div class="text-xs font-bold text-gray-500 mb-1">總客數</div><div class="text-4xl font-extrabold text-gray-800" id="statTotal">--</div></div>
+    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 mb-1">臨安店</div><div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div></div>
+    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 mb-1">南科店</div><div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div></div>
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <div class="card h-[500px] flex flex-col">
-      <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2"><h3 class="font-bold text-gray-800">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="input-std w-auto text-xs py-1"><option value="ALL">顯示全部客源</option></select></div>
-      <div class="flex-grow relative w-full h-full min-h-0"><canvas id="chartSource"></canvas></div>
-      <div id="trendBox">
-        <div class="text-xs font-bold text-gray-400 mb-1">📅 趨勢走勢 (<span id="trendLabel"></span>)</div>
-        <div class="relative w-full h-full"><canvas id="chartTrend"></canvas></div>
-      </div>
+    <div class="card h-[450px] flex flex-col">
+      <div class="flex justify-between mb-4"><h3 class="font-bold">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="border rounded text-xs p-1"><option value="ALL">全部</option></select></div>
+      <div class="flex-grow relative"><canvas id="chartSource"></canvas></div>
+      <div id="trendBox" class="hidden mt-4 h-24 w-full"><div class="text-xs font-bold text-gray-400">趨勢: <span id="trendLabel"></span></div><div class="relative w-full h-full"><canvas id="chartTrend"></canvas></div></div>
     </div>
-    <div class="card h-[500px] flex flex-col">
-      <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2"><div class="flex items-center gap-2"><h3 class="font-bold text-gray-800">來店目的</h3><span id="purposeSubtitle" class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">(全部)</span></div></div>
-      <div class="flex-grow relative w-full h-full min-h-0 flex justify-center"><canvas id="chartPurpose"></canvas></div>
+    <div class="card h-[450px] flex flex-col">
+      <div class="flex justify-between mb-4"><h3 class="font-bold">來店目的</h3></div>
+      <div class="flex-grow relative flex justify-center"><canvas id="chartPurpose"></canvas></div>
     </div>
   </div>
 
-  <!-- Table (Fixed Colors) -->
-  <div class="card overflow-hidden border-0 shadow-lg">
-    <div class="flex justify-between items-center mb-4 px-2">
-      <h3 class="font-bold text-lg text-gray-900">最新來客紀錄 <span class="text-xs font-medium text-white bg-gray-800 px-2 py-0.5 rounded-full ml-2">Top 50</span></h3>
+  <!-- Table (前台只顯示最新 10 筆 + 更多按鈕) -->
+  <div class="card overflow-hidden shadow-lg border-0 p-0">
+    <div class="p-4 bg-white border-b flex justify-between">
+      <h3 class="font-bold text-lg text-gray-800">最新來客紀錄</h3>
+      <span class="text-xs text-gray-400" id="recordCountDisplay">顯示最新 10 筆</span>
     </div>
-    <div class="overflow-x-auto rounded-lg border border-gray-200">
+    <div class="overflow-x-auto">
       <table class="w-full text-sm text-left whitespace-nowrap">
-        <thead class="table-header">
-          <tr><th class="p-3 pl-4">日期</th><th class="p-3">分店</th><th class="p-3">姓名</th><th class="p-3">客源</th><th class="p-3">目的</th><th class="p-3 pr-4 admin-only text-right">操作</th></tr>
+        <thead>
+          <tr>
+            <th class="p-3 pl-4">日期</th>
+            <th class="p-3">分店</th>
+            <th class="p-3">姓名</th>
+            <th class="p-3">客源</th>
+            <th class="p-3">目的</th>
+            <th class="p-3 pr-4 admin-only text-right" style="width: 80px;">操作</th>
+          </tr>
         </thead>
         <tbody id="tableBody" class="bg-white"></tbody>
       </table>
     </div>
-  </div>
-</div>
-
-<!-- Modals -->
-<div id="modal" class="modal-overlay">
-  <div class="modal-content shadow-2xl">
-    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-2">
-      <h2 class="text-xl font-bold text-gray-800">新增資料</h2>
-      <button onclick="closeModal()" class="text-2xl text-gray-400 hover:text-gray-600">&times;</button>
-    </div>
-    <div class="space-y-4">
-      <div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-bold text-gray-500 mb-1 block">日期</label><input type="date" id="mDate" class="input-std"></div><div><label class="text-xs font-bold text-gray-500 mb-1 block">分店</label><select id="mStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">姓名</label><input type="text" id="mName" class="input-std" placeholder="顧客姓名"></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">客源 (逗號分隔)</label><input type="text" id="mSources" class="input-std" placeholder="例如: Google搜尋, 親友介紹"></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">目的 (逗號分隔)</label><input type="text" id="mPurposes" class="input-std" placeholder="例如: 驗光配鏡"></div>
-      <div><label class="text-xs font-bold text-gray-500 mb-1 block">備註</label><textarea id="mDetail" class="input-std h-20"></textarea></div>
-      <button onclick="saveData()" class="btn-primary w-full py-3">儲存</button>
+    <!-- Load More Button -->
+    <div class="p-4 text-center border-t bg-gray-50">
+        <button onclick="loadMore()" id="btnLoadMore" class="text-blue-600 font-bold text-sm hover:underline">⬇️ 載入更多 (20筆)</button>
     </div>
   </div>
 </div>
 
+<!-- Details Modal -->
 <div id="detailModal" class="modal-overlay">
-  <div class="modal-content shadow-2xl">
-    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-      <h2 class="text-xl font-bold text-gray-800">📋 詳細資料</h2>
+  <div class="modal-content">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+      <h2 class="text-xl font-bold">詳細資料</h2>
       <div class="flex gap-2">
-        <button onclick="toggleEditMode()" class="admin-only bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-bold hover:bg-blue-200 transition">✏️ 編輯</button>
-        <button onclick="document.getElementById('detailModal').style.display='none'" class="text-2xl text-gray-400 hover:text-gray-600">&times;</button>
+        <button onclick="toggleEditMode()" class="admin-only bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-bold">編輯</button>
+        <button onclick="closeDetailModal()" class="text-2xl text-gray-400">&times;</button>
       </div>
     </div>
-    
-    <div id="detailView" class="block space-y-2">
-      <div class="detail-row"><div class="detail-label">日期</div><div class="detail-val text-gray-800" id="dDate"></div></div>
-      <div class="detail-row"><div class="detail-label">分店</div><div class="detail-val text-gray-800" id="dStore"></div></div>
-      <div class="detail-row"><div class="detail-label">姓名</div><div class="detail-val font-bold text-2xl text-blue-600" id="dName"></div></div>
-      <div class="detail-row"><div class="detail-label">客源</div><div class="detail-val flex flex-wrap gap-1" id="dSources"></div></div>
-      <div class="detail-row"><div class="detail-label">目的</div><div class="detail-val flex flex-wrap gap-1" id="dPurposes"></div></div>
-      <div class="detail-row border-0"><div class="detail-label">描述</div><div class="detail-val whitespace-pre-wrap bg-gray-50 p-4 rounded text-sm text-gray-600 border border-gray-200 w-full" id="dDetail"></div></div>
-    </div>
-
+    <!-- View Mode -->
+    <div id="detailView"></div>
+    <!-- Edit Mode -->
     <div id="detailEdit" class="hidden space-y-3">
       <input type="hidden" id="eId">
       <div class="detail-row"><div class="detail-label">日期</div><input type="date" id="eDate" class="input-std"></div>
       <div class="detail-row"><div class="detail-label">分店</div><select id="eStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
       <div class="detail-row"><div class="detail-label">姓名</div><input type="text" id="eName" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">客源</div><input type="text" id="eSources" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">目的</div><input type="text" id="ePurposes" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">描述</div><textarea id="eDetail" class="input-std h-24"></textarea></div>
-      <button onclick="saveEdit()" class="btn-primary w-full">儲存修改</button>
+      <div class="detail-row"><div class="detail-label">客源(逗號隔開)</div><input type="text" id="eSources" class="input-std"></div>
+      <div class="detail-row"><div class="detail-label">目的(逗號隔開)</div><input type="text" id="ePurposes" class="input-std"></div>
+      <div class="detail-row flex-col items-start"><div class="detail-label mb-2">備註</div><textarea id="eDetail" class="input-std h-24"></textarea></div>
+      <button onclick="saveEdit()" class="btn-primary w-full bg-green-600 hover:bg-green-700">💾 儲存修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-content">
+    <h2 class="text-xl font-bold mb-4">新增資料</h2>
+    <div class="space-y-3">
+      <input type="date" id="mDate" class="input-std">
+      <select id="mStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select>
+      <input type="text" id="mName" class="input-std" placeholder="姓名">
+      <input type="text" id="mSources" class="input-std" placeholder="客源 (可複選)">
+      <input type="text" id="mPurposes" class="input-std" placeholder="目的 (可複選)">
+      <textarea id="mDetail" class="input-std" placeholder="備註"></textarea>
+      <button onclick="saveData()" class="btn-primary w-full">儲存</button>
+      <button onclick="closeModal()" class="w-full text-center text-sm text-gray-500 mt-2">取消</button>
     </div>
   </div>
 </div>
 
 <script>
-  let visits = [], stats = {}, currentStore = '全部', savedSourceFilter = 'ALL';
-  let charts = { source: null, purpose: null, trend: null };
+  let visits = [], stats = {}, currentStore = '全部', savedSourceFilter = 'ALL', charts = {};
+  let currentLimit = 10; // 初始只顯示 10 筆
+  let datePicker;
 
   window.onload = async () => {
-    // 1. Auto-range fix (Force earliest date)
-    const { data: range } = await supabase.from('visits').select('form_date').order('form_date', { ascending: true }).limit(1);
-    const { data: rangeEnd } = await supabase.from('visits').select('form_date').order('form_date', { ascending: false }).limit(1);
+    // 1. 初始化 Flatpickr 日期選擇器 (Agoda Style)
+    const today = new Date();
+    const lastMonth = new Date(); lastMonth.setMonth(today.getMonth() - 1);
     
-    // Set default range to cover ALL data
-    document.getElementById('qFrom').value = (range && range.length) ? range[0].form_date : '2023-01-01';
-    document.getElementById('qTo').value = (rangeEnd && rangeEnd.length) ? rangeEnd[0].form_date : new Date().toISOString().split('T')[0];
+    datePicker = flatpickr("#dateRange", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        defaultDate: [lastMonth, today],
+        locale: "zh_tw",
+        onClose: function(selectedDates, dateStr, instance) {
+            if(selectedDates.length === 2) fetchData();
+        }
+    });
 
-    checkAuth();
+    // 2. 檢查登入狀態
+    const { data: { session } } = await supabase.auth.getSession();
+    if(session) {
+        document.body.classList.add('is-admin');
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('adminActions').classList.remove('hidden');
+    }
+
+    // 3. 初始載入
     fetchData();
   };
 
-  // --- DATA FETCH ---
   window.fetchData = async () => {
-    const from = document.getElementById('qFrom').value; 
-    const to = document.getElementById('qTo').value; 
-    const keyword = document.getElementById('qSearch').value;
+    const dates = document.getElementById('dateRange').value.split(' 至 ');
+    const from = dates[0] || '2023-01-01';
+    const to = dates[1] || dates[0] || new Date().toISOString().split('T')[0];
+    const key = document.getElementById('qSearch').value;
     
-    // Counts
-    const { data: allData } = await supabase.from('visits').select('store_branch').gte('form_date', from).lte('form_date', to);
-    if(allData) {
-      document.getElementById('statTotal').textContent=allData.length; 
-      document.getElementById('statLinAn').textContent=allData.filter(r=>r.store_branch==='臨安店').length; 
-      document.getElementById('statNanKe').textContent=allData.filter(r=>r.store_branch==='南科店').length; 
+    // UI Update
+    if(key) document.getElementById('btnClearSearch').classList.remove('hidden');
+    
+    // 數據載入中提示
+    document.getElementById('statTotal').innerText = '...';
+
+    // 呼叫 Supabase RPC
+    const { data, error } = await supabase.rpc('get_visits_public', { 
+        start_date: from, 
+        end_date: to, 
+        keyword: key, 
+        store_filter: currentStore 
+    });
+
+    if(error) {
+        console.error(error);
+        alert('讀取資料錯誤: ' + error.message);
+        return;
     }
-    
-    // List
-    const { data: list, error } = await supabase.rpc('get_visits_public', { start_date: from, end_date: to, keyword: keyword, store_filter: currentStore });
-    if(error) console.error(error);
-    if(list) {
-      visits = list;
-      // Calc stats
-      const sMap = {}, pMap = {};
-      list.forEach(v => {
-        (v.source_tags||[]).forEach(s => sMap[s] = (sMap[s]||0)+1);
-        (v.visit_purposes||[]).forEach(p => pMap[p] = (pMap[p]||0)+1);
-      });
-      stats = {
-        sources: Object.entries(sMap).map(([k,v])=>({tag:k,c:v})).sort((a,b)=>b.c-a.c),
-        purposes: Object.entries(pMap).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c)
-      };
+
+    if(data) {
+      visits = data;
+      // 更新統計數字
+      document.getElementById('statTotal').innerText = visits.length;
+      document.getElementById('statLinAn').innerText = visits.filter(x=>x.store_branch=='臨安店').length;
+      document.getElementById('statNanKe').innerText = visits.filter(x=>x.store_branch=='南科店').length;
       
-      // Update Dropdown (preserve selection)
-      const sel = document.getElementById('sourceFilter');
-      const currentVal = sel.value === 'ALL' ? savedSourceFilter : sel.value;
-      sel.innerHTML = '<option value="ALL">顯示全部客源</option>';
-      stats.sources.forEach(s => {
-        const opt = document.createElement('option'); opt.value = s.tag; opt.textContent = s.tag;
-        sel.appendChild(opt);
-      });
-      if(stats.sources.find(s=>s.tag === currentVal)) sel.value = currentVal;
-      
+      // 重置顯示數量
+      currentLimit = 10;
       renderAll();
     }
   };
 
-  // --- RENDER ---
   function renderAll() {
-    // Filter logic
-    let chartVisits = visits;
-    const filter = document.getElementById('sourceFilter').value;
-    if(filter !== 'ALL') {
-      chartVisits = visits.filter(v => (v.source_tags||[]).includes(filter));
-      document.getElementById('purposeSubtitle').textContent = `(來自: ${filter})`;
-      document.getElementById('trendBox').style.display = 'block';
-      document.getElementById('trendLabel').textContent = filter;
-      renderTrend(filter);
+    // 1. 處理圖表 (Charts)
+    let list = visits;
+    if(savedSourceFilter !== 'ALL') {
+      list = visits.filter(v => (v.source_tags||[]).includes(savedSourceFilter));
+      document.getElementById('trendBox').classList.remove('hidden');
+      document.getElementById('trendLabel').innerText = savedSourceFilter;
+      renderTrend(savedSourceFilter);
     } else {
-      document.getElementById('purposeSubtitle').textContent = '(全部)';
-      document.getElementById('trendBox').style.display = 'none';
+      document.getElementById('trendBox').classList.add('hidden');
     }
 
-    // Recalc Chart Data
-    const pMap = {}; chartVisits.forEach(v => (v.visit_purposes||[]).forEach(p => pMap[p] = (pMap[p]||0)+1));
-    const pData = Object.entries(pMap).map(([k,v])=>({purpose:k,c:v})).sort((a,b)=>b.c-a.c);
+    const sMap = {}, pMap = {};
+    list.forEach(v => {
+      (v.source_tags||[]).forEach(x => sMap[x] = (sMap[x]||0)+1);
+      (v.visit_purposes||[]).forEach(x => pMap[x] = (pMap[x]||0)+1);
+    });
 
-    renderChart('chartSource', 'bar', stats.sources, 'tag', '客源數量');
-    renderChart('chartPurpose', 'doughnut', pData, 'purpose', '目的分佈');
+    // 為了美觀，圖表只顯示前 10 名
+    const sortedSource = Object.entries(sMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
+    const sortedPurpose = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0, 8);
 
-    // Table
+    renderChart('chartSource', 'bar', sortedSource, '客源Top15');
+    renderChart('chartPurpose', 'doughnut', sortedPurpose, '目的分佈');
+
+    // Update Dropdown (避免重複渲染導致閃爍，這裡做個簡單判斷)
+    const sel = document.getElementById('sourceFilter');
+    if(sel.options.length <= 1 || savedSourceFilter === 'ALL') {
+        sel.innerHTML = '<option value="ALL">全部</option>';
+        Object.keys(sMap).sort().forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`);
+        sel.value = savedSourceFilter;
+    }
+
+    // 2. 渲染表格 (只顯示 currentLimit 筆)
+    renderTableList();
+  }
+
+  function renderTableList() {
     const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = visits.map(v => `
-      <tr class="cursor-pointer" onclick="showDetail('${v.id}')">
-        <td class="p-3 pl-4 font-mono text-xs text-gray-500">${v.form_date.slice(5)}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${v.store_branch==='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
+    // 依日期排序 (新 -> 舊)
+    const sortedVisits = [...visits].sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
+    const visibleData = sortedVisits.slice(0, currentLimit);
+
+    tbody.innerHTML = visibleData.map(v => `
+      <tr data-id="${v.id}" onclick="showDetail(${v.id})">
+        <td class="p-3 pl-4 font-mono text-gray-500">${v.form_date.slice(5)}</td>
+        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
         <td class="p-3 font-bold text-gray-900">${v.customer_name}</td>
-        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate">${(v.source_tags||[]).join(',')}</td>
-        <td class="p-3 text-xs text-gray-500 max-w-[100px] truncate">${(v.visit_purposes||[]).join(',')}</td>
-        <td class="p-3 pr-4 admin-only text-right"><button onclick="deleteData('${v.id}', event)" class="text-red-400 hover:text-red-600 p-1.5 font-bold">刪</button></td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]" title="${(v.source_tags||[]).join(',')}">${(v.source_tags||[]).join(',')}</td>
+        <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]" title="${(v.visit_purposes||[]).join(',')}">${(v.visit_purposes||[]).join(',')}</td>
+        <td class="p-3 pr-4 admin-only text-right" onclick="event.stopPropagation()">
+            <button class="text-red-500 hover:bg-red-50 p-2 rounded font-bold" onclick="deleteData(${v.id})">刪</button>
+        </td>
       </tr>
     `).join('');
+
+    // 更新筆數顯示
+    document.getElementById('recordCountDisplay').innerText = `顯示 ${visibleData.length} / ${visits.length} 筆`;
+    
+    // 控制 "載入更多" 按鈕
+    if(visibleData.length >= visits.length) {
+        document.getElementById('btnLoadMore').style.display = 'none';
+    } else {
+        document.getElementById('btnLoadMore').style.display = 'block';
+    }
   }
 
-  // --- CHARTS (Light Theme Only) ---
-  function renderChart(id, type, data, key, label) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if(charts[id]) charts[id].destroy();
-    
-    // Classic Bright Colors
-    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'];
-    
-    charts[id] = new Chart(ctx, {
-      type: type,
-      data: {
-        labels: data.map(x=>x[key]),
-        datasets: [{ label: label, data: data.map(x=>x.c), backgroundColor: colors, borderWidth: 0 }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: type==='doughnut', position: 'right', labels: { color: '#374151' } },
-          tooltip: {
-            backgroundColor: 'rgba(255,255,255,0.95)',
-            titleColor: '#000',
-            bodyColor: '#000',
-            borderColor: '#e5e7eb',
-            borderWidth: 1,
-            callbacks: {
-              label: function(ctx) {
-                let val = ctx.raw;
-                let total = ctx.chart._metasets[ctx.datasetIndex].total;
-                if(!total || total === 0) total = ctx.dataset.data.reduce((a,b)=>a+b, 0); 
-                let pct = total > 0 ? Math.round((val/total)*100) + '%' : '0%';
-                return `${ctx.dataset.label}: ${val} 筆 (${pct})`;
-              }
-            }
-          }
-        },
-        scales: type==='bar' ? {
-          y: { ticks: { color: '#4b5563' }, grid: { color: '#f3f4f6' } },
-          x: { ticks: { color: '#4b5563' }, grid: { display: false } }
-        } : {}
-      }
-    });
-  }
+  window.loadMore = () => {
+    currentLimit += 20;
+    renderTableList();
+  };
 
-  function renderTrend(source) {
-    const ctx = document.getElementById('chartTrend').getContext('2d');
-    if(charts.trend) charts.trend.destroy();
-    
-    const map = {};
-    visits.filter(v => (v.source_tags||[]).includes(source)).forEach(v => {
-      const m = v.form_date.slice(0, 7); // YYYY-MM
-      map[m] = (map[m]||0)+1;
-    });
-    const labels = Object.keys(map).sort();
-    
-    charts.trend = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '數量', data: labels.map(l=>map[l]),
-          borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)',
-          fill: true, tension: 0.4, pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { display: false },
-          y: { display: false }
-        }
-      }
-    });
-  }
-
-  // --- DETAILS ---
   window.showDetail = (id) => {
-    const v = visits.find(x => x.id == id); if(!v) return;
+    const v = visits.find(x => x.id == id);
+    if(!v) return;
     
-    document.getElementById('dDate').textContent = v.form_date;
-    document.getElementById('dStore').textContent = v.store_branch;
-    document.getElementById('dName').textContent = v.customer_name;
-    document.getElementById('dSources').innerHTML = (v.source_tags||[]).map(x=>`<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs border border-gray-200">${x}</span>`).join('');
-    document.getElementById('dPurposes').innerHTML = (v.visit_purposes||[]).map(x=>`<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs border border-gray-200">${x}</span>`).join('');
-    document.getElementById('dDetail').textContent = v.detail_desc || '無';
-
-    // Set Edit
+    // 閱讀模式
+    document.getElementById('detailView').innerHTML = `
+      <div class="detail-row"><div class="detail-label">日期</div><div>${v.form_date}</div></div>
+      <div class="detail-row"><div class="detail-label">分店</div><div>${v.store_branch}</div></div>
+      <div class="detail-row"><div class="detail-label">姓名</div><div class="text-2xl font-bold text-blue-600">${v.customer_name}</div></div>
+      <div class="detail-row"><div class="detail-label">客源</div><div class="flex flex-wrap gap-1">${(v.source_tags||[]).map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
+      <div class="detail-row"><div class="detail-label">目的</div><div class="flex flex-wrap gap-1">${(v.visit_purposes||[]).map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
+      <div class="mt-4 p-4 bg-gray-50 rounded text-sm text-gray-600 whitespace-pre-wrap">${v.detail_desc||'無備註'}</div>
+    `;
+    
+    // 編輯模式填值
     document.getElementById('eId').value = v.id;
     document.getElementById('eDate').value = v.form_date;
     document.getElementById('eStore').value = v.store_branch;
@@ -411,78 +376,195 @@
     document.getElementById('eSources').value = (v.source_tags||[]).join(',');
     document.getElementById('ePurposes').value = (v.visit_purposes||[]).join(',');
     document.getElementById('eDetail').value = v.detail_desc||'';
-
+    
+    // Reset to view mode
     document.getElementById('detailView').classList.remove('hidden');
     document.getElementById('detailEdit').classList.add('hidden');
     document.getElementById('detailModal').style.display = 'flex';
   };
+  
+  window.closeDetailModal = () => document.getElementById('detailModal').style.display='none';
 
-  // --- ADMIN & IMPORT ---
+  // --- CHART ---
+  function renderChart(id, type, data, label) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if(charts[id]) charts[id].destroy();
+    charts[id] = new Chart(ctx, {
+      type: type,
+      data: {
+        labels: data.map(x=>x[0]),
+        datasets: [{ 
+            label: label, 
+            data: data.map(x=>x[1]), 
+            backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#6366f1','#ec4899'], 
+            borderWidth:1,
+            borderRadius: 4 // 圓角
+        }]
+      },
+      options: { 
+          responsive:true, 
+          maintainAspectRatio:false, 
+          plugins:{ legend:{position:'right', labels: {boxWidth: 12}} } 
+      }
+    });
+  }
+
+  function renderTrend(tag) {
+    const ctx = document.getElementById('chartTrend').getContext('2d');
+    if(charts.trend) charts.trend.destroy();
+    const map = {};
+    // 統計每月數量
+    visits.filter(v=>(v.source_tags||[]).includes(tag)).forEach(v => {
+      const m = v.form_date.slice(0,7); // YYYY-MM
+      map[m] = (map[m]||0)+1;
+    });
+    const lbls = Object.keys(map).sort();
+    charts.trend = new Chart(ctx, {
+      type: 'line',
+      data: { labels: lbls, datasets: [{ label:'數量', data:lbls.map(k=>map[k]), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.1)', fill:true, tension: 0.3 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }
+    });
+  }
+
+  // --- IMPORT FIX (穩健版) ---
   window.previewCSV = (input) => {
-    const f=input.files[0]; if(!f)return;
-    Papa.parse(f,{header:true,skipEmptyLines:true,complete:(res)=>{
-      if(confirm(`解析到 ${res.data.length} 筆資料。確定匯入？`)) startImport(res.data);
-      input.value='';
-    }});
-  };
-  async function startImport(data) {
-    let count=0;
-    for(let r of data) {
-      const d=r['form_date']||r['填表日期']; let n=r['customer_name']||r['顧客姓名'];
-      if(!d||!n)continue;
-      
-      const s=(r['來源統計']||r['source_tags']||'').split(/,|，/).filter(x=>x); 
-      const p=(r['來店目的']||r['visit_purposes']||'').split(/,|，/).filter(x=>x);
-      
-      const pl={p_date:d.replace(/\//g,'-'),p_store:r['store_branch']||r['門店']||'臨安店',p_name:n,p_gender:'',p_age:'',p_tainan:false,p_sources:s,p_purposes:p,p_keyword:'',p_detail:r['detail_desc']||r['詳細描述']||''};
-      
-      const {error}=await supabase.rpc('submit_visit',pl);
-      if(!error)count++;
-    }
-    alert(`匯入作業結束。成功新增 ${count} 筆`); fetchData();
-  }
-  
-  // Standard Admin Functions
-  window.setStore=store=>{currentStore=store;document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active'));if(store==='全部')document.getElementById('btnTotal').classList.add('active');if(store==='臨安店')document.getElementById('btnLinAn').classList.add('active');if(store==='南科店')document.getElementById('btnNanKe').classList.add('active');fetchData();};
-  window.filterSource=()=>{savedSourceFilter=document.getElementById('sourceFilter').value;renderAll();};
-  window.clearSearch=()=>{document.getElementById('qSearch').value='';document.getElementById('btnClearSearch').classList.add('hidden');fetchData();};
-  window.openAddModal=()=>{document.getElementById('modal').style.display='flex';document.getElementById('mDate').value=new Date().toISOString().split('T')[0];};
-  window.closeModal=()=>{document.getElementById('modal').style.display='none';};
-  window.toggleEditMode=()=>{document.getElementById('detailView').classList.toggle('hidden');document.getElementById('detailEdit').classList.toggle('hidden');};
-  window.saveEdit=async()=>{const id=document.getElementById('eId').value;const pl={p_date:document.getElementById('eDate').value,p_store:document.getElementById('eStore').value,p_name:document.getElementById('eName').value,p_sources:document.getElementById('eSources').value.split(','),p_purposes:document.getElementById('ePurposes').value.split(','),p_detail:document.getElementById('eDetail').value};const{error}=await supabase.from('visits').update({form_date:pl.p_date,store_branch:pl.p_store,customer_name:pl.p_name,source_tags:pl.p_sources,visit_purposes:pl.p_purposes,detail_desc:pl.p_detail}).eq('id',id);if(error)alert(error.message);else{alert('更新成功');document.getElementById('detailModal').style.display='none';fetchData();}};
-  window.saveData=async()=>{const n=document.getElementById('mName').value;if(!n)return alert('請填名');const pl={p_date:document.getElementById('mDate').value,p_store:document.getElementById('mStore').value,p_name:n,p_sources:document.getElementById('mSources').value.split(','),p_purposes:document.getElementById('mPurposes').value.split(','),p_detail:document.getElementById('mDetail').value,p_gender:'',p_age:'',p_tainan:false,p_keyword:''};const{error}=await supabase.rpc('submit_visit',pl);if(error)alert(error.message);else{alert('成功');closeModal();fetchData();}};
-  window.deleteData=async(id, e)=>{e.stopPropagation(); if(!confirm('刪除?'))return;const{error}=await supabase.from('visits').delete().eq('id',id);if(!error)fetchData();};
-  window.toggleAdminPanel=()=>{document.getElementById('adminPanel').classList.toggle('hidden');};
-  
-  // FIX: Explicit Login Check
-  window.login = async () => {
-    const email = document.getElementById('admEmail').value;
-    const pwd = document.getElementById('admPwd').value;
-    // Attempt standard login first
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    const f = input.files[0]; if(!f) return;
+    const label = input.parentElement.querySelector('span');
+    const oldText = label.innerText;
+    label.innerText = '處理中...';
     
-    if(error) {
-      alert("登入失敗: " + error.message);
-    } else {
-      checkAuth();
+    Papa.parse(f, {
+      header: true, skipEmptyLines: true,
+      complete: async (res) => {
+        if(!confirm(`準備匯入 ${res.data.length} 筆資料？`)) { label.innerText=oldText; return; }
+        let success = 0;
+        const chunkSize = 50; 
+        for (let i = 0; i < res.data.length; i += chunkSize) {
+            const chunk = res.data.slice(i, i + chunkSize);
+            const promises = chunk.map(r => {
+                const d = r['form_date']||r['填表日期']; 
+                const n = r['customer_name']||r['顧客姓名'];
+                if(!d || !n) return null;
+                const s = (r['來源統計']||r['source_tags']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
+                const p = (r['來店目的']||r['visit_purposes']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
+                
+                return supabase.rpc('submit_visit', {
+                    p_date: d.replace(/\//g,'-'), p_store: r['store_branch']||r['門店']||'臨安店',
+                    p_name: n, p_sources: s, p_purposes: p, p_gender:'', p_age:'', p_tainan:false, p_keyword:'', p_detail: r['detail_desc']||r['詳細描述']||''
+                });
+            }).filter(p=>p);
+            const results = await Promise.all(promises);
+            success += results.filter(x => x && !x.error).length;
+            label.innerText = `處理中...${i}/${res.data.length}`;
+        }
+        alert(`匯入完成！成功: ${success} 筆`);
+        label.innerText = oldText;
+        input.value = '';
+        fetchData();
+      }
+    });
+  };
+
+  // --- ADMIN ACTIONS ---
+  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
+  
+  window.login = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({ 
+        email: document.getElementById('admEmail').value, 
+        password: document.getElementById('admPwd').value 
+    });
+    if(error) alert(error.message);
+    else { 
+        document.body.classList.add('is-admin'); 
+        document.getElementById('adminPanel').classList.add('hidden'); 
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('adminActions').classList.remove('hidden');
+        alert("登入成功！");
+        fetchData(); // 重新整理以啟用編輯按鈕
     }
   };
-  
-  window.logout=async()=>{await supabase.auth.signOut();checkAuth();};
-  window.wipeData=async()=>{const p=prompt("密碼：");if(!p)return;const{error}=await supabase.auth.signInWithPassword({email:document.getElementById('admEmail').value,password:p});if(error)return alert('錯誤');const{error:d}=await supabase.from('visits').delete().neq('id',0);if(!d){alert('已清空');fetchData();}};
-  window.exportCSV=()=>{if(visits.length===0)return;const c=Papa.unparse(visits);const b=new Blob([c],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`data.csv`;a.click();};
-  async function checkAuth(){
-    const{data}=await supabase.auth.getSession();
-    if(data.session) {
-      document.body.classList.add('is-admin');
-      document.getElementById('loginForm').classList.add('hidden');
-      document.getElementById('adminActions').classList.remove('hidden');
-    } else {
-      document.body.classList.remove('is-admin');
-      document.getElementById('loginForm').classList.remove('hidden');
+
+  window.logout = async () => { 
+      await supabase.auth.signOut(); 
+      document.body.classList.remove('is-admin'); 
       document.getElementById('adminActions').classList.add('hidden');
+      document.getElementById('loginForm').classList.remove('hidden');
+      alert("已登出");
+  };
+
+  window.wipeData = async () => { 
+      if(prompt('請輸入 admin 以確認清空') === 'admin') {
+          const { error } = await supabase.from('visits').delete().neq('id', 0);
+          if(error) alert(error.message);
+          else { alert('資料已清空'); fetchData(); }
+      }
+  };
+  
+  window.deleteData = async (id) => {
+      // 雙重確認
+      if(!confirm('確定要刪除這筆資料嗎？此動作無法復原。')) return;
+      
+      const { error } = await supabase.from('visits').delete().eq('id', id);
+      if(error) {
+          alert('刪除失敗: ' + error.message);
+      } else {
+          // 不重新 fetch，直接從前端移除以提升效能
+          visits = visits.filter(v => v.id != id);
+          renderAll(); 
+      }
+  };
+
+  // --- EDIT & ADD ---
+  window.toggleEditMode = () => { 
+      document.getElementById('detailView').classList.toggle('hidden'); 
+      document.getElementById('detailEdit').classList.toggle('hidden'); 
+  };
+  
+  window.saveEdit = async () => {
+    const id = document.getElementById('eId').value;
+    const updates = {
+      form_date: document.getElementById('eDate').value, 
+      store_branch: document.getElementById('eStore').value,
+      customer_name: document.getElementById('eName').value, 
+      source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
+      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x), 
+      detail_desc: document.getElementById('eDetail').value
+    };
+
+    const { error } = await supabase.from('visits').update(updates).eq('id', id);
+    if(error) {
+        alert('更新失敗: ' + error.message);
+    } else { 
+        alert('更新成功'); 
+        // 更新前端資料
+        const idx = visits.findIndex(v => v.id == id);
+        if(idx !== -1) visits[idx] = { ...visits[idx], ...updates };
+        
+        document.getElementById('detailModal').style.display='none'; 
+        renderAll(); 
     }
-  }
+  };
+
+  window.saveData = async () => {
+    const { error } = await supabase.rpc('submit_visit', {
+      p_date: document.getElementById('mDate').value, 
+      p_store: document.getElementById('mStore').value,
+      p_name: document.getElementById('mName').value, 
+      p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x),
+      p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), 
+      p_detail: document.getElementById('mDetail').value,
+      p_gender:'', p_age:'', p_tainan:false, p_keyword:''
+    });
+    if(error) alert('新增失敗: '+error.message);
+    else { alert('新增成功'); closeModal(); fetchData(); }
+  };
+
+  // --- UI HELPERS ---
+  window.setStore = s => { currentStore=s; document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active')); if(s=='全部')document.getElementById('btnTotal').classList.add('active'); if(s=='臨安店')document.getElementById('btnLinAn').classList.add('active'); if(s=='南科店')document.getElementById('btnNanKe').classList.add('active'); fetchData(); };
+  window.filterSource = () => { savedSourceFilter=document.getElementById('sourceFilter').value; renderAll(); };
+  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnClearSearch').classList.add('hidden'); fetchData(); };
+  window.openAddModal = () => { document.getElementById('mDate').value=new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display='flex'; };
+  window.closeModal = () => document.getElementById('modal').style.display='none';
 </script>
 </body>
 </html>
