@@ -803,7 +803,7 @@
       exportCSV(); 
       setTimeout(async () => {
           if(!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
-          const pwd = prompt('請輸入二次確認密碼（628599）：');
+          const pwd = prompt('請輸入二次確認密碼');
           if(pwd === '628599') { 
               const { error } = await supabase.from('visits').delete().neq('id', 0); 
               if(error) alert('失敗: '+error.message); 
