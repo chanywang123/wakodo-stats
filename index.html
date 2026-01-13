@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V7.7</title>
+  <title>和光堂戰情室 V7.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -70,7 +70,6 @@
     .lock-badge-x { cursor: pointer; font-size: 16px; padding: 0 4px; border-radius: 50%; transition: 0.15s; font-weight: 900; }
     .lock-badge-x:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.15); }
     
-    /* 科技感發光光點 */
     .tech-glow {
       display: inline-block;
       width: 8px;
@@ -101,7 +100,6 @@
       }
     }
     
-    /* 登出按鈕 */
     .logout-btn {
       background: rgba(239, 68, 68, 0.1);
       border: 1.5px solid rgba(239, 68, 68, 0.3);
@@ -118,16 +116,6 @@
       background: rgba(239, 68, 68, 0.2);
       border-color: #ef4444;
       transform: translateY(-1px);
-    }
-    
-    .pie-center-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-align: center; }
-    .pie-center-label .value { 
-        font-size: 24px; font-weight: 900; color: #1e293b; 
-        text-shadow: 
-            -2px -2px 0 #fff, 2px -2px 0 #fff,
-            -2px 2px 0 #fff, 2px 2px 0 #fff,
-            0 0 6px rgba(255,255,255,0.9);
-        letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -149,7 +137,7 @@
       <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         <span class="tech-glow"></span> 和光堂戰情室
         <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600">V7.7</div>
+          <div class="text-sm font-bold text-slate-600">V7.8</div>
           <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
         </div>
       </h1>
@@ -223,28 +211,26 @@
       </div>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-      <div class="lg:col-span-3 h-[450px] relative">
+    <!-- 🔥 修改3：新布局 - 客源2列 + 趨勢1列 + 目的2列 -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <!-- 客源條形圖 -->
+      <div class="lg:col-span-2 h-[380px] relative">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計</h4>
         <canvas id="chartSource"></canvas>
       </div>
       
-      <div class="lg:col-span-2 h-[450px] relative flex flex-col items-center justify-center">
-        <h4 class="absolute top-0 left-0 text-xs font-bold text-slate-400 uppercase tracking-wide">來店目的佔比</h4>
-        <div class="w-full h-full relative">
-          <canvas id="chartPurpose"></canvas>
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="pie-center-label">
-              <div class="value" id="topPurposeVal">--</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-8 border-t border-slate-100 pt-6">
-      <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wide">客流量趨勢走勢</h4>
-      <div class="h-[220px] relative">
+      <!-- 趨勢折線圖 -->
+      <div class="lg:col-span-1 h-[380px] relative">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流走勢</h4>
         <canvas id="chartTrend"></canvas>
+      </div>
+      
+      <!-- 來店目的圓餅圖 -->
+      <div class="lg:col-span-2 h-[380px] relative flex flex-col">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
+        <div class="flex-grow relative">
+          <canvas id="chartPurpose"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -513,39 +499,43 @@
     const pMap = {}; subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
     const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
     const totalP = sortedP.reduce((a,b)=>a+b[1],0);
-    
-    const topPurposeText = sortedP.length ? sortedP[0][0] : '--';
-    document.getElementById('topPurposeVal').innerText = topPurposeText;
 
+    // 🔥 修改2：添加動畫配置
     if(charts.purpose) charts.purpose.destroy();
     charts.purpose = new Chart(document.getElementById('chartPurpose'), {
         type: 'doughnut',
         data: { labels: sortedP.map(x=>x[0]), datasets:[{ data:sortedP.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'], borderWidth: 0, hoverOffset: 12 }] },
         options: { 
-            maintainAspectRatio: false, cutout: '65%', layout: { padding: 30 },
+            maintainAspectRatio: false, 
+            cutout: '65%', 
+            layout: { padding: 20 },
+            animation: { animateRotate: true, animateScale: true, duration: 800 },
             plugins:{ 
                 legend:{ 
-                    display: true, position: 'right', 
+                    display: true, 
+                    position: 'right', 
                     labels:{
-                        boxWidth:16, boxHeight:16, usePointStyle:true,
-                        padding: 16, 
-                        font: { size: 13, weight: '700', family: '-apple-system' },
+                        boxWidth:16, 
+                        boxHeight:16, 
+                        usePointStyle:true,
+                        padding: 12, 
+                        font: { size: 12, weight: '700', family: '-apple-system' },
                         color: '#000000',
+                        // 🔥 修改4：圖例樣式 - 所有圓圈都有黃色外圈
                         generateLabels: (chart) => {
                              const data = chart.data;
                              return data.labels.map((label, i) => {
                                  const val = data.datasets[0].data[i];
                                  const pct = totalP ? Math.round(val/totalP*100) : 0;
-                                 const isTop1 = i === 0;
                                  
                                  return { 
                                      text: `${label}  ${pct}%`,
                                      fillStyle: data.datasets[0].backgroundColor[i],
-                                     strokeStyle: isTop1 ? '#fbbf24' : 'transparent',
-                                     lineWidth: isTop1 ? 4 : 0,
+                                     strokeStyle: '#fbbf24',
+                                     lineWidth: 3,
                                      hidden: false, 
                                      index: i,
-                                     fontColor: isTop1 ? '#dc2626' : '#000000',
+                                     fontColor: '#000000',
                                      pointStyle: 'circle'
                                  };
                              });
@@ -571,18 +561,24 @@
     const maxTrendValue = Math.max(...sortedT.map(k=>tMap[k]));
     const suggestedMaxTrend = Math.ceil(maxTrendValue * 1.3);
     
+    // 🔥 修改2：趨勢圖添加動畫
     if(charts.trend) charts.trend.destroy();
     charts.trend = new Chart(document.getElementById('chartTrend'), {
         type: 'line',
-        data: { labels: sortedT, datasets:[{ data:sortedT.map(k=>tMap[k]), borderColor:'#f59e0b', borderWidth:3, pointBackgroundColor:'#fff', pointBorderColor:'#f59e0b', pointRadius:6, pointHoverRadius:8, tension:0.4, fill:true, backgroundColor:'rgba(245,158,11,0.12)' }] },
+        data: { labels: sortedT, datasets:[{ data:sortedT.map(k=>tMap[k]), borderColor:'#f59e0b', borderWidth:2.5, pointBackgroundColor:'#fff', pointBorderColor:'#f59e0b', pointRadius:5, pointHoverRadius:7, tension:0.4, fill:true, backgroundColor:'rgba(245,158,11,0.15)' }] },
         options: { 
             maintainAspectRatio: false, 
+            animation: { duration: 800, easing: 'easeInOutQuart' },
             scales:{
-                x:{grid:{display:false}}, 
+                x:{
+                    grid:{display:false},
+                    ticks: { font: { size: 9 } }
+                }, 
                 y:{
                     beginAtZero: true,
                     suggestedMax: suggestedMaxTrend,
-                    grid:{borderDash:[5,5], color:'#f1f5f9'}
+                    grid:{borderDash:[5,5], color:'#f1f5f9'},
+                    ticks: { font: { size: 9 } }
                 }
             }, 
             plugins:{
@@ -590,17 +586,17 @@
                 datalabels: {
                     align: 'top',
                     anchor: 'end',
-                    offset: 8,
-                    font: { size: 11, weight: 'bold' },
+                    offset: 4,
+                    font: { size: 10, weight: 'bold' },
                     color: '#f59e0b',
                     backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 4,
-                    padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                    padding: { top: 2, bottom: 2, left: 3, right: 3 },
                     formatter: (v) => v
                 },
                 tooltip: { 
                     backgroundColor: 'rgba(0,0,0,0.8)', 
-                    padding: 12, 
+                    padding: 10, 
                     cornerRadius: 6,
                     callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
                 } 
@@ -610,17 +606,40 @@
     
     const gMap = { '男':0, '女':0, '其他':0 }, aMap = {};
     subset.forEach(v => { const g = v.gender || '其他'; const a = v.age_range || '未填'; if(gMap.hasOwnProperty(g)) gMap[g]++; else gMap['其他']++; if(a!=='未填') aMap[a] = (aMap[a]||0)+1; });
+    
+    // 🔥 修改2：性別圖添加動畫
     if(charts.gender) charts.gender.destroy(); 
     charts.gender = new Chart(document.getElementById('chartGender'), { 
         type: 'doughnut', 
         data: { labels: ['男','女'], datasets: [{ data: [gMap['男'], gMap['女']], backgroundColor:['#60a5fa','#f472b6'], hoverOffset: 8 }] }, 
-        options: { maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels: { font: { size: 13, weight: '600' }, padding: 10 }}, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 } } } 
+        options: { 
+            maintainAspectRatio: false, 
+            cutout: '60%', 
+            animation: { animateRotate: true, duration: 600 },
+            plugins: { 
+                legend:{position:'right', labels: { font: { size: 13, weight: '600' }, padding: 10 }}, 
+                tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 },
+                datalabels: { display: false }
+            } 
+        } 
     });
+    
+    // 🔥 修改2：年齡圖添加動畫
     if(charts.age) charts.age.destroy(); 
     charts.age = new Chart(document.getElementById('chartAge'), { 
         type: 'bar', 
         data: { labels: Object.keys(aMap).sort(), datasets: [{ label:'人數', data: Object.values(aMap), backgroundColor:'#cbd5e1', borderRadius:6, hoverBackgroundColor: '#94a3b8' }] }, 
-        options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend:{display:false}, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 } }, scales: { x: { grid: { display: false } } } } 
+        options: { 
+            maintainAspectRatio: false, 
+            indexAxis: 'y', 
+            animation: { duration: 600, easing: 'easeOutQuart' },
+            plugins: { 
+                legend:{display:false}, 
+                tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 },
+                datalabels: { display: false }
+            }, 
+            scales: { x: { grid: { display: false } } } 
+        } 
     });
   }
 
@@ -685,7 +704,6 @@
           let d = row['form_date']||row['填表日期']; 
           if(!d) { console.warn(`Row ${idx}: Missing date`); return null; }
           
-          // 🔥 修改1：強化日期格式處理，自動補零
           d = d.trim().replace(/\//g, '-');
           const dateParts = d.split('-');
           if(dateParts.length === 3) {
@@ -698,7 +716,6 @@
           const n = row['customer_name']||row['顧客姓名'];
           if(!n) { console.warn(`Row ${idx}: Missing name`); return null; }
           
-          // 🔥 修改2：處理描述性姓名
           const invalidNames = ['現場客', '調整客', '現場顧客', '看看客', '電話客', '諮詢客', '住戶', '無', '不知', '-', '未知'];
           const cleanName = invalidNames.includes(n.trim()) ? '未留資料' : n;
           
