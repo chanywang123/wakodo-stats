@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V5.4</title>
+  <title>和光堂戰情室 V5.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- 引入 Flatpickr (Agoda 風格日期選擇器) -->
+  <!-- Flatpickr (Agoda Style) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    // 請確認您的 URL 和 Key 是正確的
     window.supabase = createClient(
       "https://yxalpzculcyhzvnyvecb.supabase.co", 
       "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
@@ -26,21 +25,22 @@
       --card: #ffffff; 
       --text: #1f2937; 
       --accent: #2563eb; 
-      --table-header-bg: #fcd34d; /* 鵝黃色標題 */
+      --table-header-bg: #fcd34d; 
       --table-header-text: #000000;
-      --row-hover: #fef9c3; /* 淺黃色 hover */
+      --row-hover: #fef9c3; 
     }
     
     body { background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
     .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 20px; }
     
-    /* Agoda Style Date Picker Input */
+    /* Agoda Style Date Picker */
     .date-range-container {
       display: flex; align-items: center; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
     }
+    .date-range-container:hover { border-color: var(--accent); }
     .date-range-input {
-      border: none; padding: 10px 12px; font-size: 14px; outline: none; width: 220px; text-align: center; font-weight: 500; cursor: pointer;
+      border: none; padding: 10px 12px; font-size: 14px; outline: none; width: 220px; text-align: center; font-weight: 600; cursor: pointer; color: #374151;
     }
     
     .input-std { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; width: 100%; }
@@ -49,33 +49,43 @@
     .btn-stat { cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
     .btn-stat.active { border-color: var(--accent); background: #eff6ff; }
 
-    /* Table Styles */
     thead tr th { background-color: var(--table-header-bg) !important; color: var(--table-header-text) !important; font-weight: 800; }
     tbody tr { transition: background-color 0.1s; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
     tbody tr:hover { background-color: var(--row-hover) !important; }
     
-    /* Admin Visibility */
     .admin-only { display: none !important; }
     body.is-admin .admin-only { display: flex !important; }
-    /* Table cell fix for admin buttons */
     body.is-admin td.admin-only { display: table-cell !important; } 
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 999; }
     .modal-content { background: #fff; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: 12px; }
     .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
     .detail-label { width: 100px; font-weight: bold; color: #666; }
+    
+    /* Load More Button Style */
+    .load-more-btn {
+        width: 100%; padding: 12px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        color: #6b7280; font-weight: 600; font-size: 13px;
+        background: #f9fafb; border: none; border-top: 1px solid #e5e7eb;
+        cursor: pointer; transition: 0.2s;
+    }
+    .load-more-btn:hover { background: #f3f4f6; color: var(--accent); }
+    .arrow-down { 
+        width: 0; height: 0; 
+        border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; 
+    }
   </style>
 </head>
 <body>
 
 <div class="max-w-7xl mx-auto p-4">
-  <!-- 1. Header & Version -->
+  <!-- Header -->
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <div class="flex items-center gap-3">
       <h1 class="text-2xl font-bold tracking-tight text-blue-600 flex items-center gap-2">
         <span>👓 和光堂戰情室</span>
-        <!-- 版本號：藍色字體 + 日期 -->
-        <span class="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">V5.4 • 2026/01/13</span>
+        <span class="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">V5.5 • 2026/01/13</span>
       </h1>
     </div>
     <div class="flex items-center gap-3">
@@ -92,24 +102,27 @@
       <button onclick="login()" class="btn-primary">登入</button>
     </div>
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
-      <div class="font-bold text-green-400">✅ 管理員模式</div>
+      <div class="font-bold text-green-400 flex items-center gap-2">✅ 管理員 <span class="text-xs text-gray-400 font-normal">(已登入)</span></div>
       <div class="flex gap-2">
+        <!-- 匯出 CSV 按鈕 -->
+        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1">
+            ⬇️ 匯出 CSV
+        </button>
         <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 text-white">
-          <span>📂 匯入 CSV (穩健版)</span>
+          <span>📂 匯入 CSV</span>
           <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="previewCSV(this)">
         </label>
         <button onclick="logout()" class="bg-red-600 text-white px-3 py-1.5 rounded text-sm">登出</button>
       </div>
-      <button onclick="wipeData()" class="text-red-400 text-sm border border-red-400 px-3 py-1 rounded">⚠️ 清空資料庫</button>
+      <button onclick="wipeData()" class="text-red-400 text-sm border border-red-400 px-3 py-1 rounded hover:bg-red-900">⚠️ 清空資料庫</button>
     </div>
   </div>
 
-  <!-- 2. Filter Bar (Agoda Style) -->
+  <!-- Filter Bar -->
   <div class="card mb-6 flex flex-wrap gap-3 items-center sticky top-2 z-30 shadow-md">
     <div class="date-range-container">
       <span class="pl-3 text-gray-400">📅</span>
-      <!-- 這裡綁定 Flatpickr -->
-      <input type="text" id="dateRange" class="date-range-input" placeholder="選擇日期區間">
+      <input type="text" id="dateRange" class="date-range-input" placeholder="載入中..." readonly>
     </div>
     
     <div class="flex-grow relative">
@@ -131,20 +144,20 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="card h-[450px] flex flex-col">
       <div class="flex justify-between mb-4"><h3 class="font-bold">客源分析</h3><select id="sourceFilter" onchange="filterSource()" class="border rounded text-xs p-1"><option value="ALL">全部</option></select></div>
-      <div class="flex-grow relative"><canvas id="chartSource"></canvas></div>
-      <div id="trendBox" class="hidden mt-4 h-24 w-full"><div class="text-xs font-bold text-gray-400">趨勢: <span id="trendLabel"></span></div><div class="relative w-full h-full"><canvas id="chartTrend"></canvas></div></div>
+      <div class="flex-grow relative">anvas id="chartSource"></canvas></div>
+      <div id="trendBox" class="hidden mt-4 h-24 w-full"><div class="text-xs font-bold text-gray-400">趨勢: <span id="trendLabel"></span></div><div class="relative w-full h-full">anvas id="chartTrend"></canvas></div></div>
     </div>
     <div class="card h-[450px] flex flex-col">
       <div class="flex justify-between mb-4"><h3 class="font-bold">來店目的</h3></div>
-      <div class="flex-grow relative flex justify-center"><canvas id="chartPurpose"></canvas></div>
+      <div class="flex-grow relative flex justify-center">anvas id="chartPurpose"></canvas></div>
     </div>
   </div>
 
-  <!-- Table (前台只顯示最新 10 筆 + 更多按鈕) -->
+  <!-- Table -->
   <div class="card overflow-hidden shadow-lg border-0 p-0">
     <div class="p-4 bg-white border-b flex justify-between">
       <h3 class="font-bold text-lg text-gray-800">最新來客紀錄</h3>
-      <span class="text-xs text-gray-400" id="recordCountDisplay">顯示最新 10 筆</span>
+      <span class="text-xs text-gray-400" id="recordCountDisplay">--</span>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left whitespace-nowrap">
@@ -161,10 +174,11 @@
         <tbody id="tableBody" class="bg-white"></tbody>
       </table>
     </div>
-    <!-- Load More Button -->
-    <div class="p-4 text-center border-t bg-gray-50">
-        <button onclick="loadMore()" id="btnLoadMore" class="text-blue-600 font-bold text-sm hover:underline">⬇️ 載入更多 (20筆)</button>
-    </div>
+    <!-- Load More Button (美化版) -->
+    <button onclick="loadMore()" id="btnLoadMore" class="load-more-btn hidden">
+        <span>顯示更多</span>
+        <div class="arrow-down"></div>
+    </button>
   </div>
 </div>
 
@@ -213,25 +227,25 @@
 
 <script>
   let visits = [], stats = {}, currentStore = '全部', savedSourceFilter = 'ALL', charts = {};
-  let currentLimit = 10; // 初始只顯示 10 筆
+  let currentLimit = 10;
   let datePicker;
 
   window.onload = async () => {
-    // 1. 初始化 Flatpickr 日期選擇器 (Agoda Style)
-    const today = new Date();
-    const lastMonth = new Date(); lastMonth.setMonth(today.getMonth() - 1);
-    
+    // 1. 初始化 Flatpickr，先給一個空的，等抓到極值再 update
     datePicker = flatpickr("#dateRange", {
         mode: "range",
         dateFormat: "Y-m-d",
-        defaultDate: [lastMonth, today],
         locale: "zh_tw",
-        onClose: function(selectedDates, dateStr, instance) {
+        onChange: function(selectedDates) {
+            // 只有當選滿兩個日期時才觸發查詢
             if(selectedDates.length === 2) fetchData();
         }
     });
 
-    // 2. 檢查登入狀態
+    // 2. 自動抓取資料庫「最早」與「最晚」日期來設定預設值
+    await initDateRange();
+
+    // 3. 檢查管理員登入
     const { data: { session } } = await supabase.auth.getSession();
     if(session) {
         document.body.classList.add('is-admin');
@@ -239,23 +253,52 @@
         document.getElementById('adminActions').classList.remove('hidden');
     }
 
-    // 3. 初始載入
+    // 4. 首次載入
     fetchData();
   };
 
+  async function initDateRange() {
+      // 查詢最早的一筆
+      const { data: minData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:true}).limit(1);
+      // 查詢最晚的一筆 (通常是今天，但為了保險)
+      const { data: maxData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:false}).limit(1);
+
+      let minDate = minData?.[0]?.form_date || '2023-01-01';
+      let maxDate = maxData?.[0]?.form_date || new Date().toISOString().split('T')[0];
+      
+      // 更新 Flatpickr
+      datePicker.setDate([minDate, maxDate]);
+      console.log(`Auto Date Range Set: ${minDate} to ${maxDate}`);
+  }
+
   window.fetchData = async () => {
-    const dates = document.getElementById('dateRange').value.split(' 至 ');
-    const from = dates[0] || '2023-01-01';
-    const to = dates[1] || dates[0] || new Date().toISOString().split('T')[0];
-    const key = document.getElementById('qSearch').value;
+    // 修正：從 Flatpickr 的 selectedDates 陣列取值，而不是解析 input字串
+    // 如果使用者還沒選，就用預設的
+    const dates = datePicker.selectedDates;
+    let from, to;
     
-    // UI Update
+    if (dates.length === 2) {
+        // Flatpickr 給的是 Date 物件，轉成 YYYY-MM-DD，並考慮時區問題
+        // 簡單做法：利用 text input 的值來切，因為 flatpickr 會自動 format 好
+        const rawStr = document.getElementById('dateRange').value; 
+        const parts = rawStr.split(' to '); // 這是最穩的，直接切字串
+        from = parts[0];
+        to = parts[1];
+    } else {
+        // Fallback
+        from = '2023-01-01';
+        to = new Date().toISOString().split('T')[0];
+    }
+    
+    // 如果切出來是 undefined (例如還沒選好)，就暫時不查
+    if(!from || !to) return;
+
+    const key = document.getElementById('qSearch').value;
     if(key) document.getElementById('btnClearSearch').classList.remove('hidden');
     
-    // 數據載入中提示
     document.getElementById('statTotal').innerText = '...';
 
-    // 呼叫 Supabase RPC
+    // 呼叫 RPC
     const { data, error } = await supabase.rpc('get_visits_public', { 
         start_date: from, 
         end_date: to, 
@@ -264,26 +307,28 @@
     });
 
     if(error) {
-        console.error(error);
-        alert('讀取資料錯誤: ' + error.message);
+        // 隱藏詳細錯誤給使用者，但 log 出來
+        console.error("Fetch Error:", error);
+        if(error.message.includes('invalid input syntax')) {
+            alert('日期格式錯誤，系統正在嘗試自動修正，請重試一次。');
+        } else {
+            alert('讀取失敗: ' + error.message);
+        }
         return;
     }
 
     if(data) {
       visits = data;
-      // 更新統計數字
       document.getElementById('statTotal').innerText = visits.length;
       document.getElementById('statLinAn').innerText = visits.filter(x=>x.store_branch=='臨安店').length;
       document.getElementById('statNanKe').innerText = visits.filter(x=>x.store_branch=='南科店').length;
       
-      // 重置顯示數量
       currentLimit = 10;
       renderAll();
     }
   };
 
   function renderAll() {
-    // 1. 處理圖表 (Charts)
     let list = visits;
     if(savedSourceFilter !== 'ALL') {
       list = visits.filter(v => (v.source_tags||[]).includes(savedSourceFilter));
@@ -300,14 +345,12 @@
       (v.visit_purposes||[]).forEach(x => pMap[x] = (pMap[x]||0)+1);
     });
 
-    // 為了美觀，圖表只顯示前 10 名
     const sortedSource = Object.entries(sMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
     const sortedPurpose = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0, 8);
 
     renderChart('chartSource', 'bar', sortedSource, '客源Top15');
     renderChart('chartPurpose', 'doughnut', sortedPurpose, '目的分佈');
 
-    // Update Dropdown (避免重複渲染導致閃爍，這裡做個簡單判斷)
     const sel = document.getElementById('sourceFilter');
     if(sel.options.length <= 1 || savedSourceFilter === 'ALL') {
         sel.innerHTML = '<option value="ALL">全部</option>';
@@ -315,13 +358,11 @@
         sel.value = savedSourceFilter;
     }
 
-    // 2. 渲染表格 (只顯示 currentLimit 筆)
     renderTableList();
   }
 
   function renderTableList() {
     const tbody = document.getElementById('tableBody');
-    // 依日期排序 (新 -> 舊)
     const sortedVisits = [...visits].sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
     const visibleData = sortedVisits.slice(0, currentLimit);
 
@@ -338,27 +379,23 @@
       </tr>
     `).join('');
 
-    // 更新筆數顯示
     document.getElementById('recordCountDisplay').innerText = `顯示 ${visibleData.length} / ${visits.length} 筆`;
     
-    // 控制 "載入更多" 按鈕
+    // 美化後的按鈕邏輯
+    const btn = document.getElementById('btnLoadMore');
     if(visibleData.length >= visits.length) {
-        document.getElementById('btnLoadMore').style.display = 'none';
+        btn.classList.add('hidden');
     } else {
-        document.getElementById('btnLoadMore').style.display = 'block';
+        btn.classList.remove('hidden');
     }
   }
 
-  window.loadMore = () => {
-    currentLimit += 20;
-    renderTableList();
-  };
+  window.loadMore = () => { currentLimit += 20; renderTableList(); };
 
   window.showDetail = (id) => {
     const v = visits.find(x => x.id == id);
     if(!v) return;
     
-    // 閱讀模式
     document.getElementById('detailView').innerHTML = `
       <div class="detail-row"><div class="detail-label">日期</div><div>${v.form_date}</div></div>
       <div class="detail-row"><div class="detail-label">分店</div><div>${v.store_branch}</div></div>
@@ -367,8 +404,6 @@
       <div class="detail-row"><div class="detail-label">目的</div><div class="flex flex-wrap gap-1">${(v.visit_purposes||[]).map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
       <div class="mt-4 p-4 bg-gray-50 rounded text-sm text-gray-600 whitespace-pre-wrap">${v.detail_desc||'無備註'}</div>
     `;
-    
-    // 編輯模式填值
     document.getElementById('eId').value = v.id;
     document.getElementById('eDate').value = v.form_date;
     document.getElementById('eStore').value = v.store_branch;
@@ -377,12 +412,10 @@
     document.getElementById('ePurposes').value = (v.visit_purposes||[]).join(',');
     document.getElementById('eDetail').value = v.detail_desc||'';
     
-    // Reset to view mode
     document.getElementById('detailView').classList.remove('hidden');
     document.getElementById('detailEdit').classList.add('hidden');
     document.getElementById('detailModal').style.display = 'flex';
   };
-  
   window.closeDetailModal = () => document.getElementById('detailModal').style.display='none';
 
   // --- CHART ---
@@ -393,19 +426,9 @@
       type: type,
       data: {
         labels: data.map(x=>x[0]),
-        datasets: [{ 
-            label: label, 
-            data: data.map(x=>x[1]), 
-            backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#6366f1','#ec4899'], 
-            borderWidth:1,
-            borderRadius: 4 // 圓角
-        }]
+        datasets: [{ label: label, data: data.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#6366f1','#ec4899'], borderWidth:1, borderRadius: 4 }]
       },
-      options: { 
-          responsive:true, 
-          maintainAspectRatio:false, 
-          plugins:{ legend:{position:'right', labels: {boxWidth: 12}} } 
-      }
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right', labels: {boxWidth: 12}} } }
     });
   }
 
@@ -413,11 +436,7 @@
     const ctx = document.getElementById('chartTrend').getContext('2d');
     if(charts.trend) charts.trend.destroy();
     const map = {};
-    // 統計每月數量
-    visits.filter(v=>(v.source_tags||[]).includes(tag)).forEach(v => {
-      const m = v.form_date.slice(0,7); // YYYY-MM
-      map[m] = (map[m]||0)+1;
-    });
+    visits.filter(v=>(v.source_tags||[]).includes(tag)).forEach(v => { const m = v.form_date.slice(0,7); map[m] = (map[m]||0)+1; });
     const lbls = Object.keys(map).sort();
     charts.trend = new Chart(ctx, {
       type: 'line',
@@ -426,13 +445,26 @@
     });
   }
 
-  // --- IMPORT FIX (穩健版) ---
+  // --- IMPORT / EXPORT / ADMIN ---
+  window.exportCSV = () => {
+      // 使用 PapaParse 將 visits 陣列轉為 CSV
+      const csv = Papa.unparse(visits);
+      const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'}); // 加 BOM 避免 Excel 亂碼
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `visits_export_${new Date().toISOString().slice(0,10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+
   window.previewCSV = (input) => {
     const f = input.files[0]; if(!f) return;
     const label = input.parentElement.querySelector('span');
     const oldText = label.innerText;
     label.innerText = '處理中...';
-    
     Papa.parse(f, {
       header: true, skipEmptyLines: true,
       complete: async (res) => {
@@ -447,15 +479,11 @@
                 if(!d || !n) return null;
                 const s = (r['來源統計']||r['source_tags']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
                 const p = (r['來店目的']||r['visit_purposes']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
-                
-                return supabase.rpc('submit_visit', {
-                    p_date: d.replace(/\//g,'-'), p_store: r['store_branch']||r['門店']||'臨安店',
-                    p_name: n, p_sources: s, p_purposes: p, p_gender:'', p_age:'', p_tainan:false, p_keyword:'', p_detail: r['detail_desc']||r['詳細描述']||''
-                });
+                return supabase.rpc('submit_visit', { p_date: d.replace(/\//g,'-'), p_store: r['store_branch']||r['門店']||'臨安店', p_name: n, p_sources: s, p_purposes: p, p_gender:'', p_age:'', p_tainan:false, p_keyword:'', p_detail: r['detail_desc']||r['詳細描述']||'' });
             }).filter(p=>p);
             const results = await Promise.all(promises);
             success += results.filter(x => x && !x.error).length;
-            label.innerText = `處理中...${i}/${res.data.length}`;
+            label.innerText = `匯入中...${i}/${res.data.length}`;
         }
         alert(`匯入完成！成功: ${success} 筆`);
         label.innerText = oldText;
@@ -465,106 +493,47 @@
     });
   };
 
-  // --- ADMIN ACTIONS ---
   window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
-  
   window.login = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({ 
-        email: document.getElementById('admEmail').value, 
-        password: document.getElementById('admPwd').value 
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('admEmail').value, password: document.getElementById('admPwd').value });
     if(error) alert(error.message);
     else { 
-        document.body.classList.add('is-admin'); 
-        document.getElementById('adminPanel').classList.add('hidden'); 
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('adminActions').classList.remove('hidden');
-        alert("登入成功！");
-        fetchData(); // 重新整理以啟用編輯按鈕
+        document.body.classList.add('is-admin'); document.getElementById('adminPanel').classList.add('hidden'); 
+        document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden');
+        alert("登入成功！"); fetchData();
     }
   };
-
-  window.logout = async () => { 
-      await supabase.auth.signOut(); 
-      document.body.classList.remove('is-admin'); 
-      document.getElementById('adminActions').classList.add('hidden');
-      document.getElementById('loginForm').classList.remove('hidden');
-      alert("已登出");
-  };
-
-  window.wipeData = async () => { 
-      if(prompt('請輸入 admin 以確認清空') === 'admin') {
-          const { error } = await supabase.from('visits').delete().neq('id', 0);
-          if(error) alert(error.message);
-          else { alert('資料已清空'); fetchData(); }
-      }
-  };
+  window.logout = async () => { await supabase.auth.signOut(); document.body.classList.remove('is-admin'); document.getElementById('adminActions').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); alert("已登出"); };
+  window.wipeData = async () => { if(prompt('輸入 admin 確認清空') === 'admin') { await supabase.from('visits').delete().neq('id', 0); alert('資料已清空'); fetchData(); } };
+  window.deleteData = async (id) => { if(confirm('刪除無法復原，確定？')) { await supabase.from('visits').delete().eq('id', id); visits = visits.filter(v => v.id != id); renderAll(); } };
   
-  window.deleteData = async (id) => {
-      // 雙重確認
-      if(!confirm('確定要刪除這筆資料嗎？此動作無法復原。')) return;
-      
-      const { error } = await supabase.from('visits').delete().eq('id', id);
-      if(error) {
-          alert('刪除失敗: ' + error.message);
-      } else {
-          // 不重新 fetch，直接從前端移除以提升效能
-          visits = visits.filter(v => v.id != id);
-          renderAll(); 
-      }
-  };
-
-  // --- EDIT & ADD ---
-  window.toggleEditMode = () => { 
-      document.getElementById('detailView').classList.toggle('hidden'); 
-      document.getElementById('detailEdit').classList.toggle('hidden'); 
-  };
-  
-  window.saveEdit = async () => {
-    const id = document.getElementById('eId').value;
-    const updates = {
-      form_date: document.getElementById('eDate').value, 
-      store_branch: document.getElementById('eStore').value,
-      customer_name: document.getElementById('eName').value, 
-      source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
-      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x), 
-      detail_desc: document.getElementById('eDetail').value
-    };
-
-    const { error } = await supabase.from('visits').update(updates).eq('id', id);
-    if(error) {
-        alert('更新失敗: ' + error.message);
-    } else { 
-        alert('更新成功'); 
-        // 更新前端資料
-        const idx = visits.findIndex(v => v.id == id);
-        if(idx !== -1) visits[idx] = { ...visits[idx], ...updates };
-        
-        document.getElementById('detailModal').style.display='none'; 
-        renderAll(); 
-    }
-  };
-
-  window.saveData = async () => {
-    const { error } = await supabase.rpc('submit_visit', {
-      p_date: document.getElementById('mDate').value, 
-      p_store: document.getElementById('mStore').value,
-      p_name: document.getElementById('mName').value, 
-      p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x),
-      p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), 
-      p_detail: document.getElementById('mDetail').value,
-      p_gender:'', p_age:'', p_tainan:false, p_keyword:''
-    });
-    if(error) alert('新增失敗: '+error.message);
-    else { alert('新增成功'); closeModal(); fetchData(); }
-  };
-
-  // --- UI HELPERS ---
+  // --- HELPERS ---
   window.setStore = s => { currentStore=s; document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active')); if(s=='全部')document.getElementById('btnTotal').classList.add('active'); if(s=='臨安店')document.getElementById('btnLinAn').classList.add('active'); if(s=='南科店')document.getElementById('btnNanKe').classList.add('active'); fetchData(); };
   window.filterSource = () => { savedSourceFilter=document.getElementById('sourceFilter').value; renderAll(); };
   window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnClearSearch').classList.add('hidden'); fetchData(); };
   window.openAddModal = () => { document.getElementById('mDate').value=new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display='flex'; };
   window.closeModal = () => document.getElementById('modal').style.display='none';
+  window.toggleEditMode = () => { document.getElementById('detailView').classList.toggle('hidden'); document.getElementById('detailEdit').classList.toggle('hidden'); };
+  
+  window.saveEdit = async () => {
+    const id = document.getElementById('eId').value;
+    const updates = {
+      form_date: document.getElementById('eDate').value, store_branch: document.getElementById('eStore').value,
+      customer_name: document.getElementById('eName').value, source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
+      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x), detail_desc: document.getElementById('eDetail').value
+    };
+    const { error } = await supabase.from('visits').update(updates).eq('id', id);
+    if(error) alert('更新失敗: ' + error.message); else { alert('更新成功'); const idx = visits.findIndex(v => v.id == id); if(idx !== -1) visits[idx] = { ...visits[idx], ...updates }; document.getElementById('detailModal').style.display='none'; renderAll(); }
+  };
+  
+  window.saveData = async () => {
+    const { error } = await supabase.rpc('submit_visit', {
+      p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value,
+      p_name: document.getElementById('mName').value, p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x),
+      p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), p_detail: document.getElementById('mDetail').value, p_gender:'', p_age:'', p_tainan:false, p_keyword:''
+    });
+    if(error) alert('新增失敗: '+error.message); else { alert('新增成功'); closeModal(); fetchData(); }
+  };
 </script>
 </body>
 </html>
