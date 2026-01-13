@@ -3,451 +3,410 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V6.0</title>
+  <title>和光堂戰情室 V6.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- Flatpickr -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
-
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    window.supabase = createClient(
-      "https://yxalpzculcyhzvnyvecb.supabase.co", 
-      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
-    );
+    window.supabase = createClient("https://yxalpzculcyhzvnyvecb.supabase.co", "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k");
   </script>
   <style>
-    :root { 
-      --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --accent: #2563eb; 
-      --table-header-bg: #fcd34d; --table-header-text: #000000; --row-hover: #fef9c3; 
-    }
-    body { background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
-    .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 20px; }
-    
-    .date-range-container {
-      display: flex; align-items: center; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
-    }
-    .date-range-container:hover { border-color: var(--accent); }
-    .date-range-input {
-      border: none; padding: 10px 12px; font-size: 14px; outline: none; width: 220px; text-align: center; font-weight: 600; cursor: pointer; color: #374151;
-    }
-    
-    .input-std { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; width: 100%; }
-    .btn-primary { background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .btn-primary:hover { background: #1d4ed8; }
+    :root { --accent: #2563eb; --row-hover: #fef9c3; }
+    body { background: #f3f4f6; font-family: system-ui, sans-serif; }
+    .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .btn-primary { background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; }
     .btn-stat { cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
     .btn-stat.active { border-color: var(--accent); background: #eff6ff; }
-
-    thead tr th { background-color: var(--table-header-bg) !important; color: var(--table-header-text) !important; font-weight: 800; }
-    tbody tr { transition: background-color 0.1s; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
-    tbody tr:hover { background-color: var(--row-hover) !important; }
-    
-    .admin-only { display: none !important; }
-    body.is-admin .admin-only { display: flex !important; }
-    body.is-admin td.admin-only { display: table-cell !important; } 
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 999; }
-    .modal-content { background: #fff; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: 12px; }
-    .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
-    .detail-label { width: 100px; font-weight: bold; color: #666; }
-    
-    /* Load More Button (Triangle) */
-    .load-more-btn {
-        width: 100%; padding: 12px;
-        display: flex; align-items: center; justify-content: center;
-        background: #f9fafb; border: none; border-top: 1px solid #e5e7eb;
-        cursor: pointer; transition: 0.2s; color: #9ca3af;
-    }
-    .load-more-btn:hover { background: #f3f4f6; color: var(--accent); }
-    .arrow-down { 
-        width: 0; height: 0; 
-        border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid currentColor; 
-    }
+    .load-more-btn { width: 100%; padding: 12px; text-align: center; cursor: pointer; color: #9ca3af; background: #f9fafb; border-top: 1px solid #eee; }
+    .load-more-btn:hover { color: var(--accent); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
   </style>
 </head>
 <body>
 
-<div class="max-w-7xl mx-auto p-4">
-  <!-- Header V6.0 -->
-  <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-    <div class="flex items-center gap-3">
-      <h1 class="text-2xl font-bold tracking-tight text-blue-600 flex items-center gap-2">
-        <span>👓 和光堂戰情室</span>
-        <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded border border-blue-100 tracking-wide">
-          V6.0 • 2026/01/13
-        </span>
-      </h1>
-    </div>
-    <div class="flex items-center gap-3">
-      <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-800 p-2" title="管理員">⚙️</button>
-      <button onclick="openAddModal()" class="btn-primary shadow-sm">+ 新增資料</button>
+<div class="max-w-7xl mx-auto p-4 space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+      <span>👓 和光堂戰情室</span>
+      <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">V6.1</span>
+    </h1>
+    <div class="flex gap-2">
+      <button onclick="toggleAdminPanel()" class="text-gray-400 p-2">⚙️</button>
+      <button onclick="openAddModal()" class="btn-primary">+ 新增</button>
     </div>
   </div>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="hidden mb-6 card bg-gray-800 text-white border-0 shadow-xl">
-    <div id="loginForm" class="flex gap-3 items-center">
-      <input type="email" id="admEmail" value="chanywang92@gmail.com" class="input-std text-black" placeholder="Email">
-      <input type="password" id="admPwd" class="input-std text-black" placeholder="Password">
-      <button onclick="login()" class="btn-primary">登入</button>
+  <!-- Admin Panel (Hidden) -->
+  <div id="adminPanel" class="hidden card bg-gray-800 text-white">
+    <div id="loginForm" class="flex gap-2"><input id="admPwd" type="password" class="p-2 rounded text-black" placeholder="密碼"><button onclick="login()" class="btn-primary">登入</button></div>
+    <div id="adminActions" class="hidden flex gap-4 items-center">
+      <span class="text-green-400 font-bold">✅ 管理員</span>
+      <button onclick="exportCSV()" class="bg-blue-600 px-3 py-1 rounded text-sm">⬇️ 匯出</button>
+      <label class="cursor-pointer bg-gray-600 px-3 py-1 rounded text-sm">📂 匯入 <input type="file" class="hidden" onchange="previewCSV(this)"></label>
+      <button onclick="wipeData()" class="text-red-400 text-sm ml-auto border border-red-400 px-2 py-1 rounded">⚠️ 清空</button>
     </div>
-    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center justify-between w-full">
-      <div class="font-bold text-green-400 flex items-center gap-2">✅ 管理員 <span class="text-xs text-gray-400 font-normal">(已登入)</span></div>
-      <div class="flex gap-2">
-        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1 font-bold">⬇️ 匯出 CSV</button>
-        <label class="cursor-pointer bg-gray-600 hover:bg-gray-500 px-3 py-1.5 rounded text-sm flex items-center gap-1 text-white">
-          <span>📂 匯入 CSV</span>
-          <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="previewCSV(this)">
-        </label>
-        <button onclick="logout()" class="bg-red-600 text-white px-3 py-1.5 rounded text-sm">登出</button>
+  </div>
+
+  <!-- Filter & KPIs -->
+  <div class="card flex gap-3 sticky top-2 z-30 items-center shadow-md">
+    <input id="dateRange" class="p-2 border rounded w-64 text-center font-bold" placeholder="日期範圍">
+    <button onclick="resetDate()" class="text-gray-400 hover:text-blue-600 font-bold px-2" title="重置日期">↺</button>
+    <input id="qSearch" class="p-2 border rounded flex-grow" placeholder="搜尋..." onkeyup="if(event.key==='Enter') applyFilter()">
+    <button onclick="applyFilter()" class="btn-primary">查詢</button>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4">
+    <!-- 總數邏輯修正：這裡顯示的是「全部分店」的固定數字，不受下方分店按鈕影響 -->
+    <div class="card flex flex-col items-center py-6"><div class="text-xs text-gray-500">總客數</div><div class="text-4xl font-bold" id="kpiTotal">--</div></div>
+    <div class="card flex flex-col items-center py-6"><div class="text-xs text-gray-500">臨安店</div><div class="text-4xl font-bold text-blue-600" id="kpiLinAn">--</div></div>
+    <div class="card flex flex-col items-center py-6"><div class="text-xs text-gray-500">南科店</div><div class="text-4xl font-bold text-green-600" id="kpiNanKe">--</div></div>
+  </div>
+
+  <!-- Store Switcher (這只影響圖表和列表) -->
+  <div class="flex gap-2 justify-center">
+    <button onclick="setStore('全部')" id="btnStoreAll" class="btn-stat active px-6 py-2 rounded-full bg-white font-bold shadow-sm">全部門市</button>
+    <button onclick="setStore('臨安店')" id="btnStoreLin" class="btn-stat px-6 py-2 rounded-full bg-white font-bold shadow-sm text-blue-600">臨安店</button>
+    <button onclick="setStore('南科店')" id="btnStoreNan" class="btn-stat px-6 py-2 rounded-full bg-white font-bold shadow-sm text-green-600">南科店</button>
+  </div>
+
+  <!-- Charts Area -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card h-[450px]">
+      <div class="flex justify-between mb-2">
+        <h3 class="font-bold">客源分析 <span id="sourceLockStatus" class="text-xs text-red-500 hidden">(鎖定中)</span></h3>
+        <span class="text-xs text-gray-400">點擊長條可鎖定</span>
       </div>
-      <button onclick="wipeData()" class="text-red-400 text-sm border border-red-400 px-3 py-1 rounded hover:bg-red-900">⚠️ 清空資料庫</button>
-    </div>
-  </div>
-
-  <!-- Filter Bar -->
-  <div class="card mb-6 flex flex-wrap gap-3 items-center sticky top-2 z-30 shadow-md">
-    <div class="date-range-container">
-      <span class="pl-3 text-gray-400">📅</span>
-      <input type="text" id="dateRange" class="date-range-input" placeholder="載入中..." readonly>
-    </div>
-    <div class="flex-grow relative">
-      <input type="text" id="qSearch" placeholder="搜尋姓名、手機、備註..." class="input-std pl-9" onkeyup="if(event.key==='Enter') reloadAll()">
-      <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
-      <button onclick="clearSearch()" id="btnClearSearch" class="hidden absolute right-2 top-2.5 text-gray-400 font-bold">✕</button>
-    </div>
-    <button onclick="reloadAll()" class="btn-primary">查詢</button>
-  </div>
-
-  <!-- Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div onclick="setStore('全部')" id="btnTotal" class="card btn-stat flex flex-col justify-center items-center active py-6"><div class="text-xs font-bold text-gray-500 mb-1">總客數</div><div class="text-4xl font-extrabold text-gray-800" id="statTotal">--</div></div>
-    <div onclick="setStore('臨安店')" id="btnLinAn" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 mb-1">臨安店</div><div class="text-4xl font-extrabold text-blue-600" id="statLinAn">--</div></div>
-    <div onclick="setStore('南科店')" id="btnNanKe" class="card btn-stat flex flex-col justify-center items-center py-6"><div class="text-xs font-bold text-gray-500 mb-1">南科店</div><div class="text-4xl font-extrabold text-green-600" id="statNanKe">--</div></div>
-  </div>
-
-  <!-- Charts -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <div class="card h-[450px] flex flex-col">
-      <div class="flex justify-between mb-4"><h3 class="font-bold">客源分析</h3></div>
-      <div class="flex-grow relative w-full h-full"><canvas id="chartSource"></canvas></div>
+      <div class="h-full relative"><canvas id="chartSource"></canvas></div>
     </div>
     <div class="card h-[450px] flex flex-col">
-      <div class="flex justify-between mb-4"><h3 class="font-bold">來店目的</h3></div>
-      <div class="flex-grow relative flex justify-center w-full h-full"><canvas id="chartPurpose"></canvas></div>
+       <h3 class="font-bold mb-2">連動分析: <span id="crossLabel" class="text-blue-600">整體</span></h3>
+       <div class="flex-grow flex flex-col gap-4">
+         <div class="h-1/2 relative"><canvas id="chartPurpose"></canvas></div>
+         <div class="h-1/2 relative border-t pt-2">
+           <div class="text-xs text-gray-400 mb-1">趨勢走勢</div>
+           <canvas id="chartTrend"></canvas>
+         </div>
+       </div>
     </div>
   </div>
 
   <!-- Table -->
-  <div class="card overflow-hidden shadow-lg border-0 p-0">
-    <div class="p-4 bg-white border-b flex justify-between">
-      <h3 class="font-bold text-lg text-gray-800">最新來客紀錄</h3>
-      <span class="text-xs text-gray-400" id="pageInfoDisplay">--</span>
-    </div>
+  <div class="card p-0 overflow-hidden">
+    <div class="p-4 border-b bg-white flex justify-between"><h3 class="font-bold">來客列表</h3><span id="listCount" class="text-xs text-gray-500">--</span></div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left whitespace-nowrap">
-        <thead>
-          <tr>
-            <th class="p-3 pl-4">日期</th>
-            <th class="p-3">分店</th>
-            <th class="p-3">姓名</th>
-            <th class="p-3">客源</th>
-            <th class="p-3">目的</th>
-            <th class="p-3 pr-4 admin-only text-right" style="width: 80px;">操作</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="bg-white"></tbody>
+        <thead class="bg-yellow-100"><tr><th class="p-3">日期</th><th class="p-3">分店</th><th class="p-3">姓名</th><th class="p-3">客源</th><th class="p-3">目的</th><th class="p-3 w-20"></th></tr></thead>
+        <tbody id="tableBody"></tbody>
       </table>
     </div>
-    <!-- Load More Button -->
-    <button onclick="loadNextPage()" id="btnLoadMore" class="load-more-btn hidden" title="載入更多">
-        <div class="arrow-down"></div>
-    </button>
-  </div>
-</div>
-
-<!-- Details Modal -->
-<div id="detailModal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="flex justify-between items-center mb-4 border-b pb-2">
-      <h2 class="text-xl font-bold">詳細資料</h2>
-      <div class="flex gap-2">
-        <button onclick="toggleEditMode()" class="admin-only bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-bold">編輯</button>
-        <button onclick="closeDetailModal()" class="text-2xl text-gray-400">&times;</button>
-      </div>
-    </div>
-    <div id="detailView"></div>
-    <div id="detailEdit" class="hidden space-y-3">
-      <input type="hidden" id="eId">
-      <div class="detail-row"><div class="detail-label">日期</div><input type="date" id="eDate" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">分店</div><select id="eStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select></div>
-      <div class="detail-row"><div class="detail-label">姓名</div><input type="text" id="eName" class="input-std"></div>
-      <div class="detail-row"><div class="detail-label">客源</div><input type="text" id="eSources" class="input-std" placeholder="逗號分隔"></div>
-      <div class="detail-row"><div class="detail-label">目的</div><input type="text" id="ePurposes" class="input-std" placeholder="逗號分隔"></div>
-      <div class="detail-row flex-col items-start"><div class="detail-label mb-2">備註</div><textarea id="eDetail" class="input-std h-24"></textarea></div>
-      <button onclick="saveEdit()" class="btn-primary w-full bg-green-600 hover:bg-green-700">💾 儲存修改</button>
-    </div>
+    <button onclick="loadMore()" id="btnLoadMore" class="load-more-btn hidden">▼ 載入更多</button>
   </div>
 </div>
 
 <!-- Add Modal -->
-<div id="modal" class="modal-overlay">
-  <div class="modal-content">
-    <h2 class="text-xl font-bold mb-4">新增資料</h2>
-    <div class="space-y-3">
-      <input type="date" id="mDate" class="input-std">
-      <select id="mStore" class="input-std"><option value="臨安店">臨安店</option><option value="南科店">南科店</option></select>
-      <input type="text" id="mName" class="input-std" placeholder="姓名">
-      <input type="text" id="mSources" class="input-std" placeholder="客源 (可複選, 逗號分隔)">
-      <input type="text" id="mPurposes" class="input-std" placeholder="目的 (可複選, 逗號分隔)">
-      <textarea id="mDetail" class="input-std" placeholder="備註"></textarea>
-      <button onclick="saveData()" class="btn-primary w-full">儲存</button>
-      <button onclick="closeModal()" class="w-full text-center text-sm text-gray-500 mt-2">取消</button>
-    </div>
-  </div>
-</div>
+<div id="modal" class="modal-overlay"><div class="modal-content"><h2 class="font-bold mb-4">新增</h2><input type="date" id="mDate" class="w-full p-2 border rounded mb-2"><select id="mStore" class="w-full p-2 border rounded mb-2"><option>臨安店</option><option>南科店</option></select><input id="mName" class="w-full p-2 border rounded mb-2" placeholder="姓名"><input id="mSources" class="w-full p-2 border rounded mb-2" placeholder="客源 (自動修正逗號)"><input id="mPurposes" class="w-full p-2 border rounded mb-2" placeholder="目的"><textarea id="mDetail" class="w-full p-2 border rounded mb-2 h-24" placeholder="備註"></textarea><button onclick="saveData()" class="btn-primary w-full">儲存</button><button onclick="closeModal()" class="w-full mt-2 text-gray-400">取消</button></div></div>
 
 <script>
-  // Global State (V6.0)
-  let currentPage = 1, currentStore = '全部', charts = {}, datePicker;
-  let cachedParams = {}; // To freeze params during pagination
+  // Global Data Cache (Hybrid Architecture)
+  let rawData = []; // All 2000+ rows
+  let filteredData = []; // After Date/Store filter
+  let displayLimit = 20;
+  let currentStore = '全部';
+  let lockedSource = null; // For click-lock interaction
+  let charts = {};
+  let datePicker;
 
   window.onload = async () => {
-    // 1. DatePicker Init
-    datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", onChange: (d) => { if(d.length===2) reloadAll(); } });
+    datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", onChange: (d) => { if(d.length===2) applyFilter(); } });
+    Chart.register(ChartDataLabels); // Enable % labels
     
-    // 2. Auth Check
+    // Auth
     const { data: { session } } = await supabase.auth.getSession();
-    if(session) { document.body.classList.add('is-admin'); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden'); }
-    
-    // 3. Auto Range
-    await initDateRange();
-    
-    // 4. Initial Load
-    reloadAll();
+    if(session) { document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('adminActions').classList.remove('hidden'); document.getElementById('loginForm').classList.add('hidden'); }
+
+    // Init Data
+    await initData();
   };
 
-  async function initDateRange() {
-      const { data: minData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:true}).limit(1);
-      const { data: maxData } = await supabase.from('visits').select('form_date').order('form_date', {ascending:false}).limit(1);
-      let minDate = minData?.[0]?.form_date || '2023-01-01';
-      let maxDate = maxData?.[0]?.form_date || new Date().toISOString().split('T')[0];
-      datePicker.setDate([minDate, maxDate]);
-  }
-
-  // --- CORE: CLOUD FETCH (V6.0 Logic) ---
-  window.reloadAll = async () => {
-    currentPage = 1;
-    document.getElementById('tableBody').innerHTML = ''; // Clear table
+  async function initData() {
+    // 1. Fetch ALL data (Hybrid approach)
+    // We fetch only needed columns for analytics to save bandwidth, full details on demand? 
+    // No, 2000 rows is small, fetch * is fine.
+    const { data, error } = await supabase.from('visits').select('*').order('form_date', {ascending: false}).limit(5000);
+    if(error) { alert('Error: '+error.message); return; }
     
-    // Update Params Cache
-    const dates = datePicker.selectedDates;
-    cachedParams = {
-      start: dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '2020-01-01',
-      end: dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2030-12-31',
-      key: document.getElementById('qSearch').value,
-      store: currentStore
-    };
-
-    // Parallel Fetch (Dashboard Stats + First Page)
-    await Promise.all([fetchDashboardStats(), fetchTablePage()]);
-  };
-
-  async function fetchDashboardStats() {
-    const p = cachedParams;
-    // Call V6.0 RPC
-    const { data, error } = await supabase.rpc('get_dashboard_data_v6', {
-      start_date: p.start, end_date: p.end, search_keyword: p.key, store_filter: p.store
-    });
-
-    if(error) { console.error("Stats Error:", error); return; }
+    rawData = data;
     
-    // Update Stats UI
-    const stats = data.stats || {total:0, linan:0, nanke:0};
-    document.getElementById('statTotal').innerText = stats.total;
-    document.getElementById('statLinAn').innerText = stats.linan;
-    document.getElementById('statNanKe').innerText = stats.nanke;
-
-    // Render Charts
-    renderChart('chartSource', 'bar', data.sources || {}, '客源');
-    renderChart('chartPurpose', 'doughnut', data.purposes || {}, '目的');
-  }
-
-  async function fetchTablePage() {
-    const p = cachedParams;
-    // Call V6.0 Paged RPC
-    const { data, error } = await supabase.rpc('get_visits_paged_v6', {
-      page_no: currentPage, page_size: 20,
-      start_date: p.start, end_date: p.end, search_keyword: p.key, store_filter: p.store
-    });
-
-    if(error) { console.error("Table Error:", error); return; }
-
-    const tbody = document.getElementById('tableBody');
-    
-    if(data && data.length > 0) {
-      data.forEach(v => {
-        // Safe join for arrays (handles null)
-        const sources = Array.isArray(v.source_tags) ? v.source_tags.join(',') : '';
-        const purposes = Array.isArray(v.visit_purposes) ? v.visit_purposes.join(',') : '';
-        
-        tbody.innerHTML += `
-          <tr class="border-b hover:bg-yellow-50 cursor-pointer" onclick="showDetail(${v.id})">
-            <td class="p-3 pl-4 font-mono text-gray-500">${(v.form_date||'').slice(5)}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
-            <td class="p-3 font-bold text-gray-900">${v.customer_name}</td>
-            <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]">${sources}</td>
-            <td class="p-3 text-xs text-gray-500 truncate max-w-[100px]">${purposes}</td>
-            <td class="p-3 pr-4 admin-only text-right" onclick="event.stopPropagation()">
-                <button class="text-red-500 hover:bg-red-50 p-2 rounded font-bold" onclick="deleteData(${v.id})">刪</button>
-            </td>
-          </tr>
-        `;
-      });
-      document.getElementById('btnLoadMore').classList.remove('hidden');
+    // Set Date Range based on data
+    if(rawData.length > 0) {
+       const dates = rawData.map(x=>x.form_date).sort();
+       datePicker.setDate([dates[0], dates[dates.length-1]]);
     } else {
-      document.getElementById('btnLoadMore').classList.add('hidden');
+       datePicker.setDate(['2024-01-01', new Date()]);
     }
-    document.getElementById('pageInfoDisplay').innerText = `目前顯示至第 ${currentPage} 頁`;
+    
+    // Initial Calc
+    applyFilter();
   }
 
-  window.loadNextPage = () => { currentPage++; fetchTablePage(); };
-  window.setStore = (s) => { 
-      currentStore = s; 
-      document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active')); 
-      if(s=='全部')document.getElementById('btnTotal').classList.add('active'); 
-      if(s=='臨安店')document.getElementById('btnLinAn').classList.add('active'); 
-      if(s=='南科店')document.getElementById('btnNanKe').classList.add('active'); 
-      reloadAll(); 
-  };
-  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnClearSearch').classList.add('hidden'); reloadAll(); };
+  // --- Core Filter Logic ---
+  window.applyFilter = () => {
+    const dates = datePicker.selectedDates;
+    const start = dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '2000-01-01';
+    const end = dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2099-12-31';
+    const key = document.getElementById('qSearch').value.toLowerCase();
 
-  // --- CHART RENDERER ---
-  function renderChart(id, type, jsonMap, label) {
-    const canvas = document.getElementById(id);
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if(charts[id]) charts[id].destroy();
+    // 1. Calculate KPI (Total, regardless of store filter)
+    const timeFiltered = rawData.filter(v => v.form_date >= start && v.form_date <= end);
+    document.getElementById('kpiTotal').innerText = timeFiltered.length;
+    document.getElementById('kpiLinAn').innerText = timeFiltered.filter(v=>v.store_branch=='臨安店').length;
+    document.getElementById('kpiNanKe').innerText = timeFiltered.filter(v=>v.store_branch=='南科店').length;
+
+    // 2. Filter for Charts & Table
+    filteredData = timeFiltered.filter(v => {
+       if(currentStore !== '全部' && v.store_branch !== currentStore) return false;
+       if(key && !v.customer_name.toLowerCase().includes(key) && !(v.detail_desc||'').toLowerCase().includes(key)) return false;
+       return true;
+    });
+
+    // 3. Reset View
+    displayLimit = 20;
+    lockedSource = null;
+    updateLockedStatus();
+    renderCharts(filteredData);
+    renderTable();
+  };
+
+  // --- The "Tech Feel" Interaction Logic ---
+  function renderCharts(baseData) {
+    // Aggregation
+    const sMap = {}; 
+    baseData.forEach(v => (v.source_tags||[]).forEach(t => sMap[t] = (sMap[t]||0)+1));
     
-    // Sort Desc
-    const entries = Object.entries(jsonMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
+    // Source Chart
+    const ctxS = document.getElementById('chartSource').getContext('2d');
+    if(charts.source) charts.source.destroy();
+
+    const sortedS = Object.entries(sMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
     
-    charts[id] = new Chart(ctx, {
-      type: type,
+    charts.source = new Chart(ctxS, {
+      type: 'bar',
       data: {
-        labels: entries.map(x=>x[0]),
-        datasets: [{ label: label, data: entries.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'], borderRadius:4 }]
+        labels: sortedS.map(x=>x[0]),
+        datasets: [{
+          label: '客源',
+          data: sortedS.map(x=>x[1]),
+          backgroundColor: '#3b82f6',
+          borderRadius: 4,
+          hoverBackgroundColor: '#2563eb'
+        }]
       },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {display:false},
+          datalabels: {
+            anchor: 'end', align: 'top',
+            formatter: (val, ctx) => {
+              const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+              return Math.round(val/total*100) + '%';
+            },
+            font: {weight: 'bold', size: 10}, color: '#666'
+          }
+        },
+        onHover: (e, els) => {
+          if(lockedSource) return; // Locked? Don't change
+          const el = els[0];
+          const canvas = e.native.target;
+          canvas.style.cursor = el ? 'pointer' : 'default';
+          
+          if(el) {
+            const label = sortedS[el.index][0];
+            updateCrossCharts(label); // Hover Preview
+          } else {
+            updateCrossCharts(null); // Reset
+          }
+        },
+        onClick: (e, els) => {
+          const el = els[0];
+          if(!el) { lockedSource=null; updateLockedStatus(); updateCrossCharts(null); return; }
+          
+          const label = sortedS[el.index][0];
+          if(lockedSource === label) {
+             lockedSource = null; // Unlock
+          } else {
+             lockedSource = label; // Lock
+          }
+          updateLockedStatus();
+          updateCrossCharts(lockedSource);
+        }
+      }
+    });
+
+    // Init Cross Charts (Default: All)
+    updateCrossCharts(null);
+  }
+
+  function updateCrossCharts(sourceFilter) {
+    const label = sourceFilter || '整體';
+    document.getElementById('crossLabel').innerText = label;
+    
+    // Filter logic: if sourceFilter is present, narrow down data
+    let subset = filteredData;
+    if(sourceFilter) {
+       subset = filteredData.filter(v => (v.source_tags||[]).includes(sourceFilter));
+    }
+
+    // Purpose Chart (Doughnut)
+    const pMap = {};
+    subset.forEach(v => (v.visit_purposes||[]).forEach(t => pMap[t] = (pMap[t]||0)+1));
+    const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0, 8);
+    
+    const ctxP = document.getElementById('chartPurpose').getContext('2d');
+    if(charts.purpose) charts.purpose.destroy();
+    charts.purpose = new Chart(ctxP, {
+      type: 'doughnut',
+      data: {
+        labels: sortedP.map(x=>x[0]),
+        datasets: [{ data: sortedP.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'] }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}} }
+    });
+
+    // Trend Chart (Line)
+    const tMap = {};
+    subset.forEach(v => { const m = v.form_date.slice(0,7); tMap[m] = (tMap[m]||0)+1; });
+    const sortedT = Object.keys(tMap).sort();
+    
+    const ctxT = document.getElementById('chartTrend').getContext('2d');
+    if(charts.trend) charts.trend.destroy();
+    charts.trend = new Chart(ctxT, {
+      type: 'line',
+      data: {
+        labels: sortedT,
+        datasets: [{ label:'數量', data: sortedT.map(k=>tMap[k]), borderColor: '#f59e0b', tension:0.3, fill:true, backgroundColor:'rgba(245,158,11,0.1)' }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}} }
     });
   }
 
-  // --- DETAIL & EDIT ---
-  window.showDetail = async (id) => {
-    // We need to fetch single item detail because grid might not have full info
-    const { data, error } = await supabase.from('visits').select('*').eq('id', id).single();
-    if(error || !data) return;
+  function updateLockedStatus() {
+     const tag = document.getElementById('sourceLockStatus');
+     if(lockedSource) {
+       tag.classList.remove('hidden');
+       tag.innerText = `(鎖定: ${lockedSource})`;
+     } else {
+       tag.classList.add('hidden');
+     }
+  }
+
+  // --- Table & Helper ---
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    const pageData = filteredData.slice(0, displayLimit);
     
-    const v = data;
-    const sources = Array.isArray(v.source_tags) ? v.source_tags : (v.source_tags||'').split(',');
-    const purposes = Array.isArray(v.visit_purposes) ? v.visit_purposes : (v.visit_purposes||'').split(',');
-
-    document.getElementById('detailView').innerHTML = `
-      <div class="detail-row"><div class="detail-label">日期</div><div>${v.form_date}</div></div>
-      <div class="detail-row"><div class="detail-label">分店</div><div>${v.store_branch}</div></div>
-      <div class="detail-row"><div class="detail-label">姓名</div><div class="text-2xl font-bold text-blue-600">${v.customer_name}</div></div>
-      <div class="detail-row"><div class="detail-label">客源</div><div class="flex flex-wrap gap-1">${sources.map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
-      <div class="detail-row"><div class="detail-label">目的</div><div class="flex flex-wrap gap-1">${purposes.map(t=>`<span class="bg-gray-100 px-2 rounded text-xs">${t}</span>`).join('')}</div></div>
-      <div class="mt-4 p-4 bg-gray-50 rounded text-sm text-gray-600 whitespace-pre-wrap">${v.detail_desc||'無備註'}</div>
-    `;
+    tbody.innerHTML = pageData.map(v => `
+      <tr class="border-b hover:bg-yellow-50 cursor-pointer">
+        <td class="p-3 font-mono text-gray-500">${v.form_date}</td>
+        <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${v.store_branch}</span></td>
+        <td class="p-3 font-bold">${v.customer_name}</td>
+        <td class="p-3 text-xs text-gray-500 max-w-[150px] truncate">${(v.source_tags||[]).join(',')}</td>
+        <td class="p-3 text-xs text-gray-500 max-w-[150px] truncate">${(v.visit_purposes||[]).join(',')}</td>
+        <td class="p-3 text-right"><button onclick="deleteData(${v.id})" class="text-red-400 font-bold hover:text-red-600">×</button></td>
+      </tr>
+    `).join('');
     
-    // Fill Edit Form
-    document.getElementById('eId').value = v.id;
-    document.getElementById('eDate').value = v.form_date;
-    document.getElementById('eStore').value = v.store_branch;
-    document.getElementById('eName').value = v.customer_name;
-    document.getElementById('eSources').value = sources.join(',');
-    document.getElementById('ePurposes').value = purposes.join(',');
-    document.getElementById('eDetail').value = v.detail_desc||'';
+    document.getElementById('listCount').innerText = `${pageData.length} / ${filteredData.length}`;
+    if(pageData.length >= filteredData.length) document.getElementById('btnLoadMore').classList.add('hidden');
+    else document.getElementById('btnLoadMore').classList.remove('hidden');
+  }
 
-    document.getElementById('detailView').classList.remove('hidden');
-    document.getElementById('detailEdit').classList.add('hidden');
-    document.getElementById('detailModal').style.display = 'flex';
-  };
-  
-  // Save Edit (Direct Update)
-  window.saveEdit = async () => {
-    const id = document.getElementById('eId').value;
-    const updates = {
-      form_date: document.getElementById('eDate').value,
-      store_branch: document.getElementById('eStore').value,
-      customer_name: document.getElementById('eName').value,
-      source_tags: document.getElementById('eSources').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
-      visit_purposes: document.getElementById('ePurposes').value.split(/,|，/).map(x=>x.trim()).filter(x=>x),
-      detail_desc: document.getElementById('eDetail').value
-    };
-    const { error } = await supabase.from('visits').update(updates).eq('id', id);
-    if(error) alert('更新失敗: '+error.message); else { alert('更新成功'); document.getElementById('detailModal').style.display='none'; reloadAll(); }
-  };
-
-  // --- CRUD (Admin) ---
+  window.loadMore = () => { displayLimit += 20; renderTable(); };
+  window.setStore = (s) => { currentStore = s; document.querySelectorAll('.btn-stat').forEach(b=>b.classList.remove('active', 'bg-blue-50', 'border-blue-500')); if(s=='全部')document.getElementById('btnStoreAll').classList.add('active'); if(s=='臨安店')document.getElementById('btnStoreLin').classList.add('active'); if(s=='南科店')document.getElementById('btnStoreNan').classList.add('active'); applyFilter(); };
+  window.resetDate = () => { datePicker.setDate(['2024-01-01', new Date()]); applyFilter(); };
   window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
-  window.openAddModal = () => { document.getElementById('mDate').value=new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display='flex'; };
+  window.openAddModal = () => document.getElementById('modal').style.display='flex';
   window.closeModal = () => document.getElementById('modal').style.display='none';
-  window.toggleEditMode = () => { document.getElementById('detailView').classList.toggle('hidden'); document.getElementById('detailEdit').classList.toggle('hidden'); };
-  window.closeDetailModal = () => document.getElementById('detailModal').style.display='none';
 
-  window.login = async () => { const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('admEmail').value, password: document.getElementById('admPwd').value }); if(!error) location.reload(); };
-  window.logout = async () => { await supabase.auth.signOut(); location.reload(); };
-  window.wipeData = async () => { if(prompt('輸入 admin 確認清空') === 'admin') { await supabase.from('visits').delete().neq('id', 0); reloadAll(); } };
-  window.deleteData = async (id) => { if(confirm('刪除?')) { await supabase.from('visits').delete().eq('id', id); reloadAll(); } };
-
-  // New Save Data (Uses RPC for consistency)
-  window.saveData = async () => {
-      const { error } = await supabase.rpc('submit_visit', {
-          p_date: document.getElementById('mDate').value, p_store: document.getElementById('mStore').value,
-          p_name: document.getElementById('mName').value, 
-          p_sources: document.getElementById('mSources').value.split(/,|，/).filter(x=>x), 
-          p_purposes: document.getElementById('mPurposes').value.split(/,|，/).filter(x=>x), 
-          p_detail: document.getElementById('mDetail').value,
-          p_gender:'', p_age:'', p_tainan:false, p_keyword:''
-      });
-      if(error) alert('失敗: '+error.message); else { closeModal(); reloadAll(); }
-  };
-  
-  // CSV Import (Client-side Parse -> RPC Loop)
+  // --- CSV Import ---
   window.previewCSV = (input) => {
-    const f = input.files[0]; if(!f) return;
-    const label = input.parentElement.querySelector('span'); const oldText = label.innerText; label.innerText = '處理中...';
-    Papa.parse(f, { header: true, skipEmptyLines: true, complete: async (res) => {
-        if(!confirm(`匯入 ${res.data.length} 筆?`)) { label.innerText=oldText; return; }
-        let success = 0; const chunkSize = 50;
-        for (let i = 0; i < res.data.length; i += chunkSize) {
-            const chunk = res.data.slice(i, i + chunkSize);
-            const promises = chunk.map(r => {
-                const d = r['form_date']||r['填表日期']; const n = r['customer_name']||r['顧客姓名']; if(!d || !n) return null;
-                const s = (r['來源統計']||r['source_tags']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
-                const p = (r['來店目的']||r['visit_purposes']||'').split(/,|，|、/).map(x=>x.trim()).filter(x=>x);
-                return supabase.rpc('submit_visit', { p_date: d.replace(/\//g,'-'), p_store: r['store_branch']||r['門店']||'臨安店', p_name: n, p_sources: s, p_purposes: p, p_gender:'', p_age:'', p_tainan:false, p_keyword:'', p_detail: r['detail_desc']||r['詳細描述']||'' });
-            }).filter(p=>p);
-            const results = await Promise.all(promises); success += results.filter(x => x && !x.error).length; label.innerText = `匯入中...${i}/${res.data.length}`;
-        }
-        alert(`完成！成功: ${success}`); label.innerText = oldText; input.value = ''; reloadAll();
+    const f = input.files[0];
+    Papa.parse(f, { header:true, skipEmptyLines:true, complete: async (res) => {
+       if(!confirm(`匯入 ${res.data.length} 筆? (重複者將自動覆蓋)`)) return;
+       // Clean Keys logic (remove extra spaces in keys if any)
+       const cleanData = res.data.map(row => {
+          // Mapping logic
+          const d = row['form_date']||row['填表日期']; 
+          const n = row['customer_name']||row['顧客姓名'];
+          if(!d || !n) return null;
+          
+          // Smart Clean Tags
+          let sRaw = row['source_tags']||row['來源統計']||'';
+          sRaw = sRaw.replace(/，/g, ',').replace(/、/g, ','); // 全形轉半形
+          const s = sRaw.split(',').map(x=>x.trim()).filter(x=>x);
+          
+          let pRaw = row['visit_purposes']||row['來店目的']||'';
+          pRaw = pRaw.replace(/，/g, ',').replace(/、/g, ',');
+          const p = pRaw.split(',').map(x=>x.trim()).filter(x=>x);
+
+          return { p_date: d, p_store: row['store_branch']||row['門店']||'臨安店', p_name: n, p_sources: s, p_purposes: p, p_detail: row['detail_desc']||row['詳細描述']||'' };
+       }).filter(x=>x);
+
+       // Batch Submit via RPC
+       const batchSize = 20;
+       for(let i=0; i<cleanData.length; i+=batchSize) {
+          const chunk = cleanData.slice(i, i+batchSize);
+          await Promise.all(chunk.map(r => supabase.rpc('submit_visit', r)));
+       }
+       alert('匯入完成');
+       initData();
     }});
   };
+
+  window.wipeData = async () => {
+     if(!confirm('警告：這將清空所有資料！')) return;
+     // Force Export
+     window.exportCSV();
+     const pwd = prompt('資料已強制匯出備份。\n請輸入密碼確認清空：');
+     if(pwd === 'admin888') { // Hardcoded safe password for now
+        await supabase.from('visits').delete().neq('id', 0);
+        location.reload();
+     } else {
+        alert('密碼錯誤');
+     }
+  };
   
-  window.exportCSV = async () => {
-     // Fetch ALL data for export (using raw select because RPC is paged)
-     // Be careful with large data, but for 2000 rows it's fine.
-     const { data } = await supabase.from('visits').select('*').order('form_date', {ascending:false});
-     if(!data) return;
-     const csv = Papa.unparse(data);
-     const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
-     const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `export.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  // Basic CRUD
+  window.saveData = async () => {
+     const r = {
+        p_date: document.getElementById('mDate').value,
+        p_store: document.getElementById('mStore').value,
+        p_name: document.getElementById('mName').value,
+        p_sources: document.getElementById('mSources').value.replace(/，/g,',').split(',').filter(x=>x),
+        p_purposes: document.getElementById('mPurposes').value.replace(/，/g,',').split(',').filter(x=>x),
+        p_detail: document.getElementById('mDetail').value
+     };
+     await supabase.rpc('submit_visit', r);
+     closeModal();
+     initData();
+  };
+  window.deleteData = async (id) => { if(confirm('刪除?')) { await supabase.from('visits').delete().eq('id', id); initData(); } };
+  window.login = async () => { if(document.getElementById('admPwd').value==='admin') { document.getElementById('adminActions').classList.remove('hidden'); document.getElementById('loginForm').classList.add('hidden'); } };
+  
+  // Export Helper
+  window.exportCSV = () => {
+    const csv = Papa.unparse(rawData);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'}));
+    link.download = `backup_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link); link.click();
   };
 </script>
 </body>
