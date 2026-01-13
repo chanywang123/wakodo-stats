@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V7.6</title>
+  <title>和光堂戰情室 V7.7</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -149,7 +149,7 @@
       <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         <span class="tech-glow"></span> 和光堂戰情室
         <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600">V7.6</div>
+          <div class="text-sm font-bold text-slate-600">V7.7</div>
           <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
         </div>
       </h1>
@@ -538,13 +538,11 @@
                                  const pct = totalP ? Math.round(val/totalP*100) : 0;
                                  const isTop1 = i === 0;
                                  
-                                 let textParts = [`${label}  `, `${pct}%`];
-                                 
                                  return { 
-                                     text: isTop1 ? `${label}  ` : `${label}  ${pct}%`,
+                                     text: `${label}  ${pct}%`,
                                      fillStyle: data.datasets[0].backgroundColor[i],
                                      strokeStyle: isTop1 ? '#fbbf24' : 'transparent',
-                                     lineWidth: isTop1 ? 3 : 0,
+                                     lineWidth: isTop1 ? 4 : 0,
                                      hidden: false, 
                                      index: i,
                                      fontColor: isTop1 ? '#dc2626' : '#000000',
@@ -686,10 +684,23 @@
        const cleanData = res.data.map((row, idx) => {
           let d = row['form_date']||row['填表日期']; 
           if(!d) { console.warn(`Row ${idx}: Missing date`); return null; }
-          d = d.replace(/\//g, '-');
+          
+          // 🔥 修改1：強化日期格式處理，自動補零
+          d = d.trim().replace(/\//g, '-');
+          const dateParts = d.split('-');
+          if(dateParts.length === 3) {
+              const year = dateParts[0];
+              const month = dateParts[1].padStart(2, '0');
+              const day = dateParts[2].padStart(2, '0');
+              d = `${year}-${month}-${day}`;
+          }
           
           const n = row['customer_name']||row['顧客姓名'];
           if(!n) { console.warn(`Row ${idx}: Missing name`); return null; }
+          
+          // 🔥 修改2：處理描述性姓名
+          const invalidNames = ['現場客', '調整客', '現場顧客', '看看客', '電話客', '諮詢客', '住戶', '無', '不知', '-', '未知'];
+          const cleanName = invalidNames.includes(n.trim()) ? '未留資料' : n;
           
           let sRaw = row['source_tags']||row['來源統計']||'';
           sRaw = sRaw.replace(/，/g, ',');
@@ -703,7 +714,7 @@
           return { 
               p_date: d, 
               p_store: row['store_branch']||row['門店']||'臨安店', 
-              p_name: n, 
+              p_name: cleanName, 
               p_gender: row['gender']||row['性別']||'',
               p_age: cleanAge,
               p_is_local: (row['is_local']||row['是否為台南人']||'').includes('是'),
@@ -737,7 +748,7 @@
        setTimeout(() => { 
            overlay.style.display='none'; 
            if(errors.length === 0) location.reload(); 
-           else alert(`匯入完成，但有 ${errors.length} 筆失敗。`);
+           else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
        }, 2000);
     }});
   };
@@ -803,7 +814,7 @@
       exportCSV(); 
       setTimeout(async () => {
           if(!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
-          const pwd = prompt('請輸入二次確認密碼');
+          const pwd = prompt('請輸入二次確認密碼：');
           if(pwd === '628599') { 
               const { error } = await supabase.from('visits').delete().neq('id', 0); 
               if(error) alert('失敗: '+error.message); 
