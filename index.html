@@ -3,723 +3,543 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V7.4</title>
+  <title>和光堂戰情室 V7.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    window.supabase = createClient("https://yxalpzculcyhzvnyvecb.supabase.co", "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k");
+    window.supabase = createClient(
+      "https://yxalpzculcyhzvnyvecb.supabase.co", 
+      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+    );
   </script>
   <style>
-    :root { --bg: #f3f4f6; --card-bg: rgba(255, 255, 255, 0.85); --accent: #3b82f6; }
-    body { background: var(--bg); font-family: system-ui, -apple-system, sans-serif; color: #1e293b; }
-    
-    .glass-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    :root { 
+      --bg: #0f0f23; 
+      --card-bg: #1a1a35; 
+      --accent: #3b82f6; 
+      --text-gray: #6b7280; 
     }
-
-    .kpi-card { cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; border: 2px solid transparent; }
-    .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2); }
-    .kpi-card.active { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: var(--accent); }
-    .kpi-card.active::after { content:"●"; position:absolute; top:12px; right:12px; color:var(--accent); font-size:8px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-    #hoverPreview {
-        position: fixed; pointer-events: none; z-index: 9999;
-        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(8px);
-        border: 1px solid #fbbf24; border-left: 4px solid #fbbf24;
-        padding: 14px; border-radius: 10px;
-        box-shadow: 0 20px 30px -5px rgba(251, 191, 36, 0.3);
-        max-width: 340px; font-size: 0.9rem; color: #374151; line-height: 1.6;
-        display: none; transition: opacity 0.15s;
+    
+    body { 
+      background: var(--bg); 
+      font-family: system-ui, -apple-system, sans-serif; 
+      color: white; 
+      margin: 0; 
+      padding-bottom: 100px; 
     }
-
-    thead th { background: #fef9c3; color: #000; padding: 14px; font-weight: 800; border-bottom: 2px solid #fde047; font-size: 0.9rem; }
-    tbody tr { border-bottom: 1px solid #f1f5f9; transition: all 0.2s; cursor: pointer; }
-    tbody tr:hover { background: #fefce8; transform: translateX(2px); box-shadow: 0 2px 4px rgba(251, 191, 36, 0.1); }
-
-    .btn-primary { background: var(--accent); color: white; padding: 8px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); transition: 0.2s; cursor: pointer; }
-    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
-
-    #importOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; color: white; flex-direction: column; backdrop-filter: blur(4px); }
-    .progress-bar { width: 320px; height: 12px; background: #334155; border-radius: 6px; overflow: hidden; margin-top: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #10b981); width: 0%; transition: width 0.3s ease; }
     
-    .radio-group { display: flex; flex-wrap: wrap; gap: 6px; }
-    .radio-btn { padding: 6px 14px; border: 1.5px solid #e5e7eb; border-radius: 50px; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.15s; user-select: none; background: white; }
-    .radio-btn:active { transform: scale(0.96); }
-    .radio-btn.selected { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-color: #2563eb; font-weight: 600; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4); }
-
-    .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
-    .chk-btn { padding: 8px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 12px; color: #4b5563; cursor: pointer; transition: all 0.15s; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 40px; background: white; }
-    .chk-btn.checked { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border-color: #3b82f6; font-weight: 700; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25); }
+    .glass-card { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      padding: 20px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); 
+      backdrop-filter: blur(12px); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+    }
     
-    .modal-content { background: white; width: 95%; max-width: 650px; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 100; }
-    .required-mark { color: #ef4444; margin-left: 2px; font-weight: bold; }
+    /* 科技感發光光點 */
+    .tech-glow {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #3b82f6;
+      border-radius: 50%;
+      box-shadow: 
+        0 0 10px #3b82f6,
+        0 0 20px #3b82f6,
+        0 0 30px #3b82f6;
+      animation: glow-pulse 2s ease-in-out infinite;
+      position: relative;
+      top: -2px;
+      margin-right: 8px;
+    }
     
-    .lock-badge-container { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 50px; text-xs; font-bold; background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
-    .lock-badge-x { cursor: pointer; font-size: 16px; padding: 0 4px; border-radius: 50%; transition: 0.15s; font-weight: 900; }
-    .lock-badge-x:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.15); }
+    @keyframes glow-pulse {
+      0%, 100% { 
+        opacity: 1;
+        box-shadow: 
+          0 0 10px #3b82f6,
+          0 0 20px #3b82f6,
+          0 0 30px #3b82f6;
+      }
+      50% { 
+        opacity: 0.6;
+        box-shadow: 
+          0 0 5px #3b82f6,
+          0 0 10px #3b82f6,
+          0 0 15px #3b82f6;
+      }
+    }
     
-    .pie-center-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .pie-center-label .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; font-weight: 700; }
-    .pie-center-label .value { 
-        font-size: 20px; font-weight: 900; color: #1e293b; 
-        text-shadow: 
-            -2.5px -2.5px 0 #fff, 2.5px -2.5px 0 #fff,
-            -2.5px 2.5px 0 #fff, 2.5px 2.5px 0 #fff,
-            0 0 8px rgba(255,255,255,0.9),
-            0 4px 10px rgba(0,0,0,0.2);
-        margin-top: 4px; letter-spacing: 0.5px;
+    /* Top1 優化樣式 */
+    .top-badge {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 2px solid #fbbf24;
+      box-shadow: 
+        0 4px 6px rgba(251, 191, 36, 0.3),
+        0 0 15px rgba(251, 191, 36, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .top-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 12px rgba(251, 191, 36, 0.4),
+        0 0 25px rgba(251, 191, 36, 0.3);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    
+    .top-badge-icon {
+      width: 12px;
+      height: 12px;
+      background: #fbbf24;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+    
+    /* 登出按鈕 */
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #fecaca;
+      font-weight: bold;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+    }
+    
+    /* 其他保持原有樣式 */
+    .btn-primary { 
+      background: var(--accent); 
+      color: white; 
+      padding: 10px 20px; 
+      border-radius: 8px; 
+      border: none; 
+      cursor: pointer; 
+      font-weight: bold; 
+      transition: all 0.2s; 
+    }
+    
+    .btn-primary:hover { 
+      background: #2563eb; 
+      transform: translateY(-1px); 
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #60a5fa;
+    }
+    
+    .stat-label {
+      color: var(--text-gray);
+      font-size: 0.875rem;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
 
-<div id="hoverPreview"></div>
-
-<div id="importOverlay">
-  <div class="text-3xl font-black mb-3">📦 資料匯入中...</div>
-  <div id="importStatus" class="text-base text-gray-300">正在準備...</div>
-  <div class="progress-bar"><div id="importProgress" class="progress-fill"></div></div>
-  <div id="importErrors" class="mt-6 text-xs text-red-300 max-h-48 overflow-y-auto w-[90%] max-w-lg bg-slate-900/50 p-4 rounded-lg hidden backdrop-blur"></div>
-</div>
-
-<div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
-  
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
-        👓 和光堂戰情室
-        <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600">V7.4</div>
-          <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
-        </div>
-      </h1>
+<div class="max-w-7xl mx-auto p-4">
+  <!-- Header -->
+  <div class="glass-card mb-6 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <span class="tech-glow"></span>
+      <h1 class="text-2xl font-bold">和光堂戰情室</h1>
+      <span class="text-xs text-gray-400 ml-2">V7.5</span>
     </div>
-    <div class="flex gap-3">
-      <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">⚙️</button>
-      <button onclick="openAddModal()" class="btn-primary">+ 新增資料</button>
+    <div class="flex items-center gap-3">
+      <div id="dateRangeDisplay" class="text-sm text-gray-400"></div>
+      <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">
+        🚪 登出管理模式
+      </button>
+      <button onclick="window.location.href='form.html'" class="btn-primary">
+        ➕ 新增資料
+      </button>
+      <button onclick="refreshData()" class="btn-primary">🔄 重新載入</button>
     </div>
   </div>
 
-  <div id="adminPanel" class="hidden glass-card bg-slate-900 text-white p-4 border-slate-700">
-    <div id="loginForm" class="flex gap-2"><input id="admPwd" type="password" class="p-2 rounded text-black" placeholder="輸入密碼"><button onclick="login()" class="btn-primary">登入</button></div>
-    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
-      <span class="text-green-400 font-bold">✓ 管理員模式</span>
-      <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 匯出資料</button>
-      <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">📂 匯入 CSV <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)"></label>
-      <button onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition">⚠ 清空資料庫</button>
-    </div>
+  <!-- Stats Row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="statsContainer">
+    <!-- 動態生成 -->
   </div>
 
-  <div class="glass-card p-2 flex flex-wrap gap-2 items-center sticky top-2 z-40 shadow-lg border-blue-200/50">
-    <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
-      <span class="text-xl mr-2">📅</span>
-      <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
-      <span class="text-slate-300">/</span>
-      <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
-         <option value="">月份</option>
-         <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
-         <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
-         <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-      </select>
-      <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
-      <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
-    </div>
-    <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
-      <span class="text-gray-400 mr-2">🔍</span>
-      <input id="qSearch" class="bg-transparent border-0 p-2 w-full focus:ring-0" placeholder="搜尋姓名、手機、備註..." onkeyup="if(event.key==='Enter') applyFilter()">
-      <button onclick="clearSearch()" id="btnX" class="hidden absolute right-3 text-gray-400 hover:text-red-500 font-bold">✕</button>
-    </div>
-    <button onclick="applyFilter()" class="btn-primary">查詢</button>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div onclick="setStore('全部')" id="kpiTotal" class="glass-card kpi-card p-6 flex flex-col items-center justify-center active">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">總客數</div>
-      <div class="text-5xl font-black text-slate-800" id="valTotal">--</div>
-    </div>
-    <div onclick="setStore('臨安店')" id="kpiLinAn" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">臨安店</div>
-      <div class="text-5xl font-black text-blue-600" id="valLinAn">--</div>
-    </div>
-    <div onclick="setStore('南科店')" id="kpiNanKe" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">南科店</div>
-      <div class="text-5xl font-black text-green-600" id="valNanKe">--</div>
-    </div>
-  </div>
-
-  <div class="glass-card p-6">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h3 class="text-xl font-bold text-slate-800">客源與目的分析</h3>
-        <p class="text-xs text-slate-400 mt-1 flex items-center gap-2">
-          點擊左條圖可鎖定分析
-          <span id="lockBadge" class="hidden"></span>
-        </p>
-      </div>
+  <!-- Charts Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- 趨勢分析 -->
+    <div class="glass-card">
+      <h3 class="text-lg font-bold mb-4">📈 客流趨勢分析</h3>
+      <canvas id="trendChart" height="300"></canvas>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-      <div class="lg:col-span-3 h-[450px] relative">
-        <canvas id="chartSource"></canvas>
-      </div>
-      
-      <div class="lg:col-span-2 h-[450px] relative flex flex-col items-center justify-center">
-        <h4 class="absolute top-0 left-0 text-xs font-bold text-slate-400 uppercase tracking-wide">來店目的佔比</h4>
-        <div class="w-full h-full relative">
-          <canvas id="chartPurpose"></canvas>
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="pie-center-label text-center">
-              <div class="label">TOP 1</div>
-              <div class="value" id="topPurposeVal">--</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-8 border-t border-slate-100 pt-6">
-      <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wide">客流量趨勢走勢</h4>
-      <div class="h-[220px] relative">
-        <canvas id="chartTrend"></canvas>
-      </div>
+    <!-- 目的分析 -->
+    <div class="glass-card">
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+        🎯 顧客目的分析
+        <span class="top-badge" id="topPurposeBadge">
+          <span class="top-badge-icon"></span>
+          <span id="topPurposeText">載入中...</span>
+        </span>
+      </h3>
+      <canvas id="purposeChart" height="300"></canvas>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="glass-card p-6 flex flex-col">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈 <span id="demoFilterBadge" class="text-xs font-normal text-blue-500 ml-2"></span></h3>
-       <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
+  <!-- More charts... -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- 客源分析 -->
+    <div class="glass-card">
+      <h3 class="text-lg font-bold mb-4">🌐 客源渠道分析</h3>
+      <canvas id="sourceChart" height="300"></canvas>
     </div>
-    <div class="glass-card p-6 flex flex-col md:col-span-2">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈 <span id="demoFilterBadge2" class="text-xs font-normal text-blue-500 ml-2"></span></h3>
-       <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
-    </div>
-  </div>
-
-  <div class="glass-card overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white/50">
-      <h3 class="font-bold text-slate-700">最新顧客資料</h3>
-      <span class="text-xs font-mono text-slate-400" id="listCounter">--</span>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm whitespace-nowrap">
-        <thead><tr><th class="pl-6">日期</th><th>分店</th><th>姓名</th><th>性別/年齡</th><th>客源</th><th>目的</th><th class="w-10"></th></tr></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-    <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
-  </div>
-</div>
-
-<!-- Add Modal -->
-<div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
-  <div class="modal-content relative">
-    <button onclick="closeAddModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增顧客資料</h2>
-    <div class="space-y-5">
-      
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
-          <input type="date" id="mDate" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">分店</label>
-          <select id="mStore" class="w-full p-2 border rounded-lg bg-gray-50 font-bold"><option>臨安店</option><option>南科店</option></select>
-        </div>
-      </div>
-
-      <div class="flex gap-4">
-         <div class="flex-grow">
-           <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
-           <input id="mName" class="w-full p-2 border rounded-lg" placeholder="顧客姓名">
-         </div>
-         <div class="flex flex-col justify-end pb-2">
-            <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-               <input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600" checked>
-               <span class="text-sm font-bold text-blue-800">住台南</span>
-            </label>
-         </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
-        <div class="radio-group" id="grpGender">
-           <div class="radio-btn" onclick="selectRadio('grpGender','男',this)">男</div>
-           <div class="radio-btn" onclick="selectRadio('grpGender','女',this)">女</div>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
-        <div class="radio-group" id="grpAge"></div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
-        <div class="chk-grid" id="grpSource"></div>
-        <div id="boxKeyword" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-           <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
-           <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：驗光推薦...">
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
-        <div class="chk-grid" id="grpPurpose"></div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-1">詳細備註 <span class="required-mark">*</span></label>
-        <textarea id="mDetail" class="w-full p-3 border rounded-lg h-24 resize-none" placeholder="客人描述..."></textarea>
-      </div>
-
-      <button onclick="saveData()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-blue-700 transition">確認儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Detail Modal -->
-<div id="detailModal" class="modal-overlay" onclick="if(event.target===this)closeDetail()">
-  <div class="modal-content relative">
-    <button onclick="closeDetail()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-    <div id="detailContent"></div>
-    <div id="detailActions" class="mt-6 flex gap-3 hidden border-t pt-4">
-       <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition">刪除此筆</button>
+    
+    <!-- 年齡分布 -->
+    <div class="glass-card">
+      <h3 class="text-lg font-bold mb-4">👥 年齡分布</h3>
+      <canvas id="ageChart" height="300"></canvas>
     </div>
   </div>
 </div>
 
 <script>
-  const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"];
-  const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
-  const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+let allData = [];
+let trendChartInstance = null;
+let purposeChartInstance = null;
+let sourceChartInstance = null;
+let ageChartInstance = null;
+let isAdminMode = false;
 
-  let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', lockedSource = null, charts = {}, datePicker, isAdmin = false;
-
-  window.onload = async () => {
-    Chart.register(ChartDataLabels);
-    document.getElementById('currentDateDisp').innerText = new Date().toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
-    flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-    datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: 'static', onChange: (d) => { if(d.length===2) applyFilter(); } });
-    document.getElementById('qSearch').addEventListener('input', function() { this.value ? document.getElementById('btnX').classList.remove('hidden') : document.getElementById('btnX').classList.add('hidden'); });
-    initAddModal();
-    const { data: { session } } = await supabase.auth.getSession();
-    if(session) enableAdminUI();
-    await fetchAllData();
-  };
-
-  function initAddModal() {
-     document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
-     document.getElementById('grpAge').innerHTML = AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join('');
-     document.getElementById('grpSource').innerHTML = SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}')">${s}</div>`).join('');
-     document.getElementById('grpPurpose').innerHTML = PURPOSES.map(p => `<div class="chk-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('');
-  }
-
-  window.selectRadio = (grp, val, el) => {
-     document.getElementById(grp).querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
-     el.classList.add('selected'); el.dataset.value = val;
-  };
+// 檢查管理員模式
+function checkAdminMode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  isAdminMode = urlParams.get('admin') === 'true';
   
-  window.toggleChk = (el) => {
-     el.classList.toggle('checked');
-     const grp = el.parentElement;
-     if(grp.id === 'grpSource') {
-         const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
-         document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
-     }
-  };
-
-  window.saveData = async () => {
-     const name = document.getElementById('mName').value.trim();
-     const genderEl = document.querySelector('#grpGender .selected');
-     const ageEl = document.querySelector('#grpAge .selected');
-     const sources = Array.from(document.querySelectorAll('#grpSource .checked')).map(e=>e.innerText);
-     const purposes = Array.from(document.querySelectorAll('#grpPurpose .checked')).map(e=>e.innerText);
-     const detail = document.getElementById('mDetail').value.trim();
-
-     if(!name || !genderEl || !ageEl || sources.length===0 || purposes.length===0 || !detail) {
-         alert('⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。');
-         return;
-     }
-
-     const payload = {
-        p_date: document.getElementById('mDate').value,
-        p_store: document.getElementById('mStore').value,
-        p_name: name,
-        p_gender: genderEl.dataset.value,
-        p_age: ageEl.dataset.value,
-        p_is_local: document.getElementById('mTainan').checked,
-        p_sources: sources,
-        p_purposes: purposes,
-        p_keywords: document.getElementById('mKeyword').value,
-        p_detail: detail
-     };
-
-     const { error } = await supabase.rpc('submit_visit_v7', payload);
-     if(error) { alert('儲存失敗: '+error.message); console.error(error); }
-     else { 
-         alert('🎉 新增成功！'); 
-         closeAddModal();
-         fetchAllData(); 
-     }
-  };
-
-  window.closeAddModal = () => {
-      document.getElementById('addModal').style.display='none';
-      document.getElementById('mName').value=''; document.getElementById('mDetail').value=''; document.getElementById('mKeyword').value='';
-      document.querySelectorAll('.selected, .checked').forEach(e=>e.classList.remove('selected','checked'));
-      document.getElementById('boxKeyword').classList.add('hidden');
-  };
-
-  window.quickSelectDate = () => { const y=document.getElementById('selYear').value; const m=document.getElementById('selMonth').value; if(y&&m){ datePicker.setDate([new Date(y,m-1,1), new Date(y,m,0)]); applyFilter(); } };
-  window.resetDate = () => { if(rawData.length){const d=rawData.map(x=>x.form_date).sort();datePicker.setDate([d[0],d[d.length-1]]);} document.getElementById('selMonth').value=""; applyFilter(); };
-  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnX').classList.add('hidden'); applyFilter(); };
-
-  async function fetchAllData() {
-    let allRows = [], page = 0; const pageSize = 1000;
-    document.getElementById('valTotal').innerText = '...';
-    while(true) {
-        const { data, error } = await supabase.from('visits').select('*').range(page*pageSize, (page+1)*pageSize-1);
-        if(error || !data || data.length === 0) break;
-        allRows = allRows.concat(data);
-        if(data.length < pageSize) break;
-        page++;
-    }
-    rawData = allRows.sort((a,b) => new Date(b.form_date) - new Date(a.form_date));
-    if(rawData.length > 0) {
-        const years = [...new Set(rawData.map(d => d.form_date.slice(0,4)))].sort().reverse();
-        const ySel = document.getElementById('selYear');
-        ySel.innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('');
-        const dates = rawData.map(d => d.form_date).sort();
-        datePicker.setDate([dates[0], dates[dates.length-1]]);
-    }
-    applyFilter();
+  if(isAdminMode) {
+    document.getElementById('logoutBtn').classList.remove('hidden');
   }
+}
 
-  window.applyFilter = () => {
-    const dates = datePicker.selectedDates;
-    const start = dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '1900-01-01';
-    const end = dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2100-12-31';
-    const q = document.getElementById('qSearch').value.toLowerCase();
-    const timeData = rawData.filter(v => v.form_date >= start && v.form_date <= end);
-    document.getElementById('valTotal').innerText = timeData.length;
-    document.getElementById('valLinAn').innerText = timeData.filter(v=>v.store_branch=='臨安店').length;
-    document.getElementById('valNanKe').innerText = timeData.filter(v=>v.store_branch=='南科店').length;
-    filteredData = timeData.filter(v => {
-        if(currentStore !== '全部' && v.store_branch !== currentStore) return false;
-        if(q && !v.customer_name.toLowerCase().includes(q) && !(v.detail_desc||'').toLowerCase().includes(q)) return false;
-        return true;
-    });
-    displayLimit = 20; renderCharts(filteredData); renderTable(); updateLockBadge();
-  };
+// 登出管理模式
+function logout() {
+  window.location.href = window.location.pathname;
+}
 
-  function renderCharts(data) {
-    const sMap = {}; data.forEach(v => (v.source_tags||[]).forEach(t => sMap[t] = (sMap[t]||0)+1));
-    const sortedS = Object.entries(sMap).sort((a,b)=>b[1]-a[1]).slice(0, 15);
-    const colors = sortedS.map((_, i) => (i<3 ? ['#fbbf24','#94a3b8','#b45309'][i] : `rgba(59, 130, 246, ${1 - i*0.05})`));
+// 初始化
+window.onload = async () => {
+  checkAdminMode();
+  await loadAllData();
+  renderDashboard();
+};
 
-    if(charts.source) charts.source.destroy();
-    charts.source = new Chart(document.getElementById('chartSource'), {
-        type: 'bar',
-        data: { labels: sortedS.map(x=>x[0]), datasets: [{ data: sortedS.map(x=>x[1]), backgroundColor: colors, borderRadius: 6 }] },
-        options: {
-            maintainAspectRatio: false,
-            plugins: { legend: {display: false}, datalabels: { anchor:'end', align:'top', formatter: (v,ctx) => Math.round(v/ctx.dataset.data.reduce((a,b)=>a+b,0)*100)+'%', font:{size:10, weight:'bold'}, color:'#64748b' } },
-            onClick: (e, els) => { if(els[0]) { const label=sortedS[els[0].index][0]; lockedSource=(lockedSource===label)?null:label; updateLockBadge(); updateCrossCharts(lockedSource); } },
-            onHover: (e, els) => { if(!lockedSource) updateCrossCharts(els[0] ? sortedS[els[0].index][0] : null); }
-        }
-    });
-    updateCrossCharts(lockedSource);
-  }
-
-  function updateCrossCharts(sourceFilter) {
-    let subset = filteredData;
-    const b1 = document.getElementById('demoFilterBadge'), b2 = document.getElementById('demoFilterBadge2');
-    if(sourceFilter) { subset = filteredData.filter(v => (v.source_tags||[]).includes(sourceFilter)); b1.innerText=b2.innerText=`(${sourceFilter})`; } 
-    else { b1.innerText=b2.innerText=''; }
-
-    const pMap = {}; subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
-    const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    const totalP = sortedP.reduce((a,b)=>a+b[1],0);
-    document.getElementById('topPurposeVal').innerText = sortedP.length ? sortedP[0][0] : '--';
-
-    if(charts.purpose) charts.purpose.destroy();
-    charts.purpose = new Chart(document.getElementById('chartPurpose'), {
-        type: 'doughnut',
-        data: { labels: sortedP.map(x=>x[0]), datasets:[{ data:sortedP.map(x=>x[1]), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'], borderWidth: 0, hoverOffset: 12 }] },
-        options: { 
-            maintainAspectRatio: false, cutout: '65%', layout: { padding: 30 },
-            plugins:{ 
-                legend:{ 
-                    display: true, position: 'right', 
-                    labels:{
-                        boxWidth:16, boxHeight:16, usePointStyle:false,
-                        padding: 16, 
-                        font: { size: 13, weight: '700', family: '-apple-system' },
-                        color: '#000000',
-                        generateLabels: (chart) => {
-                             const data = chart.data;
-                             return data.labels.map((label, i) => {
-                                 const val = data.datasets[0].data[i];
-                                 const pct = totalP ? Math.round(val/totalP*100) : 0;
-                                 return { 
-                                     text: `${label}  ${pct}%`, 
-                                     fillStyle: data.datasets[0].backgroundColor[i],
-                                     strokeStyle: '#4ade80',
-                                     lineWidth: 2,
-                                     hidden: false, 
-                                     index: i
-                                 };
-                             });
-                        }
-                    }
-                }, 
-                datalabels: { display: false },
-                tooltip: { 
-                    backgroundColor: 'rgba(0,0,0,0.85)', 
-                    padding: 14, 
-                    cornerRadius: 8,
-                    titleFont: { size: 14, weight: 'bold' },
-                    bodyFont: { size: 13 },
-                    callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.raw} 人 (${Math.round(ctx.raw/totalP*100)}%)` } 
-                }
-            } 
-        }
-    });
-
-    const tMap = {}; subset.forEach(v => { const m = v.form_date.slice(0,7); tMap[m]=(tMap[m]||0)+1; });
-    const sortedT = Object.keys(tMap).sort();
-    if(charts.trend) charts.trend.destroy();
-    charts.trend = new Chart(document.getElementById('chartTrend'), {
-        type: 'line',
-        data: { labels: sortedT, datasets:[{ data:sortedT.map(k=>tMap[k]), borderColor:'#f59e0b', borderWidth:3, pointBackgroundColor:'#fff', pointBorderColor:'#f59e0b', pointRadius:6, pointHoverRadius:8, tension:0.4, fill:true, backgroundColor:'rgba(245,158,11,0.12)' }] },
-        options: { 
-            maintainAspectRatio: false, 
-            scales:{
-                x:{grid:{display:false}}, 
-                y:{grid:{borderDash:[5,5], color:'#f1f5f9'}}
-            }, 
-            plugins:{
-                legend:{display:false}, 
-                datalabels: {
-                    align: 'top',
-                    anchor: 'end',
-                    offset: 8,
-                    font: { size: 11, weight: 'bold' },
-                    color: '#f59e0b',
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    borderRadius: 4,
-                    padding: { top: 2, bottom: 2, left: 4, right: 4 },
-                    formatter: (v) => v
-                },
-                tooltip: { 
-                    backgroundColor: 'rgba(0,0,0,0.8)', 
-                    padding: 12, 
-                    cornerRadius: 6,
-                    callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
-                } 
-            } 
-        }
-    });
+// 載入全部資料（修正：移除限制）
+async function loadAllData() {
+  try {
+    let allRecords = [];
+    let from = 0;
+    const batchSize = 1000;
+    let hasMore = true;
     
-    const gMap = { '男':0, '女':0, '其他':0 }, aMap = {};
-    subset.forEach(v => { const g = v.gender || '其他'; const a = v.age_range || '未填'; if(gMap.hasOwnProperty(g)) gMap[g]++; else gMap['其他']++; if(a!=='未填') aMap[a] = (aMap[a]||0)+1; });
-    if(charts.gender) charts.gender.destroy(); 
-    charts.gender = new Chart(document.getElementById('chartGender'), { 
-        type: 'doughnut', 
-        data: { labels: ['男','女'], datasets: [{ data: [gMap['男'], gMap['女']], backgroundColor:['#60a5fa','#f472b6'], hoverOffset: 8 }] }, 
-        options: { maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels: { font: { size: 13, weight: '600' }, padding: 10 }}, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 } } } 
+    while(hasMore) {
+      const { data, error } = await supabase
+        .from('customer_visits')
+        .select('*')
+        .range(from, from + batchSize - 1)
+        .order('visit_date', { ascending: false });
+      
+      if(error) throw error;
+      
+      if(data && data.length > 0) {
+        allRecords = allRecords.concat(data);
+        from += batchSize;
+        hasMore = data.length === batchSize;
+      } else {
+        hasMore = false;
+      }
+    }
+    
+    allData = allRecords;
+    console.log(`✅ 成功載入 ${allData.length} 筆資料`);
+    
+  } catch(err) {
+    console.error('載入資料失敗:', err);
+    alert('載入資料失敗：' + err.message);
+  }
+}
+
+// 渲染儀表板
+function renderDashboard() {
+  renderStats();
+  renderTrendChart();
+  renderPurposeChart();
+  renderSourceChart();
+  renderAgeChart();
+}
+
+// 統計卡片
+function renderStats() {
+  const total = allData.length;
+  const male = allData.filter(d => d.gender === '男').length;
+  const local = allData.filter(d => d.is_local).length;
+  const avgPerDay = (total / 30).toFixed(1);
+  
+  document.getElementById('statsContainer').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${total}</div>
+      <div class="stat-label">總客流量</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${male}/${total-male}</div>
+      <div class="stat-label">男 / 女</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${((local/total)*100).toFixed(1)}%</div>
+      <div class="stat-label">台南市民占比</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${avgPerDay}</div>
+      <div class="stat-label">日均客流</div>
+    </div>
+  `;
+}
+
+// 趨勢圖表（修正：增加刻度緩衝）
+function renderTrendChart() {
+  const dateCount = {};
+  allData.forEach(d => {
+    const date = d.visit_date;
+    dateCount[date] = (dateCount[date] || 0) + 1;
+  });
+  
+  const sortedDates = Object.keys(dateCount).sort();
+  const values = sortedDates.map(d => dateCount[d]);
+  const maxValue = Math.max(...values);
+  const suggestedMax = Math.ceil(maxValue * 1.3); // 增加30%緩衝
+  
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if(trendChartInstance) trendChartInstance.destroy();
+  
+  trendChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sortedDates,
+      datasets: [{
+        label: '客流量',
+        data: values,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: suggestedMax,
+          ticks: { color: '#9ca3af' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#9ca3af', maxRotation: 45 },
+          grid: { display: false }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+// 目的圖表（甜甜圈）+ Top1 聯動
+function renderPurposeChart() {
+  const purposeCount = {};
+  allData.forEach(d => {
+    d.purposes?.forEach(p => {
+      purposeCount[p] = (purposeCount[p] || 0) + 1;
     });
-    if(charts.age) charts.age.destroy(); 
-    charts.age = new Chart(document.getElementById('chartAge'), { 
-        type: 'bar', 
-        data: { labels: Object.keys(aMap).sort(), datasets: [{ label:'人數', data: Object.values(aMap), backgroundColor:'#cbd5e1', borderRadius:6, hoverBackgroundColor: '#94a3b8' }] }, 
-        options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend:{display:false}, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 } }, scales: { x: { grid: { display: false } } } } 
+  });
+  
+  const sorted = Object.entries(purposeCount).sort((a,b) => b[1] - a[1]);
+  const labels = sorted.map(x => x[0]);
+  const values = sorted.map(x => x[1]);
+  
+  // 更新 Top1 標籤
+  if(sorted.length > 0) {
+    const topPurpose = sorted[0][0];
+    document.getElementById('topPurposeText').textContent = `TOP1 ${topPurpose}`;
+  }
+  
+  const ctx = document.getElementById('purposeChart').getContext('2d');
+  if(purposeChartInstance) purposeChartInstance.destroy();
+  
+  purposeChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: [
+          '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+          '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          position: 'right',
+          labels: { color: '#9ca3af', padding: 15 }
+        }
+      },
+      onHover: (event, activeElements) => {
+        const badge = document.getElementById('topPurposeBadge');
+        if(activeElements.length > 0) {
+          badge.style.transform = 'scale(1.05)';
+        } else {
+          badge.style.transform = 'scale(1)';
+        }
+      }
+    }
+  });
+  
+  // 點擊 Top1 標籤聚焦圖表第一項
+  document.getElementById('topPurposeBadge').onclick = () => {
+    purposeChartInstance.setActiveElements([{datasetIndex: 0, index: 0}]);
+    purposeChartInstance.update();
+  };
+}
+
+// 客源圖表
+function renderSourceChart() {
+  const sourceCount = {};
+  allData.forEach(d => {
+    d.sources?.forEach(s => {
+      sourceCount[s] = (sourceCount[s] || 0) + 1;
     });
-  }
+  });
+  
+  const sorted = Object.entries(sourceCount).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = sorted.map(x => x[0]);
+  const values = sorted.map(x => x[1]);
+  
+  const ctx = document.getElementById('sourceChart').getContext('2d');
+  if(sourceChartInstance) sourceChartInstance.destroy();
+  
+  sourceChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '客源數量',
+        data: values,
+        backgroundColor: '#10b981'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: {
+          ticks: { color: '#9ca3af' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        y: {
+          ticks: { color: '#9ca3af' },
+          grid: { display: false }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
 
-  function updateLockBadge() { 
-     const badge = document.getElementById('lockBadge'); 
-     if(lockedSource) { 
-         badge.classList.remove('hidden'); 
-         badge.className = 'lock-badge-container';
-         badge.innerHTML = `🔒 ${lockedSource} <span class="lock-badge-x" onclick="event.stopPropagation(); lockedSource=null; updateLockBadge(); updateCrossCharts(null);">✕</span>`;
-     } else { 
-         badge.classList.add('hidden'); 
-     } 
-  }
+// 年齡圖表
+function renderAgeChart() {
+  const ageCount = {};
+  allData.forEach(d => {
+    ageCount[d.age] = (ageCount[d.age] || 0) + 1;
+  });
+  
+  const ages = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+  const values = ages.map(age => ageCount[age] || 0);
+  
+  const ctx = document.getElementById('ageChart').getContext('2d');
+  if(ageChartInstance) ageChartInstance.destroy();
+  
+  ageChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ages,
+      datasets: [{
+        label: '人數',
+        data: values,
+        backgroundColor: '#f59e0b'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#9ca3af' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#9ca3af' },
+          grid: { display: false }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
 
-  function renderTable() {
-      const tbody = document.getElementById('tableBody'), page = filteredData.slice(0, displayLimit); tbody.innerHTML = '';
-      page.forEach(v => {
-          const tr = document.createElement('tr');
-          const safeDesc = (v.detail_desc||'無備註').replace(/'/g, "\\'").replace(/\n/g, ' ');
-          tr.innerHTML = `
-             <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
-             <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-             <td class="font-bold text-slate-800">${v.customer_name}</td>
-             <td class="text-xs text-slate-500">${v.gender||'-'} / ${v.age_range||'-'}</td>
-             <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags||[]).join(', ')}</td>
-             <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
-             <td class="text-slate-300">›</td>
-          `;
-          tr.addEventListener('click', () => showDetail(v.id)); 
-          tr.addEventListener('mouseenter', (e) => showPreview(e, safeDesc)); 
-          tr.addEventListener('mouseleave', hidePreview); 
-          tbody.appendChild(tr);
-      });
-      document.getElementById('listCounter').innerText = `${page.length} / ${filteredData.length}`;
-      document.getElementById('btnLoadMore').classList.toggle('hidden', page.length >= filteredData.length);
-  }
-
-  window.showPreview = (e, text) => { 
-      if(!text || text === 'null' || text === '無備註') return; 
-      const tooltip = document.getElementById('hoverPreview'); 
-      tooltip.innerText = text.length > 120 ? text.slice(0,120)+'...' : text; 
-      tooltip.style.display = 'block'; 
-      tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + 'px'; 
-      tooltip.style.top = (e.clientY + 15) + 'px'; 
-  };
-  window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
-
-  window.previewCSV = (input) => {
-    const f = input.files[0]; if(!f) return;
-    Papa.parse(f, { header:true, skipEmptyLines:true, complete: async (res) => {
-       const total = res.data.length;
-       if(!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
-       
-       const overlay = document.getElementById('importOverlay');
-       const progress = document.getElementById('importProgress');
-       const status = document.getElementById('importStatus');
-       const errLog = document.getElementById('importErrors');
-       overlay.style.display = 'flex';
-       errLog.innerHTML = ''; errLog.classList.add('hidden');
-       
-       const cleanData = res.data.map((row, idx) => {
-          let d = row['form_date']||row['填表日期']; 
-          if(!d) { console.warn(`Row ${idx}: Missing date`); return null; }
-          d = d.replace(/\//g, '-');
-          
-          const n = row['customer_name']||row['顧客姓名'];
-          if(!n) { console.warn(`Row ${idx}: Missing name`); return null; }
-          
-          // ⭐ 只替換全形逗號，保留頓號
-          let sRaw = row['source_tags']||row['來源統計']||'';
-          sRaw = sRaw.replace(/，/g, ',');
-          
-          let pRaw = row['visit_purposes']||row['來店目的']||'';
-          pRaw = pRaw.replace(/，/g, ',');
-          
-          let cleanAge = row['age_range']||row['年齡範圍']||'';
-          if(cleanAge === '18以下') cleanAge = '18歲以下';
-
-          return { 
-              p_date: d, 
-              p_store: row['store_branch']||row['門店']||'臨安店', 
-              p_name: n, 
-              p_gender: row['gender']||row['性別']||'',
-              p_age: cleanAge,
-              p_is_local: (row['is_local']||row['是否為台南人']||'').includes('是'),
-              p_sources: sRaw.split(',').map(x=>x.trim()).filter(x=>x), 
-              p_purposes: pRaw.split(',').map(x=>x.trim()).filter(x=>x), 
-              p_keywords: row['search_keywords']||row['搜尋關鍵字']||'',
-              p_detail: row['detail_desc']||row['詳細描述']||'' 
-          };
-       }).filter(x=>x);
-
-       // ⭐ 序列化匯入，避免併發衝突
-       let processed = 0, errors = [];
-       for(let i = 0; i < cleanData.length; i++) {
-          const row = cleanData[i];
-          try {
-              const { error } = await supabase.rpc('submit_visit_v7', row);
-              if(error) throw error;
-          } catch(err) {
-              errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
-          }
-          processed++;
-          progress.style.width = Math.round(processed/cleanData.length*100) + '%';
-          status.innerText = `處理中... ${processed} / ${cleanData.length}`;
-       }
-       
-       status.innerText = `✅ 完成！成功: ${cleanData.length - errors.length} | 失敗: ${errors.length}`;
-       if(errors.length > 0) {
-           errLog.classList.remove('hidden');
-           errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join('');
-       }
-       
-       setTimeout(() => { 
-           overlay.style.display='none'; 
-           if(errors.length === 0) location.reload(); 
-           else alert(`匯入完成，但有 ${errors.length} 筆失敗。`);
-       }, 2000);
-    }});
-  };
-
-  window.wipeData = async () => { 
-      alert('⚠️ 安全機制：系統將強制下載備份 CSV。'); 
-      exportCSV(); 
-      setTimeout(async () => {
-          if(!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
-          const pwd = prompt('請輸入管理員密碼：');
-          if(pwd === '628599') { 
-              const { error } = await supabase.from('visits').delete().neq('id', 0); 
-              if(error) alert('失敗: '+error.message); 
-              else { alert('✅ 資料庫已清空。'); location.reload(); } 
-          } else { alert('❌ 密碼錯誤！'); }
-      }, 1500); 
-  };
-
-  window.setStore = (s) => { currentStore = s; document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); if(s=='全部')document.getElementById('kpiTotal').classList.add('active'); if(s=='臨安店')document.getElementById('kpiLinAn').classList.add('active'); if(s=='南科店')document.getElementById('kpiNanKe').classList.add('active'); applyFilter(); };
-  window.loadMore = () => { displayLimit+=20; renderTable(); };
-  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
-  window.openAddModal = () => { document.getElementById('addModal').style.display='flex'; };
-  window.showDetail = (id) => { 
-      const v = rawData.find(x => x.id === parseInt(id)); 
-      if(!v) return; 
-      document.getElementById('detailContent').innerHTML=`
-         <h2 class="font-bold text-2xl mb-3 text-slate-800">${v.customer_name}</h2>
-         <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
-            <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span>
-            <span>${v.form_date}</span>
-            <span>•</span>
-            <span>${v.gender||'-'} / ${v.age_range||'-'}</span>
-         </p>
-         <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-blue-50 p-3 rounded-lg">
-               <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
-               <div class="text-sm text-blue-900">${(v.source_tags||[]).join(', ') || '無'}</div>
-            </div>
-            <div class="bg-green-50 p-3 rounded-lg">
-               <div class="text-xs font-bold text-green-700 mb-1">目的</div>
-               <div class="text-sm text-green-900">${(v.visit_purposes||[]).join(', ') || '無'}</div>
-            </div>
-         </div>
-         ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ''}
-         <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc||'無詳細描述'}</div>
-      `; 
-      document.getElementById('detailModal').style.display='flex'; 
-      document.getElementById('detailActions').classList.remove('hidden'); 
-      window.currentDetailId = v.id; 
-  };
-  window.closeDetail = () => document.getElementById('detailModal').style.display='none';
-  window.deleteCurrentDetail = async () => { if(!confirm('確定要刪除此筆資料？')) return; const { error } = await supabase.from('visits').delete().eq('id', window.currentDetailId); if(error) alert('刪除失敗'); else { alert('已刪除'); closeDetail(); fetchAllData(); } };
-  function enableAdminUI() { isAdmin = true; document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('adminActions').classList.remove('hidden'); }
-  window.login = () => { if(document.getElementById('admPwd').value==='admin') enableAdminUI(); };
-  window.exportCSV = () => { const csv = Papa.unparse(rawData); const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'})); link.download = `backup_v7_${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+// 重新載入
+async function refreshData() {
+  await loadAllData();
+  renderDashboard();
+  alert(`✅ 資料已更新！共載入 ${allData.length} 筆`);
+}
 </script>
+
 </body>
 </html>
