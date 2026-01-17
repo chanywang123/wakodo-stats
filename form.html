@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>快速登記 - 和光堂</title>
+  <title>快速登記 v2.1 - 和光堂</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
     window.supabase = createClient(
       "https://yxalpzculcyhzvnyvecb.supabase.co", 
-      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTkzNjQsImV4cCI6MjA0OTU5NTM2NH0.7qGT_Jn9pY5_YZD5Lg6ATF_kn7x1kHJmMdgQcVGo5wc"
     );
   </script>
   <style>
@@ -223,17 +223,233 @@
       backdrop-filter: blur(8px);
     }
     .toast.show { opacity: 1; }
+
+    /* 🆕 v2.1 全螢幕模態框 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.show { display: flex; }
+    
+    .modal-content {
+      background: white;
+      width: 95%;
+      max-width: 600px;
+      max-height: 85vh;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .modal-loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+    }
+    
+    .tag-category {
+      margin-bottom: 20px;
+    }
+    
+    .tag-category-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    
+    .tag-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tag-pill {
+      padding: 10px 16px;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 50px;
+      font-size: 14px;
+      color: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+      font-weight: 500;
+    }
+    .tag-pill:active {
+      transform: scale(0.95);
+    }
+    .tag-pill.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-color: #3b82f6;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    
+    .modal-preview {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      display: none;
+    }
+    .modal-preview.show {
+      display: block;
+    }
+    .modal-preview-label {
+      font-size: 12px;
+      color: #92400e;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .modal-preview-text {
+      font-size: 16px;
+      color: #78350f;
+      font-weight: 700;
+    }
+    
+    .modal-footer {
+      padding: 16px 20px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      border: none;
+    }
+    .modal-btn-cancel {
+      background: white;
+      color: #6b7280;
+      border: 2px solid #e5e7eb;
+    }
+    .modal-btn-confirm {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .modal-btn:active {
+      transform: scale(0.97);
+    }
+
+    .keyword-input-readonly {
+      background: #f3f4f6;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
 
 <div id="toast" class="toast"></div>
 
+<!-- 🆕 v2.1 全螢幕模態框 -->
+<div id="keywordModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🔍 選擇搜尋關鍵字</h3>
+      <button class="modal-close" onclick="closeKeywordModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="modal-loading">⏳ 正在載入推薦標籤...</div>
+    </div>
+    <div id="modalPreview" class="modal-preview">
+      <div class="modal-preview-label">🔍 組合結果預覽：</div>
+      <div class="modal-preview-text" id="previewText"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-cancel" onclick="closeKeywordModal()">取消</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmKeywordSelection()">確定</button>
+    </div>
+  </div>
+</div>
+
 <div class="max-w-2xl mx-auto p-4">
   <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
     <div>
       <div class="flex items-center gap-2">
         <h1 class="font-bold text-lg">📝 顧客登記</h1>
+        <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v2.1</span>
         <input type="date" id="globalDate" class="date-picker-custom">
       </div>
       <span class="text-[10px] text-blue-200 block mt-1">⚠️ 請確保欄位皆正確填寫</span>
@@ -269,6 +485,9 @@
   let globalStore = '';
   let cardCount = 0;
   let isFirstVisit = true;
+  let currentCardId = null;
+  let selectedTags = [];
+  const tagCache = {};
 
   function showToast(message, duration = 2000) {
     const toast = document.getElementById('toast');
@@ -369,9 +588,14 @@
             <div class="chk-grid" id="${id}-sources">
               ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}', '${id}')">${s}</div>`).join('')}
             </div>
-            <div id="${id}-keyword-box" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-              <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？<span class="required-mark">*</span></label>
-              <input type="text" class="input-base border-yellow-400 text-sm keyword-input" placeholder="例如：台南驗光推薦...">
+            <div id="${id}-keyword-display" class="hidden mt-3 bg-gradient-to-br from-yellow-50 to-orange-50 p-3 rounded-lg border-2 border-yellow-300">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-xs font-bold text-yellow-800">🔍 搜尋關鍵字</label>
+                <button onclick="openKeywordModal('${id}')" class="text-xs bg-blue-500 text-white px-3 py-1.5 rounded-full hover:bg-blue-600 font-bold">
+                  💡 智能選擇
+                </button>
+              </div>
+              <input type="text" class="input-base border-yellow-400 text-sm keyword-input keyword-input-readonly" placeholder="點擊上方按鈕選擇關鍵字" readonly>
             </div>
           </div>
 
@@ -424,7 +648,168 @@
       const container = document.getElementById(`${cardId}-sources`);
       const hasGoogle = Array.from(container.querySelectorAll('.chk-btn.checked'))
         .some(btn => btn.innerText.includes('Google'));
-      document.getElementById(`${cardId}-keyword-box`).classList.toggle('hidden', !hasGoogle);
+      document.getElementById(`${cardId}-keyword-display`).classList.toggle('hidden', !hasGoogle);
+    }
+  };
+
+  // 🆕 v2.1 打開關鍵字選擇模態框
+  window.openKeywordModal = async (cardId) => {
+    const card = document.getElementById(cardId);
+    const genderEl = card.querySelector(`#${cardId}-gender .selected`);
+    const ageEl = card.querySelector(`#${cardId}-age .selected`);
+    
+    if(!genderEl || !ageEl) {
+      showToast('⚠️ 請先選擇性別和年齡層', 2500);
+      return;
+    }
+    
+    if(!globalStore) {
+      showToast('⚠️ 請先選擇分店', 2500);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
+    currentCardId = cardId;
+    selectedTags = [];
+    
+    const modal = document.getElementById('keywordModal');
+    const modalBody = document.getElementById('modalBody');
+    const preview = document.getElementById('modalPreview');
+    
+    modal.classList.add('show');
+    modalBody.innerHTML = '<div class="modal-loading">⏳ 正在載入推薦標籤...</div>';
+    preview.classList.remove('show');
+    document.body.style.overflow = 'hidden';
+    
+    const gender = genderEl.dataset.value;
+    const age = ageEl.dataset.value;
+    const cacheKey = `${gender}-${age}-${globalStore}`;
+    
+    try {
+      let tags;
+      if(tagCache[cacheKey]) {
+        tags = tagCache[cacheKey];
+      } else {
+        const { data, error } = await supabase.rpc('get_smart_keyword_tags', {
+          p_gender: gender,
+          p_age_range: age,
+          p_store: globalStore,
+          tag_limit: 15
+        });
+        
+        if(error) throw error;
+        tags = data || [];
+        tagCache[cacheKey] = tags;
+      }
+      
+      if(tags.length === 0) {
+        modalBody.innerHTML = '<div class="modal-loading">😅 目前沒有推薦標籤<br><small style="margin-top:8px;display:block;">請關閉此視窗並手動輸入</small></div>';
+        return;
+      }
+      
+      renderModalTags(tags);
+      
+    } catch(err) {
+      console.error('載入智能標籤失敗:', err);
+      modalBody.innerHTML = '<div class="modal-loading" style="color:#ef4444;">❌ 載入失敗<br><small style="margin-top:8px;display:block;">請關閉此視窗並手動輸入</small></div>';
+    }
+  };
+
+  // 🆕 v2.1 渲染模態框標籤
+  function renderModalTags(tags) {
+    const modalBody = document.getElementById('modalBody');
+    
+    const grouped = tags.reduce((acc, tag) => {
+      if(!acc[tag.category]) acc[tag.category] = [];
+      acc[tag.category].push(tag);
+      return acc;
+    }, {});
+    
+    const categoryEmojis = {
+      '地區': '📍',
+      '產品': '👓',
+      '服務': '🔧',
+      '症狀': '👁️',
+      '品牌': '🏷️',
+      '形容詞': '✨'
+    };
+    
+    let html = '';
+    for(const [cat, items] of Object.entries(grouped)) {
+      html += `
+        <div class="tag-category">
+          <div class="tag-category-title">
+            <span>${categoryEmojis[cat] || '•'}</span>
+            <span>${cat}</span>
+          </div>
+          <div class="tag-pills">
+            ${items.map(tag => `
+              <div class="tag-pill" onclick="toggleModalTag('${tag.word}', this)">
+                ${tag.word}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    modalBody.innerHTML = html;
+  }
+
+  // 🆕 v2.1 切換模態框標籤
+  window.toggleModalTag = (word, el) => {
+    el.classList.toggle('active');
+    
+    if(el.classList.contains('active')) {
+      selectedTags.push(word);
+    } else {
+      selectedTags = selectedTags.filter(t => t !== word);
+    }
+    
+    updateModalPreview();
+  };
+
+  // 🆕 v2.1 更新模態框預覽
+  function updateModalPreview() {
+    const preview = document.getElementById('modalPreview');
+    const previewText = document.getElementById('previewText');
+    
+    if(selectedTags.length === 0) {
+      preview.classList.remove('show');
+      return;
+    }
+    
+    previewText.textContent = selectedTags.join(' ');
+    preview.classList.add('show');
+  }
+
+  // 🆕 v2.1 確認選擇
+  window.confirmKeywordSelection = () => {
+    if(selectedTags.length === 0) {
+      showToast('⚠️ 請至少選擇一個標籤', 2000);
+      return;
+    }
+    
+    const input = document.querySelector(`#${currentCardId} .keyword-input`);
+    input.value = selectedTags.join(' ');
+    
+    closeKeywordModal();
+    showToast('✓ 關鍵字已設定！');
+  };
+
+  // 🆕 v2.1 關閉模態框
+  window.closeKeywordModal = () => {
+    const modal = document.getElementById('keywordModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+    currentCardId = null;
+    selectedTags = [];
+  };
+
+  // 🆕 v2.1 點擊背景關閉
+  window.closeModalOnOverlay = (event) => {
+    if(event.target.id === 'keywordModal') {
+      closeKeywordModal();
     }
   };
 
@@ -453,7 +838,7 @@
       const detail = card.querySelector('.detail-input').value.trim();
       
       const hasGoogle = sources.some(btn => btn.innerText.includes('Google'));
-      const keyword = card.querySelector('.keyword-input').value.trim();
+      const keyword = card.querySelector('.keyword-input')?.value.trim() || '';
       
       if(!name) errorMessages.push(`第 ${cardNum} 筆：未填寫姓名`);
       if(!gender) errorMessages.push(`第 ${cardNum} 筆：未選擇性別`);
@@ -461,7 +846,7 @@
       if(sources.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇客源`);
       if(purposes.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇目的`);
       if(!detail) errorMessages.push(`第 ${cardNum} 筆：未填寫備註`);
-      if(hasGoogle && !keyword) errorMessages.push(`第 ${cardNum} 筆：選擇了 Google 但未填寫搜尋關鍵字`);
+      if(hasGoogle && !keyword) errorMessages.push(`第 ${cardNum} 筆：選擇了 Google 但未設定搜尋關鍵字`);
     }
     
     if(errorMessages.length > 0) {
@@ -486,7 +871,7 @@
         .map(el => el.innerText);
       const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked'))
         .map(el => el.innerText);
-      const keywords = card.querySelector('.keyword-input').value.trim();
+      const keywords = card.querySelector('.keyword-input')?.value.trim() || '';
       const detail = card.querySelector('.detail-input').value.trim();
 
       const payload = {
