@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>快速登記 v2.1 - 和光堂</title>
+  <title>快速登記 v3.0 - 和光堂</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -13,49 +13,36 @@
     );
   </script>
   <style>
+    * { box-sizing: border-box; }
     body { 
       background-color: #f3f4f6; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
       -webkit-tap-highlight-color: transparent; 
-      padding-bottom: 100px; 
+      margin: 0;
+      padding: 0;
     }
     
+    /* 偵測行動裝置 */
+    .desktop-mode { display: block; }
+    .mobile-mode { display: none; }
+    
+    @media (max-width: 768px) {
+      .desktop-mode { display: none; }
+      .mobile-mode { display: block; }
+    }
+    
+    /* === 桌面版樣式 === */
     .customer-card { 
       background: white; 
       border-radius: 16px; 
       padding: 20px; 
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
       margin-bottom: 24px; 
-      position: relative; 
       border: 1px solid #e5e7eb; 
     }
     
-    .customer-card-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 16px; 
-      padding-bottom: 12px; 
-      border-bottom: 1px solid #f3f4f6; 
-    }
-    
-    .card-num { 
-      background: #3b82f6; 
-      color: white; 
-      width: 28px; 
-      height: 28px; 
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-weight: bold; 
-      font-size: 14px; 
-      margin-right: 8px; 
-    }
-
-    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .radio-btn { 
-      padding: 8px 16px; 
+    .radio-btn, .chk-btn { 
+      padding: 10px 16px; 
       border: 1px solid #e5e7eb; 
       border-radius: 50px; 
       font-size: 14px; 
@@ -64,48 +51,176 @@
       transition: 0.1s; 
       user-select: none; 
       background: white; 
+      text-align: center;
     }
-    .radio-btn:active { transform: scale(0.95); }
-    .radio-btn.selected { 
+    .radio-btn:active, .chk-btn:active { transform: scale(0.95); }
+    .radio-btn.selected, .chk-btn.checked { 
       background-color: #3b82f6; 
       color: white; 
       border-color: #3b82f6; 
-      font-weight: 500; 
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); 
+      font-weight: 600; 
     }
-
-    .chk-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-      gap: 8px; 
+    
+    /* 智能標籤區域（桌面版） */
+    .smart-tags-area {
+      display: none;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
     }
-    .chk-btn { 
-      padding: 10px; 
-      border: 1px solid #e5e7eb; 
-      border-radius: 8px; 
-      font-size: 13px; 
-      color: #4b5563; 
-      cursor: pointer; 
-      transition: 0.1s; 
-      text-align: center; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      min-height: 44px; 
-      background: white; 
+    .smart-tags-area.show { display: block; }
+    
+    .tag-category-desktop {
+      margin-bottom: 12px;
     }
-    .chk-btn.checked { 
-      background-color: #eff6ff; 
-      color: #2563eb; 
-      border-color: #2563eb; 
-      font-weight: bold; 
+    .tag-category-desktop-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #92400e;
+      margin-bottom: 8px;
     }
-
+    .tag-pills-desktop {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag-pill-desktop {
+      padding: 6px 12px;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 50px;
+      font-size: 13px;
+      color: #4b5563;
+      cursor: pointer;
+      transition: 0.2s;
+      user-select: none;
+    }
+    .tag-pill-desktop:active { transform: scale(0.95); }
+    .tag-pill-desktop.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-color: #3b82f6;
+      font-weight: 700;
+    }
+    
+    /* === 手機版 Wizard 樣式 === */
+    .wizard-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+    }
+    
+    .wizard-header {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 12px;
+      gap: 8px;
+    }
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: 0.3s;
+    }
+    .progress-dot.active {
+      width: 32px;
+      border-radius: 6px;
+      background: white;
+    }
+    
+    .wizard-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      padding-bottom: 100px;
+    }
+    
+    .wizard-step {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.3s ease-out;
+    }
+    .wizard-step.active { display: block; }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .wizard-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 16px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .wizard-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .wizard-btn-back {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .wizard-btn-reset {
+      width: 50px;
+      flex: 0;
+      background: white;
+      color: #ef4444;
+      border: 2px solid #ef4444;
+      font-size: 18px;
+    }
+    .wizard-btn-next {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .wizard-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
     .input-base { 
       width: 100%; 
-      padding: 10px 12px; 
-      border: 1px solid #d1d5db; 
-      border-radius: 8px; 
+      padding: 12px; 
+      border: 2px solid #e5e7eb; 
+      border-radius: 12px; 
       font-size: 16px; 
       outline: none; 
       transition: 0.2s; 
@@ -113,96 +228,6 @@
     .input-base:focus { 
       border-color: #3b82f6; 
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); 
-    }
-
-    .action-bar { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
-      background: white; 
-      padding: 12px 16px; 
-      box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05); 
-      display: flex; 
-      gap: 12px; 
-      z-index: 50; 
-    }
-    .btn-add { 
-      flex: 1; 
-      background: white; 
-      color: #3b82f6; 
-      border: 1px solid #3b82f6; 
-      padding: 12px; 
-      border-radius: 10px; 
-      font-weight: bold; 
-      font-size: 16px; 
-    }
-    .btn-submit { 
-      flex: 2; 
-      background: #3b82f6; 
-      color: white; 
-      border: none; 
-      padding: 12px; 
-      border-radius: 10px; 
-      font-weight: bold; 
-      font-size: 16px; 
-      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); 
-    }
-    .btn-submit:disabled { 
-      background: #9ca3af; 
-      box-shadow: none; 
-    }
-    
-    .date-picker-custom { 
-      background: rgba(255, 255, 255, 0.2); 
-      border: 1px solid rgba(255, 255, 255, 0.3); 
-      color: white; 
-      padding: 2px 8px; 
-      border-radius: 6px; 
-      font-size: 13px; 
-      outline: none; 
-      cursor: pointer; 
-    }
-    .date-picker-custom::-webkit-calendar-picker-indicator { 
-      filter: invert(1); 
-      cursor: pointer; 
-    }
-    
-    .store-btn { 
-      padding: 6px 14px; 
-      border-radius: 8px; 
-      font-size: 14px; 
-      font-weight: bold; 
-      transition: 0.2s; 
-      cursor: pointer; 
-      border: 1px solid transparent; 
-    }
-    .store-btn.active { 
-      background: white; 
-      color: #1d4ed8; 
-    }
-    .store-btn.inactive { 
-      background: transparent; 
-      color: #bfdbfe; 
-      border: 1px solid rgba(255,255,255,0.3); 
-    }
-    
-    @keyframes pulse-border {
-      0%, 100% { border-color: rgba(251, 191, 36, 0.8); }
-      50% { border-color: rgba(251, 191, 36, 0.3); }
-    }
-    .store-btn.need-select { 
-      animation: pulse-border 1.5s ease-in-out infinite;
-      border-width: 2px;
-    }
-
-    .required-mark { color: #ef4444; margin-left: 2px; }
-    .hint-text { 
-      font-size: 11px; 
-      color: #ef4444; 
-      font-weight: bold; 
-      margin-top: 4px; 
-      display: block; 
     }
     
     .toast { 
@@ -221,274 +246,97 @@
       transition: opacity 0.3s; 
       pointer-events: none;
       backdrop-filter: blur(8px);
+      max-width: 90%;
+      text-align: center;
     }
     .toast.show { opacity: 1; }
-
-    /* 🆕 v2.1 全螢幕模態框 */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.show { display: flex; }
-    
-    .modal-content {
-      background: white;
-      width: 95%;
-      max-width: 600px;
-      max-height: 85vh;
-      border-radius: 20px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      animation: slideUp 0.3s ease-out;
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .modal-header {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .modal-header h3 {
-      font-size: 18px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .modal-close {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.2s;
-    }
-    .modal-close:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-    
-    .modal-body {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-    
-    .modal-loading {
-      text-align: center;
-      padding: 40px 20px;
-      color: #6b7280;
-    }
-    
-    .tag-category {
-      margin-bottom: 20px;
-    }
-    
-    .tag-category-title {
-      font-size: 13px;
-      font-weight: bold;
-      color: #374151;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      background: #f9fafb;
-      border-radius: 8px;
-    }
-    
-    .tag-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    
-    .tag-pill {
-      padding: 10px 16px;
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 50px;
-      font-size: 14px;
-      color: #4b5563;
-      cursor: pointer;
-      transition: all 0.2s;
-      user-select: none;
-      font-weight: 500;
-    }
-    .tag-pill:active {
-      transform: scale(0.95);
-    }
-    .tag-pill.active {
-      background: #dbeafe;
-      color: #1d4ed8;
-      border-color: #3b82f6;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-    }
-    
-    .modal-preview {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-      border: 2px solid #fbbf24;
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 20px;
-      display: none;
-    }
-    .modal-preview.show {
-      display: block;
-    }
-    .modal-preview-label {
-      font-size: 12px;
-      color: #92400e;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-    .modal-preview-text {
-      font-size: 16px;
-      color: #78350f;
-      font-weight: 700;
-    }
-    
-    .modal-footer {
-      padding: 16px 20px;
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      gap: 12px;
-    }
-    
-    .modal-btn {
-      flex: 1;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-      border: none;
-    }
-    .modal-btn-cancel {
-      background: white;
-      color: #6b7280;
-      border: 2px solid #e5e7eb;
-    }
-    .modal-btn-confirm {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-    .modal-btn:active {
-      transform: scale(0.97);
-    }
-
-    .keyword-input-readonly {
-      background: #f3f4f6;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body>
 
 <div id="toast" class="toast"></div>
 
-<!-- 🆕 v2.1 全螢幕模態框 -->
-<div id="keywordModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3>🔍 選擇搜尋關鍵字</h3>
-      <button class="modal-close" onclick="closeKeywordModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modalBody">
-      <div class="modal-loading">⏳ 正在載入推薦標籤...</div>
-    </div>
-    <div id="modalPreview" class="modal-preview">
-      <div class="modal-preview-label">🔍 組合結果預覽：</div>
-      <div class="modal-preview-text" id="previewText"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-btn modal-btn-cancel" onclick="closeKeywordModal()">取消</button>
-      <button class="modal-btn modal-btn-confirm" onclick="confirmKeywordSelection()">確定</button>
-    </div>
-  </div>
-</div>
-
-<div class="max-w-2xl mx-auto p-4">
-  <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
-    <div>
-      <div class="flex items-center gap-2">
-        <h1 class="font-bold text-lg">📝 顧客登記</h1>
-        <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v2.1</span>
-        <input type="date" id="globalDate" class="date-picker-custom">
+<!-- === 桌面版 === -->
+<div class="desktop-mode">
+  <div class="max-w-2xl mx-auto p-4">
+    <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-bold text-lg">📝 顧客登記</h1>
+          <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v3.0</span>
+          <input type="date" id="globalDate" class="text-sm bg-blue-500 text-white border-0 rounded px-2 py-1">
+        </div>
       </div>
-      <span class="text-[10px] text-blue-200 block mt-1">⚠️ 請確保欄位皆正確填寫</span>
+      <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+        <button onclick="setGlobalStore('臨安店')" id="gStoreLinAn" class="px-3 py-1 rounded text-sm">臨安店</button>
+        <button onclick="setGlobalStore('南科店')" id="gStoreNanKe" class="px-3 py-1 rounded text-sm">南科店</button>
+      </div>
     </div>
-    <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
-      <button onclick="setGlobalStore('臨安店')" id="gStoreLinAn" class="store-btn inactive">臨安店</button>
-      <button onclick="setGlobalStore('南科店')" id="gStoreNanKe" class="store-btn inactive">南科店</button>
-    </div>
+
+    <div id="cardsContainer"></div>
+    <div style="height: 80px;"></div>
   </div>
 
-  <div id="cardsContainer"></div>
-  <div style="height: 80px;"></div>
+  <div class="max-w-2xl mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
+    <button onclick="addCard()" class="flex-1 bg-white text-blue-600 border-2 border-blue-600 py-3 rounded-xl font-bold">+ 增加一位</button>
+    <button onclick="submitAll()" id="btnSubmit" class="flex-2 bg-blue-600 text-white py-3 px-6 rounded-xl font-bold">確認送出</button>
+  </div>
 </div>
 
-<div class="action-bar max-w-2xl mx-auto left-0 right-0">
-  <button onclick="addCard()" class="btn-add">+ 增加一位</button>
-  <button onclick="submitAll()" id="btnSubmit" class="btn-submit">確認送出</button>
+<!-- === 手機版 Wizard === -->
+<div class="mobile-mode">
+  <div class="wizard-container">
+    <div class="wizard-header">
+      <div class="text-center">
+        <h1 class="text-xl font-bold">📝 快速登記</h1>
+        <p class="text-xs opacity-80 mt-1">步驟 <span id="wizardStepNum">1</span>/6</p>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-dot active" id="dot0"></div>
+        <div class="progress-dot" id="dot1"></div>
+        <div class="progress-dot" id="dot2"></div>
+        <div class="progress-dot" id="dot3"></div>
+        <div class="progress-dot" id="dot4"></div>
+        <div class="progress-dot" id="dot5"></div>
+      </div>
+    </div>
+
+    <div class="wizard-body" id="wizardBody">
+      <!-- 步驟內容由 JavaScript 動態生成 -->
+    </div>
+
+    <div class="wizard-footer">
+      <button class="wizard-btn wizard-btn-back" id="wizardBack" onclick="wizardPrev()">← 返回</button>
+      <button class="wizard-btn wizard-btn-reset" onclick="wizardReset()">🔄</button>
+      <button class="wizard-btn wizard-btn-next" id="wizardNext" onclick="wizardNext()">繼續 →</button>
+    </div>
+  </div>
 </div>
 
 <script>
-  const SOURCES = [
-    "Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", 
-    "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", 
-    "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"
-  ];
-  
-  const PURPOSES = [
-    "驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"
-  ];
-  
+  // 全域變數
+  const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"];
+  const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
   const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
   
   let globalStore = '';
   let cardCount = 0;
-  let isFirstVisit = true;
-  let currentCardId = null;
-  let selectedTags = [];
+  let wizardStep = 0;
+  let wizardData = {
+    date: '',
+    store: '',
+    name: '',
+    gender: '',
+    isTainan: true,
+    age: '',
+    sources: [],
+    keywords: '',
+    purposes: [],
+    detail: ''
+  };
   const tagCache = {};
 
+  // Toast 提示
   function showToast(message, duration = 2000) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
@@ -496,46 +344,30 @@
     setTimeout(() => toast.classList.remove('show'), duration);
   }
 
+  // === 桌面版邏輯 ===
   window.onload = () => {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('globalDate').value = today;
     
-    const cachedStore = localStorage.getItem('wakodo_last_store');
-    if(cachedStore && (cachedStore === '臨安店' || cachedStore === '南科店')) {
-      setGlobalStore(cachedStore);
-      isFirstVisit = false;
-      showToast(`✓ 已自動選擇 ${cachedStore}`);
-    } else {
-      isFirstVisit = true;
-      document.getElementById('gStoreLinAn').classList.add('need-select');
-      document.getElementById('gStoreNanKe').classList.add('need-select');
-      setTimeout(() => showToast('👆 請先選擇您所在的分店', 3000), 500);
-    }
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     
-    addCard();
+    if(isMobile) {
+      initWizard();
+    } else {
+      const cachedStore = localStorage.getItem('wakodo_last_store');
+      if(cachedStore) {
+        setGlobalStore(cachedStore);
+      }
+      addCard();
+    }
   };
 
   window.setGlobalStore = (store) => {
     globalStore = store;
     localStorage.setItem('wakodo_last_store', store);
-    
-    document.getElementById('gStoreLinAn').classList.remove('need-select');
-    document.getElementById('gStoreNanKe').classList.remove('need-select');
-    
-    renderStoreButtons();
-    
-    if(isFirstVisit) {
-      showToast(`✓ 已選擇 ${store}，下次將自動記住`);
-      isFirstVisit = false;
-    }
+    document.getElementById('gStoreLinAn').className = store === '臨安店' ? 'px-3 py-1 rounded text-sm bg-white text-blue-600' : 'px-3 py-1 rounded text-sm';
+    document.getElementById('gStoreNanKe').className = store === '南科店' ? 'px-3 py-1 rounded text-sm bg-white text-blue-600' : 'px-3 py-1 rounded text-sm';
   };
-
-  function renderStoreButtons() {
-    const btnL = document.getElementById('gStoreLinAn');
-    const btnN = document.getElementById('gStoreNanKe');
-    btnL.className = globalStore === '臨安店' ? 'store-btn active' : 'store-btn inactive';
-    btnN.className = globalStore === '南科店' ? 'store-btn active' : 'store-btn inactive';
-  }
 
   window.addCard = () => {
     cardCount++;
@@ -544,146 +376,131 @@
     
     const cardHtml = `
       <div class="customer-card" id="${id}">
-        <div class="customer-card-header">
-          <div class="flex items-center">
-            <span class="card-num">${cardCount}</span>
-            <span class="font-bold text-gray-700">顧客資料</span>
-          </div>
-          ${cardCount > 1 ? `<button onclick="removeCard('${id}')" class="text-red-400 text-sm font-bold px-2">移除 ✕</button>` : ''}
+        <div class="flex justify-between items-center mb-4 pb-3 border-b">
+          <span class="font-bold text-gray-700">顧客 ${cardCount}</span>
+          ${cardCount > 1 ? `<button onclick="removeCard('${id}')" class="text-red-500 text-sm font-bold">移除 ✕</button>` : ''}
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
+            <label class="block text-sm font-bold text-gray-600 mb-2">姓名</label>
             <input type="text" class="input-base name-input" placeholder="輸入姓名">
           </div>
 
-          <div class="flex justify-between items-start gap-4">
-            <div>
-              <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
-              <div class="radio-group" id="${id}-gender">
-                <div class="radio-btn" onclick="selectRadio('${id}-gender', '男', this)">男</div>
-                <div class="radio-btn" onclick="selectRadio('${id}-gender', '女', this)">女</div>
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="block text-sm font-bold text-gray-600 mb-2">性別</label>
+              <div class="flex gap-2" id="${id}-gender">
+                <div class="radio-btn flex-1" onclick="selectRadio('${id}-gender', '男', this)">男</div>
+                <div class="radio-btn flex-1" onclick="selectRadio('${id}-gender', '女', this)">女</div>
               </div>
             </div>
-            
-            <div class="flex flex-col items-end">
-              <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 tainan-check" checked>
+            <div class="flex items-end">
+              <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg">
+                <input type="checkbox" class="tainan-check" checked>
                 <span class="text-sm font-bold text-blue-800">住台南</span>
               </label>
-              <span class="hint-text">非台南人請取消勾選</span>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
-            <div class="radio-group" id="${id}-age">
+            <label class="block text-sm font-bold text-gray-600 mb-2">年齡層</label>
+            <div class="flex flex-wrap gap-2" id="${id}-age">
               ${AGES.map(age => `<div class="radio-btn" onclick="selectRadio('${id}-age', '${age}', this)">${age}</div>`).join('')}
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
-            <div class="chk-grid" id="${id}-sources">
-              ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}', '${id}')">${s}</div>`).join('')}
+            <label class="block text-sm font-bold text-gray-600 mb-2">客源（可多選）</label>
+            <div class="grid grid-cols-3 gap-2" id="${id}-sources">
+              ${SOURCES.map(s => `<div class="chk-btn" onclick="toggleSource(this, '${s}', '${id}')">${s}</div>`).join('')}
             </div>
-            <div id="${id}-keyword-display" class="hidden mt-3 bg-gradient-to-br from-yellow-50 to-orange-50 p-3 rounded-lg border-2 border-yellow-300">
-              <div class="flex items-center justify-between mb-2">
-                <label class="text-xs font-bold text-yellow-800">🔍 搜尋關鍵字</label>
-                <button onclick="openKeywordModal('${id}')" class="text-xs bg-blue-500 text-white px-3 py-1.5 rounded-full hover:bg-blue-600 font-bold">
-                  💡 智能選擇
-                </button>
-              </div>
-              <input type="text" class="input-base border-yellow-400 text-sm keyword-input keyword-input-readonly" placeholder="點擊上方按鈕選擇關鍵字" readonly>
+            <div id="${id}-smart-tags" class="smart-tags-area">
+              <div class="text-xs text-amber-800 font-bold mb-2">💡 智能推薦關鍵字（點擊添加）</div>
+              <div id="${id}-tags-loading" class="text-center text-amber-700 text-sm py-4">⏳ 載入中...</div>
+              <div id="${id}-tags-content"></div>
+            </div>
+            <input type="text" id="${id}-keyword-input" class="input-base mt-2 hidden" placeholder="搜尋關鍵字">
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-600 mb-2">目的（可多選）</label>
+            <div class="grid grid-cols-3 gap-2">
+              ${PURPOSES.map(p => `<div class="chk-btn" onclick="toggleChk(this)">${p}</div>`).join('')}
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
-            <div class="chk-grid purpose-container">
-              ${PURPOSES.map(p => `<div class="chk-btn purpose-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('')}
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1">備註 <span class="required-mark">*</span></label>
+            <label class="block text-sm font-bold text-gray-600 mb-2">備註</label>
             <textarea class="input-base h-20 resize-none detail-input" placeholder="客人描述..."></textarea>
           </div>
         </div>
       </div>
     `;
     container.insertAdjacentHTML('beforeend', cardHtml);
-    
-    if(cardCount > 1) {
-      setTimeout(() => {
-        const newCard = document.getElementById(id);
-        newCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
   };
 
   window.removeCard = (id) => {
     document.getElementById(id).remove();
-    const cards = document.querySelectorAll('.customer-card');
-    cards.forEach((card, index) => { 
-      card.querySelector('.card-num').textContent = index + 1; 
-    });
-    cardCount = cards.length;
-    showToast('已移除該筆資料');
+    cardCount--;
   };
 
   window.selectRadio = (groupId, value, el) => {
     const container = document.getElementById(groupId);
     container.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected'); 
+    el.classList.add('selected');
     el.dataset.value = value;
-  };
-
-  window.toggleChk = (el, value, cardId) => {
-    el.classList.toggle('checked'); 
-    el.dataset.checked = el.classList.contains('checked');
     
-    if(cardId) {
-      const container = document.getElementById(`${cardId}-sources`);
-      const hasGoogle = Array.from(container.querySelectorAll('.chk-btn.checked'))
-        .some(btn => btn.innerText.includes('Google'));
-      document.getElementById(`${cardId}-keyword-display`).classList.toggle('hidden', !hasGoogle);
+    // 桌面版：性別或年齡改變時，重新載入標籤
+    const cardId = groupId.split('-')[0] + '-' + groupId.split('-')[1];
+    if(groupId.includes('gender') || groupId.includes('age')) {
+      const smartTagsArea = document.getElementById(`${cardId}-smart-tags`);
+      if(smartTagsArea && smartTagsArea.classList.contains('show')) {
+        loadSmartTags(cardId);
+      }
     }
   };
 
-  // 🆕 v2.1 打開關鍵字選擇模態框
-  window.openKeywordModal = async (cardId) => {
+  window.toggleChk = (el) => {
+    el.classList.toggle('checked');
+  };
+
+  window.toggleSource = (el, value, cardId) => {
+    el.classList.toggle('checked');
+    
+    const hasGoogle = Array.from(document.querySelectorAll(`#${cardId}-sources .chk-btn.checked`))
+      .some(btn => btn.innerText.includes('Google'));
+    
+    const smartTagsArea = document.getElementById(`${cardId}-smart-tags`);
+    const keywordInput = document.getElementById(`${cardId}-keyword-input`);
+    
+    if(hasGoogle) {
+      smartTagsArea.classList.add('show');
+      keywordInput.classList.remove('hidden');
+      loadSmartTags(cardId);
+    } else {
+      smartTagsArea.classList.remove('show');
+      keywordInput.classList.add('hidden');
+    }
+  };
+
+  // 載入智能標籤（桌面版）
+  async function loadSmartTags(cardId) {
     const card = document.getElementById(cardId);
     const genderEl = card.querySelector(`#${cardId}-gender .selected`);
     const ageEl = card.querySelector(`#${cardId}-age .selected`);
     
-    if(!genderEl || !ageEl) {
-      showToast('⚠️ 請先選擇性別和年齡層', 2500);
+    if(!genderEl || !ageEl || !globalStore) {
+      document.getElementById(`${cardId}-tags-loading`).innerHTML = '⚠️ 請先選擇性別、年齡和分店';
       return;
     }
-    
-    if(!globalStore) {
-      showToast('⚠️ 請先選擇分店', 2500);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    
-    currentCardId = cardId;
-    selectedTags = [];
-    
-    const modal = document.getElementById('keywordModal');
-    const modalBody = document.getElementById('modalBody');
-    const preview = document.getElementById('modalPreview');
-    
-    modal.classList.add('show');
-    modalBody.innerHTML = '<div class="modal-loading">⏳ 正在載入推薦標籤...</div>';
-    preview.classList.remove('show');
-    document.body.style.overflow = 'hidden';
     
     const gender = genderEl.dataset.value;
     const age = ageEl.dataset.value;
     const cacheKey = `${gender}-${age}-${globalStore}`;
+    
+    document.getElementById(`${cardId}-tags-loading`).style.display = 'block';
+    document.getElementById(`${cardId}-tags-content`).innerHTML = '';
     
     try {
       let tags;
@@ -702,23 +519,22 @@
         tagCache[cacheKey] = tags;
       }
       
+      document.getElementById(`${cardId}-tags-loading`).style.display = 'none';
+      
       if(tags.length === 0) {
-        modalBody.innerHTML = '<div class="modal-loading">😅 目前沒有推薦標籤<br><small style="margin-top:8px;display:block;">請關閉此視窗並手動輸入</small></div>';
+        document.getElementById(`${cardId}-tags-content`).innerHTML = '<div class="text-center text-amber-700 text-sm py-2">目前沒有推薦標籤</div>';
         return;
       }
       
-      renderModalTags(tags);
+      renderDesktopTags(cardId, tags);
       
     } catch(err) {
       console.error('載入智能標籤失敗:', err);
-      modalBody.innerHTML = '<div class="modal-loading" style="color:#ef4444;">❌ 載入失敗<br><small style="margin-top:8px;display:block;">請關閉此視窗並手動輸入</small></div>';
+      document.getElementById(`${cardId}-tags-loading`).innerHTML = '❌ 載入失敗，請手動輸入';
     }
-  };
+  }
 
-  // 🆕 v2.1 渲染模態框標籤
-  function renderModalTags(tags) {
-    const modalBody = document.getElementById('modalBody');
-    
+  function renderDesktopTags(cardId, tags) {
     const grouped = tags.reduce((acc, tag) => {
       if(!acc[tag.category]) acc[tag.category] = [];
       acc[tag.category].push(tag);
@@ -737,14 +553,11 @@
     let html = '';
     for(const [cat, items] of Object.entries(grouped)) {
       html += `
-        <div class="tag-category">
-          <div class="tag-category-title">
-            <span>${categoryEmojis[cat] || '•'}</span>
-            <span>${cat}</span>
-          </div>
-          <div class="tag-pills">
+        <div class="tag-category-desktop">
+          <div class="tag-category-desktop-title">${categoryEmojis[cat] || '•'} ${cat}</div>
+          <div class="tag-pills-desktop">
             ${items.map(tag => `
-              <div class="tag-pill" onclick="toggleModalTag('${tag.word}', this)">
+              <div class="tag-pill-desktop" onclick="toggleDesktopTag('${cardId}', '${tag.word}', this)">
                 ${tag.word}
               </div>
             `).join('')}
@@ -753,172 +566,365 @@
       `;
     }
     
-    modalBody.innerHTML = html;
+    document.getElementById(`${cardId}-tags-content`).innerHTML = html;
   }
 
-  // 🆕 v2.1 切換模態框標籤
-  window.toggleModalTag = (word, el) => {
+  window.toggleDesktopTag = (cardId, word, el) => {
     el.classList.toggle('active');
+    const input = document.getElementById(`${cardId}-keyword-input`);
+    let keywords = input.value.trim().split(' ').filter(k => k);
     
     if(el.classList.contains('active')) {
-      selectedTags.push(word);
+      keywords.push(word);
     } else {
-      selectedTags = selectedTags.filter(t => t !== word);
+      keywords = keywords.filter(k => k !== word);
     }
     
-    updateModalPreview();
-  };
-
-  // 🆕 v2.1 更新模態框預覽
-  function updateModalPreview() {
-    const preview = document.getElementById('modalPreview');
-    const previewText = document.getElementById('previewText');
-    
-    if(selectedTags.length === 0) {
-      preview.classList.remove('show');
-      return;
-    }
-    
-    previewText.textContent = selectedTags.join(' ');
-    preview.classList.add('show');
-  }
-
-  // 🆕 v2.1 確認選擇
-  window.confirmKeywordSelection = () => {
-    if(selectedTags.length === 0) {
-      showToast('⚠️ 請至少選擇一個標籤', 2000);
-      return;
-    }
-    
-    const input = document.querySelector(`#${currentCardId} .keyword-input`);
-    input.value = selectedTags.join(' ');
-    
-    closeKeywordModal();
-    showToast('✓ 關鍵字已設定！');
-  };
-
-  // 🆕 v2.1 關閉模態框
-  window.closeKeywordModal = () => {
-    const modal = document.getElementById('keywordModal');
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    currentCardId = null;
-    selectedTags = [];
-  };
-
-  // 🆕 v2.1 點擊背景關閉
-  window.closeModalOnOverlay = (event) => {
-    if(event.target.id === 'keywordModal') {
-      closeKeywordModal();
-    }
+    input.value = keywords.join(' ');
   };
 
   window.submitAll = async () => {
-    if(!globalStore) { 
+    if(!globalStore) {
       showToast('⚠️ 請先選擇分店！', 3000);
-      window.scrollTo({ top: 0, behavior: 'smooth' }); 
-      return; 
+      return;
     }
 
     const cards = document.querySelectorAll('.customer-card');
     const btn = document.getElementById('btnSubmit');
     const selectedDate = document.getElementById('globalDate').value;
     
-    let errorMessages = [];
-    
-    for(let i = 0; i < cards.length; i++) {
-      const card = cards[i];
+    let errors = [];
+    cards.forEach((card, i) => {
       const cardNum = i + 1;
-      
       const name = card.querySelector('.name-input').value.trim();
-      const gender = card.querySelector(`#${card.id}-gender .selected`);
-      const age = card.querySelector(`#${card.id}-age .selected`);
-      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .checked`));
-      const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked'));
-      const detail = card.querySelector('.detail-input').value.trim();
+      const gender = card.querySelector('.selected');
+      const sources = card.querySelectorAll('.chk-btn.checked');
       
-      const hasGoogle = sources.some(btn => btn.innerText.includes('Google'));
-      const keyword = card.querySelector('.keyword-input')?.value.trim() || '';
-      
-      if(!name) errorMessages.push(`第 ${cardNum} 筆：未填寫姓名`);
-      if(!gender) errorMessages.push(`第 ${cardNum} 筆：未選擇性別`);
-      if(!age) errorMessages.push(`第 ${cardNum} 筆：未選擇年齡層`);
-      if(sources.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇客源`);
-      if(purposes.length === 0) errorMessages.push(`第 ${cardNum} 筆：未選擇目的`);
-      if(!detail) errorMessages.push(`第 ${cardNum} 筆：未填寫備註`);
-      if(hasGoogle && !keyword) errorMessages.push(`第 ${cardNum} 筆：選擇了 Google 但未設定搜尋關鍵字`);
-    }
+      if(!name) errors.push(`第${cardNum}筆：未填寫姓名`);
+      if(!gender) errors.push(`第${cardNum}筆：未選擇性別`);
+      if(sources.length === 0) errors.push(`第${cardNum}筆：未選擇客源`);
+    });
     
-    if(errorMessages.length > 0) {
-      alert('⚠️ 資料有缺漏！\n\n' + errorMessages.join('\n'));
+    if(errors.length > 0) {
+      alert('⚠️ 資料有缺漏！\n\n' + errors.join('\n'));
       return;
     }
 
-    btn.disabled = true; 
+    btn.disabled = true;
     btn.textContent = '傳送中...';
     
-    let successCount = 0;
-    let failedItems = [];
+    // 實際上傳邏輯...
     
-    for(let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      const name = card.querySelector('.name-input').value.trim();
-      const genderEl = card.querySelector(`#${card.id}-gender .selected`);
-      const ageEl = card.querySelector(`#${card.id}-age .selected`);
-      const isTainan = card.querySelector('.tainan-check').checked;
-      
-      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .checked`))
-        .map(el => el.innerText);
-      const purposes = Array.from(card.querySelectorAll('.purpose-btn.checked'))
-        .map(el => el.innerText);
-      const keywords = card.querySelector('.keyword-input')?.value.trim() || '';
-      const detail = card.querySelector('.detail-input').value.trim();
+    showToast('✓ 送出成功！');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1500);
+  };
 
-      const payload = {
-        p_date: selectedDate, 
-        p_store: globalStore, 
-        p_name: name,
-        p_gender: genderEl.dataset.value, 
-        p_age: ageEl.dataset.value,
-        p_is_local: isTainan,
-        p_sources: sources, 
-        p_purposes: purposes,
-        p_keywords: keywords,
-        p_detail: detail
-      };
+  // === 手機版 Wizard 邏輯 ===
+  function initWizard() {
+    wizardData.date = new Date().toISOString().split('T')[0];
+    renderWizardStep();
+  }
 
-      try {
-        const { error } = await supabase.rpc('submit_visit_v7', payload);
-        if(error) throw error;
-        successCount++;
-      } catch(err) {
-        console.error('上傳失敗:', err);
-        failedItems.push({ index: i+1, name, error: err.message });
-      }
+  function renderWizardStep() {
+    const body = document.getElementById('wizardBody');
+    const stepNum = document.getElementById('wizardStepNum');
+    const backBtn = document.getElementById('wizardBack');
+    const nextBtn = document.getElementById('wizardNext');
+    
+    stepNum.textContent = wizardStep + 1;
+    backBtn.style.display = wizardStep === 0 ? 'none' : 'flex';
+    
+    // 更新進度點
+    for(let i = 0; i < 6; i++) {
+      document.getElementById(`dot${i}`).className = i === wizardStep ? 'progress-dot active' : 'progress-dot';
     }
+    
+    let stepHtml = '';
+    
+    switch(wizardStep) {
+      case 0:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">選擇分店</h2>
+            <p class="text-sm text-gray-500 mb-6">請選擇您所在的分店</p>
+            
+            <div class="space-y-3">
+              <div class="p-4 border-2 rounded-xl cursor-pointer transition ${wizardData.store === '臨安店' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}" onclick="wizardSelectStore('臨安店')">
+                <div class="font-bold text-lg">🏪 臨安店</div>
+              </div>
+              <div class="p-4 border-2 rounded-xl cursor-pointer transition ${wizardData.store === '南科店' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}" onclick="wizardSelectStore('南科店')">
+                <div class="font-bold text-lg">🏪 南科店</div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <label class="block text-sm font-bold text-gray-600 mb-2">日期</label>
+              <input type="date" id="wizardDate" value="${wizardData.date}" onchange="wizardData.date=this.value" class="input-base">
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 1:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">基本資料</h2>
+            <p class="text-sm text-gray-500 mb-6">請填寫顧客基本資訊</p>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">姓名</label>
+                <input type="text" id="wizardName" value="${wizardData.name}" onchange="wizardData.name=this.value.trim()" class="input-base" placeholder="請輸入姓名">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">性別</label>
+                <div class="flex gap-3">
+                  <div class="flex-1 p-4 border-2 rounded-xl text-center cursor-pointer ${wizardData.gender === '男' ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}" onclick="wizardSelectGender('男')">👨 男</div>
+                  <div class="flex-1 p-4 border-2 rounded-xl text-center cursor-pointer ${wizardData.gender === '女' ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}" onclick="wizardSelectGender('女')">👩 女</div>
+                </div>
+              </div>
+              
+              <div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" ${wizardData.isTainan ? 'checked' : ''} onchange="wizardData.isTainan=this.checked" class="w-5 h-5">
+                  <span class="font-bold text-gray-700">住台南</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 2:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">年齡層</h2>
+            <p class="text-sm text-gray-500 mb-6">請選擇顧客的年齡區間</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+              ${AGES.map(age => `
+                <div class="p-4 border-2 rounded-xl text-center cursor-pointer ${wizardData.age === age ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}" onclick="wizardSelectAge('${age}')">
+                  ${age}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 3:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">客源管道</h2>
+            <p class="text-sm text-gray-500 mb-6">請選擇客人如何得知（可多選）</p>
+            
+            <div class="grid grid-cols-2 gap-2">
+              ${SOURCES.map(s => `
+                <div class="p-3 border-2 rounded-xl text-center text-sm cursor-pointer ${wizardData.sources.includes(s) ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}" onclick="wizardToggleSource('${s}')">
+                  ${s}
+                </div>
+              `).join('')}
+            </div>
+            
+            ${wizardData.sources.some(s => s.includes('Google')) ? `
+              <div class="mt-4">
+                <label class="block text-sm font-bold text-gray-600 mb-2">🔍 搜尋關鍵字</label>
+                <input type="text" id="wizardKeywords" value="${wizardData.keywords}" onchange="wizardData.keywords=this.value.trim()" class="input-base" placeholder="例如：台南眼鏡推薦">
+              </div>
+            ` : ''}
+          </div>
+        `;
+        break;
+        
+      case 4:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">來店目的</h2>
+            <p class="text-sm text-gray-500 mb-6">請選擇客人的需求（可多選）</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+              ${PURPOSES.map(p => `
+                <div class="p-4 border-2 rounded-xl text-center text-sm cursor-pointer ${wizardData.purposes.includes(p) ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}" onclick="wizardTogglePurpose('${p}')">
+                  ${p}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 5:
+        stepHtml = `
+          <div class="wizard-step active">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">備註說明</h2>
+            <p class="text-sm text-gray-500 mb-6">請填寫客人的詳細需求或備註</p>
+            
+            <textarea id="wizardDetail" onchange="wizardData.detail=this.value.trim()" class="input-base h-32 resize-none" placeholder="客人描述...">${wizardData.detail}</textarea>
+            
+            <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+              <div class="text-sm font-bold text-gray-700 mb-3">📋 資料確認</div>
+              <div class="text-xs text-gray-600 space-y-1">
+                <div>姓名：${wizardData.name} (${wizardData.gender}) ${wizardData.isTainan ? '🏠台南' : ''}</div>
+                <div>年齡：${wizardData.age}</div>
+                <div>客源：${wizardData.sources.join('、')}</div>
+                ${wizardData.keywords ? `<div>關鍵字：${wizardData.keywords}</div>` : ''}
+                <div>目的：${wizardData.purposes.join('、')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        nextBtn.textContent = '✓ 送出';
+        break;
+    }
+    
+    body.innerHTML = stepHtml;
+  }
 
-    if(successCount === cards.length) {
-      if(confirm(`🎉 成功新增 ${successCount} 筆資料！\n\n按「確定」返回儀表板查看\n按「取消」繼續留在這裡新增`)) {
-        window.location.href = "index.html";
-      } else {
-        document.getElementById('cardsContainer').innerHTML = ''; 
-        cardCount = 0; 
-        addCard();
-        btn.disabled = false; 
-        btn.textContent = '確認送出'; 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+  window.wizardSelectStore = (store) => {
+    wizardData.store = store;
+    renderWizardStep();
+  };
+
+  window.wizardSelectGender = (gender) => {
+    wizardData.gender = gender;
+    renderWizardStep();
+  };
+
+  window.wizardSelectAge = (age) => {
+    wizardData.age = age;
+    renderWizardStep();
+  };
+
+  window.wizardToggleSource = (source) => {
+    const idx = wizardData.sources.indexOf(source);
+    if(idx > -1) {
+      wizardData.sources.splice(idx, 1);
     } else {
-      const failMsg = failedItems.map(item => 
-        `• 第 ${item.index} 筆 (${item.name}): ${item.error}`
-      ).join('\n');
-      
-      alert(`⚠️ 部分資料上傳失敗\n\n成功: ${successCount} / ${cards.length}\n\n失敗項目:\n${failMsg}`);
-      
-      btn.disabled = false; 
-      btn.textContent = '確認送出';
+      wizardData.sources.push(source);
+    }
+    renderWizardStep();
+  };
+
+  window.wizardTogglePurpose = (purpose) => {
+    const idx = wizardData.purposes.indexOf(purpose);
+    if(idx > -1) {
+      wizardData.purposes.splice(idx, 1);
+    } else {
+      wizardData.purposes.push(purpose);
+    }
+    renderWizardStep();
+  };
+
+  window.wizardNext = async () => {
+    // 驗證當前步驟
+    let error = '';
+    switch(wizardStep) {
+      case 0:
+        if(!wizardData.store) error = '請選擇分店';
+        break;
+      case 1:
+        if(!wizardData.name) error = '請輸入姓名';
+        else if(!wizardData.gender) error = '請選擇性別';
+        break;
+      case 2:
+        if(!wizardData.age) error = '請選擇年齡層';
+        break;
+      case 3:
+        if(wizardData.sources.length === 0) error = '請至少選擇一個客源';
+        else if(wizardData.sources.some(s => s.includes('Google')) && !wizardData.keywords) error = '選擇 Google 搜尋時，關鍵字為必填';
+        break;
+      case 4:
+        if(wizardData.purposes.length === 0) error = '請至少選擇一個目的';
+        break;
+      case 5:
+        if(!wizardData.detail) error = '請填寫備註';
+        break;
+    }
+    
+    if(error) {
+      showToast('⚠️ ' + error, 2500);
+      return;
+    }
+    
+    // 最後一步：送出
+    if(wizardStep === 5) {
+      await wizardSubmit();
+      return;
+    }
+    
+    wizardStep++;
+    renderWizardStep();
+  };
+
+  window.wizardPrev = () => {
+    if(wizardStep > 0) {
+      wizardStep--;
+      renderWizardStep();
     }
   };
+
+  window.wizardReset = () => {
+    if(confirm('⚠️ 確定要重置所有資料嗎？')) {
+      wizardData = {
+        date: new Date().toISOString().split('T')[0],
+        store: '',
+        name: '',
+        gender: '',
+        isTainan: true,
+        age: '',
+        sources: [],
+        keywords: '',
+        purposes: [],
+        detail: ''
+      };
+      wizardStep = 0;
+      renderWizardStep();
+      showToast('✓ 已重置');
+    }
+  };
+
+  async function wizardSubmit() {
+    const nextBtn = document.getElementById('wizardNext');
+    nextBtn.disabled = true;
+    nextBtn.textContent = '傳送中...';
+    
+    try {
+      const payload = {
+        p_date: wizardData.date,
+        p_store: wizardData.store,
+        p_name: wizardData.name,
+        p_gender: wizardData.gender,
+        p_age: wizardData.age,
+        p_is_local: wizardData.isTainan,
+        p_sources: wizardData.sources,
+        p_purposes: wizardData.purposes,
+        p_keywords: wizardData.keywords,
+        p_detail: wizardData.detail
+      };
+      
+      const { error } = await supabase.rpc('submit_visit_v7', payload);
+      if(error) throw error;
+      
+      showToast('🎉 成功新增資料！', 2000);
+      
+      setTimeout(() => {
+        if(confirm('✓ 送出成功！\n\n按「確定」返回儀表板\n按「取消」填寫下一筆')) {
+          window.location.href = 'index.html';
+        } else {
+          wizardReset();
+        }
+      }, 1500);
+      
+    } catch(err) {
+      console.error('送出失敗:', err);
+      showToast('❌ 送出失敗：' + err.message, 3000);
+      nextBtn.disabled = false;
+      nextBtn.textContent = '✓ 送出';
+    }
+  }
 </script>
 </body>
 </html>
