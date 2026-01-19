@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V8.0.3.1</title>
+  <title>和光堂戰情室 V8.0.4.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -195,7 +195,7 @@
       <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         <span class="tech-glow"></span> 和光堂戰情室
         <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600">V8.0.3</div>
+          <div class="text-sm font-bold text-slate-600">V8.0.4</div>
           <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
         </div>
       </h1>
@@ -1047,6 +1047,19 @@
       updateAllCharts();
   };
 
+
+  // 🔥 新增：姓名遮蔽函數（V8.0.4）
+  function maskName(name) {
+      if (!name) return '未留資料';
+      if (isAdmin) return name; // 管理員看完整姓名
+
+      if (name === '未留資料') return name;
+      if (name.length === 2) return name[0] + '〇';
+      if (name.length === 3) return name[0] + '〇' + name[2];
+      if (name.length >= 4) return name[0] + '〇' + name.slice(2);
+      return name;
+  }
+
   function renderTable() {
       const tbody = document.getElementById('tableBody'), page = filteredData.slice(0, displayLimit); tbody.innerHTML = '';
       page.forEach(v => {
@@ -1055,7 +1068,7 @@
           tr.innerHTML = `
              <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
              <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-             <td class="font-bold text-slate-800">${v.customer_name}</td>
+             <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
              <td class="text-xs text-slate-500">${v.gender||'-'} / ${v.age_range||'-'}</td>
              <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags||[]).join(', ')}</td>
              <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
@@ -1249,7 +1262,7 @@
       const v = rawData.find(x => x.id === parseInt(id)); 
       if(!v) return; 
       document.getElementById('detailContent').innerHTML=`
-         <h2 class="font-bold text-2xl mb-3 text-slate-800">${v.customer_name}</h2>
+         <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
          <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
             <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span>
             <span>${v.form_date}</span>
@@ -1292,7 +1305,7 @@
   };
 
   /* =====================================================
-     V8.0.3 補丁：鎖定機制 + 圖表點擊重新綁定
+     V8.0.4 補丁：鎖定機制 + 圖表點擊重新綁定
      ===================================================== */
 
   // 統一鎖定切換函數
