@@ -210,7 +210,7 @@
   <div id="adminPanel" class="hidden glass-card bg-slate-900 text-white p-4 border-slate-700">
     <div id="loginForm" class="flex gap-2">
       <input id="admEmail" type="email" class="p-2 rounded text-black flex-1" placeholder="管理員信箱">
-      <input id="admPwd" type="password" class="p-2 rounded text-black flex-1" placeholder="密碼">
+      <input id="admPwd" type="password" class="p-2 rounded text-black flex-1" placeholder="密碼" onkeyup="if(event.key==='Enter') loginSupabase()">
       <button onclick="loginSupabase()" class="btn-primary">Supabase 登入</button>
     </div>
     <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
