@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和光堂戰情室 V7.9</title>
+  <title>和光堂戰情室 V8.0.3.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -195,7 +195,7 @@
       <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         <span class="tech-glow"></span> 和光堂戰情室
         <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600">V7.9</div>
+          <div class="text-sm font-bold text-slate-600">V8.0.3</div>
           <div class="text-[10px] font-mono text-slate-400 font-bold" id="currentDateDisp">--</div>
         </div>
       </h1>
@@ -457,7 +457,11 @@
     source: null,
     purpose: null,
     gender: null,
-    age: null
+    age: null,
+    sourceLocked: false,
+    purposeLocked: false,
+    genderLocked: false,
+    ageLocked: false
   };
 
   let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', charts = {}, datePicker, isAdmin = false;
@@ -585,12 +589,25 @@
     });
     
     // 🔥 清空全局過濾狀態
-    globalFilter = { source: null, purpose: null, gender: null, age: null };
+    // 保持所有鎖定條件
+    if (!globalFilter.sourceLocked) {
+        globalFilter.source = null;
+    }
+    if (!globalFilter.purposeLocked) {
+        globalFilter.purpose = null;
+    }
+    if (!globalFilter.genderLocked) {
+        globalFilter.gender = null;
+    }
+    if (!globalFilter.ageLocked) {
+        globalFilter.age = null;
+    }
     
     displayLimit = 20; 
     renderCharts(filteredData); 
     renderTable(); 
     updateFilterBadges();
+    updateAllCharts(); // 🔥 關鍵：切換門店後重算所有圖表
   };
 
   // 🔥 修改：renderCharts - 只渲染客源圖（固定順序+固定顏色）
@@ -654,7 +671,13 @@
             onClick: (e, els) => { 
                 if(els[0]) { 
                     const label = orderedLabels[els[0].index]; 
-                    globalFilter.source = (globalFilter.source === label) ? null : label;
+                    if (globalFilter.source === label) {
+                        globalFilter.source = null;
+                        globalFilter.sourceLocked = false;
+                    } else {
+                        globalFilter.source = label;
+                        globalFilter.sourceLocked = true;
+                    }
                     updateAllCharts();
                 } 
             }
@@ -674,6 +697,21 @@
         if(globalFilter.age && v.age_range !== globalFilter.age) return false;
         return true;
     });
+
+    // 🔥 反向連動：更新客源統計
+    const sMap_reverse = {}; 
+    subset.forEach(v => (v.source_tags||[]).forEach(t => sMap_reverse[t] = (sMap_reverse[t]||0) + 1));
+    const orderedLabels_reverse = SOURCE_ORDER.filter(s => sMap_reverse[s] > 0);
+    const orderedData_reverse = orderedLabels_reverse.map(s => sMap_reverse[s]);
+    const orderedColors_reverse = orderedLabels_reverse.map(s => SOURCE_COLORS[s] || '#94a3b8');
+
+    if (charts.source) {
+        charts.source.data.labels = orderedLabels_reverse;
+        charts.source.data.datasets[0].data = orderedData_reverse;
+        charts.source.data.datasets[0].backgroundColor = orderedColors_reverse;
+        charts.source.data.datasets[0].hoverBackgroundColor = orderedColors_reverse.map(c => c + 'dd');
+        charts.source.update('active');
+    }
 
     // 更新過濾標籤
     updateFilterBadges();
@@ -751,7 +789,13 @@
                 onClick: (e, els) => {
                     if(els[0]) {
                         const label = sortedP[els[0].index][0];
-                        globalFilter.purpose = (globalFilter.purpose === label) ? null : label;
+                        if (globalFilter.purpose === label) {
+                            globalFilter.purpose = null;
+                            globalFilter.purposeLocked = false;
+                        } else {
+                            globalFilter.purpose = label;
+                            globalFilter.purposeLocked = true;
+                        }
                         updateAllCharts();
                     }
                 }
@@ -871,7 +915,13 @@
                 onClick: (e, els) => {
                     if(els[0]) {
                         const label = els[0].index === 0 ? '男' : '女';
-                        globalFilter.gender = (globalFilter.gender === label) ? null : label;
+                        if (globalFilter.gender === label) {
+                            globalFilter.gender = null;
+                            globalFilter.genderLocked = false;
+                        } else {
+                            globalFilter.gender = label;
+                            globalFilter.genderLocked = true;
+                        }
                         updateAllCharts();
                     }
                 }
@@ -931,7 +981,13 @@
                 onClick: (e, els) => {
                     if(els[0]) {
                         const label = sortedAges[els[0].index];
-                        globalFilter.age = (globalFilter.age === label) ? null : label;
+                        if (globalFilter.age === label) {
+                            globalFilter.age = null;
+                            globalFilter.ageLocked = false;
+                        } else {
+                            globalFilter.age = label;
+                            globalFilter.ageLocked = true;
+                        }
                         updateAllCharts();
                     }
                 }
@@ -984,6 +1040,10 @@
   // 🔥 新增：清除單個過濾條件
   window.clearFilter = (type) => {
       globalFilter[type] = null;
+      if (type === 'source') globalFilter.sourceLocked = false;
+      else if (type === 'purpose') globalFilter.purposeLocked = false;
+      else if (type === 'gender') globalFilter.genderLocked = false;
+      else if (type === 'age') globalFilter.ageLocked = false;
       updateAllCharts();
   };
 
@@ -1230,6 +1290,106 @@
       if(error) alert('刪除失敗: ' + error.message); 
       else { alert('已刪除'); closeDetail(); fetchAllData(); } 
   };
+
+  /* =====================================================
+     V8.0.3 補丁：鎖定機制 + 圖表點擊重新綁定
+     ===================================================== */
+
+  // 統一鎖定切換函數
+  window.toggleLock = (type, value) => {
+    const lockKey = type + 'Locked';
+    if (!globalFilter) return;
+
+    if (globalFilter[type] === value) {
+      globalFilter[type] = null;
+      if (lockKey in globalFilter) globalFilter[lockKey] = false;
+    } else {
+      globalFilter[type] = value;
+      if (lockKey in globalFilter) globalFilter[lockKey] = true;
+    }
+    updateAllCharts();
+  };
+
+  // 重新綁定所有圖表點擊事件
+  function bindChartClicks() {
+    if (!window.charts) return;
+
+    if (charts.source && charts.source.options) {
+      charts.source.options.onClick = (e, els) => {
+        if (!els || !els.length) return;
+        const label = charts.source.data.labels[els[0].index];
+        window.toggleLock('source', label);
+      };
+      charts.source.update('none');
+    }
+
+    if (charts.purpose && charts.purpose.options) {
+      charts.purpose.options.onClick = (e, els) => {
+        if (!els || !els.length) return;
+        const label = charts.purpose.data.labels[els[0].index];
+        window.toggleLock('purpose', label);
+      };
+      charts.purpose.update('none');
+    }
+
+    if (charts.gender && charts.gender.options) {
+      charts.gender.options.onClick = (e, els) => {
+        if (!els || !els.length) return;
+        const label = (els[0].index === 0) ? '男' : '女';
+        window.toggleLock('gender', label);
+      };
+      charts.gender.update('none');
+    }
+
+    if (charts.age && charts.age.options) {
+      charts.age.options.onClick = (e, els) => {
+        if (!els || !els.length) return;
+        const label = charts.age.data.labels[els[0].index];
+        window.toggleLock('age', label);
+      };
+      charts.age.update('none');
+    }
+  }
+
+  // 包裝 updateAllCharts
+  if (typeof window.updateAllCharts === 'function') {
+    const __origUpdateAllCharts = window.updateAllCharts;
+    window.updateAllCharts = function() {
+      __origUpdateAllCharts();
+      bindChartClicks();
+      updateFilterBadges();
+    };
+  }
+
+  // 包裝 renderCharts
+  if (typeof window.renderCharts === 'function') {
+    const __origRenderCharts = window.renderCharts;
+    window.renderCharts = function(data) {
+      __origRenderCharts(data);
+      bindChartClicks();
+    };
+  }
+
+  // 包裝 applyFilter
+  if (typeof window.applyFilter === 'function') {
+    const __origApplyFilter = window.applyFilter;
+    window.applyFilter = function() {
+      __origApplyFilter();
+      if (typeof window.updateAllCharts === 'function') {
+        window.updateAllCharts();
+      }
+    };
+  }
+
+  // 初始化：確保鎖定旗標存在
+  if (typeof globalFilter === 'object' && globalFilter) {
+    if (globalFilter.sourceLocked === undefined) globalFilter.sourceLocked = false;
+    if (globalFilter.purposeLocked === undefined) globalFilter.purposeLocked = false;
+    if (globalFilter.genderLocked === undefined) globalFilter.genderLocked = false;
+    if (globalFilter.ageLocked === undefined) globalFilter.ageLocked = false;
+  }
+
+
 </script>
 </body>
 </html>
