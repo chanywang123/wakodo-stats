@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>快速登記 v3.0 - 和光堂</title>
+  <title>快速登記 v3.1 - 和光堂</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
     window.supabase = createClient(
       "https://yxalpzculcyhzvnyvecb.supabase.co", 
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTkzNjQsImV4cCI6MjA0OTU5NTM2NH0.7qGT_Jn9pY5_YZD5Lg6ATF_kn7x1kHJmMdgQcVGo5wc"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
     );
   </script>
   <style>
@@ -22,7 +22,6 @@
       padding: 0;
     }
     
-    /* 偵測行動裝置 */
     .desktop-mode { display: block; }
     .mobile-mode { display: none; }
     
@@ -31,7 +30,6 @@
       .mobile-mode { display: block; }
     }
     
-    /* === 桌面版樣式 === */
     .customer-card { 
       background: white; 
       border-radius: 16px; 
@@ -61,7 +59,6 @@
       font-weight: 600; 
     }
     
-    /* 智能標籤區域（桌面版） */
     .smart-tags-area {
       display: none;
       background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
@@ -105,7 +102,6 @@
       font-weight: 700;
     }
     
-    /* === 手機版 Wizard 樣式 === */
     .wizard-container {
       min-height: 100vh;
       display: flex;
@@ -256,14 +252,13 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- === 桌面版 === -->
 <div class="desktop-mode">
   <div class="max-w-2xl mx-auto p-4">
     <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-2 z-40">
       <div>
         <div class="flex items-center gap-2">
           <h1 class="font-bold text-lg">📝 顧客登記</h1>
-          <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v3.0</span>
+          <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v3.1</span>
           <input type="date" id="globalDate" class="text-sm bg-blue-500 text-white border-0 rounded px-2 py-1">
         </div>
       </div>
@@ -283,7 +278,6 @@
   </div>
 </div>
 
-<!-- === 手機版 Wizard === -->
 <div class="mobile-mode">
   <div class="wizard-container">
     <div class="wizard-header">
@@ -301,9 +295,7 @@
       </div>
     </div>
 
-    <div class="wizard-body" id="wizardBody">
-      <!-- 步驟內容由 JavaScript 動態生成 -->
-    </div>
+    <div class="wizard-body" id="wizardBody"></div>
 
     <div class="wizard-footer">
       <button class="wizard-btn wizard-btn-back" id="wizardBack" onclick="wizardPrev()">← 返回</button>
@@ -314,7 +306,6 @@
 </div>
 
 <script>
-  // 全域變數
   const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB 社團文"];
   const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
   const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
@@ -336,7 +327,6 @@
   };
   const tagCache = {};
 
-  // Toast 提示
   function showToast(message, duration = 2000) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
@@ -344,16 +334,15 @@
     setTimeout(() => toast.classList.remove('show'), duration);
   }
 
-  // === 桌面版邏輯 ===
   window.onload = () => {
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('globalDate').value = today;
-    
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     
     if(isMobile) {
+      wizardData.date = today;
       initWizard();
     } else {
+      document.getElementById('globalDate').value = today;
       const cachedStore = localStorage.getItem('wakodo_last_store');
       if(cachedStore) {
         setGlobalStore(cachedStore);
@@ -451,7 +440,6 @@
     el.classList.add('selected');
     el.dataset.value = value;
     
-    // 桌面版：性別或年齡改變時，重新載入標籤
     const cardId = groupId.split('-')[0] + '-' + groupId.split('-')[1];
     if(groupId.includes('gender') || groupId.includes('age')) {
       const smartTagsArea = document.getElementById(`${cardId}-smart-tags`);
@@ -484,7 +472,6 @@
     }
   };
 
-  // 載入智能標籤（桌面版）
   async function loadSmartTags(cardId) {
     const card = document.getElementById(cardId);
     const genderEl = card.querySelector(`#${cardId}-gender .selected`);
@@ -594,15 +581,41 @@
     const selectedDate = document.getElementById('globalDate').value;
     
     let errors = [];
+    const dataArray = [];
+    
     cards.forEach((card, i) => {
       const cardNum = i + 1;
       const name = card.querySelector('.name-input').value.trim();
-      const gender = card.querySelector('.selected');
-      const sources = card.querySelectorAll('.chk-btn.checked');
+      const genderEl = card.querySelector('.selected');
+      const ageEl = card.querySelector(`#${card.id}-age .selected`);
+      const isTainan = card.querySelector('.tainan-check').checked;
+      const sources = Array.from(card.querySelectorAll(`#${card.id}-sources .chk-btn.checked`)).map(el => el.innerText);
+      const purposes = Array.from(card.querySelectorAll('.chk-btn.checked')).filter(el => PURPOSES.includes(el.innerText)).map(el => el.innerText);
+      const keywords = card.querySelector(`#${card.id}-keyword-input`)?.value.trim() || '';
+      const detail = card.querySelector('.detail-input').value.trim();
       
       if(!name) errors.push(`第${cardNum}筆：未填寫姓名`);
-      if(!gender) errors.push(`第${cardNum}筆：未選擇性別`);
+      if(!genderEl) errors.push(`第${cardNum}筆：未選擇性別`);
+      if(!ageEl) errors.push(`第${cardNum}筆：未選擇年齡`);
       if(sources.length === 0) errors.push(`第${cardNum}筆：未選擇客源`);
+      if(purposes.length === 0) errors.push(`第${cardNum}筆：未選擇目的`);
+      if(!detail) errors.push(`第${cardNum}筆：未填寫備註`);
+      if(sources.some(s => s.includes('Google')) && !keywords) errors.push(`第${cardNum}筆：選擇Google但未填寫關鍵字`);
+      
+      if(errors.length === 0) {
+        dataArray.push({
+          p_date: selectedDate,
+          p_store: globalStore,
+          p_name: name,
+          p_gender: genderEl.dataset.value,
+          p_age: ageEl.dataset.value,
+          p_is_local: isTainan,
+          p_sources: sources,
+          p_purposes: purposes,
+          p_keywords: keywords,
+          p_detail: detail
+        });
+      }
     });
     
     if(errors.length > 0) {
@@ -613,17 +626,38 @@
     btn.disabled = true;
     btn.textContent = '傳送中...';
     
-    // 實際上傳邏輯...
+    let successCount = 0;
+    for(const payload of dataArray) {
+      try {
+        const { error } = await supabase.rpc('submit_visit_v7', payload);
+        if(error) throw error;
+        successCount++;
+      } catch(err) {
+        console.error('送出失敗:', err);
+        showToast('❌ 送出失敗：' + err.message, 3000);
+        btn.disabled = false;
+        btn.textContent = '確認送出';
+        return;
+      }
+    }
     
-    showToast('✓ 送出成功！');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1500);
+    if(successCount === dataArray.length) {
+      showToast('🎉 成功新增 ' + successCount + ' 筆資料！', 2000);
+      setTimeout(() => {
+        if(confirm(`✓ 送出成功！\n\n按「確定」返回儀表板\n按「取消」繼續填寫`)) {
+          window.location.href = 'index.html';
+        } else {
+          document.getElementById('cardsContainer').innerHTML = '';
+          cardCount = 0;
+          addCard();
+          btn.disabled = false;
+          btn.textContent = '確認送出';
+        }
+      }, 1500);
+    }
   };
 
-  // === 手機版 Wizard 邏輯 ===
   function initWizard() {
-    wizardData.date = new Date().toISOString().split('T')[0];
     renderWizardStep();
   }
 
@@ -635,8 +669,8 @@
     
     stepNum.textContent = wizardStep + 1;
     backBtn.style.display = wizardStep === 0 ? 'none' : 'flex';
+    nextBtn.textContent = wizardStep === 5 ? '✓ 送出' : '繼續 →';
     
-    // 更新進度點
     for(let i = 0; i < 6; i++) {
       document.getElementById(`dot${i}`).className = i === wizardStep ? 'progress-dot active' : 'progress-dot';
     }
@@ -776,7 +810,6 @@
             </div>
           </div>
         `;
-        nextBtn.textContent = '✓ 送出';
         break;
     }
     
@@ -819,7 +852,6 @@
   };
 
   window.wizardNext = async () => {
-    // 驗證當前步驟
     let error = '';
     switch(wizardStep) {
       case 0:
@@ -834,7 +866,7 @@
         break;
       case 3:
         if(wizardData.sources.length === 0) error = '請至少選擇一個客源';
-        else if(wizardData.sources.some(s => s.includes('Google')) && !wizardData.keywords) error = '選擇 Google 搜尋時，關鍵字為必填';
+        else if(wizardData.sources.some(s => s.includes('Google')) && !wizardData.keywords) error = '選擇Google搜尋時，關鍵字為必填';
         break;
       case 4:
         if(wizardData.purposes.length === 0) error = '請至少選擇一個目的';
@@ -849,7 +881,6 @@
       return;
     }
     
-    // 最後一步：送出
     if(wizardStep === 5) {
       await wizardSubmit();
       return;
@@ -915,6 +946,8 @@
           window.location.href = 'index.html';
         } else {
           wizardReset();
+          nextBtn.disabled = false;
+          nextBtn.textContent = '✓ 送出';
         }
       }, 1500);
       
