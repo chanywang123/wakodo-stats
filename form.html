@@ -22,9 +22,17 @@
     }
 
     .container { 
-      max-width: 90%;
-      margin: 0 auto; 
-      padding: 16px; 
+  width: clamp(280px, 85vw, 520px);
+  margin: 0 auto; 
+  padding: 16px; 
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: clamp(400px, 55vw, 500px);
+  }
+}
+
     }
 
     @media (min-width: 768px) {
@@ -388,7 +396,7 @@
 <div class="nav-bar">
   <div>
     <div style="font-size: 18px; font-weight: bold; color: #1f2937;">📝 顧客登記</div>
-    <div style="font-size: 11px; color: #9ca3af;">v3.2</div>
+    <div style="font-size: 11px; color: #9ca3af;">v3.3</div>
   </div>
   <div class="store-selector">
     <button onclick="selectStore('臨安店')" id="btnStore1" class="store-btn">臨安店</button>
