@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>📝 顧客登記 v3.2</title>
+  <title>📝 顧客登記 v3.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -22,15 +22,14 @@
     }
 
     .container { 
-      width: 100%;
-      max-width: 680px;
+      max-width: 90%;
       margin: 0 auto; 
       padding: 16px; 
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
       .container {
-        max-width: 580px;
+        max-width: 600px;
       }
     }
 
@@ -246,22 +245,14 @@
     .bottom-actions {
       position: fixed;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 680px;
+      left: 0;
+      right: 0;
       background: white;
       padding: 12px 16px;
       box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
       display: flex;
       gap: 12px;
       z-index: 99;
-    }
-
-    @media (min-width: 1024px) {
-      .bottom-actions {
-        max-width: 580px;
-      }
     }
 
     .action-btn {
@@ -287,12 +278,6 @@
       color: white;
     }
 
-    .report-btn {
-      background: #dc2626;
-      color: white;
-      flex: 1.2;
-    }
-
     .submit-btn:disabled {
       background: #9ca3af;
       cursor: not-allowed;
@@ -316,8 +301,8 @@
     }
     .toast.show { opacity: 1; }
 
-    /* 彈窗 */
-    .modal {
+    /* 成功彈窗 */
+    .success-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -329,70 +314,53 @@
       align-items: center;
       justify-content: center;
     }
-    .modal.show { display: flex; }
+    .success-modal.show { display: flex; }
 
-    .modal-content {
+    .success-content {
       background: white;
       border-radius: 16px;
-      padding: 24px;
-      max-width: 500px;
+      padding: 32px 24px;
+      max-width: 400px;
       width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: bold;
-      color: #dc2626;
-      margin-bottom: 20px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .modal-btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .modal-btn-cancel {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .modal-btn-submit {
-      background: #dc2626;
-      color: white;
-    }
-
-    .radio-group {
-      display: flex;
-      gap: 12px;
-      margin: 16px 0;
-    }
-
-    .radio-option {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
       text-align: center;
+    }
+
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #10b981;
+      margin-bottom: 24px;
+    }
+
+    .success-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .success-btn {
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .radio-option.selected {
-      background: #dc2626;
+    .success-btn-primary {
+      background: #3b82f6;
       color: white;
-      border-color: #dc2626;
+    }
+
+    .success-btn-secondary {
+      background: #10b981;
+      color: white;
     }
   </style>
 </head>
@@ -400,27 +368,18 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- 填錯回報彈窗 -->
-<div id="reportModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-title">⚠️ 填錯回報</div>
-    
-    <div class="form-section">
-      <label class="section-label">錯誤描述</label>
-      <textarea id="reportDescription" class="text-input" placeholder="請描述填錯的顧客名字、日期或來源" style="min-height: 120px;"></textarea>
-    </div>
-
-    <div class="form-section">
-      <label class="section-label">修改訴求</label>
-      <div class="radio-group">
-        <div class="radio-option selected" onclick="selectReportAction('修正', this)">修正</div>
-        <div class="radio-option" onclick="selectReportAction('刪除', this)">刪除</div>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="modal-btn modal-btn-cancel" onclick="closeReportModal()">取消</button>
-      <button class="modal-btn modal-btn-submit" onclick="submitReport()">送出申訴</button>
+<!-- 送出成功彈窗 -->
+<div id="successModal" class="success-modal">
+  <div class="success-content">
+    <div class="success-icon">✅</div>
+    <div class="success-title">送出成功！</div>
+    <div class="success-actions">
+      <button class="success-btn success-btn-primary" onclick="window.location.href='index.html'">
+        📊 前往查看數據
+      </button>
+      <button class="success-btn success-btn-secondary" onclick="location.reload()">
+        ➕ 繼續填寫
+      </button>
     </div>
   </div>
 </div>
@@ -458,7 +417,6 @@
 <!-- 底部操作按鈕 -->
 <div class="bottom-actions">
   <button onclick="addCustomerCard()" class="action-btn add-btn">+ 增加</button>
-  <button onclick="openReportModal()" class="action-btn report-btn">⚠️ 填錯回報</button>
   <button onclick="submitAllData()" id="btnSubmit" class="action-btn submit-btn">確認送出</button>
 </div>
 
@@ -469,7 +427,6 @@
 
   let globalStore = '';
   let cardCounter = 0;
-  let reportAction = '修正';
 
   // Toast 提示
   function showToast(message, duration = 2500) {
@@ -628,49 +585,6 @@
     }
   };
 
-  // 填錯回報
-  window.openReportModal = () => {
-    document.getElementById('reportModal').classList.add('show');
-  };
-
-  window.closeReportModal = () => {
-    document.getElementById('reportModal').classList.remove('show');
-    document.getElementById('reportDescription').value = '';
-  };
-
-  window.selectReportAction = (action, el) => {
-    reportAction = action;
-    el.parentElement.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
-    el.classList.add('selected');
-  };
-
-  window.submitReport = async () => {
-    const description = document.getElementById('reportDescription').value.trim();
-    
-    if(!description) {
-      alert('請填寫錯誤描述');
-      return;
-    }
-
-    const emailBody = `資料修改申訴\n\n希望 [${reportAction}] 該筆資料\n\n申訴內容：\n${description}`;
-
-    try {
-      const { error } = await supabase.rpc('send_report_email', {
-        p_to: 'chanywang92@gmail.com',
-        p_subject: '【和光堂】資料修改申訴',
-        p_body: emailBody
-      });
-
-      if(error) throw error;
-
-      showToast('✅ 申訴已送出！');
-      closeReportModal();
-    } catch(err) {
-      console.error(err);
-      alert('❌ 送出失敗：' + err.message);
-    }
-  };
-
   // 提交所有資料
   window.submitAllData = async () => {
     // 檢查分店
@@ -761,15 +675,11 @@
         if(error) throw error;
       }
 
-      showToast('✅ 送出成功！');
-      
-      setTimeout(() => {
-        if(confirm('資料已成功送出！\n\n是否清空並繼續登記？')) {
-          location.reload();
-        } else {
-          window.location.href = 'index.html';
-        }
-      }, 1000);
+      btn.textContent = '確認送出';
+      btn.disabled = false;
+
+      // 顯示成功彈窗
+      document.getElementById('successModal').classList.add('show');
 
     } catch(err) {
       console.error(err);
