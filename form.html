@@ -21,22 +21,102 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
       background: #f5f7fa;
       -webkit-tap-highlight-color: transparent;
-      padding-bottom: 110px; /* 避免底部 fixed 按鈕擋住內容 */
+      padding-bottom: 110px;
     }
 
-    /* 分店按鈕：沿用新版 active 樣式（JS 會 toggle active） */
+    /* ===== Theme (debug: store) =====
+       未選：灰
+       臨安：藍
+       南科：淡黃色
+    */
+    :root{
+      --primary: #9ca3af;              /* gray */
+      --primary-rgb: 156 163 175;
+      --primary-dark: #6b7280;
+      --primary-dark-rgb: 107 114 128;
+      --primary-contrast: #ffffff;
+    }
+    body[data-theme="none"]{
+      --primary: #9ca3af;
+      --primary-rgb: 156 163 175;
+      --primary-dark: #6b7280;
+      --primary-dark-rgb: 107 114 128;
+      --primary-contrast: #ffffff;
+    }
+    body[data-theme="linan"]{
+      --primary: #2563eb;              /* blue */
+      --primary-rgb: 37 99 235;
+      --primary-dark: #1d4ed8;
+      --primary-dark-rgb: 29 78 216;
+      --primary-contrast: #ffffff;
+    }
+    /* 南科：淡黃色而不是橘黃 */
+    body[data-theme="nanke"]{
+      --primary: #FDE68A;              /* 淡黃 (近 amber-200) */
+      --primary-rgb: 253 230 138;
+      --primary-dark: #FBBF24;         /* 稍深一階，給深底用 */
+      --primary-dark-rgb: 251 191 36;
+      --primary-contrast: #111827;     /* 深字，避免淡黃配白字 */
+    }
+
+    /* 20% wider than max-w-xl(36rem) => 43.2rem */
+    .wrap-wider { max-width: 43.2rem !important; }
+
+    /* theme helpers */
+    .theme-primary-bg { background: var(--primary) !important; }
+    .theme-primary-dark-bg { background: var(--primary-dark) !important; }
+    .theme-primary-text { color: var(--primary) !important; }
+    .theme-primary-border { border-color: var(--primary) !important; }
+    .theme-contrast-text { color: var(--primary-contrast) !important; }
+
+    /* store buttons: 未選=深色；被選(active)=白色 + 呼吸光 */
     .store-btn {
-      border: 2px solid #e5e7eb;
-      background: white;
-      color: #6b7280;
-      transition: all 0.2s;
-      font-weight: 600;
+      border: 2px solid var(--primary-contrast);
+      background: var(--primary-dark);
+      color: var(--primary-contrast);
+      transition: transform 0.12s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+      font-weight: 700;
+      cursor: pointer;
     }
+    .store-btn:active { transform: scale(0.98); }
     .store-btn.active {
-      background: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
+      background: #ffffff;
+      color: var(--primary-dark);
+      border-color: #ffffff;
+      position: relative;
+      z-index: 1;
+      animation: breatheGlow 1.8s ease-in-out infinite;
+      will-change: box-shadow;
     }
+
+    @keyframes breatheGlow{
+      0%,100%{
+        box-shadow:
+          0 0 0 0 rgba(255,255,255,0),
+          0 0 0 0 rgb(var(--primary-rgb) / 0),
+          0 0 0 0 rgb(var(--primary-dark-rgb) / 0);
+      }
+      50%{
+        box-shadow:
+          0 0 0 2px rgba(255,255,255,0.95),
+          0 0 0 10px rgb(var(--primary-rgb) / 0.35),
+          0 16px 32px -22px rgb(var(--primary-dark-rgb) / 0.55);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .store-btn.active { animation: none; }
+    }
+
+    /* warning emphasize */
+    .warn-em { color: #dc2626; font-weight: 800; }
+
+    /* 未選門店：日期欄位改白底黑字（不動佈局，只覆蓋配色） */
+    body[data-theme="none"] #globalDate {
+      background: #ffffff !important;
+      color: #111827 !important;
+      border: 1px solid #e5e7eb !important;
+    }
+    body[data-theme="none"] #globalDate::-webkit-calendar-picker-indicator { filter: none; }
 
     /* 顧客卡片 */
     .customer-card {
@@ -44,9 +124,10 @@
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 24px rgba(17,24,39,0.06);
     }
+
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -55,11 +136,13 @@
       margin-bottom: 20px;
       border-bottom: 2px solid #f3f4f6;
     }
+
     .card-title {
       font-size: 18px;
       font-weight: 700;
       color: #1f2937;
     }
+
     .remove-btn {
       padding: 6px 16px;
       background: #fee;
@@ -73,6 +156,7 @@
 
     /* 表單區塊 */
     .form-section { margin-bottom: 20px; }
+
     .section-label {
       font-size: 14px;
       font-weight: 700;
@@ -80,6 +164,7 @@
       margin-bottom: 10px;
       display: block;
     }
+
     .required-mark { color: #dc2626; margin-left: 4px; }
 
     /* 輸入框 */
@@ -90,14 +175,18 @@
       border-radius: 10px;
       font-size: 16px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       background: white;
     }
-    .text-input:focus { border-color: #3b82f6; }
+    .text-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+    }
     .text-input.error { border-color: #dc2626; }
 
     /* 按鈕網格 */
     .btn-grid { display: grid; gap: 10px; }
+
     @media (max-width: 768px) {
       .btn-grid { grid-template-columns: repeat(3, 1fr); }
       .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); }
@@ -118,7 +207,7 @@
       font-weight: 500;
       text-align: center;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
       user-select: none;
       min-height: 50px;
       display: flex;
@@ -127,13 +216,14 @@
     }
     .option-btn:active { transform: scale(0.96); }
     .option-btn.selected {
-      background: #3b82f6;
-      border-color: #3b82f6;
-      color: white;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--primary-contrast);  /* 依主題自動切白/深色 */
       font-weight: 700;
+      box-shadow: 0 10px 18px -14px rgba(17,24,39,0.35);
     }
 
-    /* 居住地切換按鈕 */
+    /* 居住地切換 */
     .toggle-btn {
       padding: 14px;
       border: 2px solid #10b981;
@@ -151,12 +241,14 @@
       align-items: center;
       justify-content: center;
     }
+
     .toggle-btn.unchecked {
       background: white;
       border-color: #e5e7eb;
       color: #6b7280;
       font-weight: 600;
     }
+
     .warning-text {
       font-size: 12px;
       color: #dc2626;
@@ -164,7 +256,6 @@
       font-weight: 700;
     }
 
-    /* 文字區域 */
     textarea.text-input {
       min-height: 100px;
       resize: vertical;
@@ -228,7 +319,7 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .success-btn-primary { background: #3b82f6; color: white; }
+    .success-btn-primary { background: var(--primary); color: var(--primary-contrast); }
     .success-btn-secondary { background: #10b981; color: white; }
   </style>
 </head>
@@ -248,16 +339,16 @@
     </div>
   </div>
 
-  <!-- 舊版窄版外觀（置中 + max-w），但保留新版功能 id/onclick -->
-  <div class="max-w-xl mx-auto p-4">
-    <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40">
+  <!-- 內容外框（寬度 +20%） -->
+  <div class="max-w-xl wrap-wider mx-auto p-4">
+    <div class="theme-primary-bg theme-contrast-text text-white p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40">
       <div class="flex items-center gap-2 flex-wrap">
         <h1 class="font-bold text-lg">📝 顧客登記</h1>
-        <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v3.4</span>
-        <input type="date" id="globalDate" class="text-sm bg-blue-500 text-white border-0 rounded px-2 py-1" required>
+        <span class="text-[9px] theme-primary-dark-bg px-2 py-0.5 rounded">v3.4</span>
+        <input type="date" id="globalDate" class="text-sm theme-primary-dark-bg text-white border-0 rounded px-2 py-1" required>
       </div>
 
-      <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+      <div class="flex items-center gap-2 theme-primary-dark-bg rounded-lg p-1">
         <button onclick="selectStore('臨安店')" id="btnStore1" class="store-btn px-3 py-1 rounded text-sm">臨安店</button>
         <button onclick="selectStore('南科店')" id="btnStore2" class="store-btn px-3 py-1 rounded text-sm">南科店</button>
       </div>
@@ -265,20 +356,19 @@
 
     <div class="text-xs text-gray-500 px-1 mb-2">💡 若為補登前幾天的客人，請選擇正確的到店日期</div>
 
-    <div class="bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold rounded-xl p-3 mb-4">
-      ⚠️ 請確認選擇正確的門店與日期，避免資料錯誤
+    <div class="bg-amber-50 border border-amber-200 text-gray-900 text-sm rounded-xl p-3 mb-4">
+      ⚠️ 請確認選擇正確的<span class="warn-em">門店</span>與<span class="warn-em">日期</span>，避免資料錯誤
     </div>
 
     <div id="cardsContainer"></div>
 
-    <!-- 撐開底部空間，避免被 fixed footer 擋住 -->
     <div style="height: 90px;"></div>
   </div>
 
-  <!-- 舊版窄版底部固定列（同寬置中） -->
-  <div class="max-w-xl mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
-    <button onclick="addCustomerCard()" class="flex-1 bg-white text-blue-600 border-2 border-blue-600 py-3 rounded-xl font-bold">+ 增加</button>
-    <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] bg-blue-600 text-white py-3 px-6 rounded-xl font-bold">確認送出</button>
+  <!-- 底部固定列（寬度 +20%） -->
+  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
+    <button onclick="addCustomerCard()" class="flex-1 bg-white theme-primary-text theme-primary-border border-2 py-3 rounded-xl font-bold">+ 增加</button>
+    <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] theme-primary-bg theme-contrast-text text-white py-3 px-6 rounded-xl font-bold">確認送出</button>
   </div>
 
   <script>
@@ -297,6 +387,8 @@
     }
 
     window.onload = () => {
+      document.body.dataset.theme = 'none';
+
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('globalDate').value = today;
 
@@ -308,8 +400,14 @@
 
     window.selectStore = (store) => {
       globalStore = store;
-      localStorage.setItem('wakodo_store', store);
 
+      // Theme switch
+      if (!store) document.body.dataset.theme = 'none';
+      else if (store === '臨安店') document.body.dataset.theme = 'linan';
+      else if (store === '南科店') document.body.dataset.theme = 'nanke';
+      else document.body.dataset.theme = 'none';
+
+      localStorage.setItem('wakodo_store', store);
       document.getElementById('btnStore1').classList.toggle('active', store === '臨安店');
       document.getElementById('btnStore2').classList.toggle('active', store === '南科店');
     };
@@ -514,7 +612,6 @@
 
         btn.textContent = '確認送出';
         btn.disabled = false;
-
         document.getElementById('successModal').classList.add('show');
       } catch (err) {
         console.error(err);
