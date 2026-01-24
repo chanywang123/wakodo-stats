@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>📝 顧客登記 v3.3</title>
+  <title>📝 顧客登記 v3.4</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
     window.supabase = createClient(
@@ -12,89 +14,28 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
     );
   </script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
       background: #f5f7fa;
       -webkit-tap-highlight-color: transparent;
-      padding-bottom: 100px;
+      padding-bottom: 110px; /* 避免底部 fixed 按鈕擋住內容 */
     }
 
-    .container { 
-  width: clamp(280px, 85vw, 520px);
-  margin: 0 auto; 
-  padding: 16px; 
-}
-
-@media (min-width: 1024px) {
-  .container {
-    width: clamp(400px, 55vw, 500px);
-  }
-}
-
-    }
-
-    @media (min-width: 768px) {
-      .container {
-        max-width: 600px;
-      }
-    }
-
-    /* 頂部導航 */
-    .nav-bar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .store-selector { display: flex; gap: 8px; }
+    /* 分店按鈕：沿用新版 active 樣式（JS 會 toggle active） */
     .store-btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
       border: 2px solid #e5e7eb;
       background: white;
       color: #6b7280;
-      cursor: pointer;
       transition: all 0.2s;
+      font-weight: 600;
     }
     .store-btn.active {
       background: #3b82f6;
       color: white;
       border-color: #3b82f6;
-    }
-
-    /* 日期選擇 */
-    .date-picker-box {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 16px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .date-picker-box input {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-    }
-    .date-picker-box input:focus { border-color: #3b82f6; }
-
-    .hint-text {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 6px;
-      font-style: italic;
     }
 
     /* 顧客卡片 */
@@ -106,7 +47,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       border: 1px solid #e5e7eb;
     }
-
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -115,29 +55,24 @@
       margin-bottom: 20px;
       border-bottom: 2px solid #f3f4f6;
     }
-
     .card-title {
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 700;
       color: #1f2937;
     }
-
     .remove-btn {
       padding: 6px 16px;
       background: #fee;
       color: #dc2626;
       border: none;
       border-radius: 8px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       cursor: pointer;
     }
 
     /* 表單區塊 */
-    .form-section {
-      margin-bottom: 20px;
-    }
-
+    .form-section { margin-bottom: 20px; }
     .section-label {
       font-size: 14px;
       font-weight: 700;
@@ -145,11 +80,7 @@
       margin-bottom: 10px;
       display: block;
     }
-
-    .required-mark {
-      color: #dc2626;
-      margin-left: 4px;
-    }
+    .required-mark { color: #dc2626; margin-left: 4px; }
 
     /* 輸入框 */
     .text-input {
@@ -160,23 +91,17 @@
       font-size: 16px;
       outline: none;
       transition: border-color 0.2s;
+      background: white;
     }
     .text-input:focus { border-color: #3b82f6; }
     .text-input.error { border-color: #dc2626; }
 
     /* 按鈕網格 */
-    .btn-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    /* 手機版：一排三個 */
+    .btn-grid { display: grid; gap: 10px; }
     @media (max-width: 768px) {
       .btn-grid { grid-template-columns: repeat(3, 1fr); }
       .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); }
     }
-
-    /* 電腦版：自動適應 */
     @media (min-width: 769px) {
       .btn-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
       .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); }
@@ -200,7 +125,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .option-btn:active { transform: scale(0.96); }
     .option-btn.selected {
       background: #3b82f6;
@@ -217,7 +141,7 @@
       background: #d1fae5;
       color: #065f46;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
@@ -231,15 +155,13 @@
       background: white;
       border-color: #e5e7eb;
       color: #6b7280;
-      font-weight: 500;
+      font-weight: 600;
     }
-
-    /* 警語 */
     .warning-text {
       font-size: 12px;
       color: #dc2626;
       margin-top: 6px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     /* 文字區域 */
@@ -247,48 +169,6 @@
       min-height: 100px;
       resize: vertical;
       font-family: inherit;
-    }
-
-    /* 底部按鈕區 */
-    .bottom-actions {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 12px 16px;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-      display: flex;
-      gap: 12px;
-      z-index: 99;
-    }
-
-    .action-btn {
-      flex: 1;
-      padding: 16px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .add-btn {
-      background: white;
-      color: #3b82f6;
-      border: 2px solid #3b82f6;
-    }
-
-    .submit-btn {
-      flex: 2;
-      background: #3b82f6;
-      color: white;
-    }
-
-    .submit-btn:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
     }
 
     /* Toast 通知 */
@@ -301,7 +181,7 @@
       color: white;
       padding: 12px 24px;
       border-radius: 8px;
-      font-weight: 600;
+      font-weight: 700;
       z-index: 9999;
       opacity: 0;
       transition: opacity 0.3s;
@@ -323,7 +203,6 @@
       justify-content: center;
     }
     .success-modal.show { display: flex; }
-
     .success-content {
       background: white;
       border-radius: 16px;
@@ -332,370 +211,318 @@
       width: 90%;
       text-align: center;
     }
-
-    .success-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
     .success-title {
       font-size: 24px;
-      font-weight: bold;
+      font-weight: 800;
       color: #10b981;
       margin-bottom: 24px;
     }
-
-    .success-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
+    .success-actions { display: flex; flex-direction: column; gap: 12px; }
     .success-btn {
       padding: 14px;
       border: none;
       border-radius: 10px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 16px;
       cursor: pointer;
       transition: all 0.2s;
     }
-
-    .success-btn-primary {
-      background: #3b82f6;
-      color: white;
-    }
-
-    .success-btn-secondary {
-      background: #10b981;
-      color: white;
-    }
+    .success-btn-primary { background: #3b82f6; color: white; }
+    .success-btn-secondary { background: #10b981; color: white; }
   </style>
 </head>
+
 <body>
+  <div id="toast" class="toast"></div>
 
-<div id="toast" class="toast"></div>
-
-<!-- 送出成功彈窗 -->
-<div id="successModal" class="success-modal">
-  <div class="success-content">
-    <div class="success-icon">✅</div>
-    <div class="success-title">送出成功！</div>
-    <div class="success-actions">
-      <button class="success-btn success-btn-primary" onclick="window.location.href='index.html'">
-        📊 前往查看數據
-      </button>
-      <button class="success-btn success-btn-secondary" onclick="location.reload()">
-        ➕ 繼續填寫
-      </button>
+  <!-- 送出成功彈窗 -->
+  <div id="successModal" class="success-modal">
+    <div class="success-content">
+      <div class="success-icon">✅</div>
+      <div class="success-title">送出成功！</div>
+      <div class="success-actions">
+        <button class="success-btn success-btn-primary" onclick="window.location.href='index.html'">📊 前往查看數據</button>
+        <button class="success-btn success-btn-secondary" onclick="location.reload()">➕ 繼續填寫</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- 頂部導航 -->
-<div class="nav-bar">
-  <div>
-    <div style="font-size: 18px; font-weight: bold; color: #1f2937;">📝 顧客登記</div>
-    <div style="font-size: 11px; color: #9ca3af;">v3.3</div>
-  </div>
-  <div class="store-selector">
-    <button onclick="selectStore('臨安店')" id="btnStore1" class="store-btn">臨安店</button>
-    <button onclick="selectStore('南科店')" id="btnStore2" class="store-btn">南科店</button>
-  </div>
-</div>
+  <!-- 舊版窄版外觀（置中 + max-w），但保留新版功能 id/onclick -->
+  <div class="max-w-xl mx-auto p-4">
+    <div class="bg-blue-600 text-white p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1 class="font-bold text-lg">📝 顧客登記</h1>
+        <span class="text-[9px] bg-blue-500 px-2 py-0.5 rounded">v3.4</span>
+        <input type="date" id="globalDate" class="text-sm bg-blue-500 text-white border-0 rounded px-2 py-1" required>
+      </div>
 
-<div class="container">
-  <!-- 日期選擇 -->
-  <div class="date-picker-box">
-    <label class="section-label">📅 日期 <span class="required-mark">*</span></label>
-    <input type="date" id="globalDate" required>
-    <div class="hint-text">💡 若為補登前幾天的客人，請選擇正確的到店日期</div>
-  </div>
+      <div class="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+        <button onclick="selectStore('臨安店')" id="btnStore1" class="store-btn px-3 py-1 rounded text-sm">臨安店</button>
+        <button onclick="selectStore('南科店')" id="btnStore2" class="store-btn px-3 py-1 rounded text-sm">南科店</button>
+      </div>
+    </div>
 
-  <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 12px; margin-bottom: 16px;">
-    <div style="font-size: 13px; color: #92400e; font-weight: 600;">
+    <div class="text-xs text-gray-500 px-1 mb-2">💡 若為補登前幾天的客人，請選擇正確的到店日期</div>
+
+    <div class="bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold rounded-xl p-3 mb-4">
       ⚠️ 請確認選擇正確的門店與日期，避免資料錯誤
     </div>
+
+    <div id="cardsContainer"></div>
+
+    <!-- 撐開底部空間，避免被 fixed footer 擋住 -->
+    <div style="height: 90px;"></div>
   </div>
 
-  <!-- 顧客卡片容器 -->
-  <div id="cardsContainer"></div>
-</div>
+  <!-- 舊版窄版底部固定列（同寬置中） -->
+  <div class="max-w-xl mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
+    <button onclick="addCustomerCard()" class="flex-1 bg-white text-blue-600 border-2 border-blue-600 py-3 rounded-xl font-bold">+ 增加</button>
+    <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] bg-blue-600 text-white py-3 px-6 rounded-xl font-bold">確認送出</button>
+  </div>
 
-<!-- 底部操作按鈕 -->
-<div class="bottom-actions">
-  <button onclick="addCustomerCard()" class="action-btn add-btn">+ 增加</button>
-  <button onclick="submitAllData()" id="btnSubmit" class="action-btn submit-btn">確認送出</button>
-</div>
+  <script>
+    const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB、IG 社團"];
+    const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
+    const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
 
-<script>
-  const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB、IG 社團"];
-  const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
-  const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+    let globalStore = '';
+    let cardCounter = 0;
 
-  let globalStore = '';
-  let cardCounter = 0;
+    function showToast(message, duration = 2500) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
 
-  // Toast 提示
-  function showToast(message, duration = 2500) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), duration);
-  }
+    window.onload = () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('globalDate').value = today;
 
-  // 頁面載入
-  window.onload = () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('globalDate').value = today;
-    
-    const savedStore = localStorage.getItem('wakodo_store');
-    if(savedStore) selectStore(savedStore);
-    
-    addCustomerCard();
-  };
+      const savedStore = localStorage.getItem('wakodo_store');
+      if (savedStore) selectStore(savedStore);
 
-  // 選擇分店
-  window.selectStore = (store) => {
-    globalStore = store;
-    localStorage.setItem('wakodo_store', store);
-    
-    document.getElementById('btnStore1').classList.toggle('active', store === '臨安店');
-    document.getElementById('btnStore2').classList.toggle('active', store === '南科店');
-  };
+      addCustomerCard();
+    };
 
-  // 新增顧客卡片
-  window.addCustomerCard = () => {
-    cardCounter++;
-    const cardId = `card-${cardCounter}`;
-    const cardNum = cardCounter;
+    window.selectStore = (store) => {
+      globalStore = store;
+      localStorage.setItem('wakodo_store', store);
 
-    const cardHtml = `
-      <div class="customer-card" id="${cardId}">
-        <div class="card-header">
-          <div class="card-title">👤 顧客 ${cardNum}</div>
-          ${cardNum > 1 ? `<button class="remove-btn" onclick="removeCard('${cardId}')">移除</button>` : ''}
-        </div>
+      document.getElementById('btnStore1').classList.toggle('active', store === '臨安店');
+      document.getElementById('btnStore2').classList.toggle('active', store === '南科店');
+    };
 
-        <!-- 姓名 -->
-        <div class="form-section">
-          <label class="section-label">姓名 <span class="required-mark">*</span></label>
-          <input type="text" class="text-input name-input" placeholder="請輸入顧客姓名" required>
-        </div>
+    window.addCustomerCard = () => {
+      cardCounter++;
+      const cardId = `card-${cardCounter}`;
+      const cardNum = cardCounter;
 
-        <!-- 性別 & 居住地 -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-          <div class="form-section" style="margin-bottom: 0;">
-            <label class="section-label">性別 <span class="required-mark">*</span></label>
-            <div class="btn-grid two-col" data-type="radio" data-name="gender">
-              <div class="option-btn" onclick="selectRadio(this, 'gender-${cardId}')">男</div>
-              <div class="option-btn" onclick="selectRadio(this, 'gender-${cardId}')">女</div>
+      const cardHtml = `
+        <div class="customer-card" id="${cardId}">
+          <div class="card-header">
+            <div class="card-title">👤 顧客 ${cardNum}</div>
+            ${cardNum > 1 ? `<button class="remove-btn" onclick="removeCard('${cardId}')">移除</button>` : ''}
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">姓名 <span class="required-mark">*</span></label>
+            <input type="text" class="text-input name-input" placeholder="請輸入顧客姓名" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div class="form-section" style="margin-bottom: 0;">
+              <label class="section-label">性別 <span class="required-mark">*</span></label>
+              <div class="btn-grid two-col" data-type="radio" data-name="gender">
+                <div class="option-btn" onclick="selectRadio(this, 'gender-${cardId}')">男</div>
+                <div class="option-btn" onclick="selectRadio(this, 'gender-${cardId}')">女</div>
+              </div>
+            </div>
+
+            <div class="form-section" style="margin-bottom: 0;">
+              <label class="section-label">居住地 <span class="required-mark">*</span></label>
+              <div class="toggle-btn" id="local-${cardId}" onclick="toggleLocal(this)">🏠 台南住戶</div>
+              <div class="warning-text">⚠️ 非台南住戶請取消</div>
             </div>
           </div>
 
-          <div class="form-section" style="margin-bottom: 0;">
-            <label class="section-label">居住地 <span class="required-mark">*</span></label>
-            <div class="toggle-btn" id="local-${cardId}" onclick="toggleLocal(this)">🏠 台南住戶</div>
-            <div class="warning-text">⚠️ 非台南住戶請取消</div>
-          </div>
-        </div>
-
-        <!-- 年齡層 -->
-        <div class="form-section">
-          <label class="section-label">年齡層 <span class="required-mark">*</span></label>
-          <div class="btn-grid" data-type="radio" data-name="age">
-            ${AGES.map(age => `<div class="option-btn" onclick="selectRadio(this, 'age-${cardId}')">${age}</div>`).join('')}
-          </div>
-        </div>
-
-        <!-- 客源 -->
-        <div class="form-section">
-          <label class="section-label">客源 <span class="required-mark">*</span> (可多選)</label>
-          
-          <!-- Google 關鍵字 (預設隱藏) -->
-          <div class="form-section" id="keyword-section-${cardId}" style="display: none; margin-bottom: 12px;">
-            <input type="text" class="text-input keyword-input" id="keyword-${cardId}" placeholder="請輸入 Google 搜尋關鍵字" required>
+          <div class="form-section">
+            <label class="section-label">年齡層 <span class="required-mark">*</span></label>
+            <div class="btn-grid" data-type="radio" data-name="age">
+              ${AGES.map(age => `<div class="option-btn" onclick="selectRadio(this, 'age-${cardId}')">${age}</div>`).join('')}
+            </div>
           </div>
 
-          <div class="btn-grid" id="sources-${cardId}" data-type="checkbox">
-            ${SOURCES.map(src => `<div class="option-btn" onclick="toggleCheckbox(this, '${cardId}')">${src}</div>`).join('')}
+          <div class="form-section">
+            <label class="section-label">客源 <span class="required-mark">*</span> (可多選)</label>
+
+            <div class="form-section" id="keyword-section-${cardId}" style="display: none; margin-bottom: 12px;">
+              <input type="text" class="text-input keyword-input" id="keyword-${cardId}" placeholder="請輸入 Google 搜尋關鍵字" required>
+            </div>
+
+            <div class="btn-grid" id="sources-${cardId}" data-type="checkbox">
+              ${SOURCES.map(src => `<div class="option-btn" onclick="toggleCheckbox(this, '${cardId}')">${src}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">來店目的 <span class="required-mark">*</span> (可多選)</label>
+            <div class="btn-grid" data-type="checkbox">
+              ${PURPOSES.map(p => `<div class="option-btn" onclick="toggleCheckbox(this, '${cardId}')">${p}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">備註 <span class="required-mark">*</span></label>
+            <textarea class="text-input detail-input" placeholder="請描述顧客需求、特徵或其他重要資訊" required></textarea>
           </div>
         </div>
+      `;
 
-        <!-- 來店目的 -->
-        <div class="form-section">
-          <label class="section-label">來店目的 <span class="required-mark">*</span> (可多選)</label>
-          <div class="btn-grid" data-type="checkbox">
-            ${PURPOSES.map(p => `<div class="option-btn" onclick="toggleCheckbox(this, '${cardId}')">${p}</div>`).join('')}
-          </div>
-        </div>
+      document.getElementById('cardsContainer').insertAdjacentHTML('beforeend', cardHtml);
 
-        <!-- 備註 -->
-        <div class="form-section">
-          <label class="section-label">備註 <span class="required-mark">*</span></label>
-          <textarea class="text-input detail-input" placeholder="請描述顧客需求、特徵或其他重要資訊" required></textarea>
-        </div>
-      </div>
-    `;
+      if (cardNum > 1) {
+        setTimeout(() => {
+          document.getElementById(cardId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    };
 
-    document.getElementById('cardsContainer').insertAdjacentHTML('beforeend', cardHtml);
+    window.removeCard = (cardId) => {
+      if (confirm('確定要移除這位顧客的資料嗎？')) {
+        document.getElementById(cardId).remove();
+      }
+    };
 
-    if(cardNum > 1) {
-      setTimeout(() => {
-        document.getElementById(cardId).scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  };
+    window.selectRadio = (el, groupName) => {
+      const container = el.parentElement;
+      container.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+      el.classList.add('selected');
+    };
 
-  // 移除卡片
-  window.removeCard = (cardId) => {
-    if(confirm('確定要移除這位顧客的資料嗎？')) {
-      document.getElementById(cardId).remove();
-    }
-  };
+    window.toggleCheckbox = (el, cardId) => {
+      el.classList.toggle('selected');
 
-  // 單選按鈕
-  window.selectRadio = (el, groupName) => {
-    const container = el.parentElement;
-    container.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
-    el.classList.add('selected');
-  };
+      const sourcesContainer = document.getElementById(`sources-${cardId}`);
+      if (sourcesContainer && sourcesContainer.contains(el)) {
+        const selectedSources = Array.from(sourcesContainer.querySelectorAll('.option-btn.selected'))
+          .map(btn => btn.textContent.trim());
 
-  // 多選按鈕
-  window.toggleCheckbox = (el, cardId) => {
-    el.classList.toggle('selected');
-    
-    // 檢查是否選了 Google 相關來源
-    const sourcesContainer = document.getElementById(`sources-${cardId}`);
-    if(sourcesContainer && sourcesContainer.contains(el)) {
-      const selectedSources = Array.from(sourcesContainer.querySelectorAll('.option-btn.selected'))
-        .map(btn => btn.textContent.trim());
-      
-      const hasGoogle = selectedSources.some(s => s.includes('Google'));
-      const keywordSection = document.getElementById(`keyword-section-${cardId}`);
-      
-      if(hasGoogle) {
-        keywordSection.style.display = 'block';
+        const hasGoogle = selectedSources.some(s => s.includes('Google'));
+        const keywordSection = document.getElementById(`keyword-section-${cardId}`);
+
+        if (hasGoogle) {
+          keywordSection.style.display = 'block';
+        } else {
+          keywordSection.style.display = 'none';
+          document.getElementById(`keyword-${cardId}`).value = '';
+        }
+      }
+    };
+
+    window.toggleLocal = (el) => {
+      el.classList.toggle('unchecked');
+      if (el.classList.contains('unchecked')) {
+        el.textContent = '❌ 非台南住戶';
       } else {
-        keywordSection.style.display = 'none';
-        document.getElementById(`keyword-${cardId}`).value = '';
+        el.textContent = '🏠 台南住戶';
       }
-    }
-  };
+    };
 
-  // 居住地切換
-  window.toggleLocal = (el) => {
-    el.classList.toggle('unchecked');
-    if(el.classList.contains('unchecked')) {
-      el.textContent = '❌ 非台南住戶';
-    } else {
-      el.textContent = '🏠 台南住戶';
-    }
-  };
-
-  // 提交所有資料
-  window.submitAllData = async () => {
-    // 檢查分店
-    if(!globalStore) {
-      showToast('⚠️ 請先選擇分店！');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const date = document.getElementById('globalDate').value;
-    if(!date) {
-      showToast('⚠️ 請選擇日期！');
-      return;
-    }
-
-    const cards = document.querySelectorAll('.customer-card');
-    let allData = [];
-    let errors = [];
-
-    cards.forEach((card, idx) => {
-      const num = idx + 1;
-      const cardId = card.id;
-
-      // 收集資料
-      const name = card.querySelector('.name-input').value.trim();
-      const genderEl = card.querySelector('[data-name^="gender"] .selected');
-      const gender = genderEl ? genderEl.textContent.trim() : '';
-      
-      const localBtn = card.querySelector(`[id^="local-"]`);
-      const isLocal = !localBtn.classList.contains('unchecked');
-
-      const ageEl = card.querySelector('[data-name^="age"] .selected');
-      const age = ageEl ? ageEl.textContent.trim() : '';
-
-      const sources = Array.from(card.querySelectorAll('[id^="sources-"] .selected')).map(el => el.textContent.trim());
-      const purposes = Array.from(card.querySelectorAll('[data-type="checkbox"]:not([id]) .selected')).map(el => el.textContent.trim());
-      
-      const keywordInput = card.querySelector('.keyword-input');
-      const keyword = keywordInput ? keywordInput.value.trim() : '';
-      
-      const detail = card.querySelector('.detail-input').value.trim();
-
-      // 驗證必填欄位
-      if(!name) errors.push(`【顧客 ${num}】姓名未填寫`);
-      if(!gender) errors.push(`【顧客 ${num}】性別未選擇`);
-      if(!age) errors.push(`【顧客 ${num}】年齡層未選擇`);
-      if(sources.length === 0) errors.push(`【顧客 ${num}】客源未選擇`);
-      if(purposes.length === 0) errors.push(`【顧客 ${num}】來店目的未選擇`);
-      if(!detail) errors.push(`【顧客 ${num}】備註未填寫`);
-
-      // 驗證 Google 關鍵字
-      const hasGoogle = sources.some(s => s.includes('Google'));
-      if(hasGoogle && !keyword) {
-        errors.push(`【顧客 ${num}】選擇了 Google 相關來源，但未填寫搜尋關鍵字`);
+    window.submitAllData = async () => {
+      if (!globalStore) {
+        showToast('⚠️ 請先選擇分店！');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
-      allData.push({
-        p_date: date,
-        p_store: globalStore,
-        p_name: name,
-        p_gender: gender,
-        p_age: age,
-        p_is_local: isLocal,
-        p_sources: sources,
-        p_purposes: purposes,
-        p_keywords: keyword,
-        p_detail: detail
+      const date = document.getElementById('globalDate').value;
+      if (!date) {
+        showToast('⚠️ 請選擇日期！');
+        return;
+      }
+
+      const cards = document.querySelectorAll('.customer-card');
+      let allData = [];
+      let errors = [];
+
+      cards.forEach((card, idx) => {
+        const num = idx + 1;
+        const cardId = card.id;
+
+        const name = card.querySelector('.name-input').value.trim();
+        const genderEl = card.querySelector('[data-name^="gender"] .selected');
+        const gender = genderEl ? genderEl.textContent.trim() : '';
+
+        const localBtn = card.querySelector(`[id^="local-"]`);
+        const isLocal = !localBtn.classList.contains('unchecked');
+
+        const ageEl = card.querySelector('[data-name^="age"] .selected');
+        const age = ageEl ? ageEl.textContent.trim() : '';
+
+        const sources = Array.from(card.querySelectorAll('[id^="sources-"] .selected')).map(el => el.textContent.trim());
+        const purposes = Array.from(card.querySelectorAll('[data-type="checkbox"]:not([id]) .selected')).map(el => el.textContent.trim());
+
+        const keywordInput = card.querySelector('.keyword-input');
+        const keyword = keywordInput ? keywordInput.value.trim() : '';
+
+        const detail = card.querySelector('.detail-input').value.trim();
+
+        if (!name) errors.push(`【顧客 ${num}】姓名未填寫`);
+        if (!gender) errors.push(`【顧客 ${num}】性別未選擇`);
+        if (!age) errors.push(`【顧客 ${num}】年齡層未選擇`);
+        if (sources.length === 0) errors.push(`【顧客 ${num}】客源未選擇`);
+        if (purposes.length === 0) errors.push(`【顧客 ${num}】來店目的未選擇`);
+        if (!detail) errors.push(`【顧客 ${num}】備註未填寫`);
+
+        const hasGoogle = sources.some(s => s.includes('Google'));
+        if (hasGoogle && !keyword) {
+          errors.push(`【顧客 ${num}】選擇了 Google 相關來源，但未填寫搜尋關鍵字`);
+        }
+
+        allData.push({
+          p_date: date,
+          p_store: globalStore,
+          p_name: name,
+          p_gender: gender,
+          p_age: age,
+          p_is_local: isLocal,
+          p_sources: sources,
+          p_purposes: purposes,
+          p_keywords: keyword,
+          p_detail: detail
+        });
       });
-    });
 
-    // 如有錯誤，顯示並中斷
-    if(errors.length > 0) {
-      alert('❌ 資料未完整填寫：\n\n' + errors.join('\n'));
-      return;
-    }
-
-    // 確認送出
-    if(!confirm(`確定要送出 ${allData.length} 位顧客的資料嗎？`)) return;
-
-    // 開始送出
-    const btn = document.getElementById('btnSubmit');
-    btn.disabled = true;
-    btn.textContent = '傳送中...';
-
-    try {
-      for(let data of allData) {
-        const { error } = await supabase.rpc('submit_visit_v7', data);
-        if(error) throw error;
+      if (errors.length > 0) {
+        alert('❌ 資料未完整填寫：\n\n' + errors.join('\n'));
+        return;
       }
 
-      btn.textContent = '確認送出';
-      btn.disabled = false;
+      if (!confirm(`確定要送出 ${allData.length} 位顧客的資料嗎？`)) return;
 
-      // 顯示成功彈窗
-      document.getElementById('successModal').classList.add('show');
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.textContent = '傳送中...';
 
-    } catch(err) {
-      console.error(err);
-      alert('❌ 送出失敗：' + err.message);
-      btn.disabled = false;
-      btn.textContent = '確認送出';
-    }
-  };
-</script>
+      try {
+        for (let data of allData) {
+          const { error } = await supabase.rpc('submit_visit_v7', data);
+          if (error) throw error;
+        }
+
+        btn.textContent = '確認送出';
+        btn.disabled = false;
+
+        document.getElementById('successModal').classList.add('show');
+      } catch (err) {
+        console.error(err);
+        alert('❌ 送出失敗：' + err.message);
+        btn.disabled = false;
+        btn.textContent = '確認送出';
+      }
+    };
+  </script>
 </body>
 </html>
