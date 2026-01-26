@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -174,6 +174,28 @@
     .filter-badge-close:hover {
       background: rgba(239, 68, 68, 0.3);
       transform: scale(1.2);
+    }
+
+    .reset-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #dc2626;
+      border: 1.5px solid #ef4444;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reset-all-btn:hover {
+      background: linear-gradient(135deg, #fecaca, #fca5a5);
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
     }
   </style>
 </head>
@@ -692,7 +714,6 @@
     // 根據 globalFilter 篩選數據
     let subset = filteredData.filter(v => {
         if(globalFilter.source && !(v.source_tags||[]).includes(globalFilter.source)) return false;
-        if(globalFilter.purpose && !(v.visit_purposes||[]).includes(globalFilter.purpose)) return false;
         if(globalFilter.gender && v.gender !== globalFilter.gender) return false;
         if(globalFilter.age && v.age_range !== globalFilter.age) return false;
         return true;
@@ -888,6 +909,7 @@
             data: { 
                 labels: ['男','女'], 
                 datasets: [{ 
+
                     data: [gMap['男'], gMap['女']], 
                     backgroundColor:['#60a5fa','#f472b6'], 
                     hoverOffset: 10 
@@ -998,53 +1020,43 @@
 
   // 🔥 新增：更新過濾標籤顯示
   function updateFilterBadges() {
-      const container = document.getElementById('filterBadgesContainer');
-      const badges = [];
-      
-      if(globalFilter.source) {
-          badges.push(`<div class="filter-badge">
-              <span>客源: ${globalFilter.source}</span>
-              <span class="filter-badge-close" onclick="clearFilter('source')">✕</span>
-          </div>`);
-      }
-      
-      if(globalFilter.purpose) {
-          badges.push(`<div class="filter-badge">
-              <span>目的: ${globalFilter.purpose}</span>
-              <span class="filter-badge-close" onclick="clearFilter('purpose')">✕</span>
-          </div>`);
-      }
-      
-      if(globalFilter.gender) {
-          badges.push(`<div class="filter-badge">
-              <span>性別: ${globalFilter.gender}</span>
-              <span class="filter-badge-close" onclick="clearFilter('gender')">✕</span>
-          </div>`);
-      }
-      
-      if(globalFilter.age) {
-          badges.push(`<div class="filter-badge">
-              <span>年齡: ${globalFilter.age}</span>
-              <span class="filter-badge-close" onclick="clearFilter('age')">✕</span>
-          </div>`);
-      }
-      
-      if(badges.length > 0) {
-          container.innerHTML = badges.join('');
-          container.classList.remove('hidden');
-      } else {
-          container.classList.add('hidden');
-      }
+    const container = document.getElementById('filterBadgesContainer');
+    const badges = [];
+
+    if(globalFilter.source) badges.push(`<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`);
+    if(globalFilter.gender) badges.push(`<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`);
+    if(globalFilter.age) badges.push(`<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`);
+
+    if(badges.length >= 2) {
+      badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
+    }
+
+    if(badges.length > 0) {
+      container.innerHTML = badges.join('');
+      container.classList.remove('hidden');
+    } else {
+      container.classList.add('hidden');
+    }
   }
 
   // 🔥 新增：清除單個過濾條件
   window.clearFilter = (type) => {
-      globalFilter[type] = null;
-      if (type === 'source') globalFilter.sourceLocked = false;
-      else if (type === 'purpose') globalFilter.purposeLocked = false;
-      else if (type === 'gender') globalFilter.genderLocked = false;
-      else if (type === 'age') globalFilter.ageLocked = false;
+    if(type === 'all') {
+      globalFilter.source = null;
+      globalFilter.gender = null;
+      globalFilter.age = null;
+      globalFilter.sourceLocked = false;
+      globalFilter.genderLocked = false;
+      globalFilter.ageLocked = false;
       updateAllCharts();
+      return;
+    }
+
+    globalFilter[type] = null;
+    if(type === 'source') globalFilter.sourceLocked = false;
+    else if(type === 'gender') globalFilter.genderLocked = false;
+    else if(type === 'age') globalFilter.ageLocked = false;
+    updateAllCharts();
   };
 
 
