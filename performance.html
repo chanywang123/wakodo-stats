@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和光堂 - 業績戰情室</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; }
+        .gradient-text { background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* 隱藏滾動條但保留功能 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <!-- 鎖定畫面 (輸入密碼用) -->
+    <div id="lockScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900">
+        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full border border-slate-700">
+            <div class="mb-4 text-4xl">🔒</div>
+            <h2 class="text-xl font-bold mb-4 text-white">請輸入存取密碼</h2>
+            <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password">
+            <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition">進入儀表板</button>
+        </div>
+    </div>
+
+    <!-- 導航列 -->
+    <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <span class="text-xl font-bold gradient-text">和光堂戰情室</span>
+                    <span class="px-2 py-0.5 rounded text-xs bg-blue-900 text-blue-200">業績版</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-white transition text-sm">
+                        <i class="fas fa-users mr-1"></i> 客源分析
+                    </button>
+                    <div id="adminStatus" class="hidden px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs border border-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>管理員模式
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
+        
+        <!-- 頂部 KPI 卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass-panel p-5">
+                <p class="text-slate-400 text-xs mb-1">本週總業績 (預估)</p>
+                <h3 class="text-2xl font-bold text-white" id="kpiTotal">計算中...</h3>
+                <div class="mt-2 text-xs text-emerald-400 flex items-center">
+                    <i class="fas fa-arrow-up mr-1"></i> <span id="kpiGrowth">--%</span> 較上週
+                </div>
+            </div>
+            <div class="glass-panel p-5">
+                <p class="text-slate-400 text-xs mb-1">臨安 vs 南科 (本月)</p>
+                <div class="flex items-end gap-2">
+                    <span class="text-xl font-bold text-blue-400" id="kpiLinan">--</span>
+                    <span class="text-slate-500">/</span>
+                    <span class="text-xl font-bold text-pink-400" id="kpiNanke">--</span>
+                </div>
+            </div>
+            <div class="glass-panel p-5">
+                <p class="text-slate-400 text-xs mb-1">本月累計訊息數</p>
+                <h3 class="text-2xl font-bold text-yellow-400" id="kpiMessages">--</h3>
+                <p class="text-xs text-slate-500 mt-1">詢問熱度指標</p>
+            </div>
+            <div class="glass-panel p-5 flex flex-col justify-center items-center cursor-pointer hover:bg-slate-800/50 transition" onclick="openModal()">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-900/50">
+                    <i class="fas fa-plus text-white"></i>
+                </div>
+                <span class="text-sm font-medium text-blue-300">新增本週業績</span>
+            </div>
+        </div>
+
+        <!-- 主折線圖 -->
+        <div class="glass-panel p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-white flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-blue-400"></i> 雙店業績走勢
+                </h2>
+                <div class="flex gap-2 text-xs">
+                    <button onclick="updateChartRange('all')" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 transition">全覽</button>
+                    <button onclick="updateChartRange('6m')" class="px-3 py-1 rounded bg-blue-900/50 border border-blue-800 text-blue-200">近6個月</button>
+                </div>
+            </div>
+            <div class="relative h-80 w-full">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 最新資料列表 -->
+        <div class="glass-panel overflow-hidden">
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center">
+                <h3 class="text-md font-bold text-slate-200">📋 最新業績紀錄</h3>
+                <span class="text-xs text-slate-500">點擊列表可編輯 (限管理員)</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-300">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                        <tr>
+                            <th class="px-6 py-3">期間</th>
+                            <th class="px-6 py-3">臨安店</th>
+                            <th class="px-6 py-3">南科店</th>
+                            <th class="px-6 py-3">訊息數</th>
+                            <th class="px-6 py-3">備註</th>
+                            <th class="px-6 py-3 text-right">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- 資料由 JS 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- 新增/編輯 彈窗 -->
+    <div id="entryModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-800 p-6 rounded-xl w-full max-w-md border border-slate-700 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 text-white" id="modalTitle">新增業績資料</h3>
+            
+            <form id="performanceForm" class="space-y-4">
+                <input type="hidden" id="editId">
+                
+                <!-- 日期選擇 -->
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">選擇週次 (選該週任一天即可)</label>
+                    <input type="date" id="inputDate" onchange="calculateWeekRange(this.value)" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p id="weekRangeDisplay" class="text-xs text-blue-400 mt-1 h-4"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">臨安店業績</label>
+                        <input type="number" id="inputLinan" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">南科店業績</label>
+                        <input type="number" id="inputNanke" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">訊息/詢問數</label>
+                        <input type="number" id="inputMsg" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">特殊備註</label>
+                        <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-2 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">取消</button>
+                    <button type="submit" class="flex-1 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold transition shadow-lg shadow-blue-900/50">確認儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ================= 自動注入的金鑰 =================
+        const SUPABASE_URL = 'https://yxalpzculcyhzvnyvecb.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k';
+        // ===============================================
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let performanceChart = null;
+        let allData = [];
+        let isAdmin = false;
+
+        // 1. 初始化檢查與登入
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 檢查密碼鎖
+            if(sessionStorage.getItem('wakodo_perf_auth') === 'true') {
+                document.getElementById('lockScreen').style.display = 'none';
+                initApp();
+            }
+
+            // 檢查管理員狀態
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                isAdmin = true;
+                document.getElementById('adminStatus').classList.remove('hidden');
+            }
+        });
+
+        function checkPassword() {
+            const pwd = document.getElementById('accessPassword').value;
+            if(pwd === 'wakodo') {
+                sessionStorage.setItem('wakodo_perf_auth', 'true');
+                document.getElementById('lockScreen').style.display = 'none';
+                initApp();
+            } else {
+                Swal.fire({ icon: 'error', title: '密碼錯誤', text: '請輸入正確的存取密碼', background: '#1e293b', color: '#fff' });
+            }
+        }
+
+        async function initApp() {
+            await fetchData();
+            renderChart();
+            renderTable();
+            calculateKPI();
+        }
+
+        // 2. 資料獲取
+        async function fetchData() {
+            const { data, error } = await supabase
+                .from('sales_performance')
+                .select('*')
+                .order('year', { ascending: true })
+                .order('month', { ascending: true })
+                .order('week_start_date', { ascending: true });
+
+            if (error) console.error('Error:', error);
+            else allData = data;
+        }
+
+        // 3. 圖表渲染
+        function renderChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            const labels = allData.map(d => {
+                if(d.period_type === 'weekly') {
+                    const date = new Date(d.week_start_date);
+                    return `${date.getMonth()+1}/${date.getDate()}`;
+                } else {
+                    return `${d.year}/${d.month}月`;
+                }
+            });
+
+            const linanData = allData.map(d => d.linan_amount);
+            const nankeData = allData.map(d => d.nanke_amount);
+            const msgData = allData.map(d => d.message_count);
+
+            if(performanceChart) performanceChart.destroy();
+
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '臨安店',
+                            data: linanData,
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '南科店',
+                            data: nankeData,
+                            borderColor: '#f472b6',
+                            backgroundColor: 'rgba(244, 114, 182, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '訊息數',
+                            data: msgData,
+                            borderColor: '#fbbf24',
+                            borderDash: [5, 5],
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            yAxisID: 'y1',
+                            hidden: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8' } },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    const index = context.dataIndex;
+                                    if(allData[index].note) {
+                                        label += ` (${allData[index].note})`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', maxTicksLimit: 12 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 4. 表格渲染
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            
+            const reversedData = [...allData].reverse();
+
+            reversedData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer';
+                if(isAdmin) tr.onclick = () => openModal(item);
+
+                let periodStr = '';
+                if(item.period_type === 'monthly') {
+                    periodStr = `<span class="px-2 py-1 rounded bg-slate-700 text-xs text-slate-300">${item.year}/${item.month}月</span>`;
+                } else {
+                    const s = new Date(item.week_start_date);
+                    const e = new Date(item.week_end_date);
+                    periodStr = `<span class="px-2 py-1 rounded bg-blue-900/30 text-xs text-blue-300">${s.getMonth()+1}/${s.getDate()} - ${e.getMonth()+1}/${e.getDate()}</span>`;
+                }
+
+                const noteBadge = item.note ? `<span class="px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-500 text-xs border border-yellow-800">${item.note}</span>` : '-';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4">${periodStr}</td>
+                    <td class="px-6 py-4 font-mono text-blue-300">$${item.linan_amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 font-mono text-pink-300">$${item.nanke_amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-slate-400">${item.message_count || 0}</td>
+                    <td class="px-6 py-4">${noteBadge}</td>
+                    <td class="px-6 py-4 text-right">
+                        ${isAdmin ? '<button class="text-slate-500 hover:text-white"><i class="fas fa-edit"></i></button>' : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 5. 新增/編輯 邏輯
+        let currentEditId = null;
+
+        function openModal(data = null) {
+            if(!isAdmin && data) return; 
+            if(!isAdmin && !data) {
+                Swal.fire({ icon: 'warning', title: '權限不足', text: '只有管理員可以新增或編輯業績', background: '#1e293b', color: '#fff' });
+                return;
+            }
+
+            const modal = document.getElementById('entryModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('performanceForm');
+            
+            modal.classList.remove('hidden');
+            
+            if(data) {
+                currentEditId = data.id;
+                title.innerText = '編輯業績資料';
+                if(data.period_type === 'weekly') {
+                    document.getElementById('inputDate').value = data.week_start_date;
+                    calculateWeekRange(data.week_start_date);
+                }
+                document.getElementById('inputLinan').value = data.linan_amount;
+                document.getElementById('inputNanke').value = data.nanke_amount;
+                document.getElementById('inputMsg').value = data.message_count;
+                document.getElementById('inputNote').value = data.note || '';
+            } else {
+                currentEditId = null;
+                title.innerText = '新增本週業績';
+                form.reset();
+                document.getElementById('inputDate').valueAsDate = new Date();
+                calculateWeekRange(new Date().toISOString().split('T')[0]);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('entryModal').classList.add('hidden');
+        }
+
+        function calculateWeekRange(dateStr) {
+            if(!dateStr) return;
+            const date = new Date(dateStr);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(date.setDate(diff));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const fmt = d => `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+            document.getElementById('weekRangeDisplay').innerText = `週期：${fmt(monday)} ~ ${fmt(sunday)}`;
+            return { start: monday, end: sunday };
+        }
+
+        document.getElementById('performanceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const dateInput = document.getElementById('inputDate').value;
+            const range = calculateWeekRange(dateInput);
+            const linan = parseInt(document.getElementById('inputLinan').value) || 0;
+            const nanke = parseInt(document.getElementById('inputNanke').value) || 0;
+            const msg = parseInt(document.getElementById('inputMsg').value) || 0;
+            const note = document.getElementById('inputNote').value;
+
+            const payload = {
+                period_type: 'weekly',
+                year: range.start.getFullYear(),
+                month: range.start.getMonth() + 1,
+                week_start_date: range.start.toISOString().split('T')[0],
+                week_end_date: range.end.toISOString().split('T')[0],
+                linan_amount: linan,
+                nanke_amount: nanke,
+                message_count: msg,
+                note: note || null,
+                updated_at: new Date()
+            };
+
+            let error;
+            if(currentEditId) {
+                const res = await supabase.from('sales_performance').update(payload).eq('id', currentEditId);
+                error = res.error;
+            } else {
+                const res = await supabase.from('sales_performance').insert([payload]);
+                error = res.error;
+            }
+
+            if(error) {
+                Swal.fire({ icon: 'error', title: '儲存失敗', text: error.message, background: '#1e293b', color: '#fff' });
+            } else {
+                Swal.fire({ icon: 'success', title: '儲存成功', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
+                closeModal();
+                initApp();
+            }
+        });
+
+        function calculateKPI() {
+            if(allData.length === 0) return;
+            
+            const latest = allData[allData.length - 1];
+            const prev = allData.length > 1 ? allData[allData.length - 2] : null;
+
+            const total = latest.linan_amount + latest.nanke_amount;
+            document.getElementById('kpiTotal').innerText = '$' + total.toLocaleString();
+
+            if(prev) {
+                const prevTotal = prev.linan_amount + prev.nanke_amount;
+                const growth = ((total - prevTotal) / prevTotal * 100).toFixed(1);
+                const el = document.getElementById('kpiGrowth');
+                el.innerHTML = growth > 0 
+                    ? `<i class="fas fa-arrow-up mr-1"></i> ${growth}%` 
+                    : `<i class="fas fa-arrow-down mr-1"></i> ${growth}%`;
+                el.className = growth > 0 ? "mt-2 text-xs text-emerald-400 flex items-center" : "mt-2 text-xs text-rose-400 flex items-center";
+            }
+
+            document.getElementById('kpiLinan').innerText = (latest.linan_amount / 10000).toFixed(1) + '萬';
+            document.getElementById('kpiNanke').innerText = (latest.nanke_amount / 10000).toFixed(1) + '萬';
+            document.getElementById('kpiMessages').innerText = latest.message_count;
+        }
+
+        window.updateChartRange = (range) => {
+            if(range === '6m') {
+                alert('功能開發中：目前顯示全部數據'); 
+            } else {
+                renderChart();
+            }
+        }
+    </script>
+</body>
+</html>
