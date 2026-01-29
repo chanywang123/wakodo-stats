@@ -229,14 +229,23 @@
 <div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
   
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
+      <div>
+         <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
         <span class="tech-glow"></span> <span class="title-frame">和光堂戰情室</span>
-        <div class="leading-tight text-right ml-2 pl-2 border-l border-slate-300">
-          <div class="text-sm font-bold text-slate-600" id="versionDisp">V8.0.4</div>
-          <a class="text-[10px] font-mono text-slate-400 font-bold underline decoration-dotted hover:text-blue-600 transition" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
+        
+        <!-- 右側資訊區塊：靠右對齊，內部文字置中 -->
+        <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
+          <!-- 1. 版本號 (置中) -->
+          <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.0.4</div>
+          
+          <!-- 2. 最後更新日期 (JS 自動填入，置中) -->
+          <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
+          
+          <!-- 3. 觀看業績按鈕 (置中) -->
+          <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
         </div>
       </h1>
+
     </div>
     <div class="flex gap-3">
       <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">⚙️</button>
@@ -636,6 +645,13 @@ flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6
     }
     rawData = allRows.sort((a,b) => new Date(b.form_date) - new Date(a.form_date));
     console.log(`✅ 共載入 ${rawData.length} 筆資料`);
+	      // 🔥 新增：更新最新資料日期
+    if (rawData.length > 0) {
+        const lastDate = rawData[0].form_date.replace(/-/g, '/'); // 轉成 2024/09/xx
+        const dispEl = document.getElementById('lastDataDisp');
+        if(dispEl) dispEl.innerText = 'last data ' + lastDate;
+    }
+
     if(rawData.length > 0) {
         const years = [...new Set(rawData.map(d => d.form_date.slice(0,4)))].sort().reverse();
         const ySel = document.getElementById('selYear');
