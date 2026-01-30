@@ -479,25 +479,25 @@
   ];
 
   // 🔥 新增：客源固定顏色（彩色繽紛）
-  const SOURCE_COLORS = {
-    "Google 搜尋": "#fbbf24",
-    "Google Map": "#10b981",
-    "親友介紹": "#3b82f6",
-    "Instagram 廣告": "#ec4899",
-    "Facebook 廣告": "#8b5cf6",
-    "FB、IG 一般文章": "#f59e0b",
-    "老客回購": "#06b6d4",
-    "途經路過": "#f97316",
-    "TikTok & YouTube": "#ef4444",
-    "老客-未購": "#a855f7",
-    "業配貼文 (FB、IG)": "#14b8a6",
-    "Dcard": "#f43f5e",
-    "PTT": "#6366f1",
-    "Mobile 01": "#059669",
-    "廣告看板": "#d97706",
-    "FB 社團文": "#7c3aed",
-    "其他": "#94a3b8"
-  };
+const SOURCE_COLORS = {
+    "Google 搜尋": "#f59e0b", // 深黃
+    "Google Map": "#10b981",  // 綠
+    "親友介紹": "#2563eb",    // 深藍
+    "Instagram 廣告": "#db2777", // 深粉紅
+    "Facebook 廣告": "#7c3aed",  // 紫
+    "FB、IG 一般文章": "#d97706", // 橘
+    "老客回購": "#0891b2",     // 青
+    "途經路過": "#ea580c",     // 深橘紅
+    "TikTok & YouTube": "#dc2626", // 紅
+    "老客-未購": "#9333ea",    // 紫
+    "業配貼文（FB、IG）": "#0d9488", // 藍綠
+    "Dcard": "#e11d48",        // 玫瑰紅
+    "PTT": "#4f46e5",          // 靛藍
+    "Mobile 01": "#059669",    // 翡翠綠
+    "廣告看板": "#b45309",     // 琥珀
+    "FB 社團文": "#6d28d9",    // 紫
+    "其他": "#475569"          // 灰
+};
 
 
   // 低飽和漸層工具
@@ -510,26 +510,13 @@
     const b = parseInt(full.slice(4,6),16);
     return `rgba(${r},${g},${b},${a})`;
   }
-  function makeBarGradient(ctx, baseHex, stronger=false) {
-    const chart = ctx.chart;
-    const gr = chart.ctx.createLinearGradient(0, 0, chart.width, 0);
-    const a1 = stronger ? 0.22 : 0.14;
-    const a2 = stronger ? 0.55 : 0.34;
-    gr.addColorStop(0, hexToRgba(baseHex, a1));
-    gr.addColorStop(1, hexToRgba(baseHex, a2));
-    return gr;
+function makeBarGradient(ctx, baseHex, stronger=false) {
+  return baseHex || '#94a3b8';
+
   }
-  function makeRadialGradient(ctx, baseHex, stronger=false) {
-    const chart = ctx.chart;
-    const cx = chart.chartArea ? (chart.chartArea.left + chart.chartArea.right)/2 : chart.width/2;
-    const cy = chart.chartArea ? (chart.chartArea.top + chart.chartArea.bottom)/2 : chart.height/2;
-    const r = Math.min(chart.width, chart.height) * 0.46;
-    const gr = chart.ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
-    const a1 = stronger ? 0.62 : 0.50;
-    const a2 = stronger ? 0.24 : 0.16;
-    gr.addColorStop(0, hexToRgba(baseHex, a1));
-    gr.addColorStop(1, hexToRgba(baseHex, a2));
-    return gr;
+function makeRadialGradient(ctx, baseHex, stronger=false) {
+  return baseHex || '#94a3b8';
+
   }
 
   // 🔥 新增：全局過濾狀態
@@ -808,8 +795,16 @@ flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6
     subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
     const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const totalP = sortedP.reduce((a,b)=>a+b[1],0);
-    
-    const purposeColors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316'];
+        const purposeColors = [
+        '#2563eb', // 藍
+        '#059669', // 綠
+        '#d97706', // 橘
+        '#dc2626', // 紅
+        '#7c3aed', // 紫
+        '#db2777', // 粉紅
+        '#0d9488', // 青
+        '#ea580c'  // 橘紅
+    ];
 
     if(charts.purpose) {
         charts.purpose.data.labels = sortedP.map(x=>x[0]);
@@ -982,12 +977,10 @@ flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6
             type: 'doughnut', 
             data: { 
                 labels: ['男','女'], 
-                datasets: [{ 
-
-                    data: [gMap['男'], gMap['女']], 
-                    baseColors: ['#60a5fa','#f472b6'],
-                    backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
-                    hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true), 
+                               datasets: [{
+                    data: [gMap['男'], gMap['女']],
+                    backgroundColor: ['#2563eb', '#db2777'], // 實色：深藍、深粉紅
+                    hoverBackgroundColor: ['#2563eb', '#db2777'], // 滑鼠懸停不變色
                     hoverOffset: 10 
                 }] 
             }, 
