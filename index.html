@@ -1,18 +1,17 @@
 ﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-
+    href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%200%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
   <title>和光堂戰情室 V8.2</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh_tw.js"></script>
 
@@ -25,226 +24,70 @@
   </script>
 
   <style>
-    :root { --bg: #f3f4f6; --card-bg: rgba(255, 255, 255, 0.85); --accent: #3b82f6; }
-    body { background: var(--bg); font-family: system-ui, -apple-system, sans-serif; color: #1e293b; }
+    :root { --bg:#f3f4f6; --card-bg:rgba(255,255,255,0.85); --accent:#3b82f6; }
+    body { background:var(--bg); font-family:system-ui,-apple-system,sans-serif; color:#1e293b; }
+    .glass-card { background:var(--card-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03); }
+    .kpi-card { cursor:pointer; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; border:2px solid transparent; }
+    .kpi-card:hover { transform:translateY(-4px); box-shadow:0 10px 15px -3px rgba(59,130,246,0.2); }
+    .kpi-card.active { background:linear-gradient(135deg,#eff6ff 0%,#ffffff 100%); border-color:var(--accent); }
+    .kpi-card.active::after { content:"●"; position:absolute; top:12px; right:12px; color:var(--accent); font-size:8px; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
 
-    .glass-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
+    #hoverPreview { position:fixed; pointer-events:none; z-index:9999; background:rgba(255,255,255,0.98); backdrop-filter:blur(8px); border:1px solid #fbbf24; border-left:4px solid #fbbf24; padding:14px; border-radius:10px; box-shadow:0 20px 30px -5px rgba(251,191,36,0.3); max-width:340px; font-size:.9rem; color:#374151; line-height:1.6; display:none; transition:opacity .15s; }
 
-    .kpi-card {
-      cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative; overflow: hidden; border: 2px solid transparent;
-    }
-    .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2); }
-    .kpi-card.active { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: var(--accent); }
-    .kpi-card.active::after {
-      content:"●"; position:absolute; top:12px; right:12px;
-      color:var(--accent); font-size:8px; animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    thead th { background:#fef9c3; color:#000; padding:14px; font-weight:800; border-bottom:2px solid #fde047; font-size:.9rem; }
+    tbody tr { border-bottom:1px solid #f1f5f9; transition:all .2s; cursor:pointer; }
+    tbody tr:hover { background:#fefce8; transform:translateX(2px); box-shadow:0 2px 4px rgba(251,191,36,0.1); }
 
-    #hoverPreview {
-      position: fixed; pointer-events: none; z-index: 9999;
-      background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(8px);
-      border: 1px solid #fbbf24; border-left: 4px solid #fbbf24;
-      padding: 14px; border-radius: 10px;
-      box-shadow: 0 20px 30px -5px rgba(251, 191, 36, 0.3);
-      max-width: 340px; font-size: 0.9rem; color: #374151; line-height: 1.6;
-      display: none; transition: opacity 0.15s;
-    }
+    .btn-primary { background:var(--accent); color:white; padding:8px 20px; border-radius:8px; font-weight:600; box-shadow:0 4px 6px -1px rgba(59,130,246,0.3); transition:.2s; cursor:pointer; border:none; }
+    .btn-primary:hover { background:#2563eb; transform:translateY(-1px); }
 
-    thead th { background: #fef9c3; color: #000; padding: 14px; font-weight: 800; border-bottom: 2px solid #fde047; font-size: 0.9rem; }
-    tbody tr { border-bottom: 1px solid #f1f5f9; transition: all 0.2s; cursor: pointer; }
-    tbody tr:hover { background: #fefce8; transform: translateX(2px); box-shadow: 0 2px 4px rgba(251, 191, 36, 0.1); }
+    #importOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:none; align-items:center; justify-content:center; color:white; flex-direction:column; backdrop-filter:blur(4px); }
+    .progress-bar { width:320px; height:12px; background:#334155; border-radius:6px; overflow:hidden; margin-top:20px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.3); }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#22c55e,#10b981); width:0%; transition:width .3s ease; }
 
-    .btn-primary {
-      background: var(--accent); color: white; padding: 8px 20px; border-radius: 8px;
-      font-weight: 600; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-      transition: 0.2s; cursor: pointer; border: none;
-    }
-    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+    .radio-group { display:flex; flex-wrap:wrap; gap:6px; }
+    .radio-btn { padding:6px 14px; border:1.5px solid #e5e7eb; border-radius:50px; font-size:13px; color:#4b5563; cursor:pointer; transition:all .15s; user-select:none; background:white; }
+    .radio-btn:active { transform:scale(.96); }
+    .radio-btn.selected { background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; border-color:#2563eb; font-weight:600; box-shadow:0 3px 8px rgba(59,130,246,0.4); }
 
-    #importOverlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999;
-      display: none; align-items: center; justify-content: center; color: white;
-      flex-direction: column; backdrop-filter: blur(4px);
-    }
-    .progress-bar {
-      width: 320px; height: 12px; background: #334155; border-radius: 6px; overflow: hidden;
-      margin-top: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #10b981); width: 0%; transition: width 0.3s ease; }
+    .chk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:6px; }
+    .chk-btn { padding:8px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:12px; color:#4b5563; cursor:pointer; transition:all .15s; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px; background:white; }
+    .chk-btn.checked { background:linear-gradient(135deg,#eff6ff,#dbeafe); color:#1e40af; border-color:#3b82f6; font-weight:700; box-shadow:0 2px 6px rgba(59,130,246,0.25); }
 
-    .radio-group { display: flex; flex-wrap: wrap; gap: 6px; }
-    .radio-btn {
-      padding: 6px 14px; border: 1.5px solid #e5e7eb; border-radius: 50px; font-size: 13px;
-      color: #4b5563; cursor: pointer; transition: all 0.15s; user-select: none; background: white;
-    }
-    .radio-btn:active { transform: scale(0.96); }
-    .radio-btn.selected {
-      background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;
-      border-color: #2563eb; font-weight: 600; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
-    }
+    .modal-content { background:white; width:95%; max-width:650px; border-radius:20px; padding:24px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; z-index:100; }
 
-    .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
-    .chk-btn {
-      padding: 8px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 12px;
-      color: #4b5563; cursor: pointer; transition: all 0.15s; text-align: center;
-      display: flex; align-items: center; justify-content: center; min-height: 40px; background: white;
-    }
-    .chk-btn.checked {
-      background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af;
-      border-color: #3b82f6; font-weight: 700; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
-    }
+    .required-mark { color:#ef4444; margin-left:2px; font-weight:bold; }
+    .tech-glow { display:inline-block; width:8px; height:8px; background:#3b82f6; border-radius:50%; animation:glow-pulse 2s ease-in-out infinite; position:relative; top:-2px; margin-right:6px; }
+    @keyframes glow-pulse { 0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 10px #3b82f6,0 0 20px #3b82f6,0 0 30px #3b82f6} 50%{opacity:.6;transform:scale(.85);box-shadow:0 0 5px #3b82f6,0 0 10px #3b82f6} }
 
-    .modal-content {
-      background: white; width: 95%; max-width: 650px; border-radius: 20px; padding: 24px;
-      max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    }
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-      display: none; align-items: center; justify-content: center; z-index: 100;
-    }
-    .required-mark { color: #ef4444; margin-left: 2px; font-weight: bold; }
+    .logout-btn { background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.3); padding:6px 14px; border-radius:8px; cursor:pointer; transition:all .2s; color:#dc2626; font-weight:600; font-size:.875rem; }
+    .logout-btn:hover { background:rgba(239,68,68,0.2); border-color:#ef4444; transform:translateY(-1px); }
 
-    .lock-badge-container {
-      display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px;
-      border-radius: 50px; text-xs; font-bold;
-      background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5;
-    }
-    .lock-badge-x {
-      cursor: pointer; font-size: 16px; padding: 0 4px; border-radius: 50%;
-      transition: 0.15s; font-weight: 900;
-    }
-    .lock-badge-x:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.15); }
+    .filter-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:50px; font-size:12px; font-weight:700; background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; border:1.5px solid #3b82f6; box-shadow:0 2px 4px rgba(59,130,246,0.2); }
+    .filter-badge-close { cursor:pointer; font-size:14px; padding:2px 4px; border-radius:50%; transition:.15s; font-weight:900; line-height:1; }
+    .filter-badge-close:hover { background:rgba(239,68,68,0.3); transform:scale(1.2); }
+    .reset-all-btn { display:inline-flex; align-items:center; gap:4px; padding:6px 14px; border-radius:50px; font-size:13px; font-weight:800; background:linear-gradient(135deg,#fee2e2,#fecaca); color:#dc2626; border:1.5px solid #ef4444; box-shadow:0 2px 4px rgba(239,68,68,0.2); cursor:pointer; transition:all .2s; }
+    .reset-all-btn:hover { background:linear-gradient(135deg,#fecaca,#fca5a5); transform:scale(1.05); box-shadow:0 4px 8px rgba(239,68,68,0.3); }
 
-    .tech-glow {
-      display: inline-block; width: 8px; height: 8px; background: #3b82f6;
-      border-radius: 50%; animation: glow-pulse 2s ease-in-out infinite;
-      position: relative; top: -2px; margin-right: 6px;
-    }
-    @keyframes glow-pulse {
-      0%, 100% {
-        opacity: 1; transform: scale(1);
-        box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6;
-      }
-      50% {
-        opacity: 0.6; transform: scale(0.85);
-        box-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6;
-      }
-    }
+    .title-frame { display:inline-flex; align-items:center; padding:6px 12px; border-radius:14px; border:2px solid rgba(59,130,246,0.30); background:rgba(255,255,255,0.55); box-shadow:0 10px 25px rgba(59,130,246,0.10); }
 
-    /* 🔥 新增：圖例發光效果 */
-    .legend-glow-dot {
-      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-      margin-right: 6px; animation: legend-pulse 2s ease-in-out infinite;
-    }
-    @keyframes legend-pulse {
-      0%, 100% {
-        opacity: 1; transform: scale(1);
-        box-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;
-      }
-      50% {
-        opacity: 0.7; transform: scale(0.9);
-        box-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
-      }
-    }
-
-    .logout-btn {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1.5px solid rgba(239, 68, 68, 0.3);
-      padding: 6px 14px; border-radius: 8px; cursor: pointer;
-      transition: all 0.2s; color: #dc2626; font-weight: 600; font-size: 0.875rem;
-    }
-    .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: #ef4444; transform: translateY(-1px);
-    }
-
-    /* 🔥 新增：過濾標籤樣式 */
-    .filter-badge {
-      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-      border-radius: 50px; font-size: 12px; font-weight: 700;
-      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-      color: #1e40af; border: 1.5px solid #3b82f6;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-    }
-    .filter-badge-close {
-      cursor: pointer; font-size: 14px; padding: 2px 4px;
-      border-radius: 50%; transition: 0.15s; font-weight: 900; line-height: 1;
-    }
-    .filter-badge-close:hover { background: rgba(239, 68, 68, 0.3); transform: scale(1.2); }
-
-    .reset-all-btn {
-      display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px;
-      border-radius: 50px; font-size: 13px; font-weight: 800;
-      background: linear-gradient(135deg, #fee2e2, #fecaca);
-      color: #dc2626; border: 1.5px solid #ef4444;
-      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .reset-all-btn:hover {
-      background: linear-gradient(135deg, #fecaca, #fca5a5);
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-    }
-
-    /* 標題外框 */
-    .title-frame {
-      display: inline-flex; align-items: center; padding: 6px 12px;
-      border-radius: 14px; border: 2px solid rgba(59, 130, 246, 0.30);
-      background: rgba(255, 255, 255, 0.55);
-      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.10);
-    }
-
-    /* =========================
-       新增：表層前端密碼遮罩
-       ========================= */
-    #frontGate {
-      position: fixed; inset: 0; z-index: 10000;
-      display: none; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      padding: 18px;
-    }
-    #frontGateCard {
-      width: 95%; max-width: 520px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(255,255,255,0.65);
-      border-radius: 18px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
-      padding: 22px;
-    }
-    #frontGateInput {
-      width: 100%; padding: 12px 14px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 12px; background: #fff;
-      font-weight: 800; letter-spacing: 0.5px; outline: none;
-    }
-    #frontGateHint { margin-top: 10px; font-size: 12px; color: #6b7280; line-height: 1.5; }
-    #frontGateError {
-      display: none; margin-top: 10px;
-      font-size: 12px; font-weight: 800; color: #dc2626;
-      background: #fef2f2; border: 1px solid #fecaca;
-      padding: 10px 12px; border-radius: 12px;
-    }
+    #frontGate { position:fixed; inset:0; z-index:10000; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); padding:18px; }
+    #frontGateCard { width:95%; max-width:520px; background:rgba(255,255,255,0.92); border:1px solid rgba(255,255,255,0.65); border-radius:18px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.35); padding:22px; }
+    #frontGateInput { width:100%; padding:12px 14px; border:1.5px solid #e5e7eb; border-radius:12px; background:#fff; font-weight:800; letter-spacing:.5px; outline:none; }
+    #frontGateHint { margin-top:10px; font-size:12px; color:#6b7280; line-height:1.5; }
+    #frontGateError { display:none; margin-top:10px; font-size:12px; font-weight:800; color:#dc2626; background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:12px; }
   </style>
 </head>
 
 <body>
-  <!-- =========================
-       新增：表層前端密碼入口
-       密碼：wakodo100
-       ========================= -->
+  <!-- Gate -->
   <div id="frontGate">
     <div id="frontGateCard">
       <div class="text-2xl font-extrabold text-slate-800 tracking-tight mb-2">🔒 請輸入密碼</div>
       <div class="text-xs text-slate-500 font-bold mb-4">請輸入密碼以檢視填表資料</div>
-      <input id="frontGateInput" type="password" placeholder="輸入密碼後按 Enter" autocomplete="off">
+      <input id="frontGateInput" type="password" placeholder="輸入密碼後按 Enter" autocomplete="off" />
       <div class="flex gap-2 mt-4">
         <button id="frontGateBtn" class="btn-primary w-full">進入</button>
       </div>
@@ -253,7 +96,6 @@
     </div>
   </div>
 
-  <!-- 下面整個原本內容包起來：未解鎖前不顯示 -->
   <div id="appRoot" style="display:none;">
     <div id="hoverPreview"></div>
 
@@ -270,12 +112,11 @@
           <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
-
-            <!-- 右側資訊區塊：靠右對齊，內部文字置中 -->
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.2.1</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.2.2</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
-              <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
+              <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
+                 id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
             </div>
           </h1>
         </div>
@@ -316,7 +157,6 @@
             <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
             <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
           </select>
-
           <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
           <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
         </div>
@@ -345,7 +185,6 @@
         </div>
       </div>
 
-      <!-- 🔥 修改：新布局 - 左右50%分割 -->
       <div class="glass-card p-6">
         <div class="flex justify-between items-center mb-4">
           <div>
@@ -354,30 +193,23 @@
           </div>
         </div>
 
-        <!-- 🔥 過濾標籤顯示區 -->
         <div id="filterBadgesContainer" class="hidden flex flex-wrap gap-2 mb-4 pb-4 border-b border-slate-100"></div>
 
-        <!-- 🔥 新布局：左側50%（客源+趨勢），右側50%（目的） -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- 左側：客源 + 趨勢（垂直堆疊）-->
           <div class="space-y-6">
             <div class="h-[350px] relative">
               <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計</h4>
               <canvas id="chartSource"></canvas>
             </div>
-
             <div class="h-[250px] relative">
               <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
               <canvas id="chartTrend"></canvas>
             </div>
           </div>
 
-          <!-- 右側：來店目的（獨立佔50%）-->
           <div class="h-[620px] relative">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
-            <div class="h-full">
-              <canvas id="chartPurpose"></canvas>
-            </div>
+            <div class="h-full"><canvas id="chartPurpose"></canvas></div>
           </div>
         </div>
       </div>
@@ -387,7 +219,6 @@
           <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈</h3>
           <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
         </div>
-
         <div class="glass-card p-6 flex flex-col md:col-span-2">
           <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈</h3>
           <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
@@ -471,7 +302,7 @@
             <div class="chk-grid" id="grpSource"></div>
             <div id="boxKeyword" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
               <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
-              <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：驗光推薦...">
+              <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：...">
             </div>
           </div>
 
@@ -504,1140 +335,998 @@
   </div>
 
   <script>
-    // 🔥 常數（注意：字串不可被換行切斷，否則整頁會空白）
-    const SOURCES = ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","業配貼文 (FB、IG)","老客回購","老客-未購","廣告看板","FB 社團文"];
-    const PURPOSES = ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查"];
-    const AGES = ["18歲以下","18-24","25-34","35-44","45-54","55歲以上"];
+  /* =========================================================
+    AI 維護合約（不可逆 -> 可逆 的核心）
+    目標：讓未來任何 AI 都能「看得懂、可驗證、可持續升級」，而不是越改越像壓縮圖。
 
-    // 🔥 新增：客源固定順序
-    const SOURCE_ORDER = ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","業配貼文 (FB、IG)","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"];
+    A) 不可破壞規則（最重要）
+      1. 圖表只允許在 updateAllCharts() 內建立/更新；其他地方不要碰 Chart 實例。
+      2. 狀態只改 ST；設定只改 CFG；流程只走 applyFilter()。
+      3. 改完要跑：APP.fn.selfTest({runCharts:true}) 先過再交付。
 
-    // 🔥 新增：客源固定顏色（彩色繽紛）
-    const SOURCE_COLORS = {
-      "Google 搜尋": "#f59e0b",
-      "Google Map": "#10b981",
-      "親友介紹": "#2563eb",
-      "Instagram 廣告": "#db2777",
-      "Facebook 廣告": "#7c3aed",
-      "FB、IG 一般文章": "#d97706",
-      "老客回購": "#0891b2",
-      "途經路過": "#ea580c",
-      "TikTok & YouTube": "#dc2626",
-      "老客-未購": "#9333ea",
-      "業配貼文 (FB、IG)": "#0d9488",
-      "Dcard": "#e11d48",
-      "PTT": "#4f46e5",
-      "Mobile 01": "#059669",
-      "廣告看板": "#b45309",
-      "FB 社團文": "#6d28d9",
-      "其他": "#475569"
+    B) 你以後怎麼叫 AI 改（建議口令）
+      「請只修改 CFG / applyFilter / updateAllCharts / renderTable 相關段落；
+       改完執行 selfTest，回報 PASS/FAIL 與失敗原因。」
+
+    C) 版本策略（可逆）
+      - 這份檔案永遠保持可讀（母本）。
+      - 若要上線壓縮：用外部工具產出 dist 版本（不要回寫覆蓋母本）。
+  ========================================================= */
+
+  /* ===== 設定（只改這裡） ===== */
+  const CFG = Object.freeze({
+    VERSION: "8.2.2",
+    FRONT_GATE_PASSWORD: "wakodo100",
+    FRONT_GATE_KEY: "wakodo_gate_ok",
+    PAGE_SIZE: 1000,
+
+    SOURCES: ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","業配貼文 (FB、IG)","老客回購","老客-未購","廣告看板","FB 社團文"],
+    PURPOSES: ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查"],
+    AGES: ["18歲以下","18-24","25-34","35-44","45-54","55歲以上"],
+
+    SOURCE_ORDER: ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","業配貼文 (FB、IG)","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"],
+    SOURCE_COLORS: Object.freeze({
+      "Google 搜尋":"#f59e0b","Google Map":"#10b981","親友介紹":"#2563eb","Instagram 廣告":"#db2777","Facebook 廣告":"#7c3aed","FB、IG 一般文章":"#d97706",
+      "老客回購":"#0891b2","途經路過":"#ea580c","TikTok & YouTube":"#dc2626","老客-未購":"#9333ea","業配貼文 (FB、IG)":"#0d9488",
+      "Dcard":"#e11d48","PTT":"#4f46e5","Mobile 01":"#059669","廣告看板":"#b45309","FB 社團文":"#6d28d9","其他":"#475569"
+    }),
+    PURPOSE_COLORS: ["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#db2777","#0d9488","#ea580c"],
+    INVALID_NAMES: ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"]
+  });
+
+  /* ===== 狀態（只改 ST） ===== */
+  const ST = {
+    raw: [],
+    filtered: [],
+    limit: 20,
+    store: "全部",
+    filter: { source:null, purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false },
+    datePicker: null,
+    isAdmin: false,
+    editingId: null,
+    currentDetailId: null
+  };
+
+  /* ===== 私有區（不要從外部直接碰） ===== */
+  const CH = {}; // charts（刻意不放在 ST，降低被旁路改壞的機率）
+
+  /* ===== 小工具 ===== */
+  const $ = (id) => document.getElementById(id);
+  const qa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const s = (v) => v == null ? "" : String(v);
+  const arr = (v) => Array.isArray(v) ? v : [];
+  const upd = (ch, mode="active") => { try { ch && ch.update(mode); } catch { ch && ch.update(); } };
+
+  function makeBarGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
+  function makeRadialGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
+
+  /* ===== Gate ===== */
+  function gateIsOk(){ return sessionStorage.getItem(CFG.FRONT_GATE_KEY) === "1"; }
+  function showGate(){
+    const gate=$("frontGate"), app=$("appRoot"), inp=$("frontGateInput"), btn=$("frontGateBtn"), err=$("frontGateError");
+    if(app) app.style.display="none";
+    if(gate) gate.style.display="flex";
+
+    const tryUnlock=()=>{
+      const ok = s(inp && inp.value) === CFG.FRONT_GATE_PASSWORD;
+      if(!ok){ if(err) err.style.display="block"; if(inp){ inp.value=""; inp.focus(); } return; }
+      if(err) err.style.display="none";
+      sessionStorage.setItem(CFG.FRONT_GATE_KEY,"1");
+      if(gate) gate.style.display="none";
+      if(app) app.style.display="block";
+      initMain();
     };
 
-    // 低飽和漸層工具
-    function hexToRgba(hex, a) {
-      if (!hex) return `rgba(148,163,184,${a})`;
-      const h = hex.replace('#', '').trim();
-      const full = h.length === 3 ? h.split('').map(x => x + x).join('') : h;
-      const r = parseInt(full.slice(0, 2), 16);
-      const g = parseInt(full.slice(2, 4), 16);
-      const b = parseInt(full.slice(4, 6), 16);
-      return `rgba(${r},${g},${b},${a})`;
-    }
-    function makeBarGradient(ctx, baseHex, stronger = false) { return baseHex || '#94a3b8'; }
-    function makeRadialGradient(ctx, baseHex, stronger = false) { return baseHex || '#94a3b8'; }
+    if(btn) btn.onclick=tryUnlock;
+    if(inp){ inp.onkeydown=(e)=>{ if(e.key==="Enter") tryUnlock(); }; setTimeout(()=>inp.focus(),0); }
+  }
 
-    // 🔥 全局過濾狀態
-    let globalFilter = {
-      source: null,
-      purpose: null,
-      gender: null,
-      age: null,
-      sourceLocked: false,
-      purposeLocked: false,
-      genderLocked: false,
-      ageLocked: false
-    };
+  /* ===== Admin ===== */
+  function enableAdminUI(){
+    ST.isAdmin=true;
+    $("adminPanel")?.classList.remove("hidden");
+    $("loginForm")?.classList.add("hidden");
+    $("adminActions")?.classList.remove("hidden");
+    $("logoutBtn")?.classList.remove("hidden");
+  }
 
-    let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', charts = {}, datePicker, isAdmin = false;
+  /* ===== 遮蔽姓名 ===== */
+  function maskName(name){
+    name = s(name).trim();
+    if(!name) return "未留資料";
+    if(ST.isAdmin) return name;
+    if(name === "未留資料") return name;
+    if(name.length === 2) return name[0] + "〇";
+    if(name.length === 3) return name[0] + "〇" + name[2];
+    if(name.length >= 4) return name[0] + "〇" + name.slice(2);
+    return name;
+  }
 
-    // =========================
-    // 表層前端密碼（不動管理員）
-    // =========================
-    const FRONT_GATE_PASSWORD = 'wakodo100';
-    const FRONT_GATE_KEY = 'wakodo_gate_ok';
+  /* ===== 鎖定/清除篩選 ===== */
+  function toggleLock(type, value){
+    const lk = type + "Locked";
+    if(ST.filter[type] === value){ ST.filter[type]=null; ST.filter[lk]=false; }
+    else { ST.filter[type]=value; ST.filter[lk]=true; }
+    updateAllCharts();
+  }
+  window.toggleLock = toggleLock;
 
-    function gateIsOk() { return sessionStorage.getItem(FRONT_GATE_KEY) === '1'; }
-
-    function showGate() {
-      const gate = document.getElementById('frontGate');
-      const app = document.getElementById('appRoot');
-      if (app) app.style.display = 'none';
-      if (gate) gate.style.display = 'flex';
-
-      const inp = document.getElementById('frontGateInput');
-      const btn = document.getElementById('frontGateBtn');
-      const err = document.getElementById('frontGateError');
-
-      function tryUnlock() {
-        if (!inp) return;
-        const ok = (inp.value || '') === FRONT_GATE_PASSWORD;
-        if (!ok) {
-          if (err) err.style.display = 'block';
-          inp.value = '';
-          inp.focus();
-          return;
-        }
-        if (err) err.style.display = 'none';
-        sessionStorage.setItem(FRONT_GATE_KEY, '1');
-        if (gate) gate.style.display = 'none';
-        if (app) app.style.display = 'block';
-        initMain();
-      }
-
-      if (btn) btn.onclick = tryUnlock;
-      if (inp) {
-        inp.onkeydown = (e) => { if (e.key === 'Enter') tryUnlock(); };
-        setTimeout(() => inp.focus(), 0);
-      }
-    }
-
-    // =========================
-    // 管理員可編輯（不影響原新增 RPC）
-    // =========================
-    let editingId = null;
-
-    function setSaveButtonText() {
-      const btn = document.getElementById('btnSave');
-      if (!btn) return;
-      btn.innerText = (editingId && isAdmin) ? '更新儲存' : '確認儲存';
-    }
-
-    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-
-    function selectRadioByValue(groupId, val) {
-      const grp = document.getElementById(groupId);
-      if (!grp) return;
-      const btns = Array.from(grp.querySelectorAll('.radio-btn'));
-      const target = btns.find(b => (b.dataset && b.dataset.value) === val) || btns.find(b => b.innerText.trim() === String(val || '').trim());
-      if (target) window.selectRadio(groupId, val, target);
-    }
-
-    function checkMultiByTexts(groupId, texts) {
-      const grp = document.getElementById(groupId);
-      if (!grp) return;
-      const set = new Set((texts || []).map(t => String(t).trim()));
-      Array.from(grp.querySelectorAll('.chk-btn')).forEach(btn => {
-        const label = btn.innerText.trim();
-        if (set.has(label)) btn.classList.add('checked');
-        else btn.classList.remove('checked');
-      });
-
-      if (groupId === 'grpSource') {
-        const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
-        document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
-      }
-    }
-
-    window.startEditCurrent = function () {
-      if (!isAdmin) { alert('⚠️ 需要管理員權限才能編輯！'); return; }
-      const id = window.currentDetailId;
-      const v = rawData.find(x => x.id === parseInt(id, 10));
-      if (!v) return;
-
-      editingId = v.id;
-      setSaveButtonText();
-
-      document.querySelectorAll('.selected, .checked').forEach(el => el.classList.remove('selected', 'checked'));
-      document.getElementById('boxKeyword').classList.add('hidden');
-
-      document.getElementById('mDate').value = v.form_date || '';
-      document.getElementById('mStore').value = v.store_branch || '臨安店';
-      document.getElementById('mName').value = v.customer_name || '';
-      document.getElementById('mTainan').checked = !!v.is_local;
-
-      selectRadioByValue('grpGender', v.gender || '');
-      selectRadioByValue('grpAge', v.age_range || '');
-
-      checkMultiByTexts('grpSource', v.source_tags || []);
-      checkMultiByTexts('grpPurpose', v.visit_purposes || []);
-
-      document.getElementById('mKeyword').value = v.search_keywords || '';
-      document.getElementById('mDetail').value = v.detail_desc || '';
-
-      closeDetail();
-      openAddModal();
-    };
-
-    // =========================
-    // initMain
-    // =========================
-    async function initMain() {
-      Chart.register(ChartDataLabels);
-
-      flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-      datePicker = flatpickr("#dateRange", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        locale: "zh_tw",
-        monthSelectorType: 'static',
-        onChange: (d) => { if (d.length === 2) applyFilter(); }
-      });
-
-      document.getElementById('qSearch').addEventListener('input', function () {
-        this.value ? document.getElementById('btnX').classList.remove('hidden') : document.getElementById('btnX').classList.add('hidden');
-      });
-
-      initAddModal();
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) enableAdminUI();
-
-      await fetchAllData();
-    }
-
-    window.onload = async () => {
-      if (!gateIsOk()) { showGate(); return; }
-      const app = document.getElementById('appRoot');
-      if (app) app.style.display = 'block';
-      await initMain();
-    };
-
-    function initAddModal() {
-      document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('grpAge').innerHTML = AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join('');
-      document.getElementById('grpSource').innerHTML = SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}')">${s}</div>`).join('');
-      document.getElementById('grpPurpose').innerHTML = PURPOSES.map(p => `<div class="chk-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('');
-    }
-
-    window.selectRadio = (grp, val, el) => {
-      document.getElementById(grp).querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
-      el.classList.add('selected');
-      el.dataset.value = val;
-    };
-
-    window.toggleChk = (el) => {
-      el.classList.toggle('checked');
-      const grp = el.parentElement;
-      if (grp.id === 'grpSource') {
-        const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
-        document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
-      }
-    };
-
-    window.saveData = async () => {
-      const name = document.getElementById('mName').value.trim();
-      const genderEl = document.querySelector('#grpGender .selected');
-      const ageEl = document.querySelector('#grpAge .selected');
-      const sources = Array.from(document.querySelectorAll('#grpSource .checked')).map(e => e.innerText);
-      const purposes = Array.from(document.querySelectorAll('#grpPurpose .checked')).map(e => e.innerText);
-      const detail = document.getElementById('mDetail').value.trim();
-
-      if (!name || !genderEl || !ageEl || sources.length === 0 || purposes.length === 0 || !detail) {
-        alert('⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。');
-        return;
-      }
-
-      // ✅ 編輯模式：管理員更新 visits（不動原本新增 RPC）
-      if (editingId && isAdmin) {
-        const updatePayload = {
-          form_date: document.getElementById('mDate').value,
-          store_branch: document.getElementById('mStore').value,
-          customer_name: name,
-          gender: genderEl.dataset.value,
-          age_range: ageEl.dataset.value,
-          is_local: document.getElementById('mTainan').checked,
-          source_tags: sources,
-          visit_purposes: purposes,
-          search_keywords: document.getElementById('mKeyword').value,
-          detail_desc: detail
-        };
-
-        const { error } = await supabase.from('visits').update(updatePayload).eq('id', editingId);
-        if (error) {
-          alert('更新失敗: ' + error.message);
-          console.error(error);
-          return;
-        }
-
-        alert('✅ 已更新');
-        editingId = null;
-        setSaveButtonText();
-        closeAddModal();
-        fetchAllData();
-        return;
-      }
-
-      // ✅ 新增模式：沿用原本 submit_visit_v7
-      const payload = {
-        p_date: document.getElementById('mDate').value,
-        p_store: document.getElementById('mStore').value,
-        p_name: name,
-        p_gender: genderEl.dataset.value,
-        p_age: ageEl.dataset.value,
-        p_is_local: document.getElementById('mTainan').checked,
-        p_sources: sources,
-        p_purposes: purposes,
-        p_keywords: document.getElementById('mKeyword').value,
-        p_detail: detail
-      };
-
-      const { error } = await supabase.rpc('submit_visit_v7', payload);
-      if (error) {
-        alert('儲存失敗: ' + error.message);
-        console.error(error);
-      } else {
-        alert('🎉 新增成功！');
-        closeAddModal();
-        fetchAllData();
-      }
-    };
-
-    window.closeAddModal = () => {
-      document.getElementById('addModal').style.display = 'none';
-      document.getElementById('mName').value = '';
-      document.getElementById('mDetail').value = '';
-      document.getElementById('mKeyword').value = '';
-      document.querySelectorAll('.selected, .checked').forEach(e => e.classList.remove('selected', 'checked'));
-      document.getElementById('boxKeyword').classList.add('hidden');
-      editingId = null;
-      setSaveButtonText();
-    };
-
-    window.quickSelectDate = () => {
-      const y = document.getElementById('selYear').value;
-      const m = document.getElementById('selMonth').value;
-      if (y && m) {
-        datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]);
-        applyFilter();
-      }
-    };
-
-    window.resetDate = () => {
-      if (rawData.length) {
-        const d = rawData.map(x => x.form_date).sort();
-        datePicker.setDate([d[0], d[d.length - 1]]);
-      }
-      document.getElementById('selMonth').value = "";
-      applyFilter();
-    };
-
-    window.clearSearch = () => {
-      document.getElementById('qSearch').value = '';
-      document.getElementById('btnX').classList.add('hidden');
-      applyFilter();
-    };
-
-    async function fetchAllData() {
-      let allRows = [], page = 0;
-      const pageSize = 1000;
-      document.getElementById('valTotal').innerText = '...';
-
-      while (true) {
-        const { data, error } = await supabase.from('visits').select('*').range(page * pageSize, (page + 1) * pageSize - 1);
-        if (error) {
-          console.error('資料載入錯誤:', error);
-          alert('載入資料失敗：' + error.message);
-          break;
-        }
-        if (!data || data.length === 0) break;
-        allRows = allRows.concat(data);
-        if (data.length < pageSize) break;
-        page++;
-      }
-
-      rawData = allRows.sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
-
-      if (rawData.length > 0) {
-        const lastDate = rawData[0].form_date.replace(/-/g, '/');
-        const dispEl = document.getElementById('lastDataDisp');
-        if (dispEl) dispEl.innerText = 'last data ' + lastDate;
-      }
-
-      if (rawData.length > 0) {
-        const years = [...new Set(rawData.map(d => d.form_date.slice(0, 4)))].sort().reverse();
-        const ySel = document.getElementById('selYear');
-        ySel.innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('');
-        const dates = rawData.map(d => d.form_date).sort();
-        datePicker.setDate([dates[0], dates[dates.length - 1]]);
-      }
-
-      applyFilter();
-    }
-
-    window.applyFilter = () => {
-      const dates = datePicker.selectedDates;
-      const start = dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '1900-01-01';
-      const end = dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2100-12-31';
-      const q = document.getElementById('qSearch').value.toLowerCase();
-
-      const timeData = rawData.filter(v => v.form_date >= start && v.form_date <= end);
-      document.getElementById('valTotal').innerText = timeData.length;
-      document.getElementById('valLinAn').innerText = timeData.filter(v => v.store_branch === '臨安店').length;
-      document.getElementById('valNanKe').innerText = timeData.filter(v => v.store_branch === '南科店').length;
-
-      filteredData = timeData.filter(v => {
-        if (currentStore !== '全部' && v.store_branch !== currentStore) return false;
-        if (q && !String(v.customer_name || '').toLowerCase().includes(q) && !String(v.detail_desc || '').toLowerCase().includes(q)) return false;
-        return true;
-      });
-
-      // 🔥 清空全局過濾狀態（保留所有鎖定條件）
-      if (!globalFilter.sourceLocked) globalFilter.source = null;
-      if (!globalFilter.purposeLocked) globalFilter.purpose = null;
-      if (!globalFilter.genderLocked) globalFilter.gender = null;
-      if (!globalFilter.ageLocked) globalFilter.age = null;
-
-      displayLimit = 20;
-      renderCharts(filteredData);
-      renderTable();
-      updateFilterBadges();
+  window.clearFilter = (type)=>{
+    if(type==="all"){
+      Object.assign(ST.filter,{source:null,purpose:null,gender:null,age:null,sourceLocked:false,purposeLocked:false,genderLocked:false,ageLocked:false});
       updateAllCharts();
-    };
+      return;
+    }
+    ST.filter[type]=null;
+    if(type==="source") ST.filter.sourceLocked=false;
+    if(type==="purpose") ST.filter.purposeLocked=false;
+    if(type==="gender") ST.filter.genderLocked=false;
+    if(type==="age") ST.filter.ageLocked=false;
+    updateAllCharts();
+  };
 
-    // 🔥 renderCharts - 只渲染客源圖（固定順序+固定顏色）
-    function renderCharts(data) {
-      const sMap = {};
-      data.forEach(v => (v.source_tags || []).forEach(t => sMap[t] = (sMap[t] || 0) + 1));
+  function updateFilterBadges(){
+    const c=$("filterBadgesContainer"); if(!c) return;
+    const b=[];
+    const mk=(k)=>`<div class="filter-badge"><span>${ST.filter[k]}</span><span class="filter-badge-close" onclick="clearFilter('${k}')">✕</span></div>`;
+    if(ST.filter.source) b.push(mk("source"));
+    if(ST.filter.purpose) b.push(mk("purpose"));
+    if(ST.filter.gender) b.push(mk("gender"));
+    if(ST.filter.age) b.push(mk("age"));
+    if(b.length>=2) b.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
+    if(b.length){ c.innerHTML=b.join(""); c.classList.remove("hidden"); } else c.classList.add("hidden");
+  }
 
-      const orderedLabels = SOURCE_ORDER.filter(s => sMap[s] > 0);
-      const orderedData = orderedLabels.map(s => sMap[s]);
-      const orderedColors = orderedLabels.map(s => SOURCE_COLORS[s] || '#94a3b8');
+  /* ===== 圖表：建立一次 + 更新動畫 ===== */
+  function ensureChart(key, canvasId, cfg){
+    if(CH[key]) return CH[key];
+    const el=$(canvasId); if(!el) return null;
+    CH[key] = new Chart(el, cfg);
+    return CH[key];
+  }
 
-      if (charts.source) charts.source.destroy();
-      charts.source = new Chart(document.getElementById('chartSource'), {
-        type: 'bar',
-        data: {
-          labels: orderedLabels,
-          datasets: [{
-            data: orderedData,
-            baseColors: orderedColors,
-            backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', false),
-            borderRadius: 6,
-            hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', true)
-          }]
+  function buildSubset(){
+    const f=ST.filter;
+    return ST.filtered.filter(v=>{
+      if(f.source && !arr(v.source_tags).includes(f.source)) return false;
+      if(f.gender && s(v.gender)!==f.gender) return false;
+      if(f.age && s(v.age_range)!==f.age) return false;
+      if(f.purpose && !arr(v.visit_purposes).includes(f.purpose)) return false;
+      return true;
+    });
+  }
+
+  function updSource(sub){
+    const map={};
+    sub.forEach(v=>arr(v.source_tags).forEach(t=>{ if(!t) return; map[t]=(map[t]||0)+1; }));
+    const labels = CFG.SOURCE_ORDER.filter(x => map[x] > 0);
+    const data = labels.map(x => map[x]);
+    const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
+
+    const ch = ensureChart("source", "chartSource", {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          data,
+          baseColors: colors,
+          backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
+          borderRadius: 6,
+          hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8")
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: "easeOutQuart" },
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            anchor: "end",
+            align: "right",
+            offset: 4,
+            formatter: (v, ctx) => {
+              const tot = (ctx.dataset.data || []).reduce((a, b) => a + b, 0);
+              return tot ? (Math.round(v / tot * 100) + "%") : "0%";
+            },
+            font: { size: 11, weight: "bold" },
+            color: "#475569",
+            backgroundColor: "rgba(255,255,255,0.9)",
+            borderRadius: 4,
+            padding: { top: 2, bottom: 2, left: 4, right: 4 }
+          },
+          tooltip: { backgroundColor: "rgba(0,0,0,0.85)", padding: 12, cornerRadius: 8 }
         },
-        options: {
-          indexAxis: 'y',
-          maintainAspectRatio: false,
-          animation: { duration: 800, easing: 'easeOutQuart' },
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'right',
-              offset: 4,
-              formatter: (v, ctx) => {
-                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                return total ? (Math.round(v / total * 100) + '%') : '0%';
-              },
-              font: { size: 11, weight: 'bold' },
-              color: '#475569',
-              backgroundColor: 'rgba(255,255,255,0.9)',
-              borderRadius: 4,
-              padding: { top: 2, bottom: 2, left: 4, right: 4 }
-            },
-            tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 8 }
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { grid: { display: false }, ticks: { font: { size: 11, weight: "600" } } }
+        },
+        onClick: (e, els) => {
+          if (!els || !els.length) return;
+          const label = ch.data.labels[els[0].index];
+          toggleLock("source", label);
+        }
+      }
+    });
+
+    if (!ch) return;
+    ch.data.labels = labels;
+    ch.data.datasets[0].data = data;
+    ch.data.datasets[0].baseColors = colors;
+    upd(ch, "active");
+  }
+
+  function updPurpose(sub) {
+    const map = {};
+    sub.forEach(v => arr(v.visit_purposes).forEach(p => { if (!p) return; map[p] = (map[p] || 0) + 1; }));
+    const total = Object.values(map).reduce((a, b) => a + b, 0);
+    const top = Object.entries(map).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const labels = top.map(x => x[0]);
+    const data = top.map(x => x[1]);
+    const colors = CFG.PURPOSE_COLORS.slice(0, labels.length);
+
+    const ch = ensureChart("purpose", "chartPurpose", {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [{
+          data,
+          baseColors: colors,
+          backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
+          hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
+          borderWidth: 0,
+          hoverOffset: 15
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        cutout: "60%",
+        layout: { padding: 20 },
+        animation: { animateRotate: true, animateScale: true, duration: 800 },
+        events: ["mousemove", "mouseout", "touchstart", "touchmove"], /* 保留 hover tooltip；不綁 click */
+        plugins: {
+          legend: {
+            display: true,
+            position: "right",
+            labels: {
+              boxWidth: 14,
+              boxHeight: 14,
+              usePointStyle: true,
+              pointStyle: "circle",
+              padding: 14,
+              font: { size: 12, weight: "700" },
+              color: "#1e293b",
+              generateLabels: (chart) => {
+                const ds = chart.data.datasets[0] || {};
+                const tot = Number(chart.$purposeTotalAll || 0);
+                return (chart.data.labels || []).map((label, i) => {
+                  const val = Number((ds.data || [])[i] || 0);
+                  const pct = tot ? Math.round(val / tot * 100) : 0;
+                  return { text: `${label} ${pct}%`, fillStyle: (ds.baseColors || [])[i] || "#94a3b8", hidden: false, index: i, pointStyle: "circle" };
+                });
+              }
+            }
           },
-          scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-            y: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
-          },
-          onClick: (e, els) => {
-            if (els[0]) {
-              const label = orderedLabels[els[0].index];
-              if (globalFilter.source === label) { globalFilter.source = null; globalFilter.sourceLocked = false; }
-              else { globalFilter.source = label; globalFilter.sourceLocked = true; }
-              updateAllCharts();
+          datalabels: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(0,0,0,0.85)",
+            padding: 14,
+            cornerRadius: 8,
+            titleFont: { size: 14, weight: "bold" },
+            bodyFont: { size: 13 },
+            callbacks: {
+              label: (ctx) => {
+                const tot = Number(ctx.chart.$purposeTotalAll || 0);
+                const val = Number(ctx.raw || 0);
+                const pct = tot ? Math.round(val / tot * 100) : 0;
+                return ` ${ctx.label}: ${val} 人 (${pct}%)`;
+              }
             }
           }
         }
-      });
-
-      updateAllCharts();
-    }
-
-    // 🔥 統一更新所有圖表（全雙向連動）
-    function updateAllCharts() {
-      let subset = filteredData.filter(v => {
-        if (globalFilter.source && !(v.source_tags || []).includes(globalFilter.source)) return false;
-        if (globalFilter.gender && v.gender !== globalFilter.gender) return false;
-        if (globalFilter.age && v.age_range !== globalFilter.age) return false;
-        if (globalFilter.purpose && !(v.visit_purposes || []).includes(globalFilter.purpose)) return false;
-        return true;
-      });
-
-      // 反向連動：更新客源統計
-      const sMap_reverse = {};
-      subset.forEach(v => (v.source_tags || []).forEach(t => sMap_reverse[t] = (sMap_reverse[t] || 0) + 1));
-      const orderedLabels_reverse = SOURCE_ORDER.filter(s => sMap_reverse[s] > 0);
-      const orderedData_reverse = orderedLabels_reverse.map(s => sMap_reverse[s]);
-      const orderedColors_reverse = orderedLabels_reverse.map(s => SOURCE_COLORS[s] || '#94a3b8');
-
-      if (charts.source) {
-        charts.source.data.labels = orderedLabels_reverse;
-        charts.source.data.datasets[0].data = orderedData_reverse;
-        charts.source.data.datasets[0].baseColors = orderedColors_reverse;
-        charts.source.update('active');
       }
+    });
 
-      updateFilterBadges();
+    if (!ch) return;
+    ch.data.labels = labels;
+    ch.data.datasets[0].data = data;
+    ch.data.datasets[0].baseColors = colors;
+    ch.$purposeTotalAll = total;
+    upd(ch, "active");
+  }
 
-      // === 來店目的圖表（本版：不可點擊，不鎖定）===
-      const pMap = {};
-      subset.forEach(v => (v.visit_purposes || []).forEach(p => {
-        if (!p) return;
-        pMap[p] = (pMap[p] || 0) + 1;
-      }));
-      const totalPurposeAll = Object.values(pMap).reduce((a, b) => a + b, 0);
-      const sortedP = Object.entries(pMap).filter(([_, cnt]) => cnt > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
-      const purposeColors = ['#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0d9488', '#ea580c'];
+  function updTrend(sub) {
+    const map = {};
+    sub.forEach(v => { const m = s(v.form_date).slice(0, 7); if (m) map[m] = (map[m] || 0) + 1; });
+    const labels = Object.keys(map).sort();
+    const data = labels.map(k => map[k]);
+    const maxV = Math.max(...data, 1);
+    const suggestedMax = Math.ceil(maxV * 1.2);
 
-      if (charts.purpose) {
-        charts.purpose.data.labels = sortedP.map(x => x[0]);
-        charts.purpose.data.datasets[0].data = sortedP.map(x => x[1]);
-        charts.purpose.data.datasets[0].baseColors = purposeColors.slice(0, sortedP.length);
-        charts.purpose.$purposeTotalAll = totalPurposeAll;
-        charts.purpose.update('active');
-      } else {
-        charts.purpose = new Chart(document.getElementById('chartPurpose'), {
-          type: 'doughnut',
-          data: {
-            labels: sortedP.map(x => x[0]),
-            datasets: [{
-              data: sortedP.map(x => x[1]),
-              baseColors: purposeColors.slice(0, sortedP.length),
-              backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', false),
-              hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', true),
-              borderWidth: 0,
-              hoverOffset: 15
-            }]
+    const ch = ensureChart("trend", "chartTrend", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: "#f59e0b",
+          borderWidth: 2.5,
+          pointBackgroundColor: "#fff",
+          pointBorderColor: "#f59e0b",
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.4,
+          fill: true,
+          backgroundColor: (ctx) => {
+            const chart = ctx.chart;
+            const g = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
+            g.addColorStop(0, "rgba(245,158,11,0.18)");
+            g.addColorStop(1, "rgba(245,158,11,0.04)");
+            return g;
+          }
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: "easeInOutQuart" },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: {
+            beginAtZero: true,
+            suggestedMax,
+            grid: { borderDash: [5, 5], color: "#f1f5f9" },
+            ticks: { font: { size: 10 } }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            align: "top",
+            anchor: "end",
+            offset: 4,
+            font: { size: 10, weight: "bold" },
+            color: "#f59e0b",
+            backgroundColor: "rgba(255,255,255,0.9)",
+            borderRadius: 4,
+            padding: { top: 2, bottom: 2, left: 3, right: 3 },
+            formatter: (v) => v
           },
-          options: {
-            maintainAspectRatio: false,
-            cutout: '60%',
-            layout: { padding: 20 },
-            animation: { animateRotate: true, animateScale: true, duration: 800 },
-
-            // ✅ 禁用 click（保留 hover tooltip）
-            events: ['mousemove', 'mouseout', 'touchstart', 'touchmove'],
-
-            plugins: {
-              legend: {
-                display: true,
-                position: 'right',
-                labels: {
-                  boxWidth: 14,
-                  boxHeight: 14,
-                  usePointStyle: true,
-                  pointStyle: 'circle',
-                  padding: 14,
-                  font: { size: 12, weight: '700' },
-                  color: '#1e293b',
-                  generateLabels: (chart) => {
-                    const data = chart.data;
-                    const ds = data.datasets[0] || {};
-                    const total = Number(chart.$purposeTotalAll || 0);
-                    return (data.labels || []).map((label, i) => {
-                      const val = Number((ds.data || [])[i] || 0);
-                      const pct = total ? Math.round(val / total * 100) : 0;
-                      return {
-                        text: `${label} ${pct}%`,
-                        fillStyle: (ds.baseColors || [])[i] || (ds.backgroundColor || [])[i] || '#94a3b8',
-                        hidden: false,
-                        index: i,
-                        fontColor: '#1e293b',
-                        pointStyle: 'circle'
-                      };
-                    });
-                  }
-                }
-              },
-              datalabels: { display: false },
-              tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.85)',
-                padding: 14,
-                cornerRadius: 8,
-                titleFont: { size: 14, weight: 'bold' },
-                bodyFont: { size: 13 },
-                callbacks: {
-                  label: (ctx) => {
-                    const total = Number(ctx.chart.$purposeTotalAll || 0);
-                    const val = Number(ctx.raw || 0);
-                    const pct = total ? Math.round(val / total * 100) : 0;
-                    return ` ${ctx.label}: ${val} 人 (${pct}%)`;
-                  }
-                }
-              }
-            }
+          tooltip: {
+            backgroundColor: "rgba(0,0,0,0.8)",
+            padding: 10,
+            cornerRadius: 6,
+            callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
           }
-        });
-        charts.purpose.$purposeTotalAll = totalPurposeAll;
-      }
-
-      // === 趨勢圖表 ===
-      const tMap = {};
-      subset.forEach(v => {
-        const m = String(v.form_date || '').slice(0, 7);
-        if (m) tMap[m] = (tMap[m] || 0) + 1;
-      });
-      const sortedT = Object.keys(tMap).sort();
-      const maxTrendValue = Math.max(...sortedT.map(k => tMap[k]), 1);
-      const suggestedMaxTrend = Math.ceil(maxTrendValue * 1.2);
-
-      if (charts.trend) {
-        charts.trend.data.labels = sortedT;
-        charts.trend.data.datasets[0].data = sortedT.map(k => tMap[k]);
-        charts.trend.options.scales.y.suggestedMax = suggestedMaxTrend;
-        charts.trend.update('active');
-      } else {
-        charts.trend = new Chart(document.getElementById('chartTrend'), {
-          type: 'line',
-          data: {
-            labels: sortedT,
-            datasets: [{
-              data: sortedT.map(k => tMap[k]),
-              borderColor: '#f59e0b',
-              borderWidth: 2.5,
-              pointBackgroundColor: '#fff',
-              pointBorderColor: '#f59e0b',
-              pointRadius: 5,
-              pointHoverRadius: 7,
-              tension: 0.4,
-              fill: true,
-              backgroundColor: (ctx) => {
-                const chart = ctx.chart;
-                const g = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
-                g.addColorStop(0, 'rgba(245,158,11,0.18)');
-                g.addColorStop(1, 'rgba(245,158,11,0.04)');
-                return g;
-              }
-            }]
-          },
-          options: {
-            maintainAspectRatio: false,
-            animation: { duration: 800, easing: 'easeInOutQuart' },
-            scales: {
-              x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-              y: {
-                beginAtZero: true,
-                suggestedMax: suggestedMaxTrend,
-                grid: { borderDash: [5, 5], color: '#f1f5f9' },
-                ticks: { font: { size: 10 } }
-              }
-            },
-            plugins: {
-              legend: { display: false },
-              datalabels: {
-                align: 'top',
-                anchor: 'end',
-                offset: 4,
-                font: { size: 10, weight: 'bold' },
-                color: '#f59e0b',
-                backgroundColor: 'rgba(255,255,255,0.9)',
-                borderRadius: 4,
-                padding: { top: 2, bottom: 2, left: 3, right: 3 },
-                formatter: (v) => v
-              },
-              tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                padding: 10,
-                cornerRadius: 6,
-                callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
-              }
-            }
-          }
-        });
-      }
-
-      // === 性別圖表 ===
-      const gMap = { '男': 0, '女': 0 };
-      subset.forEach(v => {
-        const g = v.gender || '其他';
-        if (g === '男' || g === '女') gMap[g]++;
-      });
-
-      if (charts.gender) {
-        charts.gender.data.datasets[0].data = [gMap['男'], gMap['女']];
-        charts.gender.update('active');
-      } else {
-        charts.gender = new Chart(document.getElementById('chartGender'), {
-          type: 'doughnut',
-          data: {
-            labels: ['男', '女'],
-            datasets: [{
-              data: [gMap['男'], gMap['女']],
-              backgroundColor: ['#2563eb', '#db2777'],
-              hoverBackgroundColor: ['#2563eb', '#db2777'],
-              hoverOffset: 10
-            }]
-          },
-          options: {
-            maintainAspectRatio: false,
-            cutout: '60%',
-            animation: { animateRotate: true, duration: 600 },
-            plugins: {
-              legend: { position: 'right', labels: { font: { size: 13, weight: '600' }, padding: 12 } },
-              tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 },
-              datalabels: { display: false }
-            },
-            onClick: (e, els) => {
-              if (els[0]) {
-                const label = els[0].index === 0 ? '男' : '女';
-                if (globalFilter.gender === label) { globalFilter.gender = null; globalFilter.genderLocked = false; }
-                else { globalFilter.gender = label; globalFilter.genderLocked = true; }
-                updateAllCharts();
-              }
-            }
-          }
-        });
-      }
-
-      // === 年齡圖表 ===
-      const aMap = {};
-      subset.forEach(v => {
-        const a = v.age_range || '未填';
-        if (a !== '未填') aMap[a] = (aMap[a] || 0) + 1;
-      });
-      const sortedAges = AGES.filter(age => aMap[age] > 0);
-
-      if (charts.age) {
-        charts.age.data.labels = sortedAges;
-        charts.age.data.datasets[0].data = sortedAges.map(age => aMap[age]);
-        charts.age.update('active');
-      } else {
-        charts.age = new Chart(document.getElementById('chartAge'), {
-          type: 'bar',
-          data: {
-            labels: sortedAges,
-            datasets: [{
-              label: '人數',
-              data: sortedAges.map(age => aMap[age]),
-              baseColors: sortedAges.map(_ => '#94a3b8'),
-              backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', false),
-              borderRadius: 6,
-              hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || '#94a3b8', true)
-            }]
-          },
-          options: {
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            animation: { duration: 600, easing: 'easeOutQuart' },
-            plugins: {
-              legend: { display: false },
-              tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 },
-              datalabels: { display: false }
-            },
-            scales: {
-              x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-              y: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
-            },
-            onClick: (e, els) => {
-              if (els[0]) {
-                const label = sortedAges[els[0].index];
-                if (globalFilter.age === label) { globalFilter.age = null; globalFilter.ageLocked = false; }
-                else { globalFilter.age = label; globalFilter.ageLocked = true; }
-                updateAllCharts();
-              }
-            }
-          }
-        });
-      }
-    } // updateAllCharts end
-
-    // 🔥 更新過濾標籤顯示
-    function updateFilterBadges() {
-      const container = document.getElementById('filterBadgesContainer');
-      const badges = [];
-
-      if (globalFilter.source) badges.push(`<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`);
-      if (globalFilter.purpose) badges.push(`<div class="filter-badge"><span>${globalFilter.purpose}</span><span class="filter-badge-close" onclick="clearFilter('purpose')">✕</span></div>`);
-      if (globalFilter.gender) badges.push(`<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`);
-      if (globalFilter.age) badges.push(`<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`);
-
-      if (badges.length >= 2) badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
-
-      if (badges.length > 0) {
-        container.innerHTML = badges.join('');
-        container.classList.remove('hidden');
-      } else {
-        container.classList.add('hidden');
-      }
-    }
-
-    // 🔥 清除過濾條件
-    window.clearFilter = (type) => {
-      if (type === 'all') {
-        globalFilter.source = null;
-        globalFilter.purpose = null;
-        globalFilter.gender = null;
-        globalFilter.age = null;
-        globalFilter.sourceLocked = false;
-        globalFilter.purposeLocked = false;
-        globalFilter.genderLocked = false;
-        globalFilter.ageLocked = false;
-        updateAllCharts();
-        return;
-      }
-
-      globalFilter[type] = null;
-      if (type === 'source') globalFilter.sourceLocked = false;
-      else if (type === 'purpose') globalFilter.purposeLocked = false;
-      else if (type === 'gender') globalFilter.genderLocked = false;
-      else if (type === 'age') globalFilter.ageLocked = false;
-
-      updateAllCharts();
-    };
-
-    // 🔥 姓名遮蔽
-    function maskName(name) {
-      if (!name) return '未留資料';
-      if (isAdmin) return name;
-      if (name === '未留資料') return name;
-      if (name.length === 2) return name[0] + '〇';
-      if (name.length === 3) return name[0] + '〇' + name[2];
-      if (name.length >= 4) return name[0] + '〇' + name.slice(2);
-      return name;
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      const page = filteredData.slice(0, displayLimit);
-      tbody.innerHTML = '';
-
-      page.forEach(v => {
-        const tr = document.createElement('tr');
-        const safeDesc = (v.detail_desc || '無備註').replace(/'/g, "\\'").replace(/\n/g, ' ');
-        tr.innerHTML = `
-          <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
-          <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === '臨安店' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-          <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
-          <td class="text-xs text-slate-500">${v.gender || '-'} / ${v.age_range || '-'}</td>
-          <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags || []).join(', ')}</td>
-          <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes || []).join(', ')}</td>
-          <td class="text-slate-300">›</td>
-        `;
-
-        tr.addEventListener('click', () => showDetail(v.id));
-        tr.addEventListener('mouseenter', (e) => showPreview(e, safeDesc));
-        tr.addEventListener('mouseleave', hidePreview);
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('listCounter').innerText = `${page.length} / ${filteredData.length}`;
-      document.getElementById('btnLoadMore').classList.toggle('hidden', page.length >= filteredData.length);
-    }
-
-    window.showPreview = (e, text) => {
-      if (!text || text === 'null' || text === '無備註') return;
-      const tooltip = document.getElementById('hoverPreview');
-      tooltip.innerText = text.length > 120 ? text.slice(0, 120) + '...' : text;
-      tooltip.style.display = 'block';
-      tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + 'px';
-      tooltip.style.top = (e.clientY + 15) + 'px';
-    };
-    window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
-
-    window.previewCSV = (input) => {
-      const f = input.files[0];
-      if (!f) return;
-
-      Papa.parse(f, {
-        header: true,
-        skipEmptyLines: true,
-        complete: async (res) => {
-          const total = res.data.length;
-          if (!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
-
-          const overlay = document.getElementById('importOverlay');
-          const progress = document.getElementById('importProgress');
-          const status = document.getElementById('importStatus');
-          const errLog = document.getElementById('importErrors');
-
-          overlay.style.display = 'flex';
-          errLog.innerHTML = '';
-          errLog.classList.add('hidden');
-
-          const invalidNames = ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"];
-
-          const cleanData = res.data.map((row, idx) => {
-            let d = row['form_date'] || row['填表日期'];
-            if (!d) { console.warn(`Row ${idx}: Missing date`); return null; }
-
-            d = String(d).trim().replace(/\//g, '-');
-            const dateParts = d.split('-');
-            if (dateParts.length === 3) {
-              const year = dateParts[0];
-              const month = dateParts[1].padStart(2, '0');
-              const day = dateParts[2].padStart(2, '0');
-              d = `${year}-${month}-${day}`;
-            }
-
-            const n = row['customer_name'] || row['顧客姓名'];
-            if (!n) { console.warn(`Row ${idx}: Missing name`); return null; }
-            const cleanName = invalidNames.includes(String(n).trim()) ? '未留資料' : n;
-
-            let sRaw = row['source_tags'] || row['來源統計'] || '';
-            sRaw = String(sRaw).replace(/，/g, ',');
-
-            let pRaw = row['visit_purposes'] || row['來店目的'] || '';
-            pRaw = String(pRaw).replace(/，/g, ',');
-
-            let cleanAge = row['age_range'] || row['年齡範圍'] || '';
-            cleanAge = String(cleanAge);
-            if (cleanAge === '18以下') cleanAge = '18歲以下';
-
-            return {
-              p_date: d,
-              p_store: row['store_branch'] || row['門店'] || '臨安店',
-              p_name: cleanName,
-              p_gender: row['gender'] || row['性別'] || '',
-              p_age: cleanAge,
-              p_is_local: String(row['is_local'] || row['是否為台南人'] || '').includes('是'),
-              p_sources: String(sRaw).split(',').map(x => x.trim()).filter(x => x),
-              p_purposes: String(pRaw).split(',').map(x => x.trim()).filter(x => x),
-              p_keywords: row['search_keywords'] || row['搜尋關鍵字'] || '',
-              p_detail: row['detail_desc'] || row['詳細描述'] || ''
-            };
-          }).filter(x => x);
-
-          let processed = 0, errors = [];
-
-          for (let i = 0; i < cleanData.length; i++) {
-            const row = cleanData[i];
-            try {
-              const { error } = await supabase.rpc('submit_visit_v7', row);
-              if (error) throw error;
-            } catch (err) {
-              errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
-            }
-
-            processed++;
-            progress.style.width = Math.round(processed / cleanData.length * 100) + '%';
-            status.innerText = `處理中... ${processed} / ${cleanData.length}`;
-          }
-
-          status.innerText = `✅ 完成！成功: ${cleanData.length - errors.length} | 失敗: ${errors.length}`;
-
-          if (errors.length > 0) {
-            errLog.classList.remove('hidden');
-            errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join('');
-          }
-
-          setTimeout(() => {
-            overlay.style.display = 'none';
-            if (errors.length === 0) location.reload();
-            else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
-          }, 2000);
         }
-      });
-    };
+      }
+    });
 
-    window.loginSupabase = async () => {
-      const email = document.getElementById('admEmail').value.trim();
-      const pwd = document.getElementById('admPwd').value;
-      if (!email || !pwd) { alert('請輸入信箱和密碼'); return; }
+    if (!ch) return;
+    ch.data.labels = labels;
+    ch.data.datasets[0].data = data;
+    ch.options.scales.y.suggestedMax = suggestedMax;
+    upd(ch, "active");
+  }
 
-      const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
-      if (error) alert('登入失敗：' + error.message);
-      else { enableAdminUI(); alert('✅ 登入成功！'); }
-    };
+  function updGender(sub) {
+    const g = { 男: 0, 女: 0 };
+    sub.forEach(v => { const x = s(v.gender); if (x === "男" || x === "女") g[x]++; });
 
-    window.logout = async () => {
-      await supabase.auth.signOut();
-      isAdmin = false;
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('loginForm').classList.remove('hidden');
-      document.getElementById('adminActions').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('admEmail').value = '';
-      document.getElementById('admPwd').value = '';
-      alert('已登出管理模式');
-    };
-
-    function enableAdminUI() {
-      isAdmin = true;
-      document.getElementById('adminPanel').classList.remove('hidden');
-      document.getElementById('loginForm').classList.add('hidden');
-      document.getElementById('adminActions').classList.remove('hidden');
-      document.getElementById('logoutBtn').classList.remove('hidden');
-    }
-
-    window.exportCSV = () => {
-      const csv = Papa.unparse(rawData);
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }));
-      link.download = `wakodo_backup_${new Date().toISOString().slice(0, 10)}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-
-    window.wipeData = async () => {
-      if (!isAdmin) { alert('⚠️ 需要管理員權限！'); return; }
-
-      alert('⚠️ 安全機制：系統將強制下載備份 CSV。');
-      exportCSV();
-
-      setTimeout(async () => {
-        if (!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
-        const pwd = prompt('請輸入二次確認密碼：');
-        if (pwd === '628599') {
-          const { error } = await supabase.from('visits').delete().neq('id', 0);
-          if (error) alert('失敗: ' + error.message);
-          else { alert('✅ 資料庫已清空。'); location.reload(); }
-        } else {
-          alert('❌ 密碼錯誤！');
+    const ch = ensureChart("gender", "chartGender", {
+      type: "doughnut",
+      data: {
+        labels: ["男", "女"],
+        datasets: [{
+          data: [g.男, g.女],
+          backgroundColor: ["#2563eb", "#db2777"],
+          hoverBackgroundColor: ["#2563eb", "#db2777"],
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        cutout: "60%",
+        animation: { animateRotate: true, duration: 600 },
+        plugins: {
+          legend: { position: "right", labels: { font: { size: 13, weight: "600" }, padding: 12 } },
+          tooltip: { backgroundColor: "rgba(0,0,0,0.8)", padding: 10, cornerRadius: 6 },
+          datalabels: { display: false }
+        },
+        onClick: (e, els) => {
+          if (!els || !els.length) return;
+          toggleLock("gender", els[0].index === 0 ? "男" : "女");
         }
-      }, 1500);
-    };
+      }
+    });
 
-    window.setStore = (s) => {
-      currentStore = s;
-      document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
-      if (s === '全部') document.getElementById('kpiTotal').classList.add('active');
-      if (s === '臨安店') document.getElementById('kpiLinAn').classList.add('active');
-      if (s === '南科店') document.getElementById('kpiNanKe').classList.add('active');
-      applyFilter();
-    };
+    if (!ch) return;
+    ch.data.datasets[0].data = [g.男, g.女];
+    upd(ch, "active");
+  }
 
-    window.loadMore = () => { displayLimit += 20; renderTable(); };
+  function updAge(sub) {
+    const map = {};
+    sub.forEach(v => { const a = s(v.age_range); if (a && a !== "未填") map[a] = (map[a] || 0) + 1; });
+    const labels = CFG.AGES.filter(a => map[a] > 0);
+    const data = labels.map(a => map[a]);
 
-    window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
+    const ch = ensureChart("age", "chartAge", {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "人數",
+          data,
+          baseColors: labels.map(() => "#94a3b8"),
+          backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
+          borderRadius: 6,
+          hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8")
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        animation: { duration: 600, easing: "easeOutQuart" },
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: "rgba(0,0,0,0.8)", padding: 10, cornerRadius: 6 },
+          datalabels: { display: false }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { grid: { display: false }, ticks: { font: { size: 11, weight: "600" } } }
+        },
+        onClick: (e, els) => {
+          if (!els || !els.length) return;
+          const label = ch.data.labels[els[0].index];
+          toggleLock("age", label);
+        }
+      }
+    });
 
-    window.showDetail = (id) => {
-      const v = rawData.find(x => x.id === parseInt(id, 10));
-      if (!v) return;
+    if (!ch) return;
+    ch.data.labels = labels;
+    ch.data.datasets[0].data = data;
+    ch.data.datasets[0].baseColors = labels.map(() => "#94a3b8");
+    upd(ch, "active");
+  }
 
-      document.getElementById('detailContent').innerHTML = `
-        <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
-        <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
-          <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === '臨安店' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}">${v.store_branch}</span>
-          <span>${v.form_date}</span>
-          <span>•</span>
-          <span>${v.gender || '-'} / ${v.age_range || '-'}</span>
-        </p>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div class="bg-blue-50 p-3 rounded-lg">
-            <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
-            <div class="text-sm text-blue-900">${(v.source_tags || []).join(', ') || '無'}</div>
-          </div>
-          <div class="bg-green-50 p-3 rounded-lg">
-            <div class="text-xs font-bold text-green-700 mb-1">目的</div>
-            <div class="text-sm text-green-900">${(v.visit_purposes || []).join(', ') || '無'}</div>
-          </div>
-        </div>
-        ${v.search_keywords ? `
-          <div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200">
-            <div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div>
-            <div class="text-sm text-yellow-900">${v.search_keywords}</div>
-          </div>
-        ` : ''}
-        <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || '無詳細描述'}</div>
+  function updateAllCharts() {
+    const sub = buildSubset();
+    updSource(sub);
+    updPurpose(sub);
+    updTrend(sub);
+    updGender(sub);
+    updAge(sub);
+    updateFilterBadges();
+  }
+  window.updateAllCharts = updateAllCharts;
+
+  /* 主流程：保留原架構 */
+  function renderCharts(_data) { updateAllCharts(); }
+  window.renderCharts = renderCharts;
+
+  /* ===== Table ===== */
+  function renderTable() {
+    const tbody = $("tableBody"); if (!tbody) return;
+    const page = ST.filtered.slice(0, ST.limit);
+    tbody.innerHTML = "";
+    page.forEach(v => {
+      const tr = document.createElement("tr");
+      const safeDesc = s(v.detail_desc || "無備註").replace(/'/g, "\\'").replace(/\n/g, " ");
+      tr.innerHTML = `
+        <td class="pl-6 py-3 font-mono text-slate-500">${s(v.form_date)}</td>
+        <td><span class="px-2 py-1 rounded-full text-xs font-bold ${s(v.store_branch) === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${s(v.store_branch)}</span></td>
+        <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
+        <td class="text-xs text-slate-500">${s(v.gender) || "-"} / ${s(v.age_range) || "-"}</td>
+        <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.source_tags).join(", ")}</td>
+        <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.visit_purposes).join(", ")}</td>
+        <td class="text-slate-300">›</td>
       `;
+      tr.addEventListener("click", () => showDetail(v.id));
+      tr.addEventListener("mouseenter", (e) => showPreview(e, safeDesc));
+      tr.addEventListener("mouseleave", hidePreview);
+      tbody.appendChild(tr);
+    });
+    $("listCounter").innerText = `${page.length} / ${ST.filtered.length}`;
+    $("btnLoadMore").classList.toggle("hidden", page.length >= ST.filtered.length);
+  }
 
-      document.getElementById('detailModal').style.display = 'flex';
-      if (isAdmin) document.getElementById('detailActions').classList.remove('hidden');
-      else document.getElementById('detailActions').classList.add('hidden');
-      window.currentDetailId = v.id;
-    };
+  function showPreview(e, text) {
+    if (!text || text === "null" || text === "無備註") return;
+    const t = $("hoverPreview");
+    t.innerText = text.length > 120 ? text.slice(0, 120) + "..." : text;
+    t.style.display = "block";
+    t.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + "px";
+    t.style.top = (e.clientY + 15) + "px";
+  }
+  function hidePreview() { $("hoverPreview").style.display = "none"; }
+  window.showPreview = showPreview;
+  window.hidePreview = hidePreview;
 
-    window.closeDetail = () => document.getElementById('detailModal').style.display = 'none';
+  /* ===== Data ===== */
+  async function fetchAllData() {
+    let all = [], page = 0;
+    $("valTotal").innerText = "...";
 
-    window.deleteCurrentDetail = async () => {
-      if (!isAdmin) { alert('⚠️ 需要管理員權限才能刪除！'); return; }
-      if (!confirm('確定要刪除此筆資料？')) return;
-
-      const { error } = await supabase.from('visits').delete().eq('id', window.currentDetailId);
-      if (error) alert('刪除失敗: ' + error.message);
-      else { alert('已刪除'); closeDetail(); fetchAllData(); }
-    };
-
-    /* =====================================================
-       V8.0.4 補丁：鎖定機制 + 圖表點擊重新綁定
-       ===================================================== */
-    window.toggleLock = (type, value) => {
-      const lockKey = type + 'Locked';
-      if (!globalFilter) return;
-
-      if (globalFilter[type] === value) {
-        globalFilter[type] = null;
-        if (lockKey in globalFilter) globalFilter[lockKey] = false;
-      } else {
-        globalFilter[type] = value;
-        if (lockKey in globalFilter) globalFilter[lockKey] = true;
-      }
-      updateAllCharts();
-    };
-
-    function bindChartClicks() {
-      if (!window.charts) return;
-
-      if (charts.source && charts.source.options) {
-        charts.source.options.onClick = (e, els) => {
-          if (!els || !els.length) return;
-          const label = charts.source.data.labels[els[0].index];
-          window.toggleLock('source', label);
-        };
-        charts.source.update('none');
-      }
-
-      // ✅ purpose 不綁 click（來店目的不可點擊）
-      // if (charts.purpose && charts.purpose.options) { ... }
-
-      if (charts.gender && charts.gender.options) {
-        charts.gender.options.onClick = (e, els) => {
-          if (!els || !els.length) return;
-          const label = (els[0].index === 0) ? '男' : '女';
-          window.toggleLock('gender', label);
-        };
-        charts.gender.update('none');
-      }
-
-      if (charts.age && charts.age.options) {
-        charts.age.options.onClick = (e, els) => {
-          if (!els || !els.length) return;
-          const label = charts.age.data.labels[els[0].index];
-          window.toggleLock('age', label);
-        };
-        charts.age.update('none');
-      }
+    while (true) {
+      const { data, error } = await supabase.from("visits").select("*").range(page * CFG.PAGE_SIZE, (page + 1) * CFG.PAGE_SIZE - 1);
+      if (error) { console.error("資料載入錯誤:", error); alert("載入資料失敗：" + error.message); break; }
+      if (!data || !data.length) break;
+      all = all.concat(data);
+      if (data.length < CFG.PAGE_SIZE) break;
+      page++;
     }
 
-    // 包裝 updateAllCharts
-    if (typeof window.updateAllCharts === 'function') {
-      const __origUpdateAllCharts = window.updateAllCharts;
-      window.updateAllCharts = function () {
-        __origUpdateAllCharts();
-        bindChartClicks();
-        updateFilterBadges();
+    ST.raw = all.sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
+
+    if (ST.raw.length) {
+      const last = ST.raw[0].form_date.replace(/-/g, "/");
+      const disp = $("lastDataDisp"); if (disp) disp.innerText = "last data " + last;
+
+      const years = [...new Set(ST.raw.map(d => s(d.form_date).slice(0, 4)))].sort().reverse();
+      $("selYear").innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join("");
+
+      const dates = ST.raw.map(d => d.form_date).sort();
+      ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+    }
+    applyFilter();
+  }
+
+  function applyFilter() {
+    const ds = ST.datePicker.selectedDates || [];
+    const start = ds[0] ? ST.datePicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
+    const end = ds[1] ? ST.datePicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
+    const q = s($("qSearch").value).toLowerCase().trim();
+
+    const timeData = ST.raw.filter(v => v.form_date >= start && v.form_date <= end);
+    $("valTotal").innerText = timeData.length;
+    $("valLinAn").innerText = timeData.filter(v => v.store_branch === "臨安店").length;
+    $("valNanKe").innerText = timeData.filter(v => v.store_branch === "南科店").length;
+
+    ST.filtered = timeData.filter(v => {
+      if (ST.store !== "全部" && v.store_branch !== ST.store) return false;
+      if (q) {
+        const n = s(v.customer_name).toLowerCase();
+        const d = s(v.detail_desc).toLowerCase();
+        if (!n.includes(q) && !d.includes(q)) return false;
+      }
+      return true;
+    });
+
+    /* 保留鎖定，未鎖定者每次查詢重置 */
+    if (!ST.filter.sourceLocked) ST.filter.source = null;
+    if (!ST.filter.purposeLocked) ST.filter.purpose = null;
+    if (!ST.filter.genderLocked) ST.filter.gender = null;
+    if (!ST.filter.ageLocked) ST.filter.age = null;
+
+    ST.limit = 20;
+    renderCharts(ST.filtered);
+    renderTable();
+  }
+  window.applyFilter = applyFilter;
+
+  /* ===== UI ===== */
+  window.loadMore = () => { ST.limit += 20; renderTable(); };
+  window.toggleAdminPanel = () => $("adminPanel").classList.toggle("hidden");
+
+  window.setStore = (s0) => {
+    ST.store = s0;
+    qa(".kpi-card").forEach(c => c.classList.remove("active"));
+    if (s0 === "全部") $("kpiTotal").classList.add("active");
+    if (s0 === "臨安店") $("kpiLinAn").classList.add("active");
+    if (s0 === "南科店") $("kpiNanKe").classList.add("active");
+    applyFilter();
+  };
+
+  window.quickSelectDate = () => {
+    const y = $("selYear").value, m = $("selMonth").value;
+    if (y && m) {
+      ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]);
+      applyFilter();
+    }
+  };
+
+  window.resetDate = () => {
+    if (ST.raw.length) {
+      const dates = ST.raw.map(x => x.form_date).sort();
+      ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+    }
+    $("selMonth").value = "";
+    applyFilter();
+  };
+
+  window.clearSearch = () => {
+    $("qSearch").value = "";
+    $("btnX").classList.add("hidden");
+    applyFilter();
+  };
+
+  /* ===== Modal / Edit ===== */
+  function setSaveButtonText() { $("btnSave").innerText = (ST.editingId && ST.isAdmin) ? "更新儲存" : "確認儲存"; }
+  function openAddModal() { $("addModal").style.display = "flex"; }
+  function closeAddModal() {
+    $("addModal").style.display = "none";
+    $("mName").value = ""; $("mDetail").value = ""; $("mKeyword").value = "";
+    qa(".selected, .checked").forEach(e => e.classList.remove("selected", "checked"));
+    $("boxKeyword").classList.add("hidden");
+    ST.editingId = null; setSaveButtonText();
+  }
+  window.closeAddModal = closeAddModal;
+
+  function selectRadioByValue(groupId, val) {
+    const grp = $(groupId); if (!grp) return;
+    const btns = qa(".radio-btn", grp);
+    const target = btns.find(b => (b.dataset && b.dataset.value) === val) || btns.find(b => b.innerText.trim() === s(val).trim());
+    if (target) window.selectRadio(groupId, val, target);
+  }
+
+  function checkMultiByTexts(groupId, texts) {
+    const grp = $(groupId); if (!grp) return;
+    const set = new Set(arr(texts).map(t => s(t).trim()));
+    qa(".chk-btn", grp).forEach(btn => btn.classList.toggle("checked", set.has(btn.innerText.trim())));
+    if (groupId === "grpSource") {
+      const hasGoogle = qa("#grpSource .checked").some(b => b.innerText.includes("Google"));
+      $("boxKeyword").classList.toggle("hidden", !hasGoogle);
+    }
+  }
+
+  window.selectRadio = (grp, val, el) => {
+    qa(`#${grp} .radio-btn`).forEach(b => b.classList.remove("selected"));
+    el.classList.add("selected");
+    el.dataset.value = val;
+  };
+
+  window.toggleChk = (el) => {
+    el.classList.toggle("checked");
+    const grp = el.parentElement;
+    if (grp && grp.id === "grpSource") {
+      const hasGoogle = qa("#grpSource .checked").some(b => b.innerText.includes("Google"));
+      $("boxKeyword").classList.toggle("hidden", !hasGoogle);
+    }
+  };
+
+  window.startEditCurrent = () => {
+    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限才能編輯！"); return; }
+    const v = ST.raw.find(x => x.id === parseInt(ST.currentDetailId, 10));
+    if (!v) return;
+
+    ST.editingId = v.id;
+    setSaveButtonText();
+
+    qa(".selected, .checked").forEach(el => el.classList.remove("selected", "checked"));
+    $("boxKeyword").classList.add("hidden");
+
+    $("mDate").value = v.form_date || "";
+    $("mStore").value = v.store_branch || "臨安店";
+    $("mName").value = v.customer_name || "";
+    $("mTainan").checked = !!v.is_local;
+
+    selectRadioByValue("grpGender", v.gender || "");
+    selectRadioByValue("grpAge", v.age_range || "");
+    checkMultiByTexts("grpSource", v.source_tags || []);
+    checkMultiByTexts("grpPurpose", v.visit_purposes || []);
+    $("mKeyword").value = v.search_keywords || "";
+    $("mDetail").value = v.detail_desc || "";
+
+    closeDetail();
+    openAddModal();
+  };
+
+  window.saveData = async () => {
+    const name = $("mName").value.trim();
+    const genderEl = document.querySelector("#grpGender .selected");
+    const ageEl = document.querySelector("#grpAge .selected");
+    const sources = qa("#grpSource .checked").map(e => e.innerText.trim());
+    const purposes = qa("#grpPurpose .checked").map(e => e.innerText.trim());
+    const detail = $("mDetail").value.trim();
+
+    if (!name || !genderEl || !ageEl || !sources.length || !purposes.length || !detail) {
+      alert("⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。");
+      return;
+    }
+
+    if (ST.editingId && ST.isAdmin) {
+      const payload = {
+        form_date: $("mDate").value,
+        store_branch: $("mStore").value,
+        customer_name: name,
+        gender: genderEl.dataset.value,
+        age_range: ageEl.dataset.value,
+        is_local: $("mTainan").checked,
+        source_tags: sources,
+        visit_purposes: purposes,
+        search_keywords: $("mKeyword").value,
+        detail_desc: detail
       };
+      const { error } = await supabase.from("visits").update(payload).eq("id", ST.editingId);
+      if (error) { alert("更新失敗: " + error.message); console.error(error); return; }
+      alert("✅ 已更新");
+      ST.editingId = null; setSaveButtonText(); closeAddModal(); fetchAllData();
+      return;
     }
 
-    // 包裝 renderCharts
-    if (typeof window.renderCharts === 'function') {
-      const __origRenderCharts = window.renderCharts;
-      window.renderCharts = function (data) {
-        __origRenderCharts(data);
-        bindChartClicks();
-      };
+    const rpcPayload = {
+      p_date: $("mDate").value,
+      p_store: $("mStore").value,
+      p_name: name,
+      p_gender: genderEl.dataset.value,
+      p_age: ageEl.dataset.value,
+      p_is_local: $("mTainan").checked,
+      p_sources: sources,
+      p_purposes: purposes,
+      p_keywords: $("mKeyword").value,
+      p_detail: detail
+    };
+    const { error } = await supabase.rpc("submit_visit_v7", rpcPayload);
+    if (error) { alert("儲存失敗: " + error.message); console.error(error); }
+    else { alert("🎉 新增成功！"); closeAddModal(); fetchAllData(); }
+  };
+
+  /* ===== Detail ===== */
+  function showDetail(id) {
+    const v = ST.raw.find(x => x.id === parseInt(id, 10));
+    if (!v) return;
+    ST.currentDetailId = v.id;
+
+    $("detailContent").innerHTML = `
+      <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
+      <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
+        <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${v.store_branch}</span>
+        <span>${v.form_date}</span><span>•</span><span>${v.gender || "-"} / ${v.age_range || "-"}</span>
+      </p>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-blue-50 p-3 rounded-lg">
+          <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
+          <div class="text-sm text-blue-900">${arr(v.source_tags).join(", ") || "無"}</div>
+        </div>
+        <div class="bg-green-50 p-3 rounded-lg">
+          <div class="text-xs font-bold text-green-700 mb-1">目的</div>
+          <div class="text-sm text-green-900">${arr(v.visit_purposes).join(", ") || "無"}</div>
+        </div>
+      </div>
+      ${v.search_keywords ? `
+        <div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200">
+          <div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div>
+          <div class="text-sm text-yellow-900">${v.search_keywords}</div>
+        </div>` : ""}
+      <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || "無詳細描述"}</div>
+    `;
+
+    $("detailModal").style.display = "flex";
+    $("detailActions").classList.toggle("hidden", !ST.isAdmin);
+  }
+  window.showDetail = showDetail;
+
+  function closeDetail() { $("detailModal").style.display = "none"; }
+  window.closeDetail = closeDetail;
+
+  window.deleteCurrentDetail = async () => {
+    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限才能刪除！"); return; }
+    if (!confirm("確定要刪除此筆資料？")) return;
+    const { error } = await supabase.from("visits").delete().eq("id", ST.currentDetailId);
+    if (error) alert("刪除失敗: " + error.message);
+    else { alert("已刪除"); closeDetail(); fetchAllData(); }
+  };
+
+  /* ===== CSV ===== */
+  window.exportCSV = () => {
+    const csv = Papa.unparse(ST.raw);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    link.download = `wakodo_backup_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  window.previewCSV = (input) => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+
+    Papa.parse(f, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (res) => {
+        const total = res.data.length;
+        if (!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
+
+        const overlay = $("importOverlay");
+        const progress = $("importProgress");
+        const status = $("importStatus");
+        const errLog = $("importErrors");
+
+        overlay.style.display = "flex";
+        errLog.innerHTML = "";
+        errLog.classList.add("hidden");
+
+        const norm = (row, idx) => {
+          let d = row["form_date"] || row["填表日期"];
+          if (!d) { console.warn(`Row ${idx}: Missing date`); return null; }
+          d = s(d).trim().replace(/\//g, "-");
+          const p = d.split("-");
+          if (p.length === 3) d = `${p[0]}-${s(p[1]).padStart(2, "0")}-${s(p[2]).padStart(2, "0")}`;
+
+          const n = row["customer_name"] || row["顧客姓名"];
+          if (!n) { console.warn(`Row ${idx}: Missing name`); return null; }
+          const cleanName = CFG.INVALID_NAMES.includes(s(n).trim()) ? "未留資料" : n;
+
+          const sRaw = s(row["source_tags"] || row["來源統計"] || "").replace(/，/g, ",");
+          const pRaw = s(row["visit_purposes"] || row["來店目的"] || "").replace(/，/g, ",");
+          let age = s(row["age_range"] || row["年齡範圍"] || "");
+          if (age === "18以下") age = "18歲以下";
+
+          return {
+            p_date: d,
+            p_store: row["store_branch"] || row["門店"] || "臨安店",
+            p_name: cleanName,
+            p_gender: row["gender"] || row["性別"] || "",
+            p_age: age,
+            p_is_local: s(row["is_local"] || row["是否為台南人"] || "").includes("是"),
+            p_sources: sRaw.split(",").map(x => x.trim()).filter(Boolean),
+            p_purposes: pRaw.split(",").map(x => x.trim()).filter(Boolean),
+            p_keywords: row["search_keywords"] || row["搜尋關鍵字"] || "",
+            p_detail: row["detail_desc"] || row["詳細描述"] || ""
+          };
+        };
+
+        const rows = res.data.map(norm).filter(Boolean);
+
+        let done = 0;
+        const errors = [];
+
+        for (const row of rows) {
+          try {
+            const { error } = await supabase.rpc("submit_visit_v7", row);
+            if (error) throw error;
+          } catch (err) {
+            errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
+          }
+
+          done++;
+          progress.style.width = Math.round(done / rows.length * 100) + "%";
+          status.innerText = `處理中... ${done} / ${rows.length}`;
+        }
+
+        status.innerText = `✅ 完成！成功: ${rows.length - errors.length} | 失敗: ${errors.length}`;
+        if (errors.length) {
+          errLog.classList.remove("hidden");
+          errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join("");
+        }
+
+        setTimeout(() => {
+          overlay.style.display = "none";
+          if (!errors.length) location.reload();
+          else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
+        }, 2000);
+      }
+    });
+  };
+
+  window.wipeData = async () => {
+    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限！"); return; }
+    alert("⚠️ 安全機制：系統將強制下載備份 CSV。");
+    window.exportCSV();
+
+    setTimeout(async () => {
+      if (!confirm("備份已下載。確定要清空所有資料？此動作無法復原！")) return;
+      const pwd = prompt("請輸入二次確認密碼：");
+      if (pwd === "628599") {
+        const { error } = await supabase.from("visits").delete().neq("id", 0);
+        if (error) alert("失敗: " + error.message);
+        else { alert("✅ 資料庫已清空。"); location.reload(); }
+      } else alert("❌ 密碼錯誤！");
+    }, 1500);
+  };
+
+  /* ===== Auth ===== */
+  window.loginSupabase = async () => {
+    const email = $("admEmail").value.trim();
+    const pwd = $("admPwd").value;
+    if (!email || !pwd) { alert("請輸入信箱和密碼"); return; }
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    if (error) alert("登入失敗：" + error.message);
+    else { enableAdminUI(); alert("✅ 登入成功！"); }
+  };
+
+  window.logout = async () => {
+    await supabase.auth.signOut();
+    ST.isAdmin = false;
+    $("adminPanel").classList.add("hidden");
+    $("loginForm").classList.remove("hidden");
+    $("adminActions").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+    $("admEmail").value = "";
+    $("admPwd").value = "";
+    alert("已登出管理模式");
+  };
+
+  /* ===== init ===== */
+  function initAddModal() {
+    $("mDate").value = new Date().toISOString().split("T")[0];
+    $("grpAge").innerHTML = CFG.AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join("");
+    $("grpSource").innerHTML = CFG.SOURCES.map(x => `<div class="chk-btn" onclick="toggleChk(this,'${x}')">${x}</div>`).join("");
+    $("grpPurpose").innerHTML = CFG.PURPOSES.map(x => `<div class="chk-btn" onclick="toggleChk(this,'${x}')">${x}</div>`).join("");
+  }
+
+  async function initMain() {
+    Chart.register(ChartDataLabels);
+    flatpickr.l10ns.default.months.longhand = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+
+    ST.datePicker = flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      locale: "zh_tw",
+      monthSelectorType: "static",
+      onChange: (d) => { if (d.length === 2) applyFilter(); }
+    });
+
+    $("qSearch").addEventListener("input", function () {
+      this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden");
+    });
+
+    initAddModal();
+    setSaveButtonText();
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) enableAdminUI();
+
+    await fetchAllData();
+  }
+
+  window.onload = async () => {
+    if (!gateIsOk()) return showGate();
+    $("appRoot").style.display = "block";
+    await initMain();
+  };
+
+  /* ===== selfTest：不自動跑，只在你/AI 需要時跑 ===== */
+  function selfTest(opts = {}) {
+    const { runCharts = false } = opts;
+    const errors = [];
+
+    const mustIds = [
+      "appRoot","frontGate","frontGateInput","frontGateBtn","frontGateError",
+      "dateRange","qSearch","btnX","selYear","selMonth",
+      "valTotal","valLinAn","valNanKe","lastDataDisp",
+      "chartSource","chartPurpose","chartTrend","chartGender","chartAge",
+      "tableBody","listCounter","btnLoadMore",
+      "addModal","detailModal","detailContent","detailActions",
+      "importOverlay","importProgress","importStatus","importErrors"
+    ];
+    mustIds.forEach(id => { if (!$(id)) errors.push(`DOM 缺少 id: #${id}`); });
+
+    if (!Array.isArray(ST.raw)) errors.push("ST.raw 不是陣列");
+    if (!Array.isArray(ST.filtered)) errors.push("ST.filtered 不是陣列");
+    if (typeof ST.filter !== "object" || !ST.filter) errors.push("ST.filter 不是物件");
+    if (!ST.datePicker) errors.push("ST.datePicker 尚未初始化（flatpickr）");
+
+    if (runCharts) {
+      try {
+        if (!Array.isArray(ST.filtered)) ST.filtered = [];
+        updateAllCharts(); /* 若 Chart.js 或 canvas 出問題，這裡會丟錯 */
+      } catch (e) {
+        errors.push("updateAllCharts 執行失敗: " + (e && e.message ? e.message : String(e)));
+      }
     }
 
-    // 包裝 applyFilter
-    if (typeof window.applyFilter === 'function') {
-      const __origApplyFilter = window.applyFilter;
-      window.applyFilter = function () {
-        __origApplyFilter();
-        if (typeof window.updateAllCharts === 'function') window.updateAllCharts();
-      };
-    }
+    const ok = errors.length === 0;
+    return { ok, errors, version: CFG.VERSION };
+  }
 
-    // 初始化：確保鎖定旗標存在
-    if (typeof globalFilter === 'object' && globalFilter) {
-      if (globalFilter.sourceLocked === undefined) globalFilter.sourceLocked = false;
-      if (globalFilter.purposeLocked === undefined) globalFilter.purposeLocked = false;
-      if (globalFilter.genderLocked === undefined) globalFilter.genderLocked = false;
-      if (globalFilter.ageLocked === undefined) globalFilter.ageLocked = false;
-    }
+  /* ===== 對外入口（給 AI/Console 用） ===== */
+  window.APP = {
+    cfg: CFG,
+    state: ST,
+    fn: { initMain, fetchAllData, applyFilter, updateAllCharts, renderTable, updateFilterBadges, toggleLock, selfTest },
+    debug: { chartKeys: () => Object.keys(CH) } /* 只提供 keys，避免旁路修改 Chart 實例 */
+  };
+
   </script>
 </body>
 </html>
+
+<!-- [file:13] -->
+
+
+
