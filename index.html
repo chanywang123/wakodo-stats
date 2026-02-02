@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
 
@@ -35,6 +34,7 @@
       border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
+
     .kpi-card {
       cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative; overflow: hidden; border: 2px solid transparent;
@@ -265,7 +265,6 @@
     </div>
 
     <div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
-
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
@@ -276,8 +275,7 @@
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
               <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.2.1</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
-              <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink"
-                 href="performance.html" target="_blank" rel="noopener">觀看業績</a>
+              <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
             </div>
           </h1>
         </div>
@@ -506,33 +504,13 @@
   </div>
 
   <script>
-    // 🔥 保留原有常數
-    const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章",
-      "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購",
-      "老客-未購", "廣告看板", "FB 社團文"];
-    const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
-    const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+    // 🔥 常數（注意：字串不可被換行切斷，否則整頁會空白）
+    const SOURCES = ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","業配貼文 (FB、IG)","老客回購","老客-未購","廣告看板","FB 社團文"];
+    const PURPOSES = ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查"];
+    const AGES = ["18歲以下","18-24","25-34","35-44","45-54","55歲以上"];
 
     // 🔥 新增：客源固定順序
-    const SOURCE_ORDER = [
-      "Google 搜尋",
-      "Google Map",
-      "親友介紹",
-      "Instagram 廣告",
-      "Facebook 廣告",
-      "FB、IG 一般文章",
-      "老客回購",
-      "途經路過",
-      "TikTok & YouTube",
-      "老客-未購",
-      "業配貼文 (FB、IG)",
-      "Dcard",
-      "PTT",
-      "Mobile 01",
-      "廣告看板",
-      "FB 社團文",
-      "其他"
-    ];
+    const SOURCE_ORDER = ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","業配貼文 (FB、IG)","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"];
 
     // 🔥 新增：客源固定顏色（彩色繽紛）
     const SOURCE_COLORS = {
@@ -546,7 +524,7 @@
       "途經路過": "#ea580c",
       "TikTok & YouTube": "#dc2626",
       "老客-未購": "#9333ea",
-      "業配貼文（FB、IG）": "#0d9488",
+      "業配貼文 (FB、IG)": "#0d9488",
       "Dcard": "#e11d48",
       "PTT": "#4f46e5",
       "Mobile 01": "#059669",
@@ -568,7 +546,7 @@
     function makeBarGradient(ctx, baseHex, stronger = false) { return baseHex || '#94a3b8'; }
     function makeRadialGradient(ctx, baseHex, stronger = false) { return baseHex || '#94a3b8'; }
 
-    // 🔥 新增：全局過濾狀態
+    // 🔥 全局過濾狀態
     let globalFilter = {
       source: null,
       purpose: null,
@@ -580,18 +558,15 @@
       ageLocked: false
     };
 
-    let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', charts = {},
-      datePicker, isAdmin = false;
+    let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', charts = {}, datePicker, isAdmin = false;
 
     // =========================
-    // 新增：表層前端密碼（不動管理員）
+    // 表層前端密碼（不動管理員）
     // =========================
     const FRONT_GATE_PASSWORD = 'wakodo100';
     const FRONT_GATE_KEY = 'wakodo_gate_ok';
 
-    function gateIsOk() {
-      return sessionStorage.getItem(FRONT_GATE_KEY) === '1';
-    }
+    function gateIsOk() { return sessionStorage.getItem(FRONT_GATE_KEY) === '1'; }
 
     function showGate() {
       const gate = document.getElementById('frontGate');
@@ -627,7 +602,7 @@
     }
 
     // =========================
-    // 新增：管理員可編輯（不影響原新增 RPC）
+    // 管理員可編輯（不影響原新增 RPC）
     // =========================
     let editingId = null;
 
@@ -637,16 +612,13 @@
       btn.innerText = (editingId && isAdmin) ? '更新儲存' : '確認儲存';
     }
 
-    function openAddModal() {
-      document.getElementById('addModal').style.display = 'flex';
-    }
+    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
 
     function selectRadioByValue(groupId, val) {
       const grp = document.getElementById(groupId);
       if (!grp) return;
       const btns = Array.from(grp.querySelectorAll('.radio-btn'));
-      const target = btns.find(b => (b.dataset && b.dataset.value) === val) ||
-        btns.find(b => b.innerText.trim() === String(val || '').trim());
+      const target = btns.find(b => (b.dataset && b.dataset.value) === val) || btns.find(b => b.innerText.trim() === String(val || '').trim());
       if (target) window.selectRadio(groupId, val, target);
     }
 
@@ -697,12 +669,12 @@
     };
 
     // =========================
-    // 原本 onload 內容搬到 initMain
+    // initMain
     // =========================
     async function initMain() {
       Chart.register(ChartDataLabels);
 
-      flatpickr.l10ns.default.months.longhand = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+      flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
       datePicker = flatpickr("#dateRange", {
         mode: "range",
         dateFormat: "Y-m-d",
@@ -724,10 +696,7 @@
     }
 
     window.onload = async () => {
-      if (!gateIsOk()) {
-        showGate();
-        return;
-      }
+      if (!gateIsOk()) { showGate(); return; }
       const app = document.getElementById('appRoot');
       if (app) app.style.display = 'block';
       await initMain();
@@ -830,7 +799,6 @@
       document.getElementById('mKeyword').value = '';
       document.querySelectorAll('.selected, .checked').forEach(e => e.classList.remove('selected', 'checked'));
       document.getElementById('boxKeyword').classList.add('hidden');
-
       editingId = null;
       setSaveButtonText();
     };
@@ -903,15 +871,13 @@
       const q = document.getElementById('qSearch').value.toLowerCase();
 
       const timeData = rawData.filter(v => v.form_date >= start && v.form_date <= end);
-
       document.getElementById('valTotal').innerText = timeData.length;
       document.getElementById('valLinAn').innerText = timeData.filter(v => v.store_branch === '臨安店').length;
       document.getElementById('valNanKe').innerText = timeData.filter(v => v.store_branch === '南科店').length;
 
       filteredData = timeData.filter(v => {
         if (currentStore !== '全部' && v.store_branch !== currentStore) return false;
-        if (q && !String(v.customer_name || '').toLowerCase().includes(q) &&
-          !String(v.detail_desc || '').toLowerCase().includes(q)) return false;
+        if (q && !String(v.customer_name || '').toLowerCase().includes(q) && !String(v.detail_desc || '').toLowerCase().includes(q)) return false;
         return true;
       });
 
@@ -928,7 +894,7 @@
       updateAllCharts();
     };
 
-    // 🔥 修改：renderCharts - 只渲染客源圖（固定順序+固定顏色）
+    // 🔥 renderCharts - 只渲染客源圖（固定順序+固定顏色）
     function renderCharts(data) {
       const sMap = {};
       data.forEach(v => (v.source_tags || []).forEach(t => sMap[t] = (sMap[t] || 0) + 1));
@@ -970,11 +936,7 @@
               borderRadius: 4,
               padding: { top: 2, bottom: 2, left: 4, right: 4 }
             },
-            tooltip: {
-              backgroundColor: 'rgba(0,0,0,0.85)',
-              padding: 12,
-              cornerRadius: 8
-            }
+            tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 8 }
           },
           scales: {
             x: { grid: { display: false }, ticks: { font: { size: 10 } } },
@@ -994,7 +956,7 @@
       updateAllCharts();
     }
 
-    // 🔥 新增：統一更新所有圖表（全雙向連動）
+    // 🔥 統一更新所有圖表（全雙向連動）
     function updateAllCharts() {
       let subset = filteredData.filter(v => {
         if (globalFilter.source && !(v.source_tags || []).includes(globalFilter.source)) return false;
@@ -1020,31 +982,21 @@
 
       updateFilterBadges();
 
-      // === 來店目的圖表 ===
-      // ✅ 分母規則修改：分母 = subset 內「全部目的」加總（不只 top8）
+      // === 來店目的圖表（本版：不可點擊，不鎖定）===
       const pMap = {};
       subset.forEach(v => (v.visit_purposes || []).forEach(p => {
         if (!p) return;
         pMap[p] = (pMap[p] || 0) + 1;
       }));
-
       const totalPurposeAll = Object.values(pMap).reduce((a, b) => a + b, 0);
-
-      const sortedP = Object.entries(pMap)
-        .filter(([_, cnt]) => cnt > 0)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 8);
-
+      const sortedP = Object.entries(pMap).filter(([_, cnt]) => cnt > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
       const purposeColors = ['#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0d9488', '#ea580c'];
 
       if (charts.purpose) {
         charts.purpose.data.labels = sortedP.map(x => x[0]);
         charts.purpose.data.datasets[0].data = sortedP.map(x => x[1]);
         charts.purpose.data.datasets[0].baseColors = purposeColors.slice(0, sortedP.length);
-
-        // 存分母在 chart 物件上，legend/tooltip 每次都抓最新值
         charts.purpose.$purposeTotalAll = totalPurposeAll;
-
         charts.purpose.update('active');
       } else {
         charts.purpose = new Chart(document.getElementById('chartPurpose'), {
@@ -1065,6 +1017,10 @@
             cutout: '60%',
             layout: { padding: 20 },
             animation: { animateRotate: true, animateScale: true, duration: 800 },
+
+            // ✅ 禁用 click（保留 hover tooltip）
+            events: ['mousemove', 'mouseout', 'touchstart', 'touchmove'],
+
             plugins: {
               legend: {
                 display: true,
@@ -1077,17 +1033,13 @@
                   padding: 14,
                   font: { size: 12, weight: '700' },
                   color: '#1e293b',
-
-                  // ✅ 這裡改成「每次呼叫都用 chart.$purposeTotalAll」當分母
                   generateLabels: (chart) => {
                     const data = chart.data;
                     const ds = data.datasets[0] || {};
                     const total = Number(chart.$purposeTotalAll || 0);
-
                     return (data.labels || []).map((label, i) => {
                       const val = Number((ds.data || [])[i] || 0);
                       const pct = total ? Math.round(val / total * 100) : 0;
-
                       return {
                         text: `${label} ${pct}%`,
                         fillStyle: (ds.baseColors || [])[i] || (ds.backgroundColor || [])[i] || '#94a3b8',
@@ -1107,8 +1059,6 @@
                 cornerRadius: 8,
                 titleFont: { size: 14, weight: 'bold' },
                 bodyFont: { size: 13 },
-
-                // ✅ 這裡改成「每次 hover 都用 ctx.chart.$purposeTotalAll」當分母
                 callbacks: {
                   label: (ctx) => {
                     const total = Number(ctx.chart.$purposeTotalAll || 0);
@@ -1118,18 +1068,9 @@
                   }
                 }
               }
-            },
-            onClick: (e, els) => {
-              if (els[0]) {
-                const label = charts.purpose.data.labels[els[0].index];
-                if (globalFilter.purpose === label) { globalFilter.purpose = null; globalFilter.purposeLocked = false; }
-                else { globalFilter.purpose = label; globalFilter.purposeLocked = true; }
-                updateAllCharts();
-              }
             }
           }
         });
-
         charts.purpose.$purposeTotalAll = totalPurposeAll;
       }
 
@@ -1210,7 +1151,10 @@
 
       // === 性別圖表 ===
       const gMap = { '男': 0, '女': 0 };
-      subset.forEach(v => { const g = v.gender || '其他'; if (g === '男' || g === '女') gMap[g]++; });
+      subset.forEach(v => {
+        const g = v.gender || '其他';
+        if (g === '男' || g === '女') gMap[g]++;
+      });
 
       if (charts.gender) {
         charts.gender.data.datasets[0].data = [gMap['男'], gMap['女']];
@@ -1290,42 +1234,27 @@
             onClick: (e, els) => {
               if (els[0]) {
                 const label = sortedAges[els[0].index];
-                if (globalFilter.age === label) {
-                  globalFilter.age = null;
-                  globalFilter.ageLocked = false;
-                } else {
-                  globalFilter.age = label;
-                  globalFilter.ageLocked = true;
-                }
+                if (globalFilter.age === label) { globalFilter.age = null; globalFilter.ageLocked = false; }
+                else { globalFilter.age = label; globalFilter.ageLocked = true; }
                 updateAllCharts();
               }
             }
           }
         });
       }
-    } // ← 這個括號是 updateAllCharts() 的結尾
+    } // updateAllCharts end
 
-    // 🔥 新增：更新過濾標籤顯示
+    // 🔥 更新過濾標籤顯示
     function updateFilterBadges() {
       const container = document.getElementById('filterBadgesContainer');
       const badges = [];
 
-      if (globalFilter.source) badges.push(
-        `<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`
-      );
-      if (globalFilter.purpose) badges.push(
-        `<div class="filter-badge"><span>${globalFilter.purpose}</span><span class="filter-badge-close" onclick="clearFilter('purpose')">✕</span></div>`
-      );
-      if (globalFilter.gender) badges.push(
-        `<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`
-      );
-      if (globalFilter.age) badges.push(
-        `<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`
-      );
+      if (globalFilter.source) badges.push(`<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`);
+      if (globalFilter.purpose) badges.push(`<div class="filter-badge"><span>${globalFilter.purpose}</span><span class="filter-badge-close" onclick="clearFilter('purpose')">✕</span></div>`);
+      if (globalFilter.gender) badges.push(`<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`);
+      if (globalFilter.age) badges.push(`<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`);
 
-      if (badges.length >= 2) {
-        badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
-      }
+      if (badges.length >= 2) badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
 
       if (badges.length > 0) {
         container.innerHTML = badges.join('');
@@ -1335,7 +1264,7 @@
       }
     }
 
-    // 🔥 新增：清除單個過濾條件
+    // 🔥 清除過濾條件
     window.clearFilter = (type) => {
       if (type === 'all') {
         globalFilter.source = null;
@@ -1359,7 +1288,7 @@
       updateAllCharts();
     };
 
-    // 🔥 新增：姓名遮蔽函數（V8.0.4）
+    // 🔥 姓名遮蔽
     function maskName(name) {
       if (!name) return '未留資料';
       if (isAdmin) return name;
@@ -1378,10 +1307,9 @@
       page.forEach(v => {
         const tr = document.createElement('tr');
         const safeDesc = (v.detail_desc || '無備註').replace(/'/g, "\\'").replace(/\n/g, ' ');
-
         tr.innerHTML = `
           <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
-          <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch==='臨安店' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
+          <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === '臨安店' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
           <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
           <td class="text-xs text-slate-500">${v.gender || '-'} / ${v.age_range || '-'}</td>
           <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags || []).join(', ')}</td>
@@ -1407,7 +1335,6 @@
       tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + 'px';
       tooltip.style.top = (e.clientY + 15) + 'px';
     };
-
     window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
 
     window.previewCSV = (input) => {
@@ -1430,11 +1357,13 @@
           errLog.innerHTML = '';
           errLog.classList.add('hidden');
 
+          const invalidNames = ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"];
+
           const cleanData = res.data.map((row, idx) => {
             let d = row['form_date'] || row['填表日期'];
             if (!d) { console.warn(`Row ${idx}: Missing date`); return null; }
 
-            d = d.trim().replace(/\//g, '-');
+            d = String(d).trim().replace(/\//g, '-');
             const dateParts = d.split('-');
             if (dateParts.length === 3) {
               const year = dateParts[0];
@@ -1445,17 +1374,16 @@
 
             const n = row['customer_name'] || row['顧客姓名'];
             if (!n) { console.warn(`Row ${idx}: Missing name`); return null; }
-
-            const invalidNames = ['現場客', '調整客', '現場顧客', '看看客', '電話客', '諮詢客', '住戶', '無', '不知', '-', '未知'];
-            const cleanName = invalidNames.includes(n.trim()) ? '未留資料' : n;
+            const cleanName = invalidNames.includes(String(n).trim()) ? '未留資料' : n;
 
             let sRaw = row['source_tags'] || row['來源統計'] || '';
-            sRaw = sRaw.replace(/，/g, ',');
+            sRaw = String(sRaw).replace(/，/g, ',');
 
             let pRaw = row['visit_purposes'] || row['來店目的'] || '';
-            pRaw = pRaw.replace(/，/g, ',');
+            pRaw = String(pRaw).replace(/，/g, ',');
 
             let cleanAge = row['age_range'] || row['年齡範圍'] || '';
+            cleanAge = String(cleanAge);
             if (cleanAge === '18以下') cleanAge = '18歲以下';
 
             return {
@@ -1464,15 +1392,16 @@
               p_name: cleanName,
               p_gender: row['gender'] || row['性別'] || '',
               p_age: cleanAge,
-              p_is_local: (row['is_local'] || row['是否為台南人'] || '').includes('是'),
-              p_sources: sRaw.split(',').map(x => x.trim()).filter(x => x),
-              p_purposes: pRaw.split(',').map(x => x.trim()).filter(x => x),
+              p_is_local: String(row['is_local'] || row['是否為台南人'] || '').includes('是'),
+              p_sources: String(sRaw).split(',').map(x => x.trim()).filter(x => x),
+              p_purposes: String(pRaw).split(',').map(x => x.trim()).filter(x => x),
               p_keywords: row['search_keywords'] || row['搜尋關鍵字'] || '',
               p_detail: row['detail_desc'] || row['詳細描述'] || ''
             };
           }).filter(x => x);
 
           let processed = 0, errors = [];
+
           for (let i = 0; i < cleanData.length; i++) {
             const row = cleanData[i];
             try {
@@ -1481,16 +1410,17 @@
             } catch (err) {
               errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
             }
+
             processed++;
             progress.style.width = Math.round(processed / cleanData.length * 100) + '%';
             status.innerText = `處理中... ${processed} / ${cleanData.length}`;
           }
 
           status.innerText = `✅ 完成！成功: ${cleanData.length - errors.length} | 失敗: ${errors.length}`;
+
           if (errors.length > 0) {
             errLog.classList.remove('hidden');
-            errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e =>
-              `<div class="mb-1">• ${e}</div>`).join('');
+            errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join('');
           }
 
           setTimeout(() => {
@@ -1505,20 +1435,11 @@
     window.loginSupabase = async () => {
       const email = document.getElementById('admEmail').value.trim();
       const pwd = document.getElementById('admPwd').value;
-
-      if (!email || !pwd) {
-        alert('請輸入信箱和密碼');
-        return;
-      }
+      if (!email || !pwd) { alert('請輸入信箱和密碼'); return; }
 
       const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
-
-      if (error) {
-        alert('登入失敗：' + error.message);
-      } else {
-        enableAdminUI();
-        alert('✅ 登入成功！');
-      }
+      if (error) alert('登入失敗：' + error.message);
+      else { enableAdminUI(); alert('✅ 登入成功！'); }
     };
 
     window.logout = async () => {
@@ -1552,10 +1473,7 @@
     };
 
     window.wipeData = async () => {
-      if (!isAdmin) {
-        alert('⚠️ 需要管理員權限！');
-        return;
-      }
+      if (!isAdmin) { alert('⚠️ 需要管理員權限！'); return; }
 
       alert('⚠️ 安全機制：系統將強制下載備份 CSV。');
       exportCSV();
@@ -1583,6 +1501,7 @@
     };
 
     window.loadMore = () => { displayLimit += 20; renderTable(); };
+
     window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
 
     window.showDetail = (id) => {
@@ -1597,7 +1516,6 @@
           <span>•</span>
           <span>${v.gender || '-'} / ${v.age_range || '-'}</span>
         </p>
-
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="bg-blue-50 p-3 rounded-lg">
             <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
@@ -1608,31 +1526,25 @@
             <div class="text-sm text-green-900">${(v.visit_purposes || []).join(', ') || '無'}</div>
           </div>
         </div>
-
         ${v.search_keywords ? `
           <div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200">
             <div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div>
             <div class="text-sm text-yellow-900">${v.search_keywords}</div>
           </div>
         ` : ''}
-
         <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || '無詳細描述'}</div>
       `;
 
       document.getElementById('detailModal').style.display = 'flex';
       if (isAdmin) document.getElementById('detailActions').classList.remove('hidden');
       else document.getElementById('detailActions').classList.add('hidden');
-
       window.currentDetailId = v.id;
     };
 
     window.closeDetail = () => document.getElementById('detailModal').style.display = 'none';
 
     window.deleteCurrentDetail = async () => {
-      if (!isAdmin) {
-        alert('⚠️ 需要管理員權限才能刪除！');
-        return;
-      }
+      if (!isAdmin) { alert('⚠️ 需要管理員權限才能刪除！'); return; }
       if (!confirm('確定要刪除此筆資料？')) return;
 
       const { error } = await supabase.from('visits').delete().eq('id', window.currentDetailId);
@@ -1646,6 +1558,7 @@
     window.toggleLock = (type, value) => {
       const lockKey = type + 'Locked';
       if (!globalFilter) return;
+
       if (globalFilter[type] === value) {
         globalFilter[type] = null;
         if (lockKey in globalFilter) globalFilter[lockKey] = false;
@@ -1668,14 +1581,8 @@
         charts.source.update('none');
       }
 
-      if (charts.purpose && charts.purpose.options) {
-        charts.purpose.options.onClick = (e, els) => {
-          if (!els || !els.length) return;
-          const label = charts.purpose.data.labels[els[0].index];
-          window.toggleLock('purpose', label);
-        };
-        charts.purpose.update('none');
-      }
+      // ✅ purpose 不綁 click（來店目的不可點擊）
+      // if (charts.purpose && charts.purpose.options) { ... }
 
       if (charts.gender && charts.gender.options) {
         charts.gender.options.onClick = (e, els) => {
