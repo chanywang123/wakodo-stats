@@ -5,7 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>業績儀表板</title>
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M7%2024.5H25%27%20stroke%3D%27%23334155%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27%20fill%3D%27none%27%20stroke%3D%27%2338bdf8%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ccircle%20cx%3D%278%27%20cy%3D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%20cy%3D%2717%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2717%27%20cy%3D%2719%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2711%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D
+%270%200%2032%2032%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2732%2
+7%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%2
+7M7%2024.5H25%27%20stroke%3D%27%23334155%27%20stroke-width%3D%272%27%20stroke-linecap
+%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27
+%20fill%3D%27none%27%20stroke%3D%27%2338bdf8%27%20stroke-width%3D%272.4%27%20stroke-line
+cap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ccircle%20cx%3D%278%27%20cy%3
+D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%2
+0cy%3D%2717%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2717%
+27%20cy%3D%2719%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2
+723%27%20cy%3D%2711%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3C/svg%3E">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -44,7 +55,7 @@
     .row-exit-right { animation: rowOutRight 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     .row-enter-right { opacity: 0; animation: rowInRight 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .row-enter-left  { opacity: 0; animation: rowInLeft  420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    
+
     .zoom-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -82,8 +93,9 @@
     <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full border border-slate-700">
       <div class="mb-4 text-4xl">🔒</div>
       <h2 class="text-xl font-bold mb-2 text-white">請輸入存取密碼</h2>
-      <p class="text-xs text-slate-400 mb-4">輸入 wakodo 進入（僅供閱覽）</p>
-      <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" autocomplete="current-password" />
+      <p class="text-xs text-slate-400 mb-4">輸入密碼進入（僅供閱覽）</p>
+      <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+placeholder="Password" autocomplete="current-password" />
       <button id="btnEnter" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition">進入儀表板</button>
     </div>
   </div>
@@ -224,6 +236,7 @@
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="entryModalBackdrop"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800 p-6 rounded-xl w-full max-w-md border border-slate-700 shadow-2xl">
       <h3 class="text-xl font-bold mb-4 text-white" id="modalTitle">新增/編輯週業績</h3>
+
       <form id="performanceForm" class="space-y-4">
         <input type="hidden" id="editId" />
         <div>
@@ -274,13 +287,13 @@
     let allData = [];
     let performanceChart = null;
     let chartXOriginal = null;
-    
+
     let hoverXValue = null;
     let hoverXRatio = 0.5;
-    
+
     let chartViewMode = "weekly";
     let weeklyStartDate = null;
-    
+
     let tableSortOrder = "desc";
     let currentPage = 1;
     const PAGE_SIZE = 12;
@@ -327,6 +340,55 @@
       return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0));
     }
 
+    // ===== 日期工具：全部用「本地日曆日」避免 UTC 偏移 =====
+    function parseISODateLocal(dateStr){
+      const [y, m, d] = String(dateStr).split("-").map(Number);
+      const dt = new Date(y, (m || 1) - 1, d || 1);
+      dt.setHours(0,0,0,0);
+      return dt;
+    }
+    function toISODateLocal(dt){
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      const d = String(dt.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+    function addDays(dt, days){
+      const x = new Date(dt);
+      x.setDate(x.getDate() + days);
+      x.setHours(0,0,0,0);
+      return x;
+    }
+
+    // 週期固定：週一～週日
+    function getWeekRange(anyIsoDateStr){
+      const date = parseISODateLocal(anyIsoDateStr);
+      const day = date.getDay(); // 0=週日..6=週六
+      const deltaToMonday = (day + 6) % 7; // 週一→0、週日→6
+      const monday = addDays(date, -deltaToMonday);
+      const sunday = addDays(monday, 6);
+      return { start: monday, end: sunday };
+    }
+
+    // 月歸類：看當週哪個月份佔比多 → 等同取「週四」(start+3) 所在月份
+    function getWeekMajorMonthStart(weekStartIso){
+      const s = parseISODateLocal(weekStartIso);
+      const thursday = addDays(s, 3);
+      return { year: thursday.getFullYear(), month: thursday.getMonth() + 1 };
+    }
+    function getWeekMajorMonthFromRange(range){
+      const thursday = addDays(range.start, 3);
+      return { year: thursday.getFullYear(), month: thursday.getMonth() + 1 };
+    }
+
+    function showWeekRangeText(isoDate) {
+      const r = getWeekRange(isoDate);
+      const s = r.start, e = r.end;
+      dom.weekRangeDisplay.textContent = `週期：${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ~ ${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()}`;
+      return r;
+    }
+
+    // ===== 前台密碼門神 =====
     function setFrontAccess() {
       localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL }));
     }
@@ -337,21 +399,16 @@
         const obj = JSON.parse(raw);
         if (!obj?.expire) return false;
         if (Date.now() > obj.expire) return false;
-        setFrontAccess();
         return true;
       } catch {
         return false;
       }
     }
 
-    if (checkFrontAccess()) {
-      dom.lockScreen.classList.add("hidden");
-      initApp();
-    } else {
-      dom.lockScreen.classList.remove("hidden");
-      dom.lockScreen.classList.add("flex");
-      setTimeout(() => dom.accessPassword.focus(), 80);
-    }
+dom.lockScreen.classList.remove("hidden");
+dom.lockScreen.classList.add("flex");
+setTimeout(() => dom.accessPassword.focus(), 80);
+
 
     dom.btnEnter.addEventListener("click", doFrontUnlock);
     dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doFrontUnlock(); });
@@ -366,8 +423,8 @@
     dom.btnCloseEntry.addEventListener("click", closeModal);
     dom.performanceForm.addEventListener("submit", handleFormSubmit);
     dom.inputDate.addEventListener("change", (e) => { if (e.target.value) showWeekRangeText(e.target.value); });
-    
-    dom.btnResetZoom.addEventListener("click", () => { 
+
+    dom.btnResetZoom.addEventListener("click", () => {
       if (performanceChart?.resetZoom) {
         performanceChart.resetZoom();
         dom.zoomSlider.value = 0;
@@ -391,14 +448,8 @@
       let min = anchor - ratio * range;
       let max = min + range;
 
-      if (min < chartXOriginal.min) {
-        min = chartXOriginal.min;
-        max = min + range;
-      }
-      if (max > chartXOriginal.max) {
-        max = chartXOriginal.max;
-        min = max - range;
-      }
+      if (min < chartXOriginal.min) { min = chartXOriginal.min; max = min + range; }
+      if (max > chartXOriginal.max) { max = chartXOriginal.max; min = max - range; }
 
       performanceChart.zoomScale("x", { min, max }, "none");
     });
@@ -493,11 +544,13 @@
       const email = dom.admEmail.value.trim();
       const pwd = dom.admPwd.value.trim();
       if (!email || !pwd) return;
+
       const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
       if (error) {
         Swal.fire({ icon: "error", title: "登入失敗", text: error.message, background: "#1e293b", color: "#fff" });
         return;
       }
+
       closeAdminLogin();
       await checkAdminSession();
       Swal.fire({ icon: "success", title: "管理員登入成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
@@ -511,7 +564,13 @@
 
     async function refreshData() {
       dom.dataStatus.textContent = "載入中...";
-      const { data, error } = await supabase.from("sales_performance").select("*").order("year", { ascending: true }).order("month", { ascending: true }).order("week_start_date", { ascending: true });
+      const { data, error } = await supabase
+        .from("sales_performance")
+        .select("*")
+        .order("year", { ascending: true })
+        .order("month", { ascending: true })
+        .order("week_start_date", { ascending: true });
+
       if (error) {
         console.error(error);
         dom.dataStatus.textContent = "載入失敗";
@@ -522,6 +581,7 @@
         renderTable(false, "next");
         return;
       }
+
       allData = data || [];
       dom.dataStatus.textContent = `共 ${allData.length} 筆`;
       tableSortOrder = "desc";
@@ -533,387 +593,507 @@
       updatePageUI();
     }
 
-    function renderChart() {
-      const weeklyData = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
-      
-      if (!weeklyData.length) {
-        if (performanceChart) performanceChart.destroy();
-        dom.dataStatus.textContent = "尚無週資料";
-        return;
+function renderChart() {
+  const weeklyData = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
+  if (!weeklyData.length) {
+    if (performanceChart) performanceChart.destroy();
+    dom.dataStatus.textContent = "尚無週資料";
+    return;
+  }
+
+  weeklyStartDate = weeklyData.reduce((min, d) => {
+    const t = parseISODateLocal(d.week_start_date).getTime();
+    return t < min ? t : min;
+  }, parseISODateLocal(weeklyData[0].week_start_date).getTime());
+
+  let chartData, labels, linanData, nankeData, msgData;
+
+  if (chartViewMode === "weekly") {
+    chartData = [...weeklyData].sort((a, b) =>
+      parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime()
+    );
+
+    // 週視圖：週一～週日（永遠用週一 + 6 天推算週日，不依賴資料庫的 week_end_date）
+    labels = chartData.map(d => {
+      const s = parseISODateLocal(d.week_start_date);
+      const e = addDays(s, 6);
+      return `${s.getMonth() + 1}/${s.getDate()}-${e.getMonth() + 1}/${e.getDate()}`;
+    });
+
+    linanData = chartData.map(d => Number(d.linan_amount || 0));
+    nankeData = chartData.map(d => Number(d.nanke_amount || 0));
+    msgData   = chartData.map(d => Number(d.message_count || 0));
+  } else {
+    // 月視圖：用「當週多數月份」歸類到該月（以週一～週日 7 天逐日統計）
+    const monthMap = {};
+
+    weeklyData.forEach(d => {
+      const wkStart = parseISODateLocal(d.week_start_date);
+
+      // 逐日計數各月份出現次數（年/月一起算，避免跨年）
+      const counts = new Map(); // key: "YYYY-MM", val: days
+      for (let i = 0; i < 7; i++) {
+        const x = addDays(wkStart, i);
+        const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
+        counts.set(key, (counts.get(key) || 0) + 1);
       }
-      
-      weeklyStartDate = weeklyData.reduce((min, d) => {
-        const t = new Date(d.week_start_date).getTime();
-        return t < min ? t : min;
-      }, new Date(weeklyData[0].week_start_date).getTime());
-      
-      let chartData, labels, linanData, nankeData, msgData;
-      
-      if (chartViewMode === "weekly") {
-        chartData = [...weeklyData].sort((a, b) => 
-          new Date(a.week_start_date).getTime() - new Date(b.week_start_date).getTime()
-        );
-        labels = chartData.map(d => {
-          const s = new Date(d.week_start_date);
-          const e = new Date(d.week_end_date);
-          return `${s.getMonth() + 1}/${s.getDate()}-${e.getMonth() + 1}/${e.getDate()}`;
-        });
-        linanData = chartData.map(d => Number(d.linan_amount || 0));
-        nankeData = chartData.map(d => Number(d.nanke_amount || 0));
-        msgData = chartData.map(d => Number(d.message_count || 0));
-        
-      } else {
-        const monthMap = {};
-        weeklyData.forEach(d => {
-          const date = new Date(d.week_start_date);
-          const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-          if (!monthMap[key]) {
-            monthMap[key] = { 
-              year: date.getFullYear(), 
-              month: date.getMonth() + 1,
-              linan: 0, 
-              nanke: 0, 
-              msg: 0,
-              notes: []
-            };
-          }
-          monthMap[key].linan += Number(d.linan_amount || 0);
-          monthMap[key].nanke += Number(d.nanke_amount || 0);
-          monthMap[key].msg += Number(d.message_count || 0);
-          if (d.note) monthMap[key].notes.push(d.note);
-        });
-        
-        chartData = Object.keys(monthMap).sort().map(k => ({
-          key: k,
-          ...monthMap[k],
-          noteStr: monthMap[k].notes.join('、') || null
-        }));
-        
-        labels = chartData.map(d => `${d.year}/${d.month}月`);
-        linanData = chartData.map(d => d.linan);
-        nankeData = chartData.map(d => d.nanke);
-        msgData = chartData.map(d => d.msg);
+
+      // 取天數最多的那個月份；若剛好同天數（極少見），取較晚的月份（更符合「多數月份」直覺）
+      let bestKey = null;
+      let bestDays = -1;
+      for (const [k, days] of counts.entries()) {
+        if (days > bestDays) { bestDays = days; bestKey = k; continue; }
+        if (days === bestDays && bestKey && k > bestKey) bestKey = k;
       }
-      
-      const ctx = document.getElementById("mainChart").getContext("2d");
-      if (performanceChart) performanceChart.destroy();
-      
-      Chart.register(window.ChartZoom);
-      
-      performanceChart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            { label: "臨安店", data: linanData, borderColor: "#38bdf8", backgroundColor: "rgba(56, 189, 248, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y" },
-            { label: "南科店", data: nankeData, borderColor: "#f472b6", backgroundColor: "rgba(244, 114, 182, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y" },
-            { label: "訊息數", data: msgData, borderColor: "#fbbf24", borderDash: [6, 6], borderWidth: 1.6, pointRadius: 0, yAxisID: "y1", hidden: true }
-          ]
+
+      const [yy, mm] = String(bestKey || `${wkStart.getFullYear()}-${String(wkStart.getMonth()+1).padStart(2,"0")}`).split("-");
+      const year = Number(yy);
+      const month = Number(mm);
+
+      const key = `${year}-${String(month).padStart(2, "0")}`;
+      if (!monthMap[key]) {
+        monthMap[key] = { year, month, linan: 0, nanke: 0, msg: 0, notes: [] };
+      }
+
+      monthMap[key].linan += Number(d.linan_amount || 0);
+      monthMap[key].nanke += Number(d.nanke_amount || 0);
+      monthMap[key].msg   += Number(d.message_count || 0);
+      if (d.note) monthMap[key].notes.push(d.note);
+    });
+
+    chartData = Object.keys(monthMap).sort().map(k => ({
+      key: k,
+      ...monthMap[k],
+      noteStr: monthMap[k].notes.join("、") || null
+    }));
+
+    labels    = chartData.map(d => `${d.year}/${d.month}月`);
+    linanData = chartData.map(d => d.linan);
+    nankeData = chartData.map(d => d.nanke);
+    msgData   = chartData.map(d => d.msg);
+  }
+
+  const ctx = document.getElementById("mainChart").getContext("2d");
+  if (performanceChart) performanceChart.destroy();
+
+  Chart.register(window.ChartZoom);
+
+  performanceChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "臨安店",
+          data: linanData,
+          borderColor: "#38bdf8",
+          backgroundColor: "rgba(56, 189, 248, 0.12)",
+          borderWidth: 2.2,
+          tension: 0.35,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          yAxisID: "y"
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: "index", intersect: false },
-          plugins: {
-            legend: { labels: { color: "#94a3b8" } },
-            tooltip: {
-              backgroundColor: "rgba(15, 23, 42, 0.92)",
-              titleColor: "#fff",
-              bodyColor: "#cbd5e1",
-              borderColor: "#334155",
-              borderWidth: 1,
-              callbacks: {
-                label: (context) => {
-                  const label = context.dataset.label || "";
-                  const val = context.parsed.y ?? 0;
-                  const base = (label === "訊息數") ? `${label}: ${val}` : `${label}: ${fmtTwd(val)}`;
-                  if (chartViewMode === "weekly") {
-                    const row = chartData[context.dataIndex] || {};
-                    return row.note ? `${base}（${row.note}）` : base;
-                  } else {
-                    const row = chartData[context.dataIndex] || {};
-                    return row.noteStr ? `${base}（${row.noteStr}）` : base;
-                  }
-                }
+        {
+          label: "南科店",
+          data: nankeData,
+          borderColor: "#f472b6",
+          backgroundColor: "rgba(244, 114, 182, 0.10)",
+          borderWidth: 2.2,
+          tension: 0.35,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          yAxisID: "y"
+        },
+        {
+          // 變更 1：訊息數虛線預設開啟（原本 hidden: true）
+          label: "訊息數",
+          data: msgData,
+          borderColor: "#fbbf24",
+          borderDash: [6, 6],
+          borderWidth: 1.6,
+          pointRadius: 0,
+          yAxisID: "y1",
+          hidden: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { labels: { color: "#94a3b8" } },
+        tooltip: {
+          backgroundColor: "rgba(15, 23, 42, 0.92)",
+          titleColor: "#fff",
+          bodyColor: "#cbd5e1",
+          borderColor: "#334155",
+          borderWidth: 1,
+          callbacks: {
+            label: (context) => {
+              const label = context.dataset.label || "";
+              const val = context.parsed.y ?? 0;
+              const base = (label === "訊息數") ? `${label}: ${val}` : `${label}: ${fmtTwd(val)}`;
+              if (chartViewMode === "weekly") {
+                const row = chartData[context.dataIndex] || {};
+                return row.note ? `${base}（${row.note}）` : base;
+              } else {
+                const row = chartData[context.dataIndex] || {};
+                return row.noteStr ? `${base}（${row.noteStr}）` : base;
               }
-            },
-            zoom: {
-              pan: { enabled: true, mode: "x" },
-              zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" }
             }
-          },
-          scales: {
-            y: { grid: { color: "#334155" }, ticks: { color: "#94a3b8", callback: (v) => (v >= 10000 ? `${Math.round(v/10000)}萬` : v) } },
-            y1: { display: false, position: "right", grid: { drawOnChartArea: false } },
-            x: { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } }
           }
+        },
+        zoom: {
+          pan:  { enabled: true, mode: "x" },
+          zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" }
         }
-      });
-      
-      if (performanceChart.getInitialScaleBounds) {
-        chartXOriginal = performanceChart.getInitialScaleBounds().x;
-      } else {
-        chartXOriginal = { min: performanceChart.scales.x.min, max: performanceChart.scales.x.max };
-      }
-
-      const canvas = performanceChart.canvas;
-      canvas.onmousemove = null;
-      canvas.onmouseleave = null;
-
-      canvas.onmousemove = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const px = e.clientX - rect.left;
-        const area = performanceChart.chartArea;
-        const xScale = performanceChart.scales.x;
-
-        if (px < area.left || px > area.right) return;
-
-        hoverXRatio = (px - area.left) / (area.right - area.left);
-        hoverXRatio = Math.min(1, Math.max(0, hoverXRatio));
-        hoverXValue = xScale.getValueForPixel(px);
-      };
-
-      canvas.onmouseleave = () => {
-        hoverXValue = null;
-        hoverXRatio = 0.5;
-      };
-    }
-
-    function renderKPI() {
-      const elTotal = document.getElementById("kpiTotal");
-      const elLinan = document.getElementById("kpiLinan");
-      const elNanke = document.getElementById("kpiNanke");
-      const elMsg = document.getElementById("kpiMessages");
-      const elGrowth = document.getElementById("kpiGrowth");
-      const wrap = document.getElementById("kpiGrowthWrap");
-      if (!allData.length) {
-        elTotal.textContent = "--";
-        elLinan.textContent = "--";
-        elNanke.textContent = "--";
-        elMsg.textContent = "--";
-        elGrowth.textContent = "--";
-        elGrowth.className = "text-slate-400";
-        wrap.className = "mt-2 text-xs flex items-center";
-        return;
-      }
-      const latest = allData[allData.length - 1];
-      const prev = allData.length > 1 ? allData[allData.length - 2] : null;
-      const total = Number(latest.linan_amount || 0) + Number(latest.nanke_amount || 0);
-      elTotal.textContent = fmtTwd(total);
-      elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
-      elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
-      elMsg.textContent = Number(latest.message_count || 0);
-      if (!prev) {
-        wrap.className = "mt-2 text-xs flex items-center text-slate-400";
-        elGrowth.className = "text-slate-400";
-        elGrowth.textContent = "尚無上週可比較";
-        return;
-      }
-      const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
-      if (!prevTotal) {
-        wrap.className = "mt-2 text-xs flex items-center text-slate-400";
-        elGrowth.className = "text-slate-400";
-        elGrowth.textContent = "上週為 0（無法計算）";
-        return;
-      }
-      const growth = ((total - prevTotal) / prevTotal) * 100;
-      const up = growth >= 0;
-      const colorClass = up ? "text-emerald-400" : "text-rose-400";
-      wrap.className = `mt-2 text-xs flex items-center ${colorClass}`;
-      elGrowth.className = colorClass;
-      elGrowth.innerHTML = `${up ? '<i class="fas fa-arrow-up mr-1"></i>' : '<i class="fas fa-arrow-down mr-1"></i>'}${growth.toFixed(1)}% 較上週`;
-    }
-
-    function timeKey(row) {
-      if (row.period_type === "weekly" && row.week_start_date) return new Date(row.week_start_date).getTime();
-      return new Date(row.year || 1970, (row.month || 1) - 1, 1).getTime();
-    }
-    function getSortedRows() {
-      const rows = [...allData];
-      rows.sort((a, b) => {
-        const ta = timeKey(a);
-        const tb = timeKey(b);
-        return tableSortOrder === "asc" ? (ta - tb) : (tb - ta);
-      });
-      return rows;
-    }
-    function totalPages() { return Math.max(1, Math.ceil(allData.length / PAGE_SIZE)); }
-    function clampPage() {
-      const tp = totalPages();
-      if (currentPage < 1) currentPage = 1;
-      if (currentPage > tp) currentPage = tp;
-    }
-    function setButtonsDisabled(disabled) {
-      dom.btnSortAsc.disabled = disabled;
-      dom.btnSortDesc.disabled = disabled;
-      dom.btnPrevPage.disabled = disabled;
-      dom.btnNextPage.disabled = disabled;
-      dom.btnSortAsc.classList.toggle("opacity-50", disabled);
-      dom.btnSortDesc.classList.toggle("opacity-50", disabled);
-      dom.btnPrevPage.classList.toggle("opacity-50", disabled);
-      dom.btnNextPage.classList.toggle("opacity-50", disabled);
-    }
-    function updateSortButtons() {
-      if (tableSortOrder === "desc") {
-        dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
-        dom.btnSortAsc.className = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
-      } else {
-        dom.btnSortAsc.className = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
-        dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
+      },
+      scales: {
+        y: {
+          grid: { color: "#334155" },
+          ticks: {
+            color: "#94a3b8",
+            callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v)
+          }
+        },
+        // y1 軸不顯示也不影響線條渲染（只是不顯示刻度）
+        y1: { display: false, position: "right", grid: { drawOnChartArea: false } },
+        x:  { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } }
       }
     }
-    function updatePageUI() {
-      const tp = totalPages();
-      dom.pageInfo.textContent = `第 ${currentPage} / ${tp} 頁`;
-      dom.btnPrevPage.disabled = (currentPage <= 1) || tableBusy;
-      dom.btnNextPage.disabled = (currentPage >= tp) || tableBusy;
-      dom.btnPrevPage.classList.toggle("opacity-50", dom.btnPrevPage.disabled);
-      dom.btnNextPage.classList.toggle("opacity-50", dom.btnNextPage.disabled);
-    }
-    async function setSort(order) {
-      if (tableSortOrder === order) return;
-      tableSortOrder = order;
-      currentPage = 1;
-      await animateTableSwitch(order === "desc" ? "next" : "prev");
-      updateSortButtons();
-      updatePageUI();
-    }
-    async function changePage(dir) {
-      const next = currentPage + dir;
-      const tp = totalPages();
-      if (next < 1 || next > tp) return;
-      currentPage = next;
-      await animateTableSwitch(dir > 0 ? "next" : "prev");
-      updatePageUI();
-    }
-    async function animateTableSwitch(direction) {
-      tableBusy = true;
-      setButtonsDisabled(true);
-      const oldRows = [...dom.tbody.querySelectorAll("tr")];
-      oldRows.forEach((tr, i) => {
-        tr.style.animationDelay = `${i * 18}ms`;
-        tr.classList.add(direction === "next" ? "row-exit-left" : "row-exit-right");
-      });
-      const waitOut = Math.min(520, 280 + oldRows.length * 18);
-      await new Promise(r => setTimeout(r, waitOut));
-      renderTable(true, direction);
-      const waitIn = Math.min(700, 420 + PAGE_SIZE * 28);
-      await new Promise(r => setTimeout(r, waitIn));
-      tableBusy = false;
-      setButtonsDisabled(false);
-      updatePageUI();
-    }
-    function renderTable(animate = false, direction = "next") {
-      clampPage();
-      const rows = getSortedRows();
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const pageRows = rows.slice(start, start + PAGE_SIZE);
-      dom.tbody.innerHTML = "";
-      pageRows.forEach((row, i) => {
-        const tr = document.createElement("tr");
-        tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer";
-        if (animate) {
-          tr.classList.add(direction === "next" ? "row-enter-right" : "row-enter-left");
-          tr.style.animationDelay = `${i * 28}ms`;
-        } else {
-          tr.style.animationDelay = "0ms";
-        }
-        if (isAdmin) tr.addEventListener("click", () => openModal(row));
-        let periodStr = "";
-        if (row.period_type === "weekly" && row.week_start_date) {
-          const s = new Date(row.week_start_date);
-          const e = new Date(row.week_end_date);
-          periodStr = `<span class="px-2 py-1 rounded bg-blue-900/30 text-xs text-blue-200 border border-blue-800">${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}</span>`;
-        } else {
-          periodStr = `<span class="px-2 py-1 rounded bg-slate-700 text-xs text-slate-200 border border-slate-600">${row.year}/${row.month}月</span>`;
-        }
-        const note = row.note ? `<span class="px-2 py-0.5 rounded-full bg-yellow-900/25 text-yellow-300 text-xs border border-yellow-800">${row.note}</span>` : `<span class="text-slate-500">-</span>`;
-        tr.innerHTML = `
-          <td class="px-6 py-4">${periodStr}</td>
-          <td class="px-6 py-4 font-mono text-sky-200">NT$${Number(row.linan_amount||0).toLocaleString()}</td>
-          <td class="px-6 py-4 font-mono text-pink-200">NT$${Number(row.nanke_amount||0).toLocaleString()}</td>
-          <td class="px-6 py-4 text-slate-300">${Number(row.message_count||0)}</td>
-          <td class="px-6 py-4">${note}</td>
-          <td class="px-6 py-4 text-right">${isAdmin ? '<span class="text-blue-400 hover:text-white"><i class="fas fa-pen"></i></span>' : '<span class="text-slate-600">-</span>'}</td>
-        `;
-        dom.tbody.appendChild(tr);
-      });
-      updateSortButtons();
-      updatePageUI();
+  });
+
+  if (performanceChart.getInitialScaleBounds) {
+    chartXOriginal = performanceChart.getInitialScaleBounds().x;
+  } else {
+    chartXOriginal = { min: performanceChart.scales.x.min, max: performanceChart.scales.x.max };
+  }
+
+  const canvas = performanceChart.canvas;
+  canvas.onmousemove = null;
+  canvas.onmouseleave = null;
+
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const area = performanceChart.chartArea;
+    const xScale = performanceChart.scales.x;
+
+    if (px < area.left || px > area.right) return;
+
+    hoverXRatio = (px - area.left) / (area.right - area.left);
+    hoverXRatio = Math.min(1, Math.max(0, hoverXRatio));
+    hoverXValue = xScale.getValueForPixel(px);
+  };
+
+  canvas.onmouseleave = () => {
+    hoverXValue = null;
+    hoverXRatio = 0.5;
+  };
+}
+
+function renderKPI() {
+  const elTotal  = document.getElementById("kpiTotal");
+  const elLinan  = document.getElementById("kpiLinan");
+  const elNanke  = document.getElementById("kpiNanke");
+  const elMsg    = document.getElementById("kpiMessages");
+  const elGrowth = document.getElementById("kpiGrowth");
+  const wrap     = document.getElementById("kpiGrowthWrap");
+
+  if (!allData.length) {
+    elTotal.textContent = "--";
+    elLinan.textContent = "--";
+    elNanke.textContent = "--";
+    elMsg.textContent = "--";
+    elGrowth.textContent = "--";
+    elGrowth.className = "text-slate-400";
+    wrap.className = "mt-2 text-xs flex items-center";
+    return;
+  }
+
+  // 只用週資料計 KPI（避免未來若有其它 period_type 影響）
+  const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
+  if (!weeklyRows.length) {
+    elTotal.textContent = "--";
+    elLinan.textContent = "--";
+    elNanke.textContent = "--";
+    elMsg.textContent = "--";
+    elGrowth.textContent = "--";
+    elGrowth.className = "text-slate-400";
+    wrap.className = "mt-2 text-xs flex items-center";
+    return;
+  }
+
+  const sorted = [...weeklyRows].sort((a, b) =>
+    parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime()
+  );
+
+  const latest = sorted[sorted.length - 1];
+  const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
+
+  const total = Number(latest.linan_amount || 0) + Number(latest.nanke_amount || 0);
+  elTotal.textContent = fmtTwd(total);
+  elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
+  elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
+  elMsg.textContent   = Number(latest.message_count || 0);
+
+  if (!prev) {
+    wrap.className = "mt-2 text-xs flex items-center text-slate-400";
+    elGrowth.className = "text-slate-400";
+    elGrowth.textContent = "尚無上週可比較";
+    return;
+  }
+
+  const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
+  if (!prevTotal) {
+    wrap.className = "mt-2 text-xs flex items-center text-slate-400";
+    elGrowth.className = "text-slate-400";
+    elGrowth.textContent = "上週為 0（無法計算）";
+    return;
+  }
+
+  const growth = ((total - prevTotal) / prevTotal) * 100;
+  const up = growth >= 0;
+  const colorClass = up ? "text-emerald-400" : "text-rose-400";
+  wrap.className = `mt-2 text-xs flex items-center ${colorClass}`;
+  elGrowth.className = colorClass;
+  elGrowth.innerHTML = `${up ? '<i class="fas fa-arrow-up mr-1"></i>' : '<i class="fas fa-arrow-down mr-1"></i>'}${growth.toFixed(1)}% 較上週`;
+}
+
+function timeKey(row) {
+  if (row.period_type === "weekly" && row.week_start_date) return parseISODateLocal(row.week_start_date).getTime();
+  return new Date(row.year || 1970, (row.month || 1) - 1, 1).getTime();
+}
+
+function getSortedRows() {
+  const rows = [...allData];
+  rows.sort((a, b) => {
+    const ta = timeKey(a);
+    const tb = timeKey(b);
+    return tableSortOrder === "asc" ? (ta - tb) : (tb - ta);
+  });
+  return rows;
+}
+
+function totalPages() { return Math.max(1, Math.ceil(allData.length / PAGE_SIZE)); }
+
+function clampPage() {
+  const tp = totalPages();
+  if (currentPage < 1) currentPage = 1;
+  if (currentPage > tp) currentPage = tp;
+}
+
+function setButtonsDisabled(disabled) {
+  dom.btnSortAsc.disabled = disabled;
+  dom.btnSortDesc.disabled = disabled;
+  dom.btnPrevPage.disabled = disabled;
+  dom.btnNextPage.disabled = disabled;
+  dom.btnSortAsc.classList.toggle("opacity-50", disabled);
+  dom.btnSortDesc.classList.toggle("opacity-50", disabled);
+  dom.btnPrevPage.classList.toggle("opacity-50", disabled);
+  dom.btnNextPage.classList.toggle("opacity-50", disabled);
+}
+
+function updateSortButtons() {
+  if (tableSortOrder === "desc") {
+    dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
+    dom.btnSortAsc.className  = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
+  } else {
+    dom.btnSortAsc.className  = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
+    dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
+  }
+}
+
+function updatePageUI() {
+  const tp = totalPages();
+  dom.pageInfo.textContent = `第 ${currentPage} / ${tp} 頁`;
+  dom.btnPrevPage.disabled = (currentPage <= 1) || tableBusy;
+  dom.btnNextPage.disabled = (currentPage >= tp) || tableBusy;
+  dom.btnPrevPage.classList.toggle("opacity-50", dom.btnPrevPage.disabled);
+  dom.btnNextPage.classList.toggle("opacity-50", dom.btnNextPage.disabled);
+}
+
+async function setSort(order) {
+  if (tableSortOrder === order) return;
+  tableSortOrder = order;
+  currentPage = 1;
+  await animateTableSwitch(order === "desc" ? "next" : "prev");
+  updateSortButtons();
+  updatePageUI();
+}
+
+async function changePage(dir) {
+  const next = currentPage + dir;
+  const tp = totalPages();
+  if (next < 1 || next > tp) return;
+  currentPage = next;
+  await animateTableSwitch(dir > 0 ? "next" : "prev");
+  updatePageUI();
+}
+
+async function animateTableSwitch(direction) {
+  tableBusy = true;
+  setButtonsDisabled(true);
+
+  const oldRows = [...dom.tbody.querySelectorAll("tr")];
+  oldRows.forEach((tr, i) => {
+    tr.style.animationDelay = `${i * 18}ms`;
+    tr.classList.add(direction === "next" ? "row-exit-left" : "row-exit-right");
+  });
+
+  const waitOut = Math.min(520, 280 + oldRows.length * 18);
+  await new Promise(r => setTimeout(r, waitOut));
+
+  renderTable(true, direction);
+
+  const waitIn = Math.min(700, 420 + PAGE_SIZE * 28);
+  await new Promise(r => setTimeout(r, waitIn));
+
+  tableBusy = false;
+  setButtonsDisabled(false);
+  updatePageUI();
+}
+
+function renderTable(animate = false, direction = "next") {
+  clampPage();
+  const rows = getSortedRows();
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageRows = rows.slice(start, start + PAGE_SIZE);
+
+  dom.tbody.innerHTML = "";
+  pageRows.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer";
+
+    if (animate) {
+      tr.classList.add(direction === "next" ? "row-enter-right" : "row-enter-left");
+      tr.style.animationDelay = `${i * 28}ms`;
+    } else {
+      tr.style.animationDelay = "0ms";
     }
 
-    function openModal(row) {
-      if (!isAdmin) return;
-      dom.entryModal.classList.remove("hidden");
-      dom.performanceForm.reset();
-      if (row) {
-        dom.editId.value = row.id;
-        dom.inputDate.value = row.week_start_date || "";
-        dom.inputLinan.value = row.linan_amount ?? 0;
-        dom.inputNanke.value = row.nanke_amount ?? 0;
-        dom.inputMsg.value = row.message_count ?? 0;
-        dom.inputNote.value = row.note ?? "";
-        if (row.week_start_date) showWeekRangeText(row.week_start_date);
-      } else {
-        dom.editId.value = "";
-        const today = new Date().toISOString().slice(0,10);
-        dom.inputDate.value = today;
-        showWeekRangeText(today);
-      }
+    if (isAdmin) tr.addEventListener("click", () => openModal(row));
+
+    let periodStr = "";
+    if (row.period_type === "weekly" && row.week_start_date) {
+      const s = parseISODateLocal(row.week_start_date);
+      const e = addDays(s, 6);
+      periodStr = `<span class="px-2 py-1 rounded bg-blue-900/30 text-xs text-blue-200 border border-blue-800">${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}</span>`;
+    } else {
+      periodStr = `<span class="px-2 py-1 rounded bg-slate-700 text-xs text-slate-200 border border-slate-600">${row.year}/${row.month}月</span>`;
     }
-    function closeModal() { dom.entryModal.classList.add("hidden"); }
-    function getWeekRange(dateStr) {
-      const date = new Date(dateStr);
-      const day = date.getDay();
-      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(date.setDate(diff));
-      monday.setHours(0,0,0,0);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      sunday.setHours(0,0,0,0);
-      return { start: monday, end: sunday };
-    }
-    function showWeekRangeText(isoDate) {
-      const r = getWeekRange(isoDate);
-      const s = r.start, e = r.end;
-      dom.weekRangeDisplay.textContent = `週期：${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ~ ${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()}`;
-      return r;
-    }
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-      if (!isAdmin) return;
-      const dateIso = dom.inputDate.value;
-      if (!dateIso) return;
-      const r = getWeekRange(dateIso);
-      const payload = {
-        period_type: "weekly",
-        year: r.start.getFullYear(),
-        month: r.start.getMonth() + 1,
-        week_start_date: r.start.toISOString().slice(0,10),
-        week_end_date: r.end.toISOString().slice(0,10),
-        linan_amount: Number(dom.inputLinan.value || 0),
-        nanke_amount: Number(dom.inputNanke.value || 0),
-        message_count: Number(dom.inputMsg.value || 0),
-        note: (dom.inputNote.value || "").trim() || null,
-        updated_at: new Date().toISOString()
-      };
-      const id = (dom.editId.value || "").trim();
-      let error = null;
-      if (id) {
-        const res = await supabase.from("sales_performance").update(payload).eq("id", id);
-        error = res.error;
-      } else {
-        const res = await supabase.from("sales_performance").insert([payload]);
-        error = res.error;
-      }
-      if (error) {
-        Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
-        return;
-      }
-      closeModal();
-      Swal.fire({ icon: "success", title: "儲存成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-      await refreshData();
-    }
+
+    const note = row.note
+      ? `<span class="px-2 py-0.5 rounded-full bg-yellow-900/25 text-yellow-300 text-xs border border-yellow-800">${row.note}</span>`
+      : `<span class="text-slate-500">-</span>`;
+
+    tr.innerHTML = `
+      <td class="px-6 py-4">${periodStr}</td>
+      <td class="px-6 py-4 font-mono text-sky-200">NT$${Number(row.linan_amount||0).toLocaleString()}</td>
+      <td class="px-6 py-4 font-mono text-pink-200">NT$${Number(row.nanke_amount||0).toLocaleString()}</td>
+      <td class="px-6 py-4 text-slate-300">${Number(row.message_count||0)}</td>
+      <td class="px-6 py-4">${note}</td>
+      <td class="px-6 py-4 text-right">${isAdmin ? '<span class="text-blue-400 hover:text-white"><i class="fas fa-pen"></i></span>' : '<span class="text-slate-600">-</span>'}</td>
+    `;
+    dom.tbody.appendChild(tr);
+  });
+
+  updateSortButtons();
+  updatePageUI();
+}
+
+function openModal(row) {
+  if (!isAdmin) return;
+
+  dom.entryModal.classList.remove("hidden");
+  dom.performanceForm.reset();
+
+  if (row) {
+    dom.editId.value = row.id;
+    dom.inputDate.value = row.week_start_date || "";
+    dom.inputLinan.value = row.linan_amount ?? 0;
+    dom.inputNanke.value = row.nanke_amount ?? 0;
+    dom.inputMsg.value = row.message_count ?? 0;
+    dom.inputNote.value = row.note ?? "";
+    if (row.week_start_date) showWeekRangeText(row.week_start_date);
+  } else {
+    dom.editId.value = "";
+    const today = new Date().toISOString().slice(0, 10);
+    dom.inputDate.value = today;
+    showWeekRangeText(today);
+  }
+}
+
+function closeModal() {
+  dom.entryModal.classList.add("hidden");
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  if (!isAdmin) return;
+
+  const dateIso = dom.inputDate.value;
+  if (!dateIso) return;
+
+  // 週一～週日固定
+  const r = getWeekRange(dateIso);
+
+  // 月歸類：以「當週多數月份」決定 year/month 欄位（確保月累計統計一致）
+  // 這裡直接沿用 renderChart 的邏輯（逐日計數）
+  const wkStart = r.start;
+  const counts = new Map();
+  for (let i = 0; i < 7; i++) {
+    const x = addDays(wkStart, i);
+    const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  let bestKey = null;
+  let bestDays = -1;
+  for (const [k, days] of counts.entries()) {
+    if (days > bestDays) { bestDays = days; bestKey = k; continue; }
+    if (days === bestDays && bestKey && k > bestKey) bestKey = k;
+  }
+  const [yy, mm] = String(bestKey).split("-");
+  const majorYear = Number(yy);
+  const majorMonth = Number(mm);
+
+  // 重要：欄位名稱改為 snake_case，與你目前 select/order/filter 的欄位一致
+  const payload = {
+    period_type: "weekly",
+    year: majorYear,
+    month: majorMonth,
+    week_start_date: toISODateLocal(r.start),
+    week_end_date: toISODateLocal(r.end),
+    linan_amount: Number(dom.inputLinan.value || 0),
+    nanke_amount: Number(dom.inputNanke.value || 0),
+    message_count: Number(dom.inputMsg.value || 0),
+    note: (dom.inputNote.value || "").trim() || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const id = (dom.editId.value || "").trim();
+  let error = null;
+
+  if (id) {
+    const res = await supabase.from("sales_performance").update(payload).eq("id", id);
+    error = res.error;
+  } else {
+    const res = await supabase.from("sales_performance").insert([payload]);
+    error = res.error;
+  }
+
+  if (error) {
+    Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
+    return;
+  }
+
+  closeModal();
+  Swal.fire({ icon: "success", title: "儲存成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
+  await refreshData();
+}
   </script>
 </body>
 </html>
+
