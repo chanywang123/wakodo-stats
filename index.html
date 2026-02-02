@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
 
-
   <title>和光堂戰情室 V8.0.4.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,58 +20,52 @@
   <style>
     :root { --bg: #f3f4f6; --card-bg: rgba(255, 255, 255, 0.85); --accent: #3b82f6; }
     body { background: var(--bg); font-family: system-ui, -apple-system, sans-serif; color: #1e293b; }
-    
+
     .glass-card {
       background: var(--card-bg);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
-
     .kpi-card { cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; border: 2px solid transparent; }
     .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2); }
     .kpi-card.active { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: var(--accent); }
     .kpi-card.active::after { content:"●"; position:absolute; top:12px; right:12px; color:var(--accent); font-size:8px; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
     #hoverPreview {
-        position: fixed; pointer-events: none; z-index: 9999;
-        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(8px);
-        border: 1px solid #fbbf24; border-left: 4px solid #fbbf24;
-        padding: 14px; border-radius: 10px;
-        box-shadow: 0 20px 30px -5px rgba(251, 191, 36, 0.3);
-        max-width: 340px; font-size: 0.9rem; color: #374151; line-height: 1.6;
-        display: none; transition: opacity 0.15s;
+      position: fixed; pointer-events: none; z-index: 9999;
+      background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(8px);
+      border: 1px solid #fbbf24; border-left: 4px solid #fbbf24;
+      padding: 14px; border-radius: 10px;
+      box-shadow: 0 20px 30px -5px rgba(251, 191, 36, 0.3);
+      max-width: 340px; font-size: 0.9rem; color: #374151; line-height: 1.6;
+      display: none; transition: opacity 0.15s;
     }
-
     thead th { background: #fef9c3; color: #000; padding: 14px; font-weight: 800; border-bottom: 2px solid #fde047; font-size: 0.9rem; }
     tbody tr { border-bottom: 1px solid #f1f5f9; transition: all 0.2s; cursor: pointer; }
     tbody tr:hover { background: #fefce8; transform: translateX(2px); box-shadow: 0 2px 4px rgba(251, 191, 36, 0.1); }
-
     .btn-primary { background: var(--accent); color: white; padding: 8px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); transition: 0.2s; cursor: pointer; border: none; }
     .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
-
     #importOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; color: white; flex-direction: column; backdrop-filter: blur(4px); }
     .progress-bar { width: 320px; height: 12px; background: #334155; border-radius: 6px; overflow: hidden; margin-top: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
     .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #10b981); width: 0%; transition: width 0.3s ease; }
-    
+
     .radio-group { display: flex; flex-wrap: wrap; gap: 6px; }
     .radio-btn { padding: 6px 14px; border: 1.5px solid #e5e7eb; border-radius: 50px; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.15s; user-select: none; background: white; }
     .radio-btn:active { transform: scale(0.96); }
     .radio-btn.selected { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-color: #2563eb; font-weight: 600; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4); }
-
     .chk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
     .chk-btn { padding: 8px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 12px; color: #4b5563; cursor: pointer; transition: all 0.15s; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 40px; background: white; }
     .chk-btn.checked { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border-color: #3b82f6; font-weight: 700; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25); }
-    
+
     .modal-content { background: white; width: 95%; max-width: 650px; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 100; }
     .required-mark { color: #ef4444; margin-left: 2px; font-weight: bold; }
-    
+
     .lock-badge-container { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 50px; text-xs; font-bold; background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
     .lock-badge-x { cursor: pointer; font-size: 16px; padding: 0 4px; border-radius: 50%; transition: 0.15s; font-weight: 900; }
     .lock-badge-x:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.15); }
-    
+
     .tech-glow {
       display: inline-block;
       width: 8px;
@@ -84,25 +77,25 @@
       top: -2px;
       margin-right: 6px;
     }
-    
+
     @keyframes glow-pulse {
-      0%, 100% { 
+      0%, 100% {
         opacity: 1;
         transform: scale(1);
-        box-shadow: 
+        box-shadow:
           0 0 10px #3b82f6,
           0 0 20px #3b82f6,
           0 0 30px #3b82f6;
       }
-      50% { 
+      50% {
         opacity: 0.6;
         transform: scale(0.85);
-        box-shadow: 
+        box-shadow:
           0 0 5px #3b82f6,
           0 0 10px #3b82f6;
       }
     }
-    
+
     /* 🔥 新增：圖例發光效果 */
     .legend-glow-dot {
       display: inline-block;
@@ -112,25 +105,25 @@
       margin-right: 6px;
       animation: legend-pulse 2s ease-in-out infinite;
     }
-    
+
     @keyframes legend-pulse {
-      0%, 100% { 
+      0%, 100% {
         opacity: 1;
         transform: scale(1);
-        box-shadow: 
+        box-shadow:
           0 0 8px currentColor,
           0 0 16px currentColor,
           0 0 24px currentColor;
       }
-      50% { 
+      50% {
         opacity: 0.7;
         transform: scale(0.9);
-        box-shadow: 
+        box-shadow:
           0 0 4px currentColor,
           0 0 8px currentColor;
       }
     }
-    
+
     .logout-btn {
       background: rgba(239, 68, 68, 0.1);
       border: 1.5px solid rgba(239, 68, 68, 0.3);
@@ -142,13 +135,13 @@
       font-weight: 600;
       font-size: 0.875rem;
     }
-    
+
     .logout-btn:hover {
       background: rgba(239, 68, 68, 0.2);
       border-color: #ef4444;
       transform: translateY(-1px);
     }
-    
+
     /* 🔥 新增：過濾標籤樣式 */
     .filter-badge {
       display: inline-flex;
@@ -163,7 +156,7 @@
       border: 1.5px solid #3b82f6;
       box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
     }
-    
+
     .filter-badge-close {
       cursor: pointer;
       font-size: 14px;
@@ -173,7 +166,7 @@
       font-weight: 900;
       line-height: 1;
     }
-    
+
     .filter-badge-close:hover {
       background: rgba(239, 68, 68, 0.3);
       transform: scale(1.2);
@@ -200,7 +193,6 @@
       transform: scale(1.05);
       box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
     }
-  
 
     /* 標題外框 */
     .title-frame {
@@ -213,243 +205,319 @@
       box-shadow: 0 10px 25px rgba(59, 130, 246, 0.10);
     }
 
+    /* =========================
+       新增：表層前端密碼遮罩
+       ========================= */
+    #frontGate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 18px;
+    }
+    #frontGateCard {
+      width: 95%;
+      max-width: 520px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 18px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+      padding: 22px;
+    }
+    #frontGateInput {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      outline: none;
+    }
+    #frontGateHint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+    #frontGateError {
+      display: none;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
   </style>
 </head>
 <body>
 
-<div id="hoverPreview"></div>
-
-<div id="importOverlay">
-  <div class="text-3xl font-black mb-3">📦 資料匯入中...</div>
-  <div id="importStatus" class="text-base text-gray-300">正在準備...</div>
-  <div class="progress-bar"><div id="importProgress" class="progress-fill"></div></div>
-  <div id="importErrors" class="mt-6 text-xs text-red-300 max-h-48 overflow-y-auto w-[90%] max-w-lg bg-slate-900/50 p-4 rounded-lg hidden backdrop-blur"></div>
-</div>
-
-<div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
-  
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-         <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
-        <span class="tech-glow"></span> <span class="title-frame">和光堂戰情室</span>
-        
-        <!-- 右側資訊區塊：靠右對齊，內部文字置中 -->
-        <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-          <!-- 1. 版本號 (置中) -->
-          <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.0.4</div>
-          
-          <!-- 2. 最後更新日期 (JS 自動填入，置中) -->
-          <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
-          
-          <!-- 3. 觀看業績按鈕 (置中) -->
-          <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
-        </div>
-      </h1>
-
+<!-- =========================
+     新增：表層前端密碼入口
+     密碼：wakodo100
+     ========================= -->
+<div id="frontGate">
+  <div id="frontGateCard">
+    <div class="text-2xl font-extrabold text-slate-800 tracking-tight mb-2">🔒 請輸入密碼</div>
+    <div class="text-xs text-slate-500 font-bold mb-4">請輸入密碼以檢視填表資料</div>
+    <input id="frontGateInput" type="password" placeholder="輸入密碼後按 Enter" autocomplete="off">
+    <div class="flex gap-2 mt-4">
+      <button id="frontGateBtn" class="btn-primary w-full">進入</button>
     </div>
-    <div class="flex gap-3">
-      <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">⚙️</button>
-      <button id="logoutBtn" onclick="logout()" class="logout-btn hidden">🚪 登出管理</button>
-      <button onclick="window.location.href='form.html'" class="btn-primary">+ 新增資料</button>
-    </div>
-  </div>
-
-  <div id="adminPanel" class="hidden glass-card bg-slate-900 text-white p-4 border-slate-700">
-    <div id="loginForm" class="flex gap-2">
-      <input id="admEmail" type="email" class="p-2 rounded text-black flex-1" placeholder="管理員信箱">
-      <input id="admPwd" type="password" class="p-2 rounded text-black flex-1" placeholder="密碼" onkeyup="if(event.key==='Enter') loginSupabase()">
-      <button onclick="loginSupabase()" class="btn-primary">Supabase 登入</button>
-    </div>
-    <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
-      <span class="text-green-400 font-bold">✓ 管理員模式</span>
-      <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 匯出資料</button>
-      <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">📂 匯入 CSV <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)"></label>
-      <button onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition">⚠ 清空資料庫</button>
-    </div>
-  </div>
-
-  <div class="glass-card p-2 flex flex-wrap gap-2 items-center sticky top-2 z-40 shadow-lg border-blue-200/50">
-    <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
-      <span class="text-xl mr-2">📅</span>
-      <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
-      <span class="text-slate-300">/</span>
-      <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
-         <option value="">月份</option>
-         <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
-         <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
-         <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-      </select>
-      <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
-      <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
-    </div>
-    <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
-      <span class="text-gray-400 mr-2">🔍</span>
-      <input id="qSearch" class="bg-transparent border-0 p-2 w-full focus:ring-0" placeholder="搜尋姓名、手機、備註..." onkeyup="if(event.key==='Enter') applyFilter()">
-      <button onclick="clearSearch()" id="btnX" class="hidden absolute right-3 text-gray-400 hover:text-red-500 font-bold">✕</button>
-    </div>
-    <button onclick="applyFilter()" class="btn-primary">查詢</button>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div onclick="setStore('全部')" id="kpiTotal" class="glass-card kpi-card p-6 flex flex-col items-center justify-center active">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">總客數</div>
-      <div class="text-5xl font-black text-slate-800" id="valTotal">--</div>
-    </div>
-    <div onclick="setStore('臨安店')" id="kpiLinAn" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">臨安店</div>
-      <div class="text-5xl font-black text-blue-600" id="valLinAn">--</div>
-    </div>
-    <div onclick="setStore('南科店')" id="kpiNanKe" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
-      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">南科店</div>
-      <div class="text-5xl font-black text-green-600" id="valNanKe">--</div>
-    </div>
-  </div>
-
-  <!-- 🔥 修改：新布局 - 左右50%分割 -->
-  <div class="glass-card p-6">
-    <div class="flex justify-between items-center mb-4">
-      <div>
-        <h3 class="text-xl font-bold text-slate-800">客源與目的分析</h3>
-        <p class="text-xs text-slate-400 mt-1">點擊任何圖表項目可連動其他分析</p>
-      </div>
-    </div>
-    
-    <!-- 🔥 過濾標籤顯示區 -->
-    <div id="filterBadgesContainer" class="hidden flex flex-wrap gap-2 mb-4 pb-4 border-b border-slate-100"></div>
-    
-    <!-- 🔥 新布局：左側50%（客源+趨勢），右側50%（目的） -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- 左側：客源 + 趨勢（垂直堆疊）-->
-      <div class="space-y-6">
-        <!-- 客源統計 -->
-        <div class="h-[350px] relative">
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計</h4>
-          <canvas id="chartSource"></canvas>
-        </div>
-        
-        <!-- 客流趨勢 -->
-        <div class="h-[250px] relative">
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
-          <canvas id="chartTrend"></canvas>
-        </div>
-      </div>
-      
-      <!-- 右側：來店目的（獨立佔50%）-->
-      <div class="h-[620px] relative">
-        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
-        <div class="h-full">
-          <canvas id="chartPurpose"></canvas>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="glass-card p-6 flex flex-col">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈</h3>
-       <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
-    </div>
-    <div class="glass-card p-6 flex flex-col md:col-span-2">
-       <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈</h3>
-       <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
-    </div>
-  </div>
-
-  <div class="glass-card overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white/50">
-      <h3 class="font-bold text-slate-700">最新顧客資料</h3>
-      <span class="text-xs font-mono text-slate-400" id="listCounter">--</span>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm whitespace-nowrap">
-        <thead><tr><th class="pl-6">日期</th><th>分店</th><th>姓名</th><th>性別/年齡</th><th>客源</th><th>目的</th><th class="w-10"></th></tr></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-    <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
+    <div id="frontGateError">密碼錯誤，請再試一次。</div>
+    <div id="frontGateHint">提示：密碼請詢問問阿旺</div>
   </div>
 </div>
 
-<!-- Add Modal -->
-<div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
-  <div class="modal-content relative">
-    <button onclick="closeAddModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增顧客資料</h2>
-    <div class="space-y-5">
-      
-      <div class="grid grid-cols-2 gap-4">
+<!-- 下面整個原本內容包起來：未解鎖前不顯示 -->
+<div id="appRoot" style="display:none;">
+
+  <div id="hoverPreview"></div>
+
+  <div id="importOverlay">
+    <div class="text-3xl font-black mb-3">📦 資料匯入中...</div>
+    <div id="importStatus" class="text-base text-gray-300">正在準備...</div>
+    <div class="progress-bar"><div id="importProgress" class="progress-fill"></div></div>
+    <div id="importErrors" class="mt-6 text-xs text-red-300 max-h-48 overflow-y-auto w-[90%] max-w-lg bg-slate-900/50 p-4 rounded-lg hidden backdrop-blur"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
+          <span class="tech-glow"></span> <span class="title-frame">和光堂戰情室</span>
+
+          <!-- 右側資訊區塊：靠右對齊，內部文字置中 -->
+          <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
+            <!-- 1. 版本號 (置中) -->
+            <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.0.4</div>
+
+            <!-- 2. 最後更新日期 (JS 自動填入，置中) -->
+            <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
+
+            <!-- 3. 觀看業績按鈕 (置中) -->
+            <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center" id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
+          </div>
+        </h1>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">⚙️</button>
+        <button id="logoutBtn" onclick="logout()" class="logout-btn hidden">🚪 登出管理</button>
+        <button onclick="window.location.href='form.html'" class="btn-primary">+ 新增資料</button>
+      </div>
+    </div>
+
+    <div id="adminPanel" class="hidden glass-card bg-slate-900 text-white p-4 border-slate-700">
+      <div id="loginForm" class="flex gap-2">
+        <input id="admEmail" type="email" class="p-2 rounded text-black flex-1" placeholder="管理員信箱">
+        <input id="admPwd" type="password" class="p-2 rounded text-black flex-1" placeholder="密碼" onkeyup="if(event.key==='Enter') loginSupabase()">
+        <button onclick="loginSupabase()" class="btn-primary">Supabase 登入</button>
+      </div>
+      <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
+        <span class="text-green-400 font-bold">✓ 管理員模式</span>
+        <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 匯出資料</button>
+        <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">📂 匯入 CSV <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)"></label>
+        <button onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition">⚠ 清空資料庫</button>
+      </div>
+    </div>
+
+    <div class="glass-card p-2 flex flex-wrap gap-2 items-center sticky top-2 z-40 shadow-lg border-blue-200/50">
+      <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
+        <span class="text-xl mr-2">📅</span>
+        <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
+        <span class="text-slate-300">/</span>
+        <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
+          <option value="">月份</option>
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+          <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+          <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+        <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
+        <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
+      </div>
+      <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
+        <span class="text-gray-400 mr-2">🔍</span>
+        <input id="qSearch" class="bg-transparent border-0 p-2 w-full focus:ring-0" placeholder="搜尋姓名、手機、備註..." onkeyup="if(event.key==='Enter') applyFilter()">
+        <button onclick="clearSearch()" id="btnX" class="hidden absolute right-3 text-gray-400 hover:text-red-500 font-bold">✕</button>
+      </div>
+      <button onclick="applyFilter()" class="btn-primary">查詢</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div onclick="setStore('全部')" id="kpiTotal" class="glass-card kpi-card p-6 flex flex-col items-center justify-center active">
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">總客數</div>
+        <div class="text-5xl font-black text-slate-800" id="valTotal">--</div>
+      </div>
+      <div onclick="setStore('臨安店')" id="kpiLinAn" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">臨安店</div>
+        <div class="text-5xl font-black text-blue-600" id="valLinAn">--</div>
+      </div>
+      <div onclick="setStore('南科店')" id="kpiNanKe" class="glass-card kpi-card p-6 flex flex-col items-center justify-center">
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">南科店</div>
+        <div class="text-5xl font-black text-green-600" id="valNanKe">--</div>
+      </div>
+    </div>
+
+    <!-- 🔥 修改：新布局 - 左右50%分割 -->
+    <div class="glass-card p-6">
+      <div class="flex justify-between items-center mb-4">
         <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
-          <input type="date" id="mDate" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">分店</label>
-          <select id="mStore" class="w-full p-2 border rounded-lg bg-gray-50 font-bold"><option>臨安店</option><option>南科店</option></select>
+          <h3 class="text-xl font-bold text-slate-800">客源與目的分析</h3>
+          <p class="text-xs text-slate-400 mt-1">點擊任何圖表項目可連動其他分析</p>
         </div>
       </div>
 
-      <div class="flex gap-4">
-         <div class="flex-grow">
-           <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
-           <input id="mName" class="w-full p-2 border rounded-lg" placeholder="顧客姓名">
-         </div>
-         <div class="flex flex-col justify-end pb-2">
+      <!-- 🔥 過濾標籤顯示區 -->
+      <div id="filterBadgesContainer" class="hidden flex flex-wrap gap-2 mb-4 pb-4 border-b border-slate-100"></div>
+
+      <!-- 🔥 新布局：左側50%（客源+趨勢），右側50%（目的） -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- 左側：客源 + 趨勢（垂直堆疊）-->
+        <div class="space-y-6">
+          <!-- 客源統計 -->
+          <div class="h-[350px] relative">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計</h4>
+            <canvas id="chartSource"></canvas>
+          </div>
+
+          <!-- 客流趨勢 -->
+          <div class="h-[250px] relative">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
+            <canvas id="chartTrend"></canvas>
+          </div>
+        </div>
+
+        <!-- 右側：來店目的（獨立佔50%）-->
+        <div class="h-[620px] relative">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
+          <div class="h-full">
+            <canvas id="chartPurpose"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="glass-card p-6 flex flex-col">
+        <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈</h3>
+        <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
+      </div>
+      <div class="glass-card p-6 flex flex-col md:col-span-2">
+        <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈</h3>
+        <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
+      </div>
+    </div>
+
+    <div class="glass-card overflow-hidden">
+      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white/50">
+        <h3 class="font-bold text-slate-700">最新顧客資料</h3>
+        <span class="text-xs font-mono text-slate-400" id="listCounter">--</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm whitespace-nowrap">
+          <thead><tr><th class="pl-6">日期</th><th>分店</th><th>姓名</th><th>性別/年齡</th><th>客源</th><th>目的</th><th class="w-10"></th></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
+    <div class="modal-content relative">
+      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增顧客資料</h2>
+      <div class="space-y-5">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
+            <input type="date" id="mDate" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-1">分店</label>
+            <select id="mStore" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
+              <option>臨安店</option>
+              <option>南科店</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-grow">
+            <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
+            <input id="mName" class="w-full p-2 border rounded-lg" placeholder="顧客姓名">
+          </div>
+          <div class="flex flex-col justify-end pb-2">
             <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-               <input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600" checked>
-               <span class="text-sm font-bold text-blue-800">住台南</span>
+              <input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600" checked>
+              <span class="text-sm font-bold text-blue-800">住台南</span>
             </label>
-         </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
-        <div class="radio-group" id="grpGender">
-           <div class="radio-btn" onclick="selectRadio('grpGender','男',this)">男</div>
-           <div class="radio-btn" onclick="selectRadio('grpGender','女',this)">女</div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
-        <div class="radio-group" id="grpAge"></div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
-        <div class="chk-grid" id="grpSource"></div>
-        <div id="boxKeyword" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-           <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
-           <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：驗光推薦...">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
+          <div class="radio-group" id="grpGender">
+            <div class="radio-btn" onclick="selectRadio('grpGender','男',this)">男</div>
+            <div class="radio-btn" onclick="selectRadio('grpGender','女',this)">女</div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
-        <div class="chk-grid" id="grpPurpose"></div>
-      </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
+          <div class="radio-group" id="grpAge"></div>
+        </div>
 
-      <div>
-        <label class="block text-xs font-bold text-gray-500 mb-1">詳細備註 <span class="required-mark">*</span></label>
-        <textarea id="mDetail" class="w-full p-3 border rounded-lg h-24 resize-none" placeholder="客人描述..."></textarea>
-      </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
+          <div class="chk-grid" id="grpSource"></div>
+          <div id="boxKeyword" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+            <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
+            <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：驗光推薦...">
+          </div>
+        </div>
 
-      <button onclick="saveData()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-blue-700 transition">確認儲存</button>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
+          <div class="chk-grid" id="grpPurpose"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">詳細備註 <span class="required-mark">*</span></label>
+          <textarea id="mDetail" class="w-full p-3 border rounded-lg h-24 resize-none" placeholder="客人描述..."></textarea>
+        </div>
+
+        <button id="btnSave" onclick="saveData()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-blue-700 transition">確認儲存</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Detail Modal -->
-<div id="detailModal" class="modal-overlay" onclick="if(event.target===this)closeDetail()">
-  <div class="modal-content relative">
-    <button onclick="closeDetail()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-    <div id="detailContent"></div>
-    <div id="detailActions" class="mt-6 flex gap-3 hidden border-t pt-4">
-       <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition">刪除此筆</button>
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal-overlay" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-content relative">
+      <button onclick="closeDetail()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+      <div id="detailContent"></div>
+      <div id="detailActions" class="mt-6 flex gap-3 hidden border-t pt-4">
+        <button onclick="startEditCurrent()" class="text-blue-600 border border-blue-200 px-4 py-2 rounded hover:bg-blue-50 font-bold text-sm transition">編輯此筆</button>
+        <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition">刪除此筆</button>
+      </div>
     </div>
   </div>
-</div>
+
+</div> <!-- /appRoot -->
 
 <script>
   // 🔥 保留原有常數
@@ -460,7 +528,7 @@
   // 🔥 新增：客源固定順序
   const SOURCE_ORDER = [
     "Google 搜尋",
-    "Google Map", 
+    "Google Map",
     "親友介紹",
     "Instagram 廣告",
     "Facebook 廣告",
@@ -479,26 +547,25 @@
   ];
 
   // 🔥 新增：客源固定顏色（彩色繽紛）
-const SOURCE_COLORS = {
-    "Google 搜尋": "#f59e0b", // 深黃
-    "Google Map": "#10b981",  // 綠
-    "親友介紹": "#2563eb",    // 深藍
-    "Instagram 廣告": "#db2777", // 深粉紅
-    "Facebook 廣告": "#7c3aed",  // 紫
-    "FB、IG 一般文章": "#d97706", // 橘
-    "老客回購": "#0891b2",     // 青
-    "途經路過": "#ea580c",     // 深橘紅
-    "TikTok & YouTube": "#dc2626", // 紅
-    "老客-未購": "#9333ea",    // 紫
-    "業配貼文（FB、IG）": "#0d9488", // 藍綠
-    "Dcard": "#e11d48",        // 玫瑰紅
-    "PTT": "#4f46e5",          // 靛藍
-    "Mobile 01": "#059669",    // 翡翠綠
-    "廣告看板": "#b45309",     // 琥珀
-    "FB 社團文": "#6d28d9",    // 紫
-    "其他": "#475569"          // 灰
-};
-
+  const SOURCE_COLORS = {
+    "Google 搜尋": "#f59e0b",
+    "Google Map": "#10b981",
+    "親友介紹": "#2563eb",
+    "Instagram 廣告": "#db2777",
+    "Facebook 廣告": "#7c3aed",
+    "FB、IG 一般文章": "#d97706",
+    "老客回購": "#0891b2",
+    "途經路過": "#ea580c",
+    "TikTok & YouTube": "#dc2626",
+    "老客-未購": "#9333ea",
+    "業配貼文（FB、IG）": "#0d9488",
+    "Dcard": "#e11d48",
+    "PTT": "#4f46e5",
+    "Mobile 01": "#059669",
+    "廣告看板": "#b45309",
+    "FB 社團文": "#6d28d9",
+    "其他": "#475569"
+  };
 
   // 低飽和漸層工具
   function hexToRgba(hex, a) {
@@ -510,14 +577,8 @@ const SOURCE_COLORS = {
     const b = parseInt(full.slice(4,6),16);
     return `rgba(${r},${g},${b},${a})`;
   }
-function makeBarGradient(ctx, baseHex, stronger=false) {
-  return baseHex || '#94a3b8';
-
-  }
-function makeRadialGradient(ctx, baseHex, stronger=false) {
-  return baseHex || '#94a3b8';
-
-  }
+  function makeBarGradient(ctx, baseHex, stronger=false) { return baseHex || '#94a3b8'; }
+  function makeRadialGradient(ctx, baseHex, stronger=false) { return baseHex || '#94a3b8'; }
 
   // 🔥 新增：全局過濾狀態
   let globalFilter = {
@@ -533,119 +594,318 @@ function makeRadialGradient(ctx, baseHex, stronger=false) {
 
   let rawData = [], filteredData = [], displayLimit = 20, currentStore = '全部', charts = {}, datePicker, isAdmin = false;
 
-  window.onload = async () => {
+  // =========================
+  // 新增：表層前端密碼（不動管理員）
+  // =========================
+  const FRONT_GATE_PASSWORD = 'wakodo100';
+  const FRONT_GATE_KEY = 'wakodo_gate_ok';
+
+  function gateIsOk() {
+    return sessionStorage.getItem(FRONT_GATE_KEY) === '1';
+  }
+  function showGate() {
+    const gate = document.getElementById('frontGate');
+    const app = document.getElementById('appRoot');
+    if (app) app.style.display = 'none';
+    if (gate) gate.style.display = 'flex';
+
+    const inp = document.getElementById('frontGateInput');
+    const btn = document.getElementById('frontGateBtn');
+    const err = document.getElementById('frontGateError');
+
+    function tryUnlock() {
+      if (!inp) return;
+      const ok = (inp.value || '') === FRONT_GATE_PASSWORD;
+      if (!ok) {
+        if (err) err.style.display = 'block';
+        inp.value = '';
+        inp.focus();
+        return;
+      }
+      if (err) err.style.display = 'none';
+      sessionStorage.setItem(FRONT_GATE_KEY, '1');
+      if (gate) gate.style.display = 'none';
+      if (app) app.style.display = 'block';
+      initMain();
+    }
+
+    if (btn) btn.onclick = tryUnlock;
+    if (inp) {
+      inp.onkeydown = (e) => { if (e.key === 'Enter') tryUnlock(); };
+      setTimeout(() => inp.focus(), 0);
+    }
+  }
+
+  // =========================
+  // 新增：管理員可編輯（不影響原新增 RPC）
+  // =========================
+  let editingId = null;
+
+  function setSaveButtonText() {
+    const btn = document.getElementById('btnSave');
+    if (!btn) return;
+    btn.innerText = (editingId && isAdmin) ? '更新儲存' : '確認儲存';
+  }
+  function openAddModal() {
+    document.getElementById('addModal').style.display = 'flex';
+  }
+  function selectRadioByValue(groupId, val) {
+    const grp = document.getElementById(groupId);
+    if (!grp) return;
+    const btns = Array.from(grp.querySelectorAll('.radio-btn'));
+    const target = btns.find(b => (b.dataset && b.dataset.value) === val) || btns.find(b => b.innerText.trim() === String(val || '').trim());
+    if (target) window.selectRadio(groupId, val, target);
+  }
+  function checkMultiByTexts(groupId, texts) {
+    const grp = document.getElementById(groupId);
+    if (!grp) return;
+    const set = new Set((texts || []).map(t => String(t).trim()));
+    Array.from(grp.querySelectorAll('.chk-btn')).forEach(btn => {
+      const label = btn.innerText.trim();
+      if (set.has(label)) btn.classList.add('checked');
+      else btn.classList.remove('checked');
+    });
+
+    if (groupId === 'grpSource') {
+      const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
+      document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
+    }
+  }
+
+  window.startEditCurrent = function () {
+    if (!isAdmin) { alert('⚠️ 需要管理員權限才能編輯！'); return; }
+    const id = window.currentDetailId;
+    const v = rawData.find(x => x.id === parseInt(id, 10));
+    if (!v) return;
+
+    editingId = v.id;
+    setSaveButtonText();
+
+    // 清空選擇
+    document.querySelectorAll('.selected, .checked').forEach(el => el.classList.remove('selected', 'checked'));
+    document.getElementById('boxKeyword').classList.add('hidden');
+
+    // 填入欄位（依 PDF 欄位命名）
+    document.getElementById('mDate').value = v.form_date || '';
+    document.getElementById('mStore').value = v.store_branch || '臨安店';
+    document.getElementById('mName').value = v.customer_name || '';
+    document.getElementById('mTainan').checked = !!v.is_local;
+
+    selectRadioByValue('grpGender', v.gender || '');
+    selectRadioByValue('grpAge', v.age_range || '');
+
+    checkMultiByTexts('grpSource', v.source_tags || []);
+    checkMultiByTexts('grpPurpose', v.visit_purposes || []);
+
+    document.getElementById('mKeyword').value = v.search_keywords || '';
+    document.getElementById('mDetail').value = v.detail_desc || '';
+
+    closeDetail();
+    openAddModal();
+  };
+
+  // =========================
+  // 原本 onload 內容搬到 initMain
+  // =========================
+  async function initMain() {
     Chart.register(ChartDataLabels);
 
     const vMatch = (document.title.match(/V\d+\.\d+/) || [null])[0];
     if(document.getElementById('versionDisp') && vMatch) document.getElementById('versionDisp').innerText = vMatch;
-flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-    datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: 'static', onChange: (d) => { if(d.length===2) applyFilter(); } });
-    document.getElementById('qSearch').addEventListener('input', function() { this.value ? document.getElementById('btnX').classList.remove('hidden') : document.getElementById('btnX').classList.add('hidden'); });
+
+    flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    datePicker = flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      locale: "zh_tw",
+      monthSelectorType: 'static',
+      onChange: (d) => { if(d.length===2) applyFilter(); }
+    });
+
+    document.getElementById('qSearch').addEventListener('input', function() {
+      this.value ? document.getElementById('btnX').classList.remove('hidden') : document.getElementById('btnX').classList.add('hidden');
+    });
+
     initAddModal();
+
     const { data: { session } } = await supabase.auth.getSession();
     if(session) enableAdminUI();
+
     await fetchAllData();
+  }
+
+  window.onload = async () => {
+    if (!gateIsOk()) {
+      showGate();
+      return;
+    }
+    const app = document.getElementById('appRoot');
+    if (app) app.style.display = 'block';
+    await initMain();
   };
 
   function initAddModal() {
-     document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
-     document.getElementById('grpAge').innerHTML = AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join('');
-     document.getElementById('grpSource').innerHTML = SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}')">${s}</div>`).join('');
-     document.getElementById('grpPurpose').innerHTML = PURPOSES.map(p => `<div class="chk-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('');
+    document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('grpAge').innerHTML = AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join('');
+    document.getElementById('grpSource').innerHTML = SOURCES.map(s => `<div class="chk-btn" onclick="toggleChk(this, '${s}')">${s}</div>`).join('');
+    document.getElementById('grpPurpose').innerHTML = PURPOSES.map(p => `<div class="chk-btn" onclick="toggleChk(this, '${p}')">${p}</div>`).join('');
   }
 
   window.selectRadio = (grp, val, el) => {
-     document.getElementById(grp).querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
-     el.classList.add('selected'); el.dataset.value = val;
+    document.getElementById(grp).querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected'); el.dataset.value = val;
   };
-  
+
   window.toggleChk = (el) => {
-     el.classList.toggle('checked');
-     const grp = el.parentElement;
-     if(grp.id === 'grpSource') {
-         const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
-         document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
-     }
+    el.classList.toggle('checked');
+    const grp = el.parentElement;
+    if(grp.id === 'grpSource') {
+      const hasGoogle = Array.from(grp.querySelectorAll('.checked')).some(b => b.innerText.includes('Google'));
+      document.getElementById('boxKeyword').classList.toggle('hidden', !hasGoogle);
+    }
   };
 
   window.saveData = async () => {
-     const name = document.getElementById('mName').value.trim();
-     const genderEl = document.querySelector('#grpGender .selected');
-     const ageEl = document.querySelector('#grpAge .selected');
-     const sources = Array.from(document.querySelectorAll('#grpSource .checked')).map(e=>e.innerText);
-     const purposes = Array.from(document.querySelectorAll('#grpPurpose .checked')).map(e=>e.innerText);
-     const detail = document.getElementById('mDetail').value.trim();
+    const name = document.getElementById('mName').value.trim();
+    const genderEl = document.querySelector('#grpGender .selected');
+    const ageEl = document.querySelector('#grpAge .selected');
+    const sources = Array.from(document.querySelectorAll('#grpSource .checked')).map(e=>e.innerText);
+    const purposes = Array.from(document.querySelectorAll('#grpPurpose .checked')).map(e=>e.innerText);
+    const detail = document.getElementById('mDetail').value.trim();
 
-     if(!name || !genderEl || !ageEl || sources.length===0 || purposes.length===0 || !detail) {
-         alert('⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。');
-         return;
-     }
+    if(!name || !genderEl || !ageEl || sources.length===0 || purposes.length===0 || !detail) {
+      alert('⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。');
+      return;
+    }
 
-     const payload = {
-        p_date: document.getElementById('mDate').value,
-        p_store: document.getElementById('mStore').value,
-        p_name: name,
-        p_gender: genderEl.dataset.value,
-        p_age: ageEl.dataset.value,
-        p_is_local: document.getElementById('mTainan').checked,
-        p_sources: sources,
-        p_purposes: purposes,
-        p_keywords: document.getElementById('mKeyword').value,
-        p_detail: detail
-     };
+    // ✅ 編輯模式：管理員更新 visits（不動原本新增 RPC）
+    if (editingId && isAdmin) {
+      const updatePayload = {
+        form_date: document.getElementById('mDate').value,
+        store_branch: document.getElementById('mStore').value,
+        customer_name: name,
+        gender: genderEl.dataset.value,
+        age_range: ageEl.dataset.value,
+        is_local: document.getElementById('mTainan').checked,
+        source_tags: sources,
+        visit_purposes: purposes,
+        search_keywords: document.getElementById('mKeyword').value,
+        detail_desc: detail
+      };
 
-     const { error } = await supabase.rpc('submit_visit_v7', payload);
-     if(error) { alert('儲存失敗: '+error.message); console.error(error); }
-     else { 
-         alert('🎉 新增成功！'); 
-         closeAddModal();
-         fetchAllData(); 
-     }
+      const { error } = await supabase.from('visits').update(updatePayload).eq('id', editingId);
+      if (error) {
+        alert('更新失敗: ' + error.message);
+        console.error(error);
+        return;
+      }
+
+      alert('✅ 已更新');
+      editingId = null;
+      setSaveButtonText();
+      closeAddModal();
+      fetchAllData();
+      return;
+    }
+
+    // ✅ 新增模式：沿用原本 submit_visit_v7
+    const payload = {
+      p_date: document.getElementById('mDate').value,
+      p_store: document.getElementById('mStore').value,
+      p_name: name,
+      p_gender: genderEl.dataset.value,
+      p_age: ageEl.dataset.value,
+      p_is_local: document.getElementById('mTainan').checked,
+      p_sources: sources,
+      p_purposes: purposes,
+      p_keywords: document.getElementById('mKeyword').value,
+      p_detail: detail
+    };
+
+    const { error } = await supabase.rpc('submit_visit_v7', payload);
+    if(error) {
+      alert('儲存失敗: ' + error.message);
+      console.error(error);
+    } else {
+      alert('🎉 新增成功！');
+      closeAddModal();
+      fetchAllData();
+    }
   };
 
   window.closeAddModal = () => {
-      document.getElementById('addModal').style.display='none';
-      document.getElementById('mName').value=''; document.getElementById('mDetail').value=''; document.getElementById('mKeyword').value='';
-      document.querySelectorAll('.selected, .checked').forEach(e=>e.classList.remove('selected','checked'));
-      document.getElementById('boxKeyword').classList.add('hidden');
+    document.getElementById('addModal').style.display='none';
+    document.getElementById('mName').value='';
+    document.getElementById('mDetail').value='';
+    document.getElementById('mKeyword').value='';
+    document.querySelectorAll('.selected, .checked').forEach(e=>e.classList.remove('selected','checked'));
+    document.getElementById('boxKeyword').classList.add('hidden');
+
+    // ✅ 退出編輯模式
+    editingId = null;
+    setSaveButtonText();
   };
 
-  window.quickSelectDate = () => { const y=document.getElementById('selYear').value; const m=document.getElementById('selMonth').value; if(y&&m){ datePicker.setDate([new Date(y,m-1,1), new Date(y,m,0)]); applyFilter(); } };
-  window.resetDate = () => { if(rawData.length){const d=rawData.map(x=>x.form_date).sort();datePicker.setDate([d[0],d[d.length-1]]);} document.getElementById('selMonth').value=""; applyFilter(); };
-  window.clearSearch = () => { document.getElementById('qSearch').value=''; document.getElementById('btnX').classList.add('hidden'); applyFilter(); };
+  window.quickSelectDate = () => {
+    const y=document.getElementById('selYear').value;
+    const m=document.getElementById('selMonth').value;
+    if(y&&m){
+      datePicker.setDate([new Date(y,m-1,1), new Date(y,m,0)]);
+      applyFilter();
+    }
+  };
+
+  window.resetDate = () => {
+    if(rawData.length){
+      const d=rawData.map(x=>x.form_date).sort();
+      datePicker.setDate([d[0], d[d.length-1]]);
+    }
+    document.getElementById('selMonth').value="";
+    applyFilter();
+  };
+
+  window.clearSearch = () => {
+    document.getElementById('qSearch').value='';
+    document.getElementById('btnX').classList.add('hidden');
+    applyFilter();
+  };
 
   async function fetchAllData() {
-    let allRows = [], page = 0; const pageSize = 1000;
+    let allRows = [], page = 0;
+    const pageSize = 1000;
+
     document.getElementById('valTotal').innerText = '...';
+
     while(true) {
-        const { data, error } = await supabase.from('visits').select('*').range(page*pageSize, (page+1)*pageSize-1);
-        if(error) {
-            console.error('資料載入錯誤:', error);
-            alert('載入資料失敗：' + error.message);
-            break;
-        }
-        if(!data || data.length === 0) break;
-        allRows = allRows.concat(data);
-        console.log(`已載入 ${allRows.length} 筆資料...`);
-        if(data.length < pageSize) break;
-        page++;
+      const { data, error } = await supabase.from('visits').select('*').range(page*pageSize, (page+1)*pageSize-1);
+      if(error) {
+        console.error('資料載入錯誤:', error);
+        alert('載入資料失敗：' + error.message);
+        break;
+      }
+      if(!data || data.length === 0) break;
+      allRows = allRows.concat(data);
+      if(data.length < pageSize) break;
+      page++;
     }
+
     rawData = allRows.sort((a,b) => new Date(b.form_date) - new Date(a.form_date));
-    console.log(`✅ 共載入 ${rawData.length} 筆資料`);
-	      // 🔥 新增：更新最新資料日期
+
+    // 🔥 更新最新資料日期
     if (rawData.length > 0) {
-        const lastDate = rawData[0].form_date.replace(/-/g, '/'); // 轉成 2024/09/xx
-        const dispEl = document.getElementById('lastDataDisp');
-        if(dispEl) dispEl.innerText = 'last data ' + lastDate;
+      const lastDate = rawData[0].form_date.replace(/-/g, '/');
+      const dispEl = document.getElementById('lastDataDisp');
+      if(dispEl) dispEl.innerText = 'last data ' + lastDate;
     }
 
     if(rawData.length > 0) {
-        const years = [...new Set(rawData.map(d => d.form_date.slice(0,4)))].sort().reverse();
-        const ySel = document.getElementById('selYear');
-        ySel.innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('');
-        const dates = rawData.map(d => d.form_date).sort();
-        datePicker.setDate([dates[0], dates[dates.length-1]]);
+      const years = [...new Set(rawData.map(d => d.form_date.slice(0,4)))].sort().reverse();
+      const ySel = document.getElementById('selYear');
+      ySel.innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('');
+      const dates = rawData.map(d => d.form_date).sort();
+      datePicker.setDate([dates[0], dates[dates.length-1]]);
     }
+
     applyFilter();
   }
 
@@ -654,832 +914,807 @@ flatpickr.l10ns.default.months.longhand = ['1月','2月','3月','4月','5月','6
     const start = dates[0] ? datePicker.formatDate(dates[0], 'Y-m-d') : '1900-01-01';
     const end = dates[1] ? datePicker.formatDate(dates[1], 'Y-m-d') : '2100-12-31';
     const q = document.getElementById('qSearch').value.toLowerCase();
+
     const timeData = rawData.filter(v => v.form_date >= start && v.form_date <= end);
+
     document.getElementById('valTotal').innerText = timeData.length;
     document.getElementById('valLinAn').innerText = timeData.filter(v=>v.store_branch=='臨安店').length;
     document.getElementById('valNanKe').innerText = timeData.filter(v=>v.store_branch=='南科店').length;
+
     filteredData = timeData.filter(v => {
-        if(currentStore !== '全部' && v.store_branch !== currentStore) return false;
-        if(q && !v.customer_name.toLowerCase().includes(q) && !(v.detail_desc||'').toLowerCase().includes(q)) return false;
-        return true;
+      if(currentStore !== '全部' && v.store_branch !== currentStore) return false;
+      if(q && !String(v.customer_name||'').toLowerCase().includes(q) && !(String(v.detail_desc||'')).toLowerCase().includes(q)) return false;
+      return true;
     });
-    
-    // 🔥 清空全局過濾狀態
-    // 保持所有鎖定條件
-    if (!globalFilter.sourceLocked) {
-        globalFilter.source = null;
-    }
-    if (!globalFilter.purposeLocked) {
-        globalFilter.purpose = null;
-    }
-    if (!globalFilter.genderLocked) {
-        globalFilter.gender = null;
-    }
-    if (!globalFilter.ageLocked) {
-        globalFilter.age = null;
-    }
-    
-    displayLimit = 20; 
-    renderCharts(filteredData); 
-    renderTable(); 
+
+    // 🔥 清空全局過濾狀態（保留所有鎖定條件）
+    if (!globalFilter.sourceLocked) globalFilter.source = null;
+    if (!globalFilter.purposeLocked) globalFilter.purpose = null;
+    if (!globalFilter.genderLocked) globalFilter.gender = null;
+    if (!globalFilter.ageLocked) globalFilter.age = null;
+
+    displayLimit = 20;
+    renderCharts(filteredData);
+    renderTable();
     updateFilterBadges();
-    updateAllCharts(); // 🔥 關鍵：切換門店後重算所有圖表
+    updateAllCharts();
   };
 
   // 🔥 修改：renderCharts - 只渲染客源圖（固定順序+固定顏色）
   function renderCharts(data) {
-    const sMap = {}; 
+    const sMap = {};
     data.forEach(v => (v.source_tags||[]).forEach(t => sMap[t] = (sMap[t]||0)+1));
-    
-    // 🔥 按照固定順序排列（不再按數量排序）
+
     const orderedLabels = SOURCE_ORDER.filter(s => sMap[s] > 0);
     const orderedData = orderedLabels.map(s => sMap[s]);
     const orderedColors = orderedLabels.map(s => SOURCE_COLORS[s] || '#94a3b8');
 
     if(charts.source) charts.source.destroy();
     charts.source = new Chart(document.getElementById('chartSource'), {
-        type: 'bar',
-        data: { 
-            labels: orderedLabels, 
-            datasets: [{ 
-                data: orderedData, 
-                baseColors: orderedColors,
-                backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
-                borderRadius: 6,
-                hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true)}] 
+      type: 'bar',
+      data: {
+        labels: orderedLabels,
+        datasets: [{
+          data: orderedData,
+          baseColors: orderedColors,
+          backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
+          borderRadius: 6,
+          hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true)
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        plugins: {
+          legend: {display: false},
+          datalabels: {
+            anchor:'end',
+            align:'right',
+            offset: 4,
+            formatter: (v,ctx) => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return total ? (Math.round(v/total*100)+'%') : '0%';
+            },
+            font:{size:11, weight:'bold'},
+            color:'#475569',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            borderRadius: 4,
+            padding: { top: 2, bottom: 2, left: 4, right: 4 }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            padding: 12,
+            cornerRadius: 8
+          }
         },
-        options: {
-            indexAxis: 'y',
-            maintainAspectRatio: false,
-            animation: { duration: 800, easing: 'easeOutQuart' },
-            plugins: { 
-                legend: {display: false}, 
-                datalabels: { 
-                    anchor:'end', 
-                    align:'right', 
-                    offset: 4,
-                    formatter: (v,ctx) => {
-                        const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
-                        return Math.round(v/total*100)+'%';
-                    }, 
-                    font:{size:11, weight:'bold'}, 
-                    color:'#475569',
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    borderRadius: 4,
-                    padding: { top: 2, bottom: 2, left: 4, right: 4 }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.85)',
-                    padding: 12,
-                    cornerRadius: 8
-                }
-            },
-            scales: {
-                x: { 
-                    grid: { display: false },
-                    ticks: { font: { size: 10 } }
-                },
-                y: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11, weight: '600' } }
-                }
-            },
-            onClick: (e, els) => { 
-                if(els[0]) { 
-                    const label = orderedLabels[els[0].index]; 
-                    if (globalFilter.source === label) {
-                        globalFilter.source = null;
-                        globalFilter.sourceLocked = false;
-                    } else {
-                        globalFilter.source = label;
-                        globalFilter.sourceLocked = true;
-                    }
-                    updateAllCharts();
-                } 
-            }
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
+        },
+        onClick: (e, els) => {
+          if(els[0]) {
+            const label = orderedLabels[els[0].index];
+            if (globalFilter.source === label) { globalFilter.source = null; globalFilter.sourceLocked = false; }
+            else { globalFilter.source = label; globalFilter.sourceLocked = true; }
+            updateAllCharts();
+          }
         }
+      }
     });
-    
+
     updateAllCharts();
   }
 
   // 🔥 新增：統一更新所有圖表（全雙向連動）
   function updateAllCharts() {
-    // 根據 globalFilter 篩選數據
     let subset = filteredData.filter(v => {
-        if(globalFilter.source && !(v.source_tags||[]).includes(globalFilter.source)) return false;
-        if(globalFilter.gender && v.gender !== globalFilter.gender) return false;
-        if(globalFilter.age && v.age_range !== globalFilter.age) return false;
-        return true;
+      if(globalFilter.source && !(v.source_tags||[]).includes(globalFilter.source)) return false;
+      if(globalFilter.gender && v.gender !== globalFilter.gender) return false;
+      if(globalFilter.age && v.age_range !== globalFilter.age) return false;
+      if(globalFilter.purpose && !(v.visit_purposes||[]).includes(globalFilter.purpose)) return false;
+      return true;
     });
 
-    // 🔥 反向連動：更新客源統計
-    const sMap_reverse = {}; 
+    // 反向連動：更新客源統計
+    const sMap_reverse = {};
     subset.forEach(v => (v.source_tags||[]).forEach(t => sMap_reverse[t] = (sMap_reverse[t]||0) + 1));
     const orderedLabels_reverse = SOURCE_ORDER.filter(s => sMap_reverse[s] > 0);
     const orderedData_reverse = orderedLabels_reverse.map(s => sMap_reverse[s]);
     const orderedColors_reverse = orderedLabels_reverse.map(s => SOURCE_COLORS[s] || '#94a3b8');
 
     if (charts.source) {
-        charts.source.data.labels = orderedLabels_reverse;
-        charts.source.data.datasets[0].data = orderedData_reverse;
-        charts.source.data.datasets[0].baseColors = orderedColors_reverse;
-        charts.source.update('active');
+      charts.source.data.labels = orderedLabels_reverse;
+      charts.source.data.datasets[0].data = orderedData_reverse;
+      charts.source.data.datasets[0].baseColors = orderedColors_reverse;
+      charts.source.update('active');
     }
 
-    // 更新過濾標籤
     updateFilterBadges();
 
     // === 來店目的圖表 ===
-    const pMap = {}; 
+    const pMap = {};
     subset.forEach(v => (v.visit_purposes||[]).forEach(p=>pMap[p]=(pMap[p]||0)+1));
     const sortedP = Object.entries(pMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const totalP = sortedP.reduce((a,b)=>a+b[1],0);
-        const purposeColors = [
-        '#2563eb', // 藍
-        '#059669', // 綠
-        '#d97706', // 橘
-        '#dc2626', // 紅
-        '#7c3aed', // 紫
-        '#db2777', // 粉紅
-        '#0d9488', // 青
-        '#ea580c'  // 橘紅
-    ];
+    const purposeColors = ['#2563eb','#059669','#d97706','#dc2626','#7c3aed','#db2777','#0d9488','#ea580c'];
 
     if(charts.purpose) {
-        charts.purpose.data.labels = sortedP.map(x=>x[0]);
-        charts.purpose.data.datasets[0].data = sortedP.map(x=>x[1]);
-        charts.purpose.data.datasets[0].baseColors = purposeColors.slice(0, sortedP.length);
-        charts.purpose.update('active');
+      charts.purpose.data.labels = sortedP.map(x=>x[0]);
+      charts.purpose.data.datasets[0].data = sortedP.map(x=>x[1]);
+      charts.purpose.data.datasets[0].baseColors = purposeColors.slice(0, sortedP.length);
+      charts.purpose.update('active');
     } else {
-        charts.purpose = new Chart(document.getElementById('chartPurpose'), {
-            type: 'doughnut',
-            data: { 
-                labels: sortedP.map(x=>x[0]), 
-                datasets:[{ 
-                    data:sortedP.map(x=>x[1]), 
-                    baseColors: purposeColors.slice(0, sortedP.length),
-                    backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
-                    hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true),
-                    borderWidth: 0, 
-                    hoverOffset: 15
-                }] 
-            },
-            options: { 
-                maintainAspectRatio: false, 
-                cutout: '60%', 
-                layout: { padding: 20 },
-                animation: { animateRotate: true, animateScale: true, duration: 800 },
-                plugins:{ 
-                    legend:{ 
-                        display: true, 
-                        position: 'right', 
-                        labels:{
-                            boxWidth:14, 
-                            boxHeight:14, 
-                            usePointStyle:true,
-                            pointStyle: 'circle',
-                            padding: 14, 
-                            font: { size: 12, weight: '700' },
-                            color: '#1e293b',
-                            generateLabels: (chart) => {
-                                 const data = chart.data;
-                                 return data.labels.map((label, i) => {
-                                     const val = data.datasets[0].data[i];
-                                     const pct = totalP ? Math.round(val/totalP*100) : 0;
-                                     
-                                     return { 
-                                         text: `${label}  ${pct}%`,
-                                         fillStyle: (data.datasets[0].baseColors||[])[i] || data.datasets[0].backgroundColor[i],
-                                         hidden: false, 
-                                         index: i,
-                                         fontColor: '#1e293b',
-                                         pointStyle: 'circle'
-                                     };
-                                 });
-                            }
-                        }
-                    }, 
-                    datalabels: { display: false },
-                    tooltip: { 
-                        backgroundColor: 'rgba(0,0,0,0.85)', 
-                        padding: 14, 
-                        cornerRadius: 8,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
-                        callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.raw} 人 (${Math.round(ctx.raw/totalP*100)}%)` } 
-                    }
-                },
-                onClick: (e, els) => {
-                    if(els[0]) {
-                        const label = sortedP[els[0].index][0];
-                        if (globalFilter.purpose === label) {
-                            globalFilter.purpose = null;
-                            globalFilter.purposeLocked = false;
-                        } else {
-                            globalFilter.purpose = label;
-                            globalFilter.purposeLocked = true;
-                        }
-                        updateAllCharts();
-                    }
+      charts.purpose = new Chart(document.getElementById('chartPurpose'), {
+        type: 'doughnut',
+        data: {
+          labels: sortedP.map(x=>x[0]),
+          datasets:[{
+            data:sortedP.map(x=>x[1]),
+            baseColors: purposeColors.slice(0, sortedP.length),
+            backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
+            hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true),
+            borderWidth: 0,
+            hoverOffset: 15
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          cutout: '60%',
+          layout: { padding: 20 },
+          animation: { animateRotate: true, animateScale: true, duration: 800 },
+          plugins:{
+            legend:{
+              display: true,
+              position: 'right',
+              labels:{
+                boxWidth:14,
+                boxHeight:14,
+                usePointStyle:true,
+                pointStyle: 'circle',
+                padding: 14,
+                font: { size: 12, weight: '700' },
+                color: '#1e293b',
+                generateLabels: (chart) => {
+                  const data = chart.data;
+                  return data.labels.map((label, i) => {
+                    const val = data.datasets[0].data[i];
+                    const pct = totalP ? Math.round(val/totalP*100) : 0;
+                    return {
+                      text: `${label} ${pct}%`,
+                      fillStyle: (data.datasets[0].baseColors||[])[i] || (data.datasets[0].backgroundColor||[])[i],
+                      hidden: false,
+                      index: i,
+                      fontColor: '#1e293b',
+                      pointStyle: 'circle'
+                    };
+                  });
                 }
+              }
+            },
+            datalabels: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.85)',
+              padding: 14,
+              cornerRadius: 8,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              callbacks: {
+                label: (ctx) => {
+                  const pct = totalP ? Math.round(ctx.raw/totalP*100) : 0;
+                  return ` ${ctx.label}: ${ctx.raw} 人 (${pct}%)`;
+                }
+              }
             }
-        });
+          },
+          onClick: (e, els) => {
+            if(els[0]) {
+              const label = sortedP[els[0].index][0];
+              if (globalFilter.purpose === label) { globalFilter.purpose = null; globalFilter.purposeLocked = false; }
+              else { globalFilter.purpose = label; globalFilter.purposeLocked = true; }
+              updateAllCharts();
+            }
+          }
+        }
+      });
     }
 
     // === 趨勢圖表 ===
-    const tMap = {}; 
-    subset.forEach(v => { const m = v.form_date.slice(0,7); tMap[m]=(tMap[m]||0)+1; });
+    const tMap = {};
+    subset.forEach(v => { const m = String(v.form_date||'').slice(0,7); if(m) tMap[m]=(tMap[m]||0)+1; });
     const sortedT = Object.keys(tMap).sort();
     const maxTrendValue = Math.max(...sortedT.map(k=>tMap[k]), 1);
     const suggestedMaxTrend = Math.ceil(maxTrendValue * 1.2);
-    
+
     if(charts.trend) {
-        charts.trend.data.labels = sortedT;
-        charts.trend.data.datasets[0].data = sortedT.map(k=>tMap[k]);
-        charts.trend.options.scales.y.suggestedMax = suggestedMaxTrend;
-        charts.trend.update('active');
+      charts.trend.data.labels = sortedT;
+      charts.trend.data.datasets[0].data = sortedT.map(k=>tMap[k]);
+      charts.trend.options.scales.y.suggestedMax = suggestedMaxTrend;
+      charts.trend.update('active');
     } else {
-        charts.trend = new Chart(document.getElementById('chartTrend'), {
-            type: 'line',
-            data: { 
-                labels: sortedT, 
-                datasets:[{ 
-                    data:sortedT.map(k=>tMap[k]), 
-                    borderColor:'#f59e0b', 
-                    borderWidth:2.5, 
-                    pointBackgroundColor:'#fff', 
-                    pointBorderColor:'#f59e0b', 
-                    pointRadius:5, 
-                    pointHoverRadius:7, 
-                    tension:0.4, 
-                    fill:true, 
-                    backgroundColor:(ctx)=>{
-                      const chart = ctx.chart;
-                      const g = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
-                      g.addColorStop(0, 'rgba(245,158,11,0.18)');
-                      g.addColorStop(1, 'rgba(245,158,11,0.04)');
-                      return g;
-                    } 
-                }] 
-            },
-            options: { 
-                maintainAspectRatio: false, 
-                animation: { duration: 800, easing: 'easeInOutQuart' },
-                scales:{
-                    x:{
-                        grid:{display:false},
-                        ticks: { font: { size: 10 } }
-                    }, 
-                    y:{
-                        beginAtZero: true,
-                        suggestedMax: suggestedMaxTrend,
-                        grid:{borderDash:[5,5], color:'#f1f5f9'},
-                        ticks: { font: { size: 10 } }
-                    }
-                }, 
-                plugins:{
-                    legend:{display:false}, 
-                    datalabels: {
-                        align: 'top',
-                        anchor: 'end',
-                        offset: 4,
-                        font: { size: 10, weight: 'bold' },
-                        color: '#f59e0b',
-                        backgroundColor: 'rgba(255,255,255,0.9)',
-                        borderRadius: 4,
-                        padding: { top: 2, bottom: 2, left: 3, right: 3 },
-                        formatter: (v) => v
-                    },
-                    tooltip: { 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        padding: 10, 
-                        cornerRadius: 6,
-                        callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
-                    } 
-                } 
+      charts.trend = new Chart(document.getElementById('chartTrend'), {
+        type: 'line',
+        data: {
+          labels: sortedT,
+          datasets:[{
+            data:sortedT.map(k=>tMap[k]),
+            borderColor:'#f59e0b',
+            borderWidth:2.5,
+            pointBackgroundColor:'#fff',
+            pointBorderColor:'#f59e0b',
+            pointRadius:5,
+            pointHoverRadius:7,
+            tension:0.4,
+            fill:true,
+            backgroundColor:(ctx)=>{
+              const chart = ctx.chart;
+              const g = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
+              g.addColorStop(0, 'rgba(245,158,11,0.18)');
+              g.addColorStop(1, 'rgba(245,158,11,0.04)');
+              return g;
             }
-        });
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          animation: { duration: 800, easing: 'easeInOutQuart' },
+          scales:{
+            x:{ grid:{display:false}, ticks: { font: { size: 10 } } },
+            y:{
+              beginAtZero: true,
+              suggestedMax: suggestedMaxTrend,
+              grid:{borderDash:[5,5], color:'#f1f5f9'},
+              ticks: { font: { size: 10 } }
+            }
+          },
+          plugins:{
+            legend:{display:false},
+            datalabels: {
+              align: 'top',
+              anchor: 'end',
+              offset: 4,
+              font: { size: 10, weight: 'bold' },
+              color: '#f59e0b',
+              backgroundColor: 'rgba(255,255,255,0.9)',
+              borderRadius: 4,
+              padding: { top: 2, bottom: 2, left: 3, right: 3 },
+              formatter: (v) => v
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              padding: 10,
+              cornerRadius: 6,
+              callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
+            }
+          }
+        }
+      });
     }
-    
+
     // === 性別圖表 ===
     const gMap = { '男':0, '女':0 };
-    subset.forEach(v => { 
-        const g = v.gender || '其他'; 
-        if(g === '男' || g === '女') gMap[g]++; 
-    });
-    
+    subset.forEach(v => { const g = v.gender || '其他'; if(g === '男' || g === '女') gMap[g]++; });
+
     if(charts.gender) {
-        charts.gender.data.datasets[0].data = [gMap['男'], gMap['女']];
-        charts.gender.update('active');
+      charts.gender.data.datasets[0].data = [gMap['男'], gMap['女']];
+      charts.gender.update('active');
     } else {
-        charts.gender = new Chart(document.getElementById('chartGender'), { 
-            type: 'doughnut', 
-            data: { 
-                labels: ['男','女'], 
-                               datasets: [{
-                    data: [gMap['男'], gMap['女']],
-                    backgroundColor: ['#2563eb', '#db2777'], // 實色：深藍、深粉紅
-                    hoverBackgroundColor: ['#2563eb', '#db2777'], // 滑鼠懸停不變色
-                    hoverOffset: 10 
-                }] 
-            }, 
-            options: { 
-                maintainAspectRatio: false, 
-                cutout: '60%', 
-                animation: { animateRotate: true, duration: 600 },
-                plugins: { 
-                    legend:{position:'right', labels:{font:{size:13, weight:'600'}, padding:12, generateLabels:(chart)=>{const ds=chart.data.datasets[0]; const cols=ds.baseColors||['#60a5fa','#f472b6']; return chart.data.labels.map((l,i)=>({text:l, fillStyle: cols[i]||'#94a3b8', strokeStyle: cols[i]||'#94a3b8', hidden:false, index:i}));}}}, 
-                    tooltip: { 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        padding: 10, 
-                        cornerRadius: 6 
-                    },
-                    datalabels: { display: false }
-                },
-                onClick: (e, els) => {
-                    if(els[0]) {
-                        const label = els[0].index === 0 ? '男' : '女';
-                        if (globalFilter.gender === label) {
-                            globalFilter.gender = null;
-                            globalFilter.genderLocked = false;
-                        } else {
-                            globalFilter.gender = label;
-                            globalFilter.genderLocked = true;
-                        }
-                        updateAllCharts();
-                    }
-                }
-            } 
-        });
+      charts.gender = new Chart(document.getElementById('chartGender'), {
+        type: 'doughnut',
+        data: {
+          labels: ['男','女'],
+          datasets: [{
+            data: [gMap['男'], gMap['女']],
+            backgroundColor: ['#2563eb', '#db2777'],
+            hoverBackgroundColor: ['#2563eb', '#db2777'],
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          cutout: '60%',
+          animation: { animateRotate: true, duration: 600 },
+          plugins: {
+            legend:{position:'right', labels:{font:{size:13, weight:'600'}, padding:12}},
+            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, cornerRadius: 6 },
+            datalabels: { display: false }
+          },
+          onClick: (e, els) => {
+            if(els[0]) {
+              const label = els[0].index === 0 ? '男' : '女';
+              if (globalFilter.gender === label) { globalFilter.gender = null; globalFilter.genderLocked = false; }
+              else { globalFilter.gender = label; globalFilter.genderLocked = true; }
+              updateAllCharts();
+            }
+          }
+        }
+      });
     }
-    
-    // === 年齡圖表 ===
-    const aMap = {};
-    subset.forEach(v => { 
-        const a = v.age_range || '未填'; 
-        if(a !== '未填') aMap[a] = (aMap[a]||0)+1; 
-    });
-    
-    const sortedAges = AGES.filter(age => aMap[age] > 0);
-    
-    if(charts.age) {
-        charts.age.data.labels = sortedAges;
-        charts.age.data.datasets[0].data = sortedAges.map(age => aMap[age]);
-        charts.age.update('active');
-    } else {
-        charts.age = new Chart(document.getElementById('chartAge'), { 
-            type: 'bar', 
-            data: { 
-                labels: sortedAges, 
-                datasets: [{ 
-                    label:'人數', 
-                    data: sortedAges.map(age => aMap[age]),
-                    baseColors: sortedAges.map(_ => '#94a3b8'),
-                    backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false), 
-                    borderRadius:6, 
-                    hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true)}] 
-            }, 
-            options: { 
-                maintainAspectRatio: false, 
-                indexAxis: 'y', 
-                animation: { duration: 600, easing: 'easeOutQuart' },
-                plugins: { 
-                    legend:{display:false}, 
-                    tooltip: { 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        padding: 10, 
-                        cornerRadius: 6 
-                    },
-                    datalabels: { display: false }
-                }, 
-                scales: { 
-                    x: { 
-                        grid: { display: false },
-                        ticks: { font: { size: 10 } }
-                    },
-                    y: {
-                        grid: { display: false },
-                        ticks: { font: { size: 11, weight: '600' } }
-                    }
-                },
-                onClick: (e, els) => {
-                    if(els[0]) {
-                        const label = sortedAges[els[0].index];
-                        if (globalFilter.age === label) {
-                            globalFilter.age = null;
-                            globalFilter.ageLocked = false;
-                        } else {
-                            globalFilter.age = label;
-                            globalFilter.ageLocked = true;
-                        }
-                        updateAllCharts();
-                    }
-                }
-            } 
-        });
+
+   // === 年齡圖表 ===
+const aMap = {};
+subset.forEach(v => {
+  const a = v.age_range || '未填';
+  if(a !== '未填') aMap[a] = (aMap[a]||0)+1;
+});
+const sortedAges = AGES.filter(age => aMap[age] > 0);
+
+if(charts.age) {
+  charts.age.data.labels = sortedAges;
+  charts.age.data.datasets[0].data = sortedAges.map(age => aMap[age]);
+  charts.age.update('active');
+} else {
+  charts.age = new Chart(document.getElementById('chartAge'), {
+    type: 'bar',
+    data: {
+      labels: sortedAges,
+      datasets: [{
+        label:'人數',
+        data: sortedAges.map(age => aMap[age]),
+        baseColors: sortedAges.map(_ => '#94a3b8'),
+        backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', false),
+        borderRadius:6,
+        hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex] || '#94a3b8', true)
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend:{display:false},
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          padding: 10,
+          cornerRadius: 6
+        },
+        datalabels: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
+        }
+      },
+      onClick: (e, els) => {
+        if(els[0]) {
+          const label = sortedAges[els[0].index];
+          if (globalFilter.age === label) {
+            globalFilter.age = null;
+            globalFilter.ageLocked = false;
+          } else {
+            globalFilter.age = label;
+            globalFilter.ageLocked = true;
+          }
+          updateAllCharts();
+        }
+      }
     }
+  });
+}
+} // ← 這個括號是 updateAllCharts() 的結尾
+
+// 🔥 新增：更新過濾標籤顯示
+function updateFilterBadges() {
+  const container = document.getElementById('filterBadgesContainer');
+  const badges = [];
+
+  if(globalFilter.source) badges.push(
+    `<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`
+  );
+  if(globalFilter.purpose) badges.push(
+    `<div class="filter-badge"><span>${globalFilter.purpose}</span><span class="filter-badge-close" onclick="clearFilter('purpose')">✕</span></div>`
+  );
+  if(globalFilter.gender) badges.push(
+    `<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`
+  );
+  if(globalFilter.age) badges.push(
+    `<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`
+  );
+
+  if(badges.length >= 2) {
+    badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
   }
 
-  // 🔥 新增：更新過濾標籤顯示
-  function updateFilterBadges() {
-    const container = document.getElementById('filterBadgesContainer');
-    const badges = [];
+  if(badges.length > 0) {
+    container.innerHTML = badges.join('');
+    container.classList.remove('hidden');
+  } else {
+    container.classList.add('hidden');
+  }
+}
 
-    if(globalFilter.source) badges.push(`<div class="filter-badge"><span>${globalFilter.source}</span><span class="filter-badge-close" onclick="clearFilter('source')">✕</span></div>`);
-    if(globalFilter.gender) badges.push(`<div class="filter-badge"><span>${globalFilter.gender}</span><span class="filter-badge-close" onclick="clearFilter('gender')">✕</span></div>`);
-    if(globalFilter.age) badges.push(`<div class="filter-badge"><span>${globalFilter.age}</span><span class="filter-badge-close" onclick="clearFilter('age')">✕</span></div>`);
-
-    if(badges.length >= 2) {
-      badges.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
-    }
-
-    if(badges.length > 0) {
-      container.innerHTML = badges.join('');
-      container.classList.remove('hidden');
-    } else {
-      container.classList.add('hidden');
-    }
+// 🔥 新增：清除單個過濾條件
+window.clearFilter = (type) => {
+  if(type === 'all') {
+    globalFilter.source = null;
+    globalFilter.purpose = null;
+    globalFilter.gender = null;
+    globalFilter.age = null;
+    globalFilter.sourceLocked = false;
+    globalFilter.purposeLocked = false;
+    globalFilter.genderLocked = false;
+    globalFilter.ageLocked = false;
+    updateAllCharts();
+    return;
   }
 
-  // 🔥 新增：清除單個過濾條件
-  window.clearFilter = (type) => {
-    if(type === 'all') {
-      globalFilter.source = null;
-      globalFilter.gender = null;
-      globalFilter.age = null;
-      globalFilter.sourceLocked = false;
-      globalFilter.genderLocked = false;
-      globalFilter.ageLocked = false;
-      updateAllCharts();
-      return;
-    }
+  globalFilter[type] = null;
+  if(type === 'source') globalFilter.sourceLocked = false;
+  else if(type === 'purpose') globalFilter.purposeLocked = false;
+  else if(type === 'gender') globalFilter.genderLocked = false;
+  else if(type === 'age') globalFilter.ageLocked = false;
 
+  updateAllCharts();
+};
+
+// 🔥 新增：姓名遮蔽函數（V8.0.4）
+function maskName(name) {
+  if (!name) return '未留資料';
+  if (isAdmin) return name;
+  if (name === '未留資料') return name;
+  if (name.length === 2) return name[0] + '〇';
+  if (name.length === 3) return name[0] + '〇' + name[2];
+  if (name.length >= 4) return name[0] + '〇' + name.slice(2);
+  return name;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const page = filteredData.slice(0, displayLimit);
+  tbody.innerHTML = '';
+
+  page.forEach(v => {
+    const tr = document.createElement('tr');
+    const safeDesc = (v.detail_desc||'無備註').replace(/'/g, "\\'").replace(/\n/g, ' ');
+
+    tr.innerHTML = `
+      <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
+      <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
+      <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
+      <td class="text-xs text-slate-500">${v.gender||'-'} / ${v.age_range||'-'}</td>
+      <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags||[]).join(', ')}</td>
+      <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
+      <td class="text-slate-300">›</td>
+    `;
+
+    tr.addEventListener('click', () => showDetail(v.id));
+    tr.addEventListener('mouseenter', (e) => showPreview(e, safeDesc));
+    tr.addEventListener('mouseleave', hidePreview);
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('listCounter').innerText = `${page.length} / ${filteredData.length}`;
+  document.getElementById('btnLoadMore').classList.toggle('hidden', page.length >= filteredData.length);
+}
+
+window.showPreview = (e, text) => {
+  if(!text || text === 'null' || text === '無備註') return;
+  const tooltip = document.getElementById('hoverPreview');
+  tooltip.innerText = text.length > 120 ? text.slice(0,120)+'...' : text;
+  tooltip.style.display = 'block';
+  tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + 'px';
+  tooltip.style.top = (e.clientY + 15) + 'px';
+};
+
+window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
+
+window.previewCSV = (input) => {
+  const f = input.files[0];
+  if(!f) return;
+
+  Papa.parse(f, {
+    header:true,
+    skipEmptyLines:true,
+    complete: async (res) => {
+      const total = res.data.length;
+      if(!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
+
+      const overlay = document.getElementById('importOverlay');
+      const progress = document.getElementById('importProgress');
+      const status = document.getElementById('importStatus');
+      const errLog = document.getElementById('importErrors');
+
+      overlay.style.display = 'flex';
+      errLog.innerHTML = '';
+      errLog.classList.add('hidden');
+
+      const cleanData = res.data.map((row, idx) => {
+        let d = row['form_date']||row['填表日期'];
+        if(!d) { console.warn(`Row ${idx}: Missing date`); return null; }
+
+        d = d.trim().replace(/\//g, '-');
+        const dateParts = d.split('-');
+        if(dateParts.length === 3) {
+          const year = dateParts[0];
+          const month = dateParts[1].padStart(2, '0');
+          const day = dateParts[2].padStart(2, '0');
+          d = `${year}-${month}-${day}`;
+        }
+
+        const n = row['customer_name']||row['顧客姓名'];
+        if(!n) { console.warn(`Row ${idx}: Missing name`); return null; }
+
+        const invalidNames = ['現場客', '調整客', '現場顧客', '看看客', '電話客', '諮詢客', '住戶', '無','不知', '-', '未知'];
+        const cleanName = invalidNames.includes(n.trim()) ? '未留資料' : n;
+
+        let sRaw = row['source_tags']||row['來源統計']||'';
+        sRaw = sRaw.replace(/，/g, ',');
+
+        let pRaw = row['visit_purposes']||row['來店目的']||'';
+        pRaw = pRaw.replace(/，/g, ',');
+
+        let cleanAge = row['age_range']||row['年齡範圍']||'';
+        if(cleanAge === '18以下') cleanAge = '18歲以下';
+
+        return {
+          p_date: d,
+          p_store: row['store_branch']||row['門店']||'臨安店',
+          p_name: cleanName,
+          p_gender: row['gender']||row['性別']||'',
+          p_age: cleanAge,
+          p_is_local: (row['is_local']||row['是否為台南人']||'').includes('是'),
+          p_sources: sRaw.split(',').map(x=>x.trim()).filter(x=>x),
+          p_purposes: pRaw.split(',').map(x=>x.trim()).filter(x=>x),
+          p_keywords: row['search_keywords']||row['搜尋關鍵字']||'',
+          p_detail: row['detail_desc']||row['詳細描述']||''
+        };
+      }).filter(x=>x);
+
+      let processed = 0, errors = [];
+      for(let i = 0; i < cleanData.length; i++) {
+        const row = cleanData[i];
+        try {
+          const { error } = await supabase.rpc('submit_visit_v7', row);
+          if(error) throw error;
+        } catch(err) {
+          errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
+        }
+        processed++;
+        progress.style.width = Math.round(processed/cleanData.length*100) + '%';
+        status.innerText = `處理中... ${processed} / ${cleanData.length}`;
+      }
+
+      status.innerText = `✅ 完成！成功: ${cleanData.length - errors.length} | 失敗: ${errors.length}`;
+      if(errors.length > 0) {
+        errLog.classList.remove('hidden');
+        errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join('');
+      }
+
+      setTimeout(() => {
+        overlay.style.display='none';
+        if(errors.length === 0) location.reload();
+        else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
+      }, 2000);
+    }
+  });
+};
+
+window.loginSupabase = async () => {
+  const email = document.getElementById('admEmail').value.trim();
+  const pwd = document.getElementById('admPwd').value;
+
+  if(!email || !pwd) {
+    alert('請輸入信箱和密碼');
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+
+  if(error) {
+    alert('登入失敗：' + error.message);
+  } else {
+    enableAdminUI();
+    alert('✅ 登入成功！');
+  }
+};
+
+window.logout = async () => {
+  await supabase.auth.signOut();
+  isAdmin = false;
+  document.getElementById('adminPanel').classList.add('hidden');
+  document.getElementById('loginForm').classList.remove('hidden');
+  document.getElementById('adminActions').classList.add('hidden');
+  document.getElementById('logoutBtn').classList.add('hidden');
+  document.getElementById('admEmail').value = '';
+  document.getElementById('admPwd').value = '';
+  alert('已登出管理模式');
+};
+
+function enableAdminUI() {
+  isAdmin = true;
+  document.getElementById('adminPanel').classList.remove('hidden');
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('adminActions').classList.remove('hidden');
+  document.getElementById('logoutBtn').classList.remove('hidden');
+}
+
+window.exportCSV = () => {
+  const csv = Papa.unparse(rawData);
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'}));
+  link.download = `wakodo_backup_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+window.wipeData = async () => {
+  if(!isAdmin) {
+    alert('⚠️ 需要管理員權限！');
+    return;
+  }
+  alert('⚠️ 安全機制：系統將強制下載備份 CSV。');
+  exportCSV();
+
+  setTimeout(async () => {
+    if(!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
+    const pwd = prompt('請輸入二次確認密碼：');
+    if(pwd === '628599') {
+      const { error } = await supabase.from('visits').delete().neq('id', 0);
+      if(error) alert('失敗: '+error.message);
+      else { alert('✅ 資料庫已清空。'); location.reload(); }
+    } else {
+      alert('❌ 密碼錯誤！');
+    }
+  }, 1500);
+};
+
+window.setStore = (s) => {
+  currentStore = s;
+  document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
+  if(s=='全部')document.getElementById('kpiTotal').classList.add('active');
+  if(s=='臨安店')document.getElementById('kpiLinAn').classList.add('active');
+  if(s=='南科店')document.getElementById('kpiNanKe').classList.add('active');
+  applyFilter();
+};
+
+window.loadMore = () => { displayLimit+=20; renderTable(); };
+window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
+
+window.showDetail = (id) => {
+  const v = rawData.find(x => x.id === parseInt(id));
+  if(!v) return;
+
+  document.getElementById('detailContent').innerHTML=`
+    <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
+    <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
+      <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span>
+      <span>${v.form_date}</span>
+      <span>•</span>
+      <span>${v.gender||'-'} / ${v.age_range||'-'}</span>
+    </p>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-blue-50 p-3 rounded-lg">
+        <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
+        <div class="text-sm text-blue-900">${(v.source_tags||[]).join(', ') || '無'}</div>
+      </div>
+      <div class="bg-green-50 p-3 rounded-lg">
+        <div class="text-xs font-bold text-green-700 mb-1">目的</div>
+        <div class="text-sm text-green-900">${(v.visit_purposes||[]).join(', ') || '無'}</div>
+      </div>
+    </div>
+    ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ''}
+    <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc||'無詳細描述'}</div>
+  `;
+
+  document.getElementById('detailModal').style.display='flex';
+  if(isAdmin) document.getElementById('detailActions').classList.remove('hidden');
+  else document.getElementById('detailActions').classList.add('hidden');
+
+  window.currentDetailId = v.id;
+};
+
+window.closeDetail = () => document.getElementById('detailModal').style.display='none';
+
+window.deleteCurrentDetail = async () => {
+  if(!isAdmin) {
+    alert('⚠️ 需要管理員權限才能刪除！');
+    return;
+  }
+  if(!confirm('確定要刪除此筆資料？')) return;
+  const { error } = await supabase.from('visits').delete().eq('id', window.currentDetailId);
+  if(error) alert('刪除失敗: ' + error.message);
+  else { alert('已刪除'); closeDetail(); fetchAllData(); }
+};
+
+/* =====================================================
+ V8.0.4 補丁：鎖定機制 + 圖表點擊重新綁定
+ ===================================================== */
+window.toggleLock = (type, value) => {
+  const lockKey = type + 'Locked';
+  if (!globalFilter) return;
+  if (globalFilter[type] === value) {
     globalFilter[type] = null;
-    if(type === 'source') globalFilter.sourceLocked = false;
-    else if(type === 'gender') globalFilter.genderLocked = false;
-    else if(type === 'age') globalFilter.ageLocked = false;
-    updateAllCharts();
-  };
-
-
-  // 🔥 新增：姓名遮蔽函數（V8.0.4）
-  function maskName(name) {
-      if (!name) return '未留資料';
-      if (isAdmin) return name; // 管理員看完整姓名
-
-      if (name === '未留資料') return name;
-      if (name.length === 2) return name[0] + '〇';
-      if (name.length === 3) return name[0] + '〇' + name[2];
-      if (name.length >= 4) return name[0] + '〇' + name.slice(2);
-      return name;
+    if (lockKey in globalFilter) globalFilter[lockKey] = false;
+  } else {
+    globalFilter[type] = value;
+    if (lockKey in globalFilter) globalFilter[lockKey] = true;
   }
+  updateAllCharts();
+};
 
-  function renderTable() {
-      const tbody = document.getElementById('tableBody'), page = filteredData.slice(0, displayLimit); tbody.innerHTML = '';
-      page.forEach(v => {
-          const tr = document.createElement('tr');
-          const safeDesc = (v.detail_desc||'無備註').replace(/'/g, "\\'").replace(/\n/g, ' ');
-          tr.innerHTML = `
-             <td class="pl-6 py-3 font-mono text-slate-500">${v.form_date}</td>
-             <td><span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span></td>
-             <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
-             <td class="text-xs text-slate-500">${v.gender||'-'} / ${v.age_range||'-'}</td>
-             <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.source_tags||[]).join(', ')}</td>
-             <td class="text-xs text-slate-500 max-w-[120px] truncate">${(v.visit_purposes||[]).join(', ')}</td>
-             <td class="text-slate-300">›</td>
-          `;
-          tr.addEventListener('click', () => showDetail(v.id)); 
-          tr.addEventListener('mouseenter', (e) => showPreview(e, safeDesc)); 
-          tr.addEventListener('mouseleave', hidePreview); 
-          tbody.appendChild(tr);
-      });
-      document.getElementById('listCounter').innerText = `${page.length} / ${filteredData.length}`;
-      document.getElementById('btnLoadMore').classList.toggle('hidden', page.length >= filteredData.length);
-  }
+function bindChartClicks() {
+  if (!window.charts) return;
 
-  window.showPreview = (e, text) => { 
-      if(!text || text === 'null' || text === '無備註') return; 
-      const tooltip = document.getElementById('hoverPreview'); 
-      tooltip.innerText = text.length > 120 ? text.slice(0,120)+'...' : text; 
-      tooltip.style.display = 'block'; 
-      tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 360) + 'px'; 
-      tooltip.style.top = (e.clientY + 15) + 'px'; 
-  };
-  window.hidePreview = () => document.getElementById('hoverPreview').style.display = 'none';
-
-  window.previewCSV = (input) => {
-    const f = input.files[0]; if(!f) return;
-    Papa.parse(f, { header:true, skipEmptyLines:true, complete: async (res) => {
-       const total = res.data.length;
-       if(!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
-       
-       const overlay = document.getElementById('importOverlay');
-       const progress = document.getElementById('importProgress');
-       const status = document.getElementById('importStatus');
-       const errLog = document.getElementById('importErrors');
-       overlay.style.display = 'flex';
-       errLog.innerHTML = ''; errLog.classList.add('hidden');
-       
-       const cleanData = res.data.map((row, idx) => {
-          let d = row['form_date']||row['填表日期']; 
-          if(!d) { console.warn(`Row ${idx}: Missing date`); return null; }
-          
-          d = d.trim().replace(/\//g, '-');
-          const dateParts = d.split('-');
-          if(dateParts.length === 3) {
-              const year = dateParts[0];
-              const month = dateParts[1].padStart(2, '0');
-              const day = dateParts[2].padStart(2, '0');
-              d = `${year}-${month}-${day}`;
-          }
-          
-          const n = row['customer_name']||row['顧客姓名'];
-          if(!n) { console.warn(`Row ${idx}: Missing name`); return null; }
-          
-          const invalidNames = ['現場客', '調整客', '現場顧客', '看看客', '電話客', '諮詢客', '住戶', '無', '不知', '-', '未知'];
-          const cleanName = invalidNames.includes(n.trim()) ? '未留資料' : n;
-          
-          let sRaw = row['source_tags']||row['來源統計']||'';
-          sRaw = sRaw.replace(/，/g, ',');
-          
-          let pRaw = row['visit_purposes']||row['來店目的']||'';
-          pRaw = pRaw.replace(/，/g, ',');
-          
-          let cleanAge = row['age_range']||row['年齡範圍']||'';
-          if(cleanAge === '18以下') cleanAge = '18歲以下';
-
-          return { 
-              p_date: d, 
-              p_store: row['store_branch']||row['門店']||'臨安店', 
-              p_name: cleanName, 
-              p_gender: row['gender']||row['性別']||'',
-              p_age: cleanAge,
-              p_is_local: (row['is_local']||row['是否為台南人']||'').includes('是'),
-              p_sources: sRaw.split(',').map(x=>x.trim()).filter(x=>x), 
-              p_purposes: pRaw.split(',').map(x=>x.trim()).filter(x=>x), 
-              p_keywords: row['search_keywords']||row['搜尋關鍵字']||'',
-              p_detail: row['detail_desc']||row['詳細描述']||'' 
-          };
-       }).filter(x=>x);
-
-       let processed = 0, errors = [];
-       for(let i = 0; i < cleanData.length; i++) {
-          const row = cleanData[i];
-          try {
-              const { error } = await supabase.rpc('submit_visit_v7', row);
-              if(error) throw error;
-          } catch(err) {
-              errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
-          }
-          processed++;
-          progress.style.width = Math.round(processed/cleanData.length*100) + '%';
-          status.innerText = `處理中... ${processed} / ${cleanData.length}`;
-       }
-       
-       status.innerText = `✅ 完成！成功: ${cleanData.length - errors.length} | 失敗: ${errors.length}`;
-       if(errors.length > 0) {
-           errLog.classList.remove('hidden');
-           errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join('');
-       }
-       
-       setTimeout(() => { 
-           overlay.style.display='none'; 
-           if(errors.length === 0) location.reload(); 
-           else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
-       }, 2000);
-    }});
-  };
-
-  window.loginSupabase = async () => {
-      const email = document.getElementById('admEmail').value.trim();
-      const pwd = document.getElementById('admPwd').value;
-      
-      if(!email || !pwd) {
-          alert('請輸入信箱和密碼');
-          return;
-      }
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: pwd
-      });
-      
-      if(error) {
-          alert('登入失敗：' + error.message);
-      } else {
-          enableAdminUI();
-          alert('✅ 登入成功！');
-      }
-  };
-
-  window.logout = async () => {
-      await supabase.auth.signOut();
-      isAdmin = false;
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('loginForm').classList.remove('hidden');
-      document.getElementById('adminActions').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('admEmail').value = '';
-      document.getElementById('admPwd').value = '';
-      alert('已登出管理模式');
-  };
-
-  function enableAdminUI() { 
-      isAdmin = true; 
-      document.getElementById('adminPanel').classList.remove('hidden'); 
-      document.getElementById('loginForm').classList.add('hidden'); 
-      document.getElementById('adminActions').classList.remove('hidden'); 
-      document.getElementById('logoutBtn').classList.remove('hidden');
-  }
-
-  window.exportCSV = () => { 
-      const csv = Papa.unparse(rawData); 
-      const link = document.createElement("a"); 
-      link.href = URL.createObjectURL(new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'})); 
-      link.download = `wakodo_backup_${new Date().toISOString().slice(0,10)}.csv`; 
-      document.body.appendChild(link); 
-      link.click(); 
-      document.body.removeChild(link); 
-  };
-
-  window.wipeData = async () => { 
-      if(!isAdmin) {
-          alert('⚠️ 需要管理員權限！');
-          return;
-      }
-      alert('⚠️ 安全機制：系統將強制下載備份 CSV。'); 
-      exportCSV(); 
-      setTimeout(async () => {
-          if(!confirm('備份已下載。確定要清空所有資料？此動作無法復原！')) return;
-          const pwd = prompt('請輸入二次確認密碼：');
-          if(pwd === '628599') { 
-              const { error } = await supabase.from('visits').delete().neq('id', 0); 
-              if(error) alert('失敗: '+error.message); 
-              else { alert('✅ 資料庫已清空。'); location.reload(); } 
-          } else { alert('❌ 密碼錯誤！'); }
-      }, 1500); 
-  };
-
-  window.setStore = (s) => { 
-      currentStore = s; 
-      document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); 
-      if(s=='全部')document.getElementById('kpiTotal').classList.add('active'); 
-      if(s=='臨安店')document.getElementById('kpiLinAn').classList.add('active'); 
-      if(s=='南科店')document.getElementById('kpiNanKe').classList.add('active'); 
-      applyFilter(); 
-  };
-  
-  window.loadMore = () => { displayLimit+=20; renderTable(); };
-  window.toggleAdminPanel = () => document.getElementById('adminPanel').classList.toggle('hidden');
-  
-  window.showDetail = (id) => { 
-      const v = rawData.find(x => x.id === parseInt(id)); 
-      if(!v) return; 
-      document.getElementById('detailContent').innerHTML=`
-         <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
-         <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
-            <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch=='臨安店'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}">${v.store_branch}</span>
-            <span>${v.form_date}</span>
-            <span>•</span>
-            <span>${v.gender||'-'} / ${v.age_range||'-'}</span>
-         </p>
-         <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-blue-50 p-3 rounded-lg">
-               <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
-               <div class="text-sm text-blue-900">${(v.source_tags||[]).join(', ') || '無'}</div>
-            </div>
-            <div class="bg-green-50 p-3 rounded-lg">
-               <div class="text-xs font-bold text-green-700 mb-1">目的</div>
-               <div class="text-sm text-green-900">${(v.visit_purposes||[]).join(', ') || '無'}</div>
-            </div>
-         </div>
-         ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ''}
-         <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc||'無詳細描述'}</div>
-      `; 
-      document.getElementById('detailModal').style.display='flex'; 
-      if(isAdmin) {
-          document.getElementById('detailActions').classList.remove('hidden'); 
-      } else {
-          document.getElementById('detailActions').classList.add('hidden'); 
-      }
-      window.currentDetailId = v.id; 
-  };
-  
-  window.closeDetail = () => document.getElementById('detailModal').style.display='none';
-  
-  window.deleteCurrentDetail = async () => { 
-      if(!isAdmin) {
-          alert('⚠️ 需要管理員權限才能刪除！');
-          return;
-      }
-      if(!confirm('確定要刪除此筆資料？')) return; 
-      const { error } = await supabase.from('visits').delete().eq('id', window.currentDetailId); 
-      if(error) alert('刪除失敗: ' + error.message); 
-      else { alert('已刪除'); closeDetail(); fetchAllData(); } 
-  };
-
-  /* =====================================================
-     V8.0.4 補丁：鎖定機制 + 圖表點擊重新綁定
-     ===================================================== */
-
-  // 統一鎖定切換函數
-  window.toggleLock = (type, value) => {
-    const lockKey = type + 'Locked';
-    if (!globalFilter) return;
-
-    if (globalFilter[type] === value) {
-      globalFilter[type] = null;
-      if (lockKey in globalFilter) globalFilter[lockKey] = false;
-    } else {
-      globalFilter[type] = value;
-      if (lockKey in globalFilter) globalFilter[lockKey] = true;
-    }
-    updateAllCharts();
-  };
-
-  // 重新綁定所有圖表點擊事件
-  function bindChartClicks() {
-    if (!window.charts) return;
-
-    if (charts.source && charts.source.options) {
-      charts.source.options.onClick = (e, els) => {
-        if (!els || !els.length) return;
-        const label = charts.source.data.labels[els[0].index];
-        window.toggleLock('source', label);
-      };
-      charts.source.update('none');
-    }
-
-    if (charts.purpose && charts.purpose.options) {
-      charts.purpose.options.onClick = (e, els) => {
-        if (!els || !els.length) return;
-        const label = charts.purpose.data.labels[els[0].index];
-        window.toggleLock('purpose', label);
-      };
-      charts.purpose.update('none');
-    }
-
-    if (charts.gender && charts.gender.options) {
-      charts.gender.options.onClick = (e, els) => {
-        if (!els || !els.length) return;
-        const label = (els[0].index === 0) ? '男' : '女';
-        window.toggleLock('gender', label);
-      };
-      charts.gender.update('none');
-    }
-
-    if (charts.age && charts.age.options) {
-      charts.age.options.onClick = (e, els) => {
-        if (!els || !els.length) return;
-        const label = charts.age.data.labels[els[0].index];
-        window.toggleLock('age', label);
-      };
-      charts.age.update('none');
-    }
-  }
-
-  // 包裝 updateAllCharts
-  if (typeof window.updateAllCharts === 'function') {
-    const __origUpdateAllCharts = window.updateAllCharts;
-    window.updateAllCharts = function() {
-      __origUpdateAllCharts();
-      bindChartClicks();
-      updateFilterBadges();
+  if (charts.source && charts.source.options) {
+    charts.source.options.onClick = (e, els) => {
+      if (!els || !els.length) return;
+      const label = charts.source.data.labels[els[0].index];
+      window.toggleLock('source', label);
     };
+    charts.source.update('none');
   }
 
-  // 包裝 renderCharts
-  if (typeof window.renderCharts === 'function') {
-    const __origRenderCharts = window.renderCharts;
-    window.renderCharts = function(data) {
-      __origRenderCharts(data);
-      bindChartClicks();
+  if (charts.purpose && charts.purpose.options) {
+    charts.purpose.options.onClick = (e, els) => {
+      if (!els || !els.length) return;
+      const label = charts.purpose.data.labels[els[0].index];
+      window.toggleLock('purpose', label);
     };
+    charts.purpose.update('none');
   }
 
-  // 包裝 applyFilter
-  if (typeof window.applyFilter === 'function') {
-    const __origApplyFilter = window.applyFilter;
-    window.applyFilter = function() {
-      __origApplyFilter();
-      if (typeof window.updateAllCharts === 'function') {
-        window.updateAllCharts();
-      }
+  if (charts.gender && charts.gender.options) {
+    charts.gender.options.onClick = (e, els) => {
+      if (!els || !els.length) return;
+      const label = (els[0].index === 0) ? '男' : '女';
+      window.toggleLock('gender', label);
     };
+    charts.gender.update('none');
   }
 
-  // 初始化：確保鎖定旗標存在
-  if (typeof globalFilter === 'object' && globalFilter) {
-    if (globalFilter.sourceLocked === undefined) globalFilter.sourceLocked = false;
-    if (globalFilter.purposeLocked === undefined) globalFilter.purposeLocked = false;
-    if (globalFilter.genderLocked === undefined) globalFilter.genderLocked = false;
-    if (globalFilter.ageLocked === undefined) globalFilter.ageLocked = false;
+  if (charts.age && charts.age.options) {
+    charts.age.options.onClick = (e, els) => {
+      if (!els || !els.length) return;
+      const label = charts.age.data.labels[els[0].index];
+      window.toggleLock('age', label);
+    };
+    charts.age.update('none');
   }
+}
 
+// 包裝 updateAllCharts
+if (typeof window.updateAllCharts === 'function') {
+  const __origUpdateAllCharts = window.updateAllCharts;
+  window.updateAllCharts = function() {
+    __origUpdateAllCharts();
+    bindChartClicks();
+    updateFilterBadges();
+  };
+}
 
+// 包裝 renderCharts
+if (typeof window.renderCharts === 'function') {
+  const __origRenderCharts = window.renderCharts;
+  window.renderCharts = function(data) {
+    __origRenderCharts(data);
+    bindChartClicks();
+  };
+}
+
+// 包裝 applyFilter
+if (typeof window.applyFilter === 'function') {
+  const __origApplyFilter = window.applyFilter;
+  window.applyFilter = function() {
+    __origApplyFilter();
+    if (typeof window.updateAllCharts === 'function') window.updateAllCharts();
+  };
+}
+
+// 初始化：確保鎖定旗標存在
+if (typeof globalFilter === 'object' && globalFilter) {
+  if (globalFilter.sourceLocked === undefined) globalFilter.sourceLocked = false;
+  if (globalFilter.purposeLocked === undefined) globalFilter.purposeLocked = false;
+  if (globalFilter.genderLocked === undefined) globalFilter.genderLocked = false;
+  if (globalFilter.ageLocked === undefined) globalFilter.ageLocked = false;
+}
 </script>
-</body>
 
-<!-- [file:7] -->
+</body>
 </html>
+
