@@ -488,7 +488,7 @@ setTimeout(() => dom.accessPassword.focus(), 80);
     function doFrontUnlock() {
       const v = dom.accessPassword.value.trim();
       if (v !== FRONT_PASS) {
-        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入 wakodo", background: "#1e293b", color: "#fff" });
+        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入正確密碼", background: "#1e293b", color: "#fff" });
         return;
       }
       setFrontAccess();
