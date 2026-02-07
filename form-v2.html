@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Favicon 照搬 Index -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%200%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
+  <title>📝 顧客登記 v4.0</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    window.supabase = createClient(
+      "https://yxalpzculcyhzvnyvecb.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
+    );
+  </script>
+
+  <style>
+    /* ===== 核心 CSS: 100% 還原 v3.5 ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif; background: #f5f7fa; padding-bottom: 110px; -webkit-tap-highlight-color: transparent; }
+    
+    :root { --primary: #9ca3af; --primary-rgb: 156 163 175; --primary-dark: #6b7280; --primary-contrast: #ffffff; }
+    body[data-theme="linan"] { --primary: #2563eb; --primary-rgb: 37 99 235; --primary-dark: #1d4ed8; --primary-contrast: #ffffff; }
+    body[data-theme="nanke"] { --primary: #FDE68A; --primary-rgb: 253 230 138; --primary-dark: #FBBF24; --primary-contrast: #111827; }
+
+    .wrap-wider { max-width: 43.2rem !important; }
+    .theme-primary-bg { background: var(--primary) !important; }
+    .theme-primary-text { color: var(--primary) !important; }
+    .theme-primary-border { border-color: var(--primary) !important; }
+    .theme-contrast-text { color: var(--primary-contrast) !important; }
+
+    /* v4.0 質感門市選擇器 (黑框、白滑塊、黑字) */
+    .store-selector { position: relative; display: flex; background: transparent; border-radius: 12px; padding: 2px; width: 164px; height: 42px; border: 2.5px solid #111; }
+    .store-slider { position: absolute; top: 2px; left: 2px; width: 78px; height: 34px; background: white; border-radius: 8px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; opacity: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .store-label { flex: 1; text-align: center; line-height: 34px; font-size: 13px; font-weight: 900; color: #111; cursor: pointer; position: relative; z-index: 2; }
+    
+    /* 卡片與佈局還原 */
+    .customer-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #e5e7eb; box-shadow: 0 10px 24px rgba(17,24,39,0.06); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 2px solid #f3f4f6; }
+    .section-label { font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 10px; display: block; }
+    .required-mark { color: #dc2626; margin-left: 4px; }
+    .text-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; outline: none; background: #fff; }
+
+    .btn-grid { display: grid; gap: 10px; }
+    @media (max-width: 768px) { .btn-grid { grid-template-columns: repeat(3, 1fr); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 769px) { .btn-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
+
+    .option-btn { padding: 14px 8px; border: 2px solid #e5e7eb; border-radius: 10px; background: white; color: #4b5563; font-size: 15px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.12s; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+    .option-btn.selected { background: var(--primary); border-color: var(--primary); color: var(--primary-contrast); font-weight: 700; }
+    
+    .toggle-btn { padding: 14px; border: 2px solid #10b981; border-radius: 10px; background: #d1fae5; color: #065f46; font-size: 15px; font-weight: 800; text-align: center; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+    .toggle-btn.unchecked { background: white; border-color: #e5e7eb; color: #6b7280; font-weight: 600; }
+    .warn-text { font-size: 12px; color: #dc2626; margin-top: 6px; font-weight: 700; }
+
+    /* 廣告選單 */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: white; border-radius: 20px; width: 100%; max-width: 450px; padding: 20px; max-height: 85vh; display: flex; flex-direction: column; }
+    .ad-scroll { flex: 1; overflow-y: auto; padding: 10px 0; }
+    .ad-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .ad-item { border-radius: 8px; overflow: hidden; border: 3px solid #f3f4f6; position: relative; cursor: pointer; }
+    .ad-item img { width: 100%; height: auto; display: block; background: #eee; }
+    .ad-item.selected { border-color: #2563eb; }
+    .ad-item.selected::after { content: "✓"; position: absolute; inset: 0; background: rgba(37, 99, 235, 0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: bold; }
+
+    /* 管理員工作台 */
+    .admin-slot { background: white; border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .slot-thumb { width: 60px; height: 60px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .slot-thumb img { width: 100%; height: 100%; object-fit: contain; }
+    .sort-item { position: relative; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; aspect-ratio: 1; cursor: grab; background: white; }
+    .sort-item img { width: 100%; height: 100%; object-fit: contain; }
+    .del-tag { position: absolute; top: 0; right: 0; background: #ef4444; color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
+  </style>
+</head>
+
+<body data-theme="none">
+  <!-- 廣告彈窗 -->
+  <div id="adModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold mb-4 text-slate-800">選取看到的廣告 (可多選)</h3>
+      <div class="ad-scroll">
+        <div id="adGrid" class="ad-grid-3"></div>
+      </div>
+      <div class="flex gap-2 mt-4">
+        <button onclick="closeAdModal(false)" class="flex-1 bg-gray-100 py-4 rounded-xl font-bold text-gray-500">取消</button>
+        <button onclick="closeAdModal(true)" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-bold">確認選擇</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-xl wrap-wider mx-auto p-4">
+    <!-- Header 質感滑塊 -->
+    <div class="theme-primary-bg theme-contrast-text p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40 transition-colors">
+      <div class="flex items-center gap-2">
+        <h1 class="font-bold text-lg">📝 顧客登記 v4.0</h1>
+        <input type="date" id="globalDate" class="text-sm bg-black/10 border-0 rounded px-2 py-1 text-inherit">
+      </div>
+      <div class="store-selector">
+        <div id="slider" class="store-slider"></div>
+        <div class="store-label" id="label1" onclick="selectStore('臨安店')">臨安店</div>
+        <div class="store-label" id="label2" onclick="selectStore('南科店')">南科店</div>
+      </div>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <!-- 管理員素材台 -->
+    <div class="mt-10 mb-20 text-center">
+      <button onclick="handleAdminEntry()" class="text-xs text-gray-400 underline">管理員模式 (素材與排序)</button>
+      <div id="adminPanel" class="hidden mt-4 p-4 bg-slate-100 rounded-2xl border-2 border-slate-200 text-left">
+        <div class="flex justify-between items-center mb-4">
+          <h4 class="font-bold text-slate-700">🖼️ 素材管理 (自動 WebP)</h4>
+          <button onclick="logoutAdmin()" class="text-red-500 text-xs font-bold underline">退出管理模式</button>
+        </div>
+        <div id="uploadContainer"></div>
+        <button onclick="addUploadSlot()" class="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold text-sm mb-4 bg-white/50">+ 增加廣告素材組</button>
+        <button id="btnAdminUpload" onclick="handleAdminUpload()" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold mb-6 shadow-lg">確認批量上傳</button>
+        
+        <div class="border-t pt-4">
+          <div class="flex justify-between items-center mb-3">
+            <h5 class="text-xs font-bold text-slate-500 uppercase">圖庫排序 (拖動儲存)</h5>
+            <button onclick="saveNewOrder()" class="text-blue-600 text-xs font-bold">儲存順序</button>
+          </div>
+          <div id="adminGallery" class="grid grid-cols-4 gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部固定按鈕 -->
+  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
+    <button onclick="addCustomerCard()" class="flex-1 bg-white theme-primary-text theme-primary-border border-2 py-3 rounded-xl font-bold">+ 增加顧客</button>
+    <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] theme-primary-bg theme-contrast-text py-3 px-6 rounded-xl font-bold text-lg">確認並送出</button>
+  </div>
+
+  <script>
+    // 1000% 原始 v3.5 還原
+    const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "業配貼文 (FB、IG)", "老客回購", "老客-未購", "廣告看板", "FB、IG 社團"];
+    const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
+    const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
+    const BASE_URL = "https://yxalpzculcyhzvnyvecb.supabase.co/storage/v1/object/public/ads/";
+
+    let globalStore = '';
+    let cardCounter = 0;
+    let adsGallery = [];
+    let activeAdTriggerBtn = null;
+    let isAdminLogged = false;
+
+    window.onload = async () => {
+      document.getElementById('globalDate').value = new Date().toISOString().split('T')[0];
+      const savedStore = localStorage.getItem('wakodo_store');
+      if (savedStore) selectStore(savedStore);
+      addCustomerCard();
+      fetchAds();
+      addUploadSlot();
+    };
+
+    function selectStore(store) {
+      globalStore = store;
+      document.body.dataset.theme = store === '臨安店' ? 'linan' : 'nanke';
+      localStorage.setItem('wakodo_store', store);
+      const slider = document.getElementById('slider');
+      slider.style.opacity = '1';
+      if(store === '臨安店') slider.style.transform = 'translateX(0px)';
+      else slider.style.transform = 'translateX(78px)';
+    }
+
+    async function fetchAds() {
+      const { data, error } = await supabase.from('ads_gallery').select('*').eq('is_active', true).order('sort_order', {ascending: true});
+      if(error) { console.error("資料讀取失敗:", error); return; }
+      const t = new Date().getTime();
+      adsGallery = (data || []).map(ad => ({
+        ...ad,
+        fullUrl: `${BASE_URL}${ad.image_path.trim()}?t=${t}`
+      }));
+      renderAdminGallery();
+    }
+
+    window.addCustomerCard = () => {
+      cardCounter++;
+      const id = `card-${cardCounter}`;
+      const html = `
+        <div class="customer-card" id="${id}" data-ad-labels="">
+          <div class="card-header">
+            <div class="card-title">👤 顧客 ${cardCounter}</div>
+            ${cardCounter > 1 ? `<button onclick="document.getElementById('${id}').remove()" class="text-red-500 text-xs font-bold" style="background:#fee; padding:4px 8px; border-radius:4px;">移除</button>` : ''}
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="section-label">顧客身份 <span class="required-mark">*</span></label>
+              <div class="btn-grid two-col" data-type="is_new">
+                <div class="option-btn selected" onclick="toggleRadio(this)">全新客</div>
+                <div class="option-btn" onclick="toggleRadio(this)">老客戶</div>
+              </div>
+            </div>
+            <div>
+              <label class="section-label">本次消費 <span class="required-mark">*</span></label>
+              <div class="btn-grid two-col">
+                <div class="option-btn selected" onclick="toggleAmt(this, true, '${id}')">有</div>
+                <div class="option-btn" onclick="toggleAmt(this, false, '${id}')">無</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="amt-box-${id}" class="form-section mb-6">
+            <label class="section-label">消費金額 (TWD) <span class="required-mark">*</span></label>
+            <input type="number" class="text-input amount-input" placeholder="請輸入金額">
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">姓名 <span class="required-mark">*</span></label>
+            <input type="text" class="text-input name-input" placeholder="請輸入顧客姓名">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="form-section mb-0">
+              <label class="section-label">性別 <span class="required-mark">*</span></label>
+              <div class="btn-grid two-col" data-type="gender"><div class="option-btn" onclick="toggleRadio(this)">男</div><div class="option-btn" onclick="toggleRadio(this)">女</div></div>
+            </div>
+            <div class="form-section mb-0">
+              <label class="section-label">居住地 <span class="required-mark">*</span></label>
+              <div class="toggle-btn" onclick="this.classList.toggle('unchecked'); this.innerText=this.classList.contains('unchecked')?'❌ 非台南住戶':'🏠 台南住戶'">🏠 台南住戶</div>
+              <div class="warn-text">⚠️ 非台南住戶請取消</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">年齡層 <span class="required-mark">*</span></label>
+            <div class="btn-grid" data-type="age">${AGES.map(a => `<div class="option-btn" onclick="toggleRadio(this)">${a}</div>`).join('')}</div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">客源 <span class="required-mark">*</span> (可多選)</label>
+            <div id="kw-box-${id}" class="hidden mb-3"><input type="text" class="text-input keyword-input" placeholder="請輸入 Google 搜尋關鍵字"></div>
+            <div class="btn-grid" data-type="source">${SOURCES.map(s => `<div class="option-btn" onclick="handleSrc(this, '${id}', '${s}')">${s}</div>`).join('')}</div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">來店目的 <span class="required-mark">*</span> (可多選)</label>
+            <div class="btn-grid" data-type="purpose">${PURPOSES.map(p => `<div class="option-btn" onclick="this.classList.toggle('selected')">${p}</div>`).join('')}</div>
+          </div>
+
+          <div class="form-section">
+            <label class="section-label">來和光堂的動機和得知途徑 <span class="required-mark">*</span></label>
+            <textarea class="text-input detail-input h-24" placeholder="例：老客看到廣告想回來保養、新客度數不足上網查眼鏡行找到我們...等等 "></textarea>
+          </div>
+        </div>
+      `;
+      document.getElementById('cardsContainer').insertAdjacentHTML('beforeend', html);
+    };
+
+    window.toggleRadio = (el) => {
+      Array.from(el.parentElement.children).forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    };
+
+    window.toggleAmt = (el, has, id) => {
+      toggleRadio(el);
+      const box = document.getElementById(`amt-box-${id}`);
+      box.classList.toggle('hidden', !has);
+      if(!has) box.querySelector('input').value = 0;
+    };
+
+    window.handleSrc = (el, id, src) => {
+      el.classList.toggle('selected');
+      if(src.includes('Google')) {
+        const hasG = Array.from(el.parentElement.querySelectorAll('.selected')).some(b => b.innerText.includes('Google'));
+        document.getElementById(`kw-box-${id}`).classList.toggle('hidden', !hasG);
+      }
+      if(el.classList.contains('selected') && (src === 'Facebook 廣告' || src === 'Instagram 廣告')) {
+        activeAdTriggerBtn = el;
+        openAdModal(id);
+      }
+    };
+
+    function openAdModal(cardId) {
+      const grid = document.getElementById('adGrid');
+      grid.innerHTML = adsGallery.map(ad => `<div class="ad-item" onclick="this.classList.toggle('selected')" data-label="${ad.label}"><img src="${ad.fullUrl}"></div>`).join('');
+      document.getElementById('adModal').dataset.cardId = cardId;
+      document.getElementById('adModal').style.display = 'flex';
+    }
+
+    function closeAdModal(confirm) {
+      const cardId = document.getElementById('adModal').dataset.cardId;
+      const selected = Array.from(document.querySelectorAll('.ad-item.selected')).map(el => el.dataset.label);
+      if(confirm && selected.length > 0) {
+        const card = document.getElementById(cardId);
+        let curr = card.dataset.adLabels ? card.dataset.adLabels.split(',') : [];
+        card.dataset.adLabels = [...new Set([...curr, ...selected])].join(',');
+      } else {
+        if(activeAdTriggerBtn && !selected.length) activeAdTriggerBtn.classList.remove('selected');
+      }
+      document.getElementById('adModal').style.display = 'none';
+    }
+
+    window.handleAdminEntry = () => {
+      if(!isAdminLogged) {
+        if(prompt("管理員密碼") === "628599") { isAdminLogged = true; document.getElementById('adminPanel').classList.remove('hidden'); }
+      } else { document.getElementById('adminPanel').classList.toggle('hidden'); }
+    };
+
+    window.logoutAdmin = () => { isAdminLogged = false; document.getElementById('adminPanel').classList.add('hidden'); };
+
+    window.addUploadSlot = () => {
+      const id = Date.now();
+      const html = `<div class="admin-slot" id="slot-${id}"><div class="slot-thumb" id="thumb-${id}">?</div><div class="flex-1 space-y-1"><input type="file" class="hidden slot-file" id="f-${id}" onchange="previewSlot(this, '${id}')" accept="image/*"><button onclick="document.getElementById('f-${id}').click()" class="w-full text-[10px] bg-slate-200 py-1 rounded">選取圖片</button><input type="text" class="w-full text-xs p-1 border rounded slot-label" placeholder="標籤"></div><button onclick="this.closest('.admin-slot').remove()" class="text-slate-300 px-2">✕</button></div>`;
+      document.getElementById('uploadContainer').insertAdjacentHTML('beforeend', html);
+    };
+
+    window.previewSlot = (inp, id) => { if(inp.files[0]) document.getElementById(`thumb-${id}`).innerHTML = `<img src="${URL.createObjectURL(inp.files[0])}" class="w-full h-full object-contain">`; };
+
+    async function processImg(file) {
+      return new Promise(res => {
+        const img = new Image(); img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          const cvs = document.createElement('canvas'); const max = 800; let w = img.width, h = img.height;
+          if(w > max) { h *= max/w; w = max; }
+          cvs.width = w; cvs.height = h; cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+          cvs.toBlob(b => res(b), 'image/webp', 0.85);
+        };
+      });
+    }
+
+    async function handleAdminUpload() {
+      const slots = document.querySelectorAll('.admin-slot');
+      let tasks = [];
+      for(let s of slots) {
+        const f = s.querySelector('.slot-file').files[0]; const l = s.querySelector('.slot-label').value.trim();
+        if(f && l) tasks.push({f, l});
+      }
+      if(!tasks.length) return alert("請提供圖文素材");
+      const btn = document.getElementById('btnAdminUpload');
+      btn.disabled = true; btn.innerText = "正在處理並上傳...";
+      try {
+        for(let t of tasks) {
+          const blob = await processImg(t.f); 
+          const name = `ad_${Date.now()}_${Math.floor(Math.random()*1000)}.webp`;
+          const { error: upErr } = await supabase.storage.from('ads').upload(name, blob, { contentType: 'image/webp' });
+          if(upErr) throw upErr;
+          const { error: dbErr } = await supabase.from('ads_gallery').insert({ label: t.l, category: 'FB', image_path: name, sort_order: adsGallery.length + 1 });
+          if(dbErr) throw dbErr;
+        }
+        location.reload();
+      } catch(e) { alert("上傳失敗: " + e.message); btn.disabled = false; }
+    }
+
+    async function deleteAd(id, path) {
+      if(!confirm("確定刪除？")) return;
+      await supabase.storage.from('ads').remove([path]);
+      await supabase.from('ads_gallery').delete().eq('id', id);
+      fetchAds();
+    }
+
+    function renderAdminGallery() {
+      const box = document.getElementById('adminGallery');
+      box.innerHTML = adsGallery.map(ad => `<div class="sort-item" draggable="true" data-id="${ad.id}"><div class="del-tag" onclick="deleteAd('${ad.id}', '${ad.image_path}')">✕</div><img src="${ad.fullUrl}"></div>`).join('');
+      let drag = null;
+      box.querySelectorAll('.sort-item').forEach(i => {
+        i.ondragstart = () => { drag = i; i.style.opacity = '0.5'; };
+        i.ondragend = () => { i.style.opacity = '1'; drag = null; };
+      });
+      box.ondragover = e => e.preventDefault();
+      box.ondrop = e => {
+        const after = [...box.querySelectorAll('.sort-item')].find(i => {
+          const b = i.getBoundingClientRect(); return e.clientX < b.left + b.width/2;
+        });
+        if(!after) box.appendChild(drag); else box.insertBefore(drag, after);
+      };
+    }
+
+    async function saveNewOrder() {
+      const items = [...document.querySelectorAll('.sort-item')];
+      for(let i=0; i<items.length; i++) await supabase.from('ads_gallery').update({sort_order: i+1}).eq('id', items[i].dataset.id);
+      alert("✅ 順序已儲存"); fetchAds();
+    }
+
+    async function submitAllData() {
+      if(!globalStore) return alert("請先選擇分店");
+      const btn = document.getElementById('btnSubmit');
+      const cards = document.querySelectorAll('.customer-card');
+      const date = document.getElementById('globalDate').value;
+      const finalData = [];
+      for(let c of cards) {
+        const name = c.querySelector('.name-input').value.trim();
+        const isNew = c.querySelector('[data-type="is_new"] .selected').innerText === '全新客';
+        const amt = parseFloat(c.querySelector('.amount-input').value);
+        const gender = c.querySelector('[data-type="gender"] .selected')?.innerText;
+        const age = c.querySelector('[data-type="age"] .selected')?.innerText;
+        const sources = Array.from(c.querySelectorAll('[data-type="source"] .selected')).map(el => el.innerText);
+        const purposes = Array.from(c.querySelectorAll('[data-type="purpose"] .selected')).map(el => el.innerText);
+        if(!isNew) { if(amt > 0) sources.push('老客回購'); else sources.push('老客-未購'); }
+        if(!name || !gender || !age || !sources.length || !purposes.length || isNaN(amt)) return alert("請完整填寫必填項與金額");
+        finalData.push({
+          p_date: date, p_store: globalStore, p_name: name, p_gender: gender, p_age: age,
+          p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'),
+          p_sources: [...new Set(sources)], p_purposes: purposes, p_keywords: c.querySelector('.keyword-input').value,
+          p_detail: c.querySelector('.detail-input').value.trim(),
+          p_is_new_customer: isNew, p_amount: amt, p_ad_source_detail: c.dataset.adLabels
+        });
+      }
+      btn.disabled = true; btn.innerText = "傳送中...";
+      try {
+        for(let d of finalData) {
+          const { error } = await supabase.rpc('submit_visit_v8', d);
+          if(error) throw error;
+        }
+        alert("🎉 送出成功！"); location.reload();
+      } catch(e) { alert("送出失敗: " + e.message); btn.disabled = false; }
+    }
+  </script>
+</body>
+</html>
