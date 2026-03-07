@@ -15,9 +15,9 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #e2e8f0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #ffffff; }
     .glass-panel { background: rgba(30, 41, 59, 0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; }
-    .gradient-text { background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .gradient-text { background: linear-gradient(45deg, #FF0088, #FF3EFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -40,18 +40,18 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: #ffffff;
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     }
     .zoom-slider::-moz-range-thumb {
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: #ffffff;
       cursor: pointer;
       border: none;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     }
   </style>
 </head>
@@ -60,13 +60,13 @@
 
   <!-- 懸浮按鈕：全展開 / 全收折 -->
   <div class="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
-    <button id="btnExpandAll" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="展開所有月份">
+    <button id="btnExpandAll" class="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="展開所有月份">
       <i class="fas fa-expand-arrows-alt mb-1 text-blue-400 text-lg"></i>
-      <span class="text-[10px] leading-none font-bold">全展開</span>
+      <span class="text-[10px] leading-none font-bold text-slate-300">全展開</span>
     </button>
-    <button id="btnCollapseAll" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="收折所有月份">
+    <button id="btnCollapseAll" class="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="收折所有月份">
       <i class="fas fa-compress-arrows-alt mb-1 text-slate-400 text-lg"></i>
-      <span class="text-[10px] leading-none font-bold">全收折</span>
+      <span class="text-[10px] leading-none font-bold text-slate-300">全收折</span>
     </button>
   </div>
 
@@ -107,8 +107,8 @@
           <span class="px-2 py-0.5 rounded text-xs bg-blue-900 text-blue-200">業績版</span>
         </div>
         <div class="flex items-center gap-3">
-          <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-white transition text-sm"><i class="fas fa-users mr-1"></i> 客源分析</button>
-          <button id="btnLogin" class="text-slate-400 hover:text-white transition text-sm"><i class="fas fa-sign-in-alt mr-1"></i> 管理員登入</button>
+          <button onclick="window.location.href='index.html'" class="text-slate-300 hover:text-white transition text-sm"><i class="fas fa-users mr-1"></i> 客源分析</button>
+          <button id="btnLogin" class="text-slate-300 hover:text-white transition text-sm"><i class="fas fa-sign-in-alt mr-1"></i> 管理員登入</button>
           <button id="btnLogout" class="hidden text-red-400 hover:text-red-300 transition text-sm"><i class="fas fa-sign-out-alt mr-1"></i> 登出管理</button>
           <div id="adminStatus" class="hidden px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs border border-green-800"><i class="fas fa-check-circle mr-1"></i>已授權</div>
         </div>
@@ -120,23 +120,23 @@
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div class="glass-panel p-5">
-        <p class="text-slate-400 text-xs mb-1">最新週總業績</p>
+        <p class="text-white text-xs mb-1">最新週總業績</p>
         <h3 class="text-2xl font-bold text-white" id="kpiTotal">--</h3>
-        <div class="mt-2 text-xs flex items-center" id="kpiGrowthWrap"><span id="kpiGrowth" class="text-slate-400">--</span></div>
+        <div class="mt-2 text-xs flex items-center" id="kpiGrowthWrap"><span id="kpiGrowth" class="text-white">--</span></div>
       </div>
       <div class="glass-panel p-5">
-        <p class="text-slate-400 text-xs mb-1">最新週：臨安 / 南科</p>
+        <p class="text-white text-xs mb-1">最新週：臨安 / 南科</p>
         <div class="flex items-end gap-2">
-          <span class="text-xl font-bold text-sky-300" id="kpiLinan">--</span>
-          <span class="text-slate-500">/</span>
-          <span class="text-xl font-bold text-pink-300" id="kpiNanke">--</span>
+          <span class="text-xl font-bold text-[#FF0088]" id="kpiLinan">--</span>
+          <span class="text-white">/</span>
+          <span class="text-xl font-bold text-[#FF3EFF]" id="kpiNanke">--</span>
         </div>
-        <p class="text-xs text-slate-500 mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
+        <p class="text-xs text-white mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
       </div>
       <div class="glass-panel p-5">
-        <p class="text-slate-400 text-xs mb-1">最新週訊息數</p>
-        <h3 class="text-2xl font-bold text-yellow-300" id="kpiMessages">--</h3>
-        <p class="text-xs text-slate-500 mt-1">當週詢問熱度</p>
+        <p class="text-white text-xs mb-1">最新週訊息數</p>
+        <h3 class="text-2xl font-bold text-[#FFFF33]" id="kpiMessages">--</h3>
+        <p class="text-xs text-white mt-1">當週詢問熱度</p>
       </div>
       <div id="btnAddData" class="hidden glass-panel p-5 flex-col justify-center items-center cursor-pointer hover:bg-slate-800/50 transition">
         <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-900/50"><i class="fas fa-plus text-white"></i></div>
@@ -144,8 +144,8 @@
       </div>
       <div id="btnAddPlaceholder" class="glass-panel p-5 flex flex-col justify-center items-center opacity-50 cursor-not-allowed">
         <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-2"><i class="fas fa-eye text-slate-400"></i></div>
-        <span class="text-sm font-medium text-slate-400">僅閱覽模式</span>
-        <span class="text-xs text-slate-500 mt-1">管理員登入後可編輯</span>
+        <span class="text-sm font-medium text-slate-300">僅閱覽模式</span>
+        <span class="text-xs text-slate-400 mt-1">管理員登入後可編輯</span>
       </div>
     </div>
 
@@ -155,18 +155,18 @@
           <h2 class="text-lg font-bold text-white flex items-center"><i class="fas fa-chart-line mr-2 text-blue-400"></i> 雙店業績走勢</h2>
           <div class="flex items-center gap-2 text-xs">
             <button id="btnViewWeekly" class="px-3 py-1 rounded bg-blue-600 text-white transition">週視圖</button>
-            <button id="btnViewMonthly" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">月視圖</button>
+            <button id="btnViewMonthly" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition">月視圖</button>
           </div>
           <!-- 獨立的圖表開關 -->
           <div class="flex flex-wrap items-center gap-3 ml-2 border-l border-slate-700 pl-4">
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#38bdf8]">
-              <input type="checkbox" id="toggleLinanSales" checked class="w-3.5 h-3.5 accent-[#38bdf8] cursor-pointer"> 臨安業績
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF0088]">
+              <input type="checkbox" id="toggleLinanSales" checked class="w-3.5 h-3.5 accent-[#FF0088] cursor-pointer"> 臨安業績
             </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#f472b6]">
-              <input type="checkbox" id="toggleNankeSales" checked class="w-3.5 h-3.5 accent-[#f472b6] cursor-pointer"> 南科業績
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF3EFF]">
+              <input type="checkbox" id="toggleNankeSales" checked class="w-3.5 h-3.5 accent-[#FF3EFF] cursor-pointer"> 南科業績
             </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#fbbf24]">
-              <input type="checkbox" id="toggleMsg" checked class="w-3.5 h-3.5 accent-[#fbbf24] cursor-pointer"> 訊息數
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FFFF33]">
+              <input type="checkbox" id="toggleMsg" checked class="w-3.5 h-3.5 accent-[#FFFF33] cursor-pointer"> 訊息數
             </label>
             <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#00ffff]">
               <input type="checkbox" id="toggleLinanVisits" checked class="w-3.5 h-3.5 accent-[#00ffff] cursor-pointer"> 臨安來客
@@ -178,37 +178,37 @@
         </div>
         <div class="flex gap-3 items-center text-xs">
           <div class="flex items-center gap-2">
-            <i class="fas fa-search-minus text-slate-400"></i>
+            <i class="fas fa-search-minus text-white"></i>
             <input type="range" id="zoomSlider" class="zoom-slider" min="0" max="100" value="0" />
-            <i class="fas fa-search-plus text-slate-400"></i>
+            <i class="fas fa-search-plus text-white"></i>
           </div>
-          <button id="btnResetZoom" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition shadow border border-slate-600"><i class="fas fa-compress mr-1"></i>重置</button>
+          <button id="btnResetZoom" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition shadow border border-slate-600"><i class="fas fa-compress mr-1"></i>重置</button>
         </div>
       </div>
       <div class="relative h-96 w-full"><canvas id="mainChart"></canvas></div>
-      <div class="mt-3 text-xs text-slate-400 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div class="mt-3 text-xs text-white flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <span><i class="fas fa-mouse-pointer mr-1"></i> 提示：左鍵拖曳可平移，滑鼠移到想看的位置後拉右上拉桿縮放</span>
-        <span id="dataStatus" class="text-slate-500">載入中...</span>
+        <span id="dataStatus" class="text-white">載入中...</span>
       </div>
     </div>
 
     <div class="glass-panel table-viewport overflow-hidden">
       <div class="p-4 border-b border-slate-700/50 flex flex-col md:flex-row md:justify-between md:items-center gap-3 bg-slate-900/50">
         <div class="flex items-center justify-between md:justify-start gap-3">
-          <h3 class="text-md font-bold text-slate-200">📋 業績紀錄 (按月群組)</h3>
-          <span class="text-xs text-slate-500" id="tableHint">目前為閱覽模式</span>
+          <h3 class="text-md font-bold text-white">📋 業績紀錄 (按月群組)</h3>
+          <span class="text-xs text-white" id="tableHint">目前為閱覽模式</span>
         </div>
       </div>
       <!-- 加上 max-h-[70vh] 與 overflow-y-auto 讓表格內部可捲動，表頭吸頂 -->
       <div class="overflow-x-auto overflow-y-auto max-h-[70vh] relative">
-        <table class="w-full text-sm text-left text-slate-300">
-          <thead class="text-xs text-slate-400 uppercase text-center sticky top-0 z-30 shadow-lg ring-1 ring-slate-700">
+        <table class="w-full text-sm text-left text-white">
+          <thead class="text-xs text-white uppercase text-center sticky top-0 z-30 shadow-lg ring-1 ring-slate-700">
             <tr>
               <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-28">月份</th>
               <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-32">區間(週)</th>
-              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-sky-300">臨安店</th>
-              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-pink-300">南科店</th>
-              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 text-center leading-tight">來客數<br><span class="text-[10px] text-slate-500 font-normal tracking-wider">臨安 / 南科</span></th>
+              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF0088]">臨安店</th>
+              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF3EFF]">南科店</th>
+              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 text-center leading-tight">來客數<br><span class="text-[10px] text-white font-normal tracking-wider"><span class="text-[#00ffff]">臨安</span> / <span class="text-[#39ff14]">南科</span></span></th>
               <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 leading-tight">後台新私<br>訊則數</th>
               <th rowspan="2" class="px-4 py-3 border-b border-slate-700 bg-slate-800">備註檔期</th>
             </tr>
@@ -234,33 +234,33 @@
       <form id="performanceForm" class="space-y-4">
         <input type="hidden" id="editId" />
         <div>
-          <label class="block text-xs text-slate-400 mb-1">選擇週次（選該週任一天即可）</label>
+          <label class="block text-xs text-white mb-1">選擇週次（選該週任一天即可）</label>
           <input type="date" id="inputDate" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none">
-          <p id="weekRangeDisplay" class="text-xs text-blue-300 mt-1 h-4"></p>
+          <p id="weekRangeDisplay" class="text-xs text-blue-400 mt-1 h-4"></p>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs text-slate-400 mb-1">臨安店業績（NT$）</label>
+            <label class="block text-xs text-white mb-1">臨安店業績（NT$）</label>
             <input type="number" id="inputLinan" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
           </div>
           <div>
-            <label class="block text-xs text-slate-400 mb-1">南科店業績（NT$）</label>
+            <label class="block text-xs text-white mb-1">南科店業績（NT$）</label>
             <input type="number" id="inputNanke" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs text-slate-400 mb-1">當週訊息數</label>
+            <label class="block text-xs text-white mb-1">當週訊息數</label>
             <input type="number" id="inputMsg" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
           </div>
           <div>
-            <label class="block text-xs text-slate-400 mb-1">備註檔期說明</label>
+            <label class="block text-xs text-white mb-1">備註檔期說明</label>
             <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
           </div>
         </div>
         <div class="pt-2 flex gap-3">
-          <button type="button" id="btnDeleteEntry" class="hidden flex-1 py-2 rounded bg-red-900/80 hover:bg-red-800 text-red-200 transition border border-red-700">刪除</button>
-          <button type="button" id="btnCloseEntry" class="flex-1 py-2 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 transition">取消</button>
+          <button type="button" id="btnDeleteEntry" class="hidden flex-1 py-2 rounded bg-red-900/80 hover:bg-red-800 text-white transition border border-red-700">刪除</button>
+          <button type="button" id="btnCloseEntry" class="flex-1 py-2 rounded bg-slate-700 hover:bg-slate-600 text-white transition">取消</button>
           <button type="submit" class="flex-1 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold transition">確認儲存</button>
         </div>
       </form>
@@ -496,26 +496,31 @@
       const btnM = document.getElementById("btnViewMonthly");
       if (chartViewMode === "weekly") {
         btnW.className = "px-3 py-1 rounded bg-blue-600 text-white transition";
-        btnM.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition";
+        btnM.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition";
       } else {
         btnM.className = "px-3 py-1 rounded bg-blue-600 text-white transition";
-        btnW.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition";
+        btnW.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition";
       }
     }
 
-    // 圖表開關事件 (透過 Dataset Index 控制)
-    function updateChartVisibility() {
-      if (!performanceChart) return;
-      performanceChart.setDatasetVisibility(0, dom.toggleLinanSales.checked);
-      performanceChart.setDatasetVisibility(1, dom.toggleNankeSales.checked);
-      performanceChart.setDatasetVisibility(2, dom.toggleMsg.checked);
-      performanceChart.setDatasetVisibility(3, dom.toggleLinanVisits.checked);
-      performanceChart.setDatasetVisibility(4, dom.toggleNankeVisits.checked);
-      performanceChart.update('none');
-    }
+    // 圖表開關事件 (使用 show/hide 觸發原生過場動畫)
+    const toggleMap = [
+      { el: dom.toggleLinanSales, index: 0 },
+      { el: dom.toggleNankeSales, index: 1 },
+      { el: dom.toggleMsg, index: 2 },
+      { el: dom.toggleLinanVisits, index: 3 },
+      { el: dom.toggleNankeVisits, index: 4 }
+    ];
 
-    [dom.toggleLinanSales, dom.toggleNankeSales, dom.toggleMsg, dom.toggleLinanVisits, dom.toggleNankeVisits].forEach(el => {
-      el.addEventListener('change', updateChartVisibility);
+    toggleMap.forEach(item => {
+      item.el.addEventListener('change', (e) => {
+        if (!performanceChart) return;
+        if (e.target.checked) {
+          performanceChart.show(item.index);
+        } else {
+          performanceChart.hide(item.index);
+        }
+      });
     });
 
     function doFrontUnlock() {
@@ -692,9 +697,19 @@
         nankeVisitsData = chartData.map(d => d.nankeVisits);
       }
 
+      // 處理訊息數：去除前導零，讓線條從第一筆有資料的地方開始畫
+      let firstNonZeroMsgIdx = msgData.findIndex(v => v > 0);
+      if (firstNonZeroMsgIdx > -1) {
+        for (let i = 0; i < firstNonZeroMsgIdx; i++) {
+          msgData[i] = null;
+        }
+      } else {
+        msgData = msgData.map(() => null);
+      }
+
       // 計算全局最大值，鎖定 Y 軸高度防止跳動
       const maxSales = Math.max(...linanData, ...nankeData, 100000);
-      const maxMsg = Math.max(...msgData, 10);
+      const maxMsg = Math.max(...msgData.filter(v => v !== null), 10);
       const maxVisits = Math.max(...linanVisitsData, ...nankeVisitsData, 10);
 
       const ctx = document.getElementById("mainChart").getContext("2d");
@@ -706,19 +721,25 @@
         data: {
           labels,
           datasets: [
-            { label: "臨安店", data: linanData, borderColor: "#38bdf8", backgroundColor: "rgba(56, 189, 248, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleLinanSales.checked },
-            { label: "南科店", data: nankeData, borderColor: "#f472b6", backgroundColor: "rgba(244, 114, 182, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleNankeSales.checked },
-            { label: "訊息數", data: msgData, borderColor: "#fbbf24", borderDash: [6, 6], borderWidth: 1.6, pointRadius: 0, yAxisID: "y1", hidden: !dom.toggleMsg.checked },
+            { label: "臨安店", data: linanData, borderColor: "#FF0088", backgroundColor: "rgba(255, 0, 136, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleLinanSales.checked },
+            { label: "南科店", data: nankeData, borderColor: "#FFB3FF", backgroundColor: "rgba(255, 179, 255, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleNankeSales.checked },
+            { label: "訊息數", data: msgData, borderColor: "#FFFF33", borderDash: [6, 6], borderWidth: 1.6, pointRadius: 0, yAxisID: "y1", hidden: !dom.toggleMsg.checked },
             { label: "臨安來客數", data: linanVisitsData, borderColor: "#00ffff", backgroundColor: "rgba(0, 255, 255, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleLinanVisits.checked },
             { label: "南科來客數", data: nankeVisitsData, borderColor: "#39ff14", backgroundColor: "rgba(57, 255, 20, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleNankeVisits.checked }
           ]
         },
         options: {
-          responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+          responsive: true, 
+          maintainAspectRatio: false, 
+          interaction: { mode: "index", intersect: false },
+          animation: {
+            duration: 750,
+            easing: 'easeInOutQuart'
+          },
           plugins: {
             legend: { display: false }, // 關閉預設圖例，改用自訂 Checkbox
             tooltip: {
-              backgroundColor: "rgba(15, 23, 42, 0.92)", titleColor: "#fff", bodyColor: "#cbd5e1", borderColor: "#334155", borderWidth: 1,
+              backgroundColor: "rgba(15, 23, 42, 0.92)", titleColor: "#fff", bodyColor: "#ffffff", borderColor: "#334155", borderWidth: 1,
               callbacks: {
                 label: (context) => {
                   const label = context.dataset.label || "";
@@ -737,10 +758,10 @@
             zoom: { pan: { enabled: true, mode: "x" }, zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" } }
           },
           scales: {
-            y: { min: 0, suggestedMax: maxSales * 1.1, grid: { color: "#334155" }, ticks: { color: "#94a3b8", callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v) } },
+            y: { min: 0, suggestedMax: maxSales * 1.1, grid: { color: "#334155" }, ticks: { color: "#ffffff", callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v) } },
             y1: { min: 0, suggestedMax: maxMsg * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
             y2: { min: 0, suggestedMax: maxVisits * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
-            x:  { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } }
+            x:  { grid: { display: false }, ticks: { color: "#ffffff", maxTicksLimit: 10 } }
           }
         }
       });
@@ -770,7 +791,7 @@
       if (!weeklyRows.length) {
         elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elMsg.textContent = "--"; elGrowth.textContent = "--";
         elVisit.textContent = "來客數：-- / -- 人";
-        elGrowth.className = "text-slate-400"; wrap.className = "mt-2 text-xs flex items-center"; return;
+        elGrowth.className = "text-white"; wrap.className = "mt-2 text-xs flex items-center"; return;
       }
 
       const sorted = [...weeklyRows].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
@@ -785,10 +806,10 @@
 
       // 計算最新週來客數
       const counts = getVisitCounts(latest.week_start_date, latest.week_end_date);
-      elVisit.innerHTML = `來客數：<span class="text-sky-300">${counts.linan}</span> / <span class="text-pink-300">${counts.nanke}</span> 人`;
+      elVisit.innerHTML = `來客數：<span class="text-[#00ffff]">${counts.linan}</span> / <span class="text-[#39ff14]">${counts.nanke}</span> 人`;
 
       if (!prev || !(Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0))) {
-        wrap.className = "mt-2 text-xs flex items-center text-slate-400"; elGrowth.className = "text-slate-400"; elGrowth.textContent = "無上週比較資料"; return;
+        wrap.className = "mt-2 text-xs flex items-center text-white"; elGrowth.className = "text-white"; elGrowth.textContent = "無上週比較資料"; return;
       }
 
       const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
@@ -832,7 +853,7 @@
           groups[groupKey] = {
             key: groupKey, isHistorical, year: y, month: m,
             title: isHistorical ? "2025年6月以前 (歷史資料)" : `${y}/${m}月`,
-            rows: [], totalLinan: 0, totalNanke: 0, totalMsg: 0
+            rows: [], totalLinan: 0, totalNanke: 0, totalMsg: 0, totalLinanVisits: 0, totalNankeVisits: 0
           };
         }
 
@@ -840,6 +861,10 @@
         groups[groupKey].totalLinan += Number(row.linan_amount || 0);
         groups[groupKey].totalNanke += Number(row.nanke_amount || 0);
         groups[groupKey].totalMsg += Number(row.message_count || 0);
+        
+        const counts = getVisitCounts(row.week_start_date, row.week_end_date);
+        groups[groupKey].totalLinanVisits += (counts.linan === '-' ? 0 : counts.linan);
+        groups[groupKey].totalNankeVisits += (counts.nanke === '-' ? 0 : counts.nanke);
       });
 
       // 群組內按時間排序 (舊到新)
@@ -880,17 +905,17 @@
           tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer bg-slate-800/30";
           tr.onclick = () => toggleGroup(group.key);
           tr.innerHTML = `
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200">
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white">
               <i class="fas fa-plus-square text-blue-400 mr-2"></i>${group.title}
             </td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-400">共 ${rowCount} ${group.isHistorical ? '個月' : '週'}</td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200 font-bold">${fmtNum(group.totalLinan)}</td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200 font-bold">${fmtNum(group.totalNanke)}</td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-yellow-300 font-bold">${group.totalMsg}</td>
-            <td class="px-4 py-3 text-center text-slate-500">-</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">共 ${rowCount} ${group.isHistorical ? '個月' : '週'}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${group.totalLinanVisits}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${group.totalNankeVisits}</span></td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-[#FFFF33] font-bold">${group.totalMsg}</td>
+            <td class="px-4 py-3 text-center text-white">-</td>
           `;
           dom.tbody.appendChild(tr);
         } else {
@@ -903,22 +928,22 @@
               
               let monthCell = '';
               if (i === 0) {
-                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200 cursor-pointer hover:text-blue-300" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
+                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white cursor-pointer hover:text-gray-300" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
                   <i class="fas fa-minus-square text-blue-400 mr-2"></i>${row.year}/${row.month}月
                 </td>`;
               } else {
-                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.year}/${row.month}月</td>`;
+                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.year}/${row.month}月</td>`;
               }
 
               tr.innerHTML = `
                 ${monthCell}
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 bg-black/40 text-slate-600 text-xs">無週資料</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200">${fmtNum(row.linan_amount)}</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200">${fmtNum(row.nanke_amount)}</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.message_count || '-'}</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 bg-black/40 text-white text-xs">無週資料</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
+                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
+                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.message_count || '-'}</td>
                 <td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>
               `;
               
@@ -944,29 +969,29 @@
               let html = '';
               if (i === 0) {
                 html += `
-                  <td rowspan="${rowCount}" class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200 align-top pt-4 cursor-pointer hover:text-blue-300 bg-slate-800/10" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
+                  <td rowspan="${rowCount}" class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white align-top pt-4 cursor-pointer hover:text-gray-300 bg-slate-800/10" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
                     <i class="fas fa-minus-square text-blue-400 mr-2"></i><br>${group.title}
                   </td>
                 `;
               }
 
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300 text-xs">${periodStr}</td>`;
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200">${fmtNum(row.linan_amount)}</td>`;
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white text-xs">${periodStr}</td>`;
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</td>`;
 
               if (i === 0) {
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200 font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalLinan)}</td>`;
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalLinan)}</td>`;
               }
 
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200">${fmtNum(row.nanke_amount)}</td>`;
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</td>`;
 
               if (i === 0) {
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200 font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalNanke)}</td>`;
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalNanke)}</td>`;
               }
 
               // 來客數欄位
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-sky-300">${counts.linan}</span><span class="text-slate-600 mx-1">/</span><span class="text-pink-300">${counts.nanke}</span></td>`;
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${counts.linan}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${counts.nanke}</span></td>`;
               
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.message_count || '-'}</td>`;
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.message_count || '-'}</td>`;
               html += `<td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>`;
 
               tr.innerHTML = html;
