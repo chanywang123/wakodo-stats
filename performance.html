@@ -5,18 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>業績儀表板</title>
 
-  <link rel="icon" type="image/svg+xml"
-href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D
-%270%200%2032%2032%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2732%2
-7%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%2
-7M7%2024.5H25%27%20stroke%3D%27%23334155%27%20stroke-width%3D%272%27%20stroke-linecap
-%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27
-%20fill%3D%27none%27%20stroke%3D%27%2338bdf8%27%20stroke-width%3D%272.4%27%20stroke-line
-cap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ccircle%20cx%3D%278%27%20cy%3
-D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%2
-0cy%3D%2717%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2717%
-27%20cy%3D%2719%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2
-723%27%20cy%3D%2711%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M7%2024.5H25%27%20stroke%3D%27%23334155%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27%20fill%3D%27none%27%20stroke%3D%27%2338bdf8%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ccircle%20cx%3D%278%27%20cy%3D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%20cy%3D%2717%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2717%27%20cy%3D%2719%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2711%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3C/svg%3E">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -29,33 +18,13 @@ D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%
     body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #e2e8f0; }
     .glass-panel { background: rgba(30, 41, 59, 0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; }
     .gradient-text { background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
     #mainChart { touch-action: none; }
     .table-viewport { overflow: hidden; position: relative; }
-    @keyframes rowOutLeft {
-      0% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
-      100% { opacity: 0; transform: translateX(-44px) scale(0.97); filter: blur(5px); }
-    }
-    @keyframes rowOutRight {
-      0% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
-      100% { opacity: 0; transform: translateX(44px) scale(0.97); filter: blur(5px); }
-    }
-    @keyframes rowInRight {
-      0% { opacity: 0; transform: translateX(56px); filter: blur(9px); }
-      100% { opacity: 1; transform: translateX(0); filter: blur(0); }
-    }
-    @keyframes rowInLeft {
-      0% { opacity: 0; transform: translateX(-56px); filter: blur(9px); }
-      100% { opacity: 1; transform: translateX(0); filter: blur(0); }
-    }
-    .row-exit-left { animation: rowOutLeft 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    .row-exit-right { animation: rowOutRight 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    .row-enter-right { opacity: 0; animation: rowInRight 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .row-enter-left  { opacity: 0; animation: rowInLeft  420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-
+    
     .zoom-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -87,15 +56,26 @@ D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%
   </style>
 </head>
 
-<body class="min-h-screen pb-10">
+<body class="min-h-screen pb-10 relative">
+
+  <!-- 懸浮按鈕：全展開 / 全收折 -->
+  <div class="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
+    <button id="btnExpandAll" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="展開所有月份">
+      <i class="fas fa-expand-arrows-alt mb-1 text-blue-400 text-lg"></i>
+      <span class="text-[10px] leading-none font-bold">全展開</span>
+    </button>
+    <button id="btnCollapseAll" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="收折所有月份">
+      <i class="fas fa-compress-arrows-alt mb-1 text-slate-400 text-lg"></i>
+      <span class="text-[10px] leading-none font-bold">全收折</span>
+    </button>
+  </div>
 
   <div id="lockScreen" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900">
     <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full border border-slate-700">
       <div class="mb-4 text-4xl">🔒</div>
       <h2 class="text-xl font-bold mb-2 text-white">請輸入存取密碼</h2>
       <p class="text-xs text-slate-400 mb-4">輸入密碼進入（僅供閱覽）</p>
-      <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-placeholder="Password" autocomplete="current-password" />
+      <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" autocomplete="current-password" />
       <button id="btnEnter" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition">進入儀表板</button>
     </div>
   </div>
@@ -151,7 +131,7 @@ placeholder="Password" autocomplete="current-password" />
           <span class="text-slate-500">/</span>
           <span class="text-xl font-bold text-pink-300" id="kpiNanke">--</span>
         </div>
-        <p class="text-xs text-slate-500 mt-1">單位：萬元</p>
+        <p class="text-xs text-slate-500 mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
       </div>
       <div class="glass-panel p-5">
         <p class="text-slate-400 text-xs mb-1">最新週訊息數</p>
@@ -170,12 +150,30 @@ placeholder="Password" autocomplete="current-password" />
     </div>
 
     <div class="glass-panel p-6">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-4">
+      <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <h2 class="text-lg font-bold text-white flex items-center"><i class="fas fa-chart-line mr-2 text-blue-400"></i> 雙店業績走勢</h2>
           <div class="flex items-center gap-2 text-xs">
             <button id="btnViewWeekly" class="px-3 py-1 rounded bg-blue-600 text-white transition">週視圖</button>
             <button id="btnViewMonthly" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">月視圖</button>
+          </div>
+          <!-- 獨立的圖表開關 -->
+          <div class="flex flex-wrap items-center gap-3 ml-2 border-l border-slate-700 pl-4">
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#38bdf8]">
+              <input type="checkbox" id="toggleLinanSales" checked class="w-3.5 h-3.5 accent-[#38bdf8] cursor-pointer"> 臨安業績
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#f472b6]">
+              <input type="checkbox" id="toggleNankeSales" checked class="w-3.5 h-3.5 accent-[#f472b6] cursor-pointer"> 南科業績
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#fbbf24]">
+              <input type="checkbox" id="toggleMsg" checked class="w-3.5 h-3.5 accent-[#fbbf24] cursor-pointer"> 訊息數
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#00ffff]">
+              <input type="checkbox" id="toggleLinanVisits" checked class="w-3.5 h-3.5 accent-[#00ffff] cursor-pointer"> 臨安來客
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#39ff14]">
+              <input type="checkbox" id="toggleNankeVisits" checked class="w-3.5 h-3.5 accent-[#39ff14] cursor-pointer"> 南科來客
+            </label>
           </div>
         </div>
         <div class="flex gap-3 items-center text-xs">
@@ -197,32 +195,28 @@ placeholder="Password" autocomplete="current-password" />
     <div class="glass-panel table-viewport overflow-hidden">
       <div class="p-4 border-b border-slate-700/50 flex flex-col md:flex-row md:justify-between md:items-center gap-3 bg-slate-900/50">
         <div class="flex items-center justify-between md:justify-start gap-3">
-          <h3 class="text-md font-bold text-slate-200">📋 最新業績紀錄</h3>
+          <h3 class="text-md font-bold text-slate-200">📋 業績紀錄 (按月群組)</h3>
           <span class="text-xs text-slate-500" id="tableHint">目前為閱覽模式</span>
         </div>
-        <div class="flex items-center justify-between md:justify-end gap-3">
-          <div class="flex items-center gap-2 text-xs">
-            <span class="text-slate-400">排序</span>
-            <button id="btnSortDesc" class="px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition" title="最新在上（降冪）"><i class="fas fa-arrow-down-wide-short"></i></button>
-            <button id="btnSortAsc" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="最舊在上（升冪）"><i class="fas fa-arrow-up-short-wide"></i></button>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <button id="btnPrevPage" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"><i class="fas fa-chevron-left"></i></button>
-            <span id="pageInfo" class="text-slate-400 w-24 text-center">第 1 / 1 頁</span>
-            <button id="btnNextPage" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"><i class="fas fa-chevron-right"></i></button>
-          </div>
-        </div>
       </div>
-      <div class="overflow-x-auto">
+      <!-- 加上 max-h-[70vh] 與 overflow-y-auto 讓表格內部可捲動，表頭吸頂 -->
+      <div class="overflow-x-auto overflow-y-auto max-h-[70vh] relative">
         <table class="w-full text-sm text-left text-slate-300">
-          <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+          <thead class="text-xs text-slate-400 uppercase text-center sticky top-0 z-30 shadow-lg ring-1 ring-slate-700">
             <tr>
-              <th class="px-6 py-3">期間</th>
-              <th class="px-6 py-3">臨安店</th>
-              <th class="px-6 py-3">南科店</th>
-              <th class="px-6 py-3">訊息數</th>
-              <th class="px-6 py-3">備註檔期</th>
-              <th class="px-6 py-3 text-right">操作</th>
+              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-28">月份</th>
+              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-32">區間(週)</th>
+              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-sky-300">臨安店</th>
+              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-pink-300">南科店</th>
+              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 text-center leading-tight">來客數<br><span class="text-[10px] text-slate-500 font-normal tracking-wider">臨安 / 南科</span></th>
+              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 leading-tight">後台新私<br>訊則數</th>
+              <th rowspan="2" class="px-4 py-3 border-b border-slate-700 bg-slate-800">備註檔期</th>
+            </tr>
+            <tr>
+              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">週變化</th>
+              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">總共</th>
+              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">週變化</th>
+              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">總共</th>
             </tr>
           </thead>
           <tbody id="dataTableBody"></tbody>
@@ -265,6 +259,7 @@ placeholder="Password" autocomplete="current-password" />
           </div>
         </div>
         <div class="pt-2 flex gap-3">
+          <button type="button" id="btnDeleteEntry" class="hidden flex-1 py-2 rounded bg-red-900/80 hover:bg-red-800 text-red-200 transition border border-red-700">刪除</button>
           <button type="button" id="btnCloseEntry" class="flex-1 py-2 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 transition">取消</button>
           <button type="submit" class="flex-1 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold transition">確認儲存</button>
         </div>
@@ -285,6 +280,7 @@ placeholder="Password" autocomplete="current-password" />
 
     let isAdmin = false;
     let allData = [];
+    let allVisits = []; // 儲存客源資料以計算來客數
     let performanceChart = null;
     let chartXOriginal = null;
 
@@ -292,12 +288,9 @@ placeholder="Password" autocomplete="current-password" />
     let hoverXRatio = 0.5;
 
     let chartViewMode = "weekly";
-    let weeklyStartDate = null;
-
-    let tableSortOrder = "desc";
-    let currentPage = 1;
-    const PAGE_SIZE = 12;
-    let tableBusy = false;
+    
+    // 讀取收折狀態
+    let expandedGroups = new Set(JSON.parse(localStorage.getItem('expandedGroups') || '[]'));
 
     const dom = {
       lockScreen: document.getElementById("lockScreen"),
@@ -317,15 +310,11 @@ placeholder="Password" autocomplete="current-password" />
       dataStatus: document.getElementById("dataStatus"),
       btnResetZoom: document.getElementById("btnResetZoom"),
       zoomSlider: document.getElementById("zoomSlider"),
-      btnSortDesc: document.getElementById("btnSortDesc"),
-      btnSortAsc: document.getElementById("btnSortAsc"),
-      btnPrevPage: document.getElementById("btnPrevPage"),
-      btnNextPage: document.getElementById("btnNextPage"),
-      pageInfo: document.getElementById("pageInfo"),
       tbody: document.getElementById("dataTableBody"),
       entryModal: document.getElementById("entryModal"),
       entryModalBackdrop: document.getElementById("entryModalBackdrop"),
       btnCloseEntry: document.getElementById("btnCloseEntry"),
+      btnDeleteEntry: document.getElementById("btnDeleteEntry"),
       performanceForm: document.getElementById("performanceForm"),
       inputDate: document.getElementById("inputDate"),
       inputLinan: document.getElementById("inputLinan"),
@@ -333,14 +322,25 @@ placeholder="Password" autocomplete="current-password" />
       inputMsg: document.getElementById("inputMsg"),
       inputNote: document.getElementById("inputNote"),
       editId: document.getElementById("editId"),
-      weekRangeDisplay: document.getElementById("weekRangeDisplay")
+      weekRangeDisplay: document.getElementById("weekRangeDisplay"),
+      btnExpandAll: document.getElementById("btnExpandAll"),
+      btnCollapseAll: document.getElementById("btnCollapseAll"),
+      toggleLinanSales: document.getElementById("toggleLinanSales"),
+      toggleNankeSales: document.getElementById("toggleNankeSales"),
+      toggleMsg: document.getElementById("toggleMsg"),
+      toggleLinanVisits: document.getElementById("toggleLinanVisits"),
+      toggleNankeVisits: document.getElementById("toggleNankeVisits")
     };
 
     function fmtTwd(n) {
       return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0));
     }
+    
+    function fmtNum(n) {
+      return Number(n || 0).toLocaleString();
+    }
 
-    // ===== 日期工具：全部用「本地日曆日」避免 UTC 偏移 =====
+    // ===== 日期工具 =====
     function parseISODateLocal(dateStr){
       const [y, m, d] = String(dateStr).split("-").map(Number);
       const dt = new Date(y, (m || 1) - 1, d || 1);
@@ -360,25 +360,31 @@ placeholder="Password" autocomplete="current-password" />
       return x;
     }
 
-    // 週期固定：週一～週日
     function getWeekRange(anyIsoDateStr){
       const date = parseISODateLocal(anyIsoDateStr);
-      const day = date.getDay(); // 0=週日..6=週六
-      const deltaToMonday = (day + 6) % 7; // 週一→0、週日→6
+      const day = date.getDay(); 
+      const deltaToMonday = (day + 6) % 7; 
       const monday = addDays(date, -deltaToMonday);
       const sunday = addDays(monday, 6);
       return { start: monday, end: sunday };
     }
 
-    // 月歸類：看當週哪個月份佔比多 → 等同取「週四」(start+3) 所在月份
-    function getWeekMajorMonthStart(weekStartIso){
-      const s = parseISODateLocal(weekStartIso);
-      const thursday = addDays(s, 3);
-      return { year: thursday.getFullYear(), month: thursday.getMonth() + 1 };
-    }
-    function getWeekMajorMonthFromRange(range){
-      const thursday = addDays(range.start, 3);
-      return { year: thursday.getFullYear(), month: thursday.getMonth() + 1 };
+    function getMajorMonth(isoDateStr) {
+      const wkStart = parseISODateLocal(isoDateStr);
+      const counts = new Map();
+      for (let i = 0; i < 7; i++) {
+        const x = addDays(wkStart, i);
+        const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+      let bestKey = null;
+      let bestDays = -1;
+      for (const [k, days] of counts.entries()) {
+        if (days > bestDays) { bestDays = days; bestKey = k; continue; }
+        if (days === bestDays && bestKey && k > bestKey) bestKey = k;
+      }
+      const [yy, mm] = String(bestKey).split("-");
+      return { year: Number(yy), month: Number(mm), key: bestKey };
     }
 
     function showWeekRangeText(isoDate) {
@@ -388,27 +394,35 @@ placeholder="Password" autocomplete="current-password" />
       return r;
     }
 
-    // ===== 前台密碼門神 =====
-    function setFrontAccess() {
-      localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL }));
+    // ===== 計算來客數 =====
+    function getVisitCounts(startDate, endDate) {
+      let linan = 0, nanke = 0;
+      if (!startDate || !endDate) return { linan: '-', nanke: '-' };
+      
+      for (const v of allVisits) {
+        if (v.form_date >= startDate && v.form_date <= endDate) {
+          if (v.store_branch === "臨安店") linan++;
+          else if (v.store_branch === "南科店") nanke++;
+        }
+      }
+      return { linan, nanke };
     }
+
+    // ===== 前台密碼門神 =====
+    function setFrontAccess() { localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL })); }
     function checkFrontAccess() {
       const raw = localStorage.getItem(FRONT_KEY);
       if (!raw) return false;
       try {
         const obj = JSON.parse(raw);
-        if (!obj?.expire) return false;
-        if (Date.now() > obj.expire) return false;
+        if (!obj?.expire || Date.now() > obj.expire) return false;
         return true;
-      } catch {
-        return false;
-      }
+      } catch { return false; }
     }
 
-dom.lockScreen.classList.remove("hidden");
-dom.lockScreen.classList.add("flex");
-setTimeout(() => dom.accessPassword.focus(), 80);
-
+    dom.lockScreen.classList.remove("hidden");
+    dom.lockScreen.classList.add("flex");
+    setTimeout(() => dom.accessPassword.focus(), 80);
 
     dom.btnEnter.addEventListener("click", doFrontUnlock);
     dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doFrontUnlock(); });
@@ -421,8 +435,22 @@ setTimeout(() => dom.accessPassword.focus(), 80);
     dom.btnAddData.addEventListener("click", () => openModal(null));
     dom.entryModalBackdrop.addEventListener("click", closeModal);
     dom.btnCloseEntry.addEventListener("click", closeModal);
+    dom.btnDeleteEntry.addEventListener("click", handleDelete);
     dom.performanceForm.addEventListener("submit", handleFormSubmit);
     dom.inputDate.addEventListener("change", (e) => { if (e.target.value) showWeekRangeText(e.target.value); });
+
+    dom.btnExpandAll.addEventListener("click", () => {
+      const grouped = groupData(allData);
+      grouped.forEach(g => expandedGroups.add(g.key));
+      saveExpandedState();
+      renderTable();
+    });
+
+    dom.btnCollapseAll.addEventListener("click", () => {
+      expandedGroups.clear();
+      saveExpandedState();
+      renderTable();
+    });
 
     dom.btnResetZoom.addEventListener("click", () => {
       if (performanceChart?.resetZoom) {
@@ -435,22 +463,17 @@ setTimeout(() => dom.accessPassword.focus(), 80);
 
     dom.zoomSlider.addEventListener("input", (e) => {
       if (!performanceChart || !chartXOriginal) return;
-
       const t = Number(e.target.value) / 100;
       const origRange = chartXOriginal.max - chartXOriginal.min;
       const minRange = origRange * 0.02;
       const range = Math.max(minRange, origRange * (1 - t));
-
       const xScale = performanceChart.scales.x;
       const anchor = (hoverXValue != null) ? hoverXValue : (xScale.min + xScale.max) / 2;
       const ratio = (hoverXValue != null) ? hoverXRatio : 0.5;
-
       let min = anchor - ratio * range;
       let max = min + range;
-
       if (min < chartXOriginal.min) { min = chartXOriginal.min; max = min + range; }
       if (max > chartXOriginal.max) { max = chartXOriginal.max; min = max - range; }
-
       performanceChart.zoomScale("x", { min, max }, "none");
     });
 
@@ -480,10 +503,20 @@ setTimeout(() => dom.accessPassword.focus(), 80);
       }
     }
 
-    dom.btnSortDesc.addEventListener("click", async () => { if (!tableBusy) await setSort("desc"); });
-    dom.btnSortAsc.addEventListener("click", async () => { if (!tableBusy) await setSort("asc"); });
-    dom.btnPrevPage.addEventListener("click", async () => { if (!tableBusy) await changePage(-1); });
-    dom.btnNextPage.addEventListener("click", async () => { if (!tableBusy) await changePage(1); });
+    // 圖表開關事件 (透過 Dataset Index 控制)
+    function updateChartVisibility() {
+      if (!performanceChart) return;
+      performanceChart.setDatasetVisibility(0, dom.toggleLinanSales.checked);
+      performanceChart.setDatasetVisibility(1, dom.toggleNankeSales.checked);
+      performanceChart.setDatasetVisibility(2, dom.toggleMsg.checked);
+      performanceChart.setDatasetVisibility(3, dom.toggleLinanVisits.checked);
+      performanceChart.setDatasetVisibility(4, dom.toggleNankeVisits.checked);
+      performanceChart.update('none');
+    }
+
+    [dom.toggleLinanSales, dom.toggleNankeSales, dom.toggleMsg, dom.toggleLinanVisits, dom.toggleNankeVisits].forEach(el => {
+      el.addEventListener('change', updateChartVisibility);
+    });
 
     function doFrontUnlock() {
       const v = dom.accessPassword.value.trim();
@@ -526,7 +559,7 @@ setTimeout(() => dom.accessPassword.focus(), 80);
         dom.btnAddPlaceholder.classList.remove("hidden");
         dom.tableHint.textContent = "目前為閱覽模式";
       }
-      renderTable(false, "next");
+      renderTable();
     }
 
     function openAdminLogin() {
@@ -544,13 +577,11 @@ setTimeout(() => dom.accessPassword.focus(), 80);
       const email = dom.admEmail.value.trim();
       const pwd = dom.admPwd.value.trim();
       if (!email || !pwd) return;
-
       const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
       if (error) {
         Swal.fire({ icon: "error", title: "登入失敗", text: error.message, background: "#1e293b", color: "#fff" });
         return;
       }
-
       closeAdminLogin();
       await checkAdminSession();
       Swal.fire({ icon: "success", title: "管理員登入成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
@@ -562,538 +593,494 @@ setTimeout(() => dom.accessPassword.focus(), 80);
       Swal.fire({ icon: "info", title: "已登出管理", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
     }
 
+    // 抓取客源資料 (分頁抓取，確保資料完整)
+    async function fetchVisitsData() {
+      let data = [];
+      let page = 0;
+      const PAGE_SIZE = 1000;
+      while(true) {
+        const res = await supabase.from("visits").select("form_date, store_branch").range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+        if (res.error || !res.data || !res.data.length) break;
+        data = data.concat(res.data);
+        if (res.data.length < PAGE_SIZE) break;
+        page++;
+      }
+      return data;
+    }
+
     async function refreshData() {
       dom.dataStatus.textContent = "載入中...";
-      const { data, error } = await supabase
-        .from("sales_performance")
-        .select("*")
-        .order("year", { ascending: true })
-        .order("month", { ascending: true })
-        .order("week_start_date", { ascending: true });
+      
+      // 平行抓取業績與客源資料
+      const [salesRes, visitsData] = await Promise.all([
+        supabase.from("sales_performance").select("*").order("year", { ascending: true }).order("month", { ascending: true }).order("week_start_date", { ascending: true }),
+        fetchVisitsData()
+      ]);
 
-      if (error) {
-        console.error(error);
+      if (salesRes.error) {
+        console.error(salesRes.error);
         dom.dataStatus.textContent = "載入失敗";
-        Swal.fire({ icon: "error", title: "載入失敗", text: error.message, background: "#1e293b", color: "#fff" });
+        Swal.fire({ icon: "error", title: "載入失敗", text: salesRes.error.message, background: "#1e293b", color: "#fff" });
         allData = [];
-        renderChart();
-        renderKPI();
-        renderTable(false, "next");
+      } else {
+        allData = salesRes.data || [];
+        allVisits = visitsData || [];
+        dom.dataStatus.textContent = `共 ${allData.length} 筆`;
+      }
+      
+      renderChart();
+      renderKPI();
+      renderTable();
+    }
+
+    function renderChart() {
+      const weeklyData = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
+      if (!weeklyData.length) {
+        if (performanceChart) performanceChart.destroy();
+        dom.dataStatus.textContent = "尚無週資料";
         return;
       }
 
-      allData = data || [];
-      dom.dataStatus.textContent = `共 ${allData.length} 筆`;
-      tableSortOrder = "desc";
-      currentPage = 1;
-      renderChart();
-      renderKPI();
-      renderTable(true, "next");
-      updateSortButtons();
-      updatePageUI();
-    }
+      let chartData, labels, linanData, nankeData, msgData, linanVisitsData, nankeVisitsData;
 
-function renderChart() {
-  const weeklyData = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
-  if (!weeklyData.length) {
-    if (performanceChart) performanceChart.destroy();
-    dom.dataStatus.textContent = "尚無週資料";
-    return;
-  }
+      if (chartViewMode === "weekly") {
+        chartData = [...weeklyData].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
+        labels = chartData.map(d => {
+          const s = parseISODateLocal(d.week_start_date);
+          const e = addDays(s, 6);
+          return `${s.getMonth() + 1}/${s.getDate()}-${e.getMonth() + 1}/${e.getDate()}`;
+        });
+        linanData = chartData.map(d => Number(d.linan_amount || 0));
+        nankeData = chartData.map(d => Number(d.nanke_amount || 0));
+        msgData   = chartData.map(d => Number(d.message_count || 0));
+        
+        linanVisitsData = chartData.map(d => {
+          const c = getVisitCounts(d.week_start_date, d.week_end_date);
+          return c.linan === '-' ? 0 : c.linan;
+        });
+        nankeVisitsData = chartData.map(d => {
+          const c = getVisitCounts(d.week_start_date, d.week_end_date);
+          return c.nanke === '-' ? 0 : c.nanke;
+        });
+      } else {
+        const monthMap = {};
+        weeklyData.forEach(d => {
+          const major = getMajorMonth(d.week_start_date);
+          const key = major.key;
+          if (!monthMap[key]) {
+            monthMap[key] = { year: major.year, month: major.month, linan: 0, nanke: 0, msg: 0, linanVisits: 0, nankeVisits: 0, notes: [] };
+          }
+          monthMap[key].linan += Number(d.linan_amount || 0);
+          monthMap[key].nanke += Number(d.nanke_amount || 0);
+          monthMap[key].msg   += Number(d.message_count || 0);
+          
+          const counts = getVisitCounts(d.week_start_date, d.week_end_date);
+          monthMap[key].linanVisits += (counts.linan === '-' ? 0 : counts.linan);
+          monthMap[key].nankeVisits += (counts.nanke === '-' ? 0 : counts.nanke);
 
-  weeklyStartDate = weeklyData.reduce((min, d) => {
-    const t = parseISODateLocal(d.week_start_date).getTime();
-    return t < min ? t : min;
-  }, parseISODateLocal(weeklyData[0].week_start_date).getTime());
+          if (d.note) monthMap[key].notes.push(d.note);
+        });
 
-  let chartData, labels, linanData, nankeData, msgData;
-
-  if (chartViewMode === "weekly") {
-    chartData = [...weeklyData].sort((a, b) =>
-      parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime()
-    );
-
-    // 週視圖：週一～週日（永遠用週一 + 6 天推算週日，不依賴資料庫的 week_end_date）
-    labels = chartData.map(d => {
-      const s = parseISODateLocal(d.week_start_date);
-      const e = addDays(s, 6);
-      return `${s.getMonth() + 1}/${s.getDate()}-${e.getMonth() + 1}/${e.getDate()}`;
-    });
-
-    linanData = chartData.map(d => Number(d.linan_amount || 0));
-    nankeData = chartData.map(d => Number(d.nanke_amount || 0));
-    msgData   = chartData.map(d => Number(d.message_count || 0));
-  } else {
-    // 月視圖：用「當週多數月份」歸類到該月（以週一～週日 7 天逐日統計）
-    const monthMap = {};
-
-    weeklyData.forEach(d => {
-      const wkStart = parseISODateLocal(d.week_start_date);
-
-      // 逐日計數各月份出現次數（年/月一起算，避免跨年）
-      const counts = new Map(); // key: "YYYY-MM", val: days
-      for (let i = 0; i < 7; i++) {
-        const x = addDays(wkStart, i);
-        const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
-        counts.set(key, (counts.get(key) || 0) + 1);
+        chartData = Object.keys(monthMap).sort().map(k => ({
+          key: k, ...monthMap[k], noteStr: monthMap[k].notes.join("、") || null
+        }));
+        labels    = chartData.map(d => `${d.year}/${d.month}月`);
+        linanData = chartData.map(d => d.linan);
+        nankeData = chartData.map(d => d.nanke);
+        msgData   = chartData.map(d => d.msg);
+        linanVisitsData = chartData.map(d => d.linanVisits);
+        nankeVisitsData = chartData.map(d => d.nankeVisits);
       }
 
-      // 取天數最多的那個月份；若剛好同天數（極少見），取較晚的月份（更符合「多數月份」直覺）
-      let bestKey = null;
-      let bestDays = -1;
-      for (const [k, days] of counts.entries()) {
-        if (days > bestDays) { bestDays = days; bestKey = k; continue; }
-        if (days === bestDays && bestKey && k > bestKey) bestKey = k;
-      }
+      // 計算全局最大值，鎖定 Y 軸高度防止跳動
+      const maxSales = Math.max(...linanData, ...nankeData, 100000);
+      const maxMsg = Math.max(...msgData, 10);
+      const maxVisits = Math.max(...linanVisitsData, ...nankeVisitsData, 10);
 
-      const [yy, mm] = String(bestKey || `${wkStart.getFullYear()}-${String(wkStart.getMonth()+1).padStart(2,"0")}`).split("-");
-      const year = Number(yy);
-      const month = Number(mm);
+      const ctx = document.getElementById("mainChart").getContext("2d");
+      if (performanceChart) performanceChart.destroy();
+      Chart.register(window.ChartZoom);
 
-      const key = `${year}-${String(month).padStart(2, "0")}`;
-      if (!monthMap[key]) {
-        monthMap[key] = { year, month, linan: 0, nanke: 0, msg: 0, notes: [] };
-      }
-
-      monthMap[key].linan += Number(d.linan_amount || 0);
-      monthMap[key].nanke += Number(d.nanke_amount || 0);
-      monthMap[key].msg   += Number(d.message_count || 0);
-      if (d.note) monthMap[key].notes.push(d.note);
-    });
-
-    chartData = Object.keys(monthMap).sort().map(k => ({
-      key: k,
-      ...monthMap[k],
-      noteStr: monthMap[k].notes.join("、") || null
-    }));
-
-    labels    = chartData.map(d => `${d.year}/${d.month}月`);
-    linanData = chartData.map(d => d.linan);
-    nankeData = chartData.map(d => d.nanke);
-    msgData   = chartData.map(d => d.msg);
-  }
-
-  const ctx = document.getElementById("mainChart").getContext("2d");
-  if (performanceChart) performanceChart.destroy();
-
-  Chart.register(window.ChartZoom);
-
-  performanceChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "臨安店",
-          data: linanData,
-          borderColor: "#38bdf8",
-          backgroundColor: "rgba(56, 189, 248, 0.12)",
-          borderWidth: 2.2,
-          tension: 0.35,
-          pointRadius: 2,
-          pointHoverRadius: 5,
-          yAxisID: "y"
+      performanceChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            { label: "臨安店", data: linanData, borderColor: "#38bdf8", backgroundColor: "rgba(56, 189, 248, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleLinanSales.checked },
+            { label: "南科店", data: nankeData, borderColor: "#f472b6", backgroundColor: "rgba(244, 114, 182, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleNankeSales.checked },
+            { label: "訊息數", data: msgData, borderColor: "#fbbf24", borderDash: [6, 6], borderWidth: 1.6, pointRadius: 0, yAxisID: "y1", hidden: !dom.toggleMsg.checked },
+            { label: "臨安來客數", data: linanVisitsData, borderColor: "#00ffff", backgroundColor: "rgba(0, 255, 255, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleLinanVisits.checked },
+            { label: "南科來客數", data: nankeVisitsData, borderColor: "#39ff14", backgroundColor: "rgba(57, 255, 20, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleNankeVisits.checked }
+          ]
         },
-        {
-          label: "南科店",
-          data: nankeData,
-          borderColor: "#f472b6",
-          backgroundColor: "rgba(244, 114, 182, 0.10)",
-          borderWidth: 2.2,
-          tension: 0.35,
-          pointRadius: 2,
-          pointHoverRadius: 5,
-          yAxisID: "y"
-        },
-        {
-          // 變更 1：訊息數虛線預設開啟（原本 hidden: true）
-          label: "訊息數",
-          data: msgData,
-          borderColor: "#fbbf24",
-          borderDash: [6, 6],
-          borderWidth: 1.6,
-          pointRadius: 0,
-          yAxisID: "y1",
-          hidden: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: { labels: { color: "#94a3b8" } },
-        tooltip: {
-          backgroundColor: "rgba(15, 23, 42, 0.92)",
-          titleColor: "#fff",
-          bodyColor: "#cbd5e1",
-          borderColor: "#334155",
-          borderWidth: 1,
-          callbacks: {
-            label: (context) => {
-              const label = context.dataset.label || "";
-              const val = context.parsed.y ?? 0;
-              const base = (label === "訊息數") ? `${label}: ${val}` : `${label}: ${fmtTwd(val)}`;
-              if (chartViewMode === "weekly") {
-                const row = chartData[context.dataIndex] || {};
-                return row.note ? `${base}（${row.note}）` : base;
-              } else {
-                const row = chartData[context.dataIndex] || {};
-                return row.noteStr ? `${base}（${row.noteStr}）` : base;
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { display: false }, // 關閉預設圖例，改用自訂 Checkbox
+            tooltip: {
+              backgroundColor: "rgba(15, 23, 42, 0.92)", titleColor: "#fff", bodyColor: "#cbd5e1", borderColor: "#334155", borderWidth: 1,
+              callbacks: {
+                label: (context) => {
+                  const label = context.dataset.label || "";
+                  const val = context.parsed.y ?? 0;
+                  let base = "";
+                  if (label === "訊息數") base = `${label}: ${val}`;
+                  else if (label.includes("來客數")) base = `${label}: ${val} 人`;
+                  else base = `${label}: ${fmtTwd(val)}`;
+                  
+                  const row = chartData[context.dataIndex] || {};
+                  const note = chartViewMode === "weekly" ? row.note : row.noteStr;
+                  return note ? `${base}（${note}）` : base;
+                }
               }
-            }
+            },
+            zoom: { pan: { enabled: true, mode: "x" }, zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" } }
+          },
+          scales: {
+            y: { min: 0, suggestedMax: maxSales * 1.1, grid: { color: "#334155" }, ticks: { color: "#94a3b8", callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v) } },
+            y1: { min: 0, suggestedMax: maxMsg * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
+            y2: { min: 0, suggestedMax: maxVisits * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
+            x:  { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } }
           }
-        },
-        zoom: {
-          pan:  { enabled: true, mode: "x" },
-          zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" }
         }
-      },
-      scales: {
-        y: {
-          grid: { color: "#334155" },
-          ticks: {
-            color: "#94a3b8",
-            callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v)
+      });
+
+      if (performanceChart.getInitialScaleBounds) {
+        chartXOriginal = performanceChart.getInitialScaleBounds().x;
+      } else {
+        chartXOriginal = { min: performanceChart.scales.x.min, max: performanceChart.scales.x.max };
+      }
+
+      const canvas = performanceChart.canvas;
+      canvas.onmousemove = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const area = performanceChart.chartArea;
+        if (px < area.left || px > area.right) return;
+        hoverXRatio = Math.min(1, Math.max(0, (px - area.left) / (area.right - area.left)));
+        hoverXValue = performanceChart.scales.x.getValueForPixel(px);
+      };
+      canvas.onmouseleave = () => { hoverXValue = null; hoverXRatio = 0.5; };
+    }
+
+    function renderKPI() {
+      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elMsg = document.getElementById("kpiMessages"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount");
+      const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
+      
+      if (!weeklyRows.length) {
+        elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elMsg.textContent = "--"; elGrowth.textContent = "--";
+        elVisit.textContent = "來客數：-- / -- 人";
+        elGrowth.className = "text-slate-400"; wrap.className = "mt-2 text-xs flex items-center"; return;
+      }
+
+      const sorted = [...weeklyRows].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
+      const latest = sorted[sorted.length - 1];
+      const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
+
+      const total = Number(latest.linan_amount || 0) + Number(latest.nanke_amount || 0);
+      elTotal.textContent = fmtTwd(total);
+      elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
+      elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
+      elMsg.textContent   = Number(latest.message_count || 0);
+
+      // 計算最新週來客數
+      const counts = getVisitCounts(latest.week_start_date, latest.week_end_date);
+      elVisit.innerHTML = `來客數：<span class="text-sky-300">${counts.linan}</span> / <span class="text-pink-300">${counts.nanke}</span> 人`;
+
+      if (!prev || !(Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0))) {
+        wrap.className = "mt-2 text-xs flex items-center text-slate-400"; elGrowth.className = "text-slate-400"; elGrowth.textContent = "無上週比較資料"; return;
+      }
+
+      const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
+      const growth = ((total - prevTotal) / prevTotal) * 100;
+      const up = growth >= 0;
+      const colorClass = up ? "text-emerald-400" : "text-rose-400";
+      wrap.className = `mt-2 text-xs flex items-center ${colorClass}`;
+      elGrowth.className = colorClass;
+      elGrowth.innerHTML = `${up ? '<i class="fas fa-arrow-up mr-1"></i>' : '<i class="fas fa-arrow-down mr-1"></i>'}${growth.toFixed(1)}% 較上週`;
+    }
+
+    function saveExpandedState() {
+      localStorage.setItem('expandedGroups', JSON.stringify([...expandedGroups]));
+    }
+
+    window.toggleGroup = function(key) {
+      if (expandedGroups.has(key)) expandedGroups.delete(key);
+      else expandedGroups.add(key);
+      saveExpandedState();
+      renderTable();
+    };
+
+    // ===== 資料群組化邏輯 (固定升冪：舊到新) =====
+    function groupData(data) {
+      const groups = {};
+      data.forEach(row => {
+        let y, m, groupKey, isHistorical;
+
+        if (row.period_type === "weekly" && row.week_start_date) {
+          const major = getMajorMonth(row.week_start_date);
+          y = major.year; m = major.month;
+        } else {
+          y = row.year; m = row.month;
+        }
+
+        // 歷史資料判定：2025年6月(含)以前
+        isHistorical = (y < 2025) || (y === 2025 && m <= 6);
+        groupKey = isHistorical ? "historical" : `${y}-${String(m).padStart(2, '0')}`;
+
+        if (!groups[groupKey]) {
+          groups[groupKey] = {
+            key: groupKey, isHistorical, year: y, month: m,
+            title: isHistorical ? "2025年6月以前 (歷史資料)" : `${y}/${m}月`,
+            rows: [], totalLinan: 0, totalNanke: 0, totalMsg: 0
+          };
+        }
+
+        groups[groupKey].rows.push(row);
+        groups[groupKey].totalLinan += Number(row.linan_amount || 0);
+        groups[groupKey].totalNanke += Number(row.nanke_amount || 0);
+        groups[groupKey].totalMsg += Number(row.message_count || 0);
+      });
+
+      // 群組內按時間排序 (舊到新)
+      Object.values(groups).forEach(g => {
+        g.rows.sort((a, b) => {
+          const ta = a.week_start_date ? parseISODateLocal(a.week_start_date).getTime() : new Date(a.year, a.month-1, 1).getTime();
+          const tb = b.week_start_date ? parseISODateLocal(b.week_start_date).getTime() : new Date(b.year, b.month-1, 1).getTime();
+          return ta - tb;
+        });
+      });
+
+      // 群組間排序 (固定升冪：舊到新)
+      let groupArr = Object.values(groups);
+      groupArr.sort((a, b) => {
+        if (a.isHistorical && !b.isHistorical) return -1;
+        if (!a.isHistorical && b.isHistorical) return 1;
+        if (a.isHistorical && b.isHistorical) return 0;
+        const valA = a.year * 100 + a.month;
+        const valB = b.year * 100 + b.month;
+        return valA - valB;
+      });
+
+      return groupArr;
+    }
+
+    // ===== 渲染表格 (PDF 佈局 + 來客數) =====
+    function renderTable() {
+      const grouped = groupData(allData);
+      dom.tbody.innerHTML = "";
+
+      grouped.forEach(group => {
+        const isExpanded = expandedGroups.has(group.key);
+        const rowCount = group.rows.length;
+
+        if (!isExpanded) {
+          // 收折狀態：顯示單列總計
+          const tr = document.createElement("tr");
+          tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer bg-slate-800/30";
+          tr.onclick = () => toggleGroup(group.key);
+          tr.innerHTML = `
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200">
+              <i class="fas fa-plus-square text-blue-400 mr-2"></i>${group.title}
+            </td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-400">共 ${rowCount} ${group.isHistorical ? '個月' : '週'}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200 font-bold">${fmtNum(group.totalLinan)}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200 font-bold">${fmtNum(group.totalNanke)}</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-yellow-300 font-bold">${group.totalMsg}</td>
+            <td class="px-4 py-3 text-center text-slate-500">-</td>
+          `;
+          dom.tbody.appendChild(tr);
+        } else {
+          // 展開狀態
+          if (group.isHistorical) {
+            // 歷史資料：逐月顯示，無 rowspan
+            group.rows.forEach((row, i) => {
+              const tr = document.createElement("tr");
+              tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
+              
+              let monthCell = '';
+              if (i === 0) {
+                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200 cursor-pointer hover:text-blue-300" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
+                  <i class="fas fa-minus-square text-blue-400 mr-2"></i>${row.year}/${row.month}月
+                </td>`;
+              } else {
+                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.year}/${row.month}月</td>`;
+              }
+
+              tr.innerHTML = `
+                ${monthCell}
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 bg-black/40 text-slate-600 text-xs">無週資料</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200">${fmtNum(row.linan_amount)}</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200">${fmtNum(row.nanke_amount)}</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-500">-</td>
+                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.message_count || '-'}</td>
+                <td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>
+              `;
+              
+              if (isAdmin) {
+                tr.classList.add("cursor-pointer");
+                tr.onclick = (e) => { if (!e.target.closest('.fa-minus-square')) openModal(row); };
+              }
+              dom.tbody.appendChild(tr);
+            });
+          } else {
+            // 正常月份：使用 Rowspan 合併總計
+            group.rows.forEach((row, i) => {
+              const tr = document.createElement("tr");
+              tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
+
+              const s = parseISODateLocal(row.week_start_date);
+              const e = addDays(s, 6);
+              const periodStr = `${s.getMonth()+1}/${s.getDate()} - ${e.getMonth()+1}/${e.getDate()}`;
+              
+              // 計算該週來客數
+              const counts = getVisitCounts(row.week_start_date, row.week_end_date);
+
+              let html = '';
+              if (i === 0) {
+                html += `
+                  <td rowspan="${rowCount}" class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-slate-200 align-top pt-4 cursor-pointer hover:text-blue-300 bg-slate-800/10" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
+                    <i class="fas fa-minus-square text-blue-400 mr-2"></i><br>${group.title}
+                  </td>
+                `;
+              }
+
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300 text-xs">${periodStr}</td>`;
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200">${fmtNum(row.linan_amount)}</td>`;
+
+              if (i === 0) {
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-sky-200 font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalLinan)}</td>`;
+              }
+
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200">${fmtNum(row.nanke_amount)}</td>`;
+
+              if (i === 0) {
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-pink-200 font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalNanke)}</td>`;
+              }
+
+              // 來客數欄位
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-sky-300">${counts.linan}</span><span class="text-slate-600 mx-1">/</span><span class="text-pink-300">${counts.nanke}</span></td>`;
+              
+              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-slate-300">${row.message_count || '-'}</td>`;
+              html += `<td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>`;
+
+              tr.innerHTML = html;
+
+              if (isAdmin) {
+                tr.classList.add("cursor-pointer");
+                tr.onclick = (e) => {
+                  if (!e.target.closest('td[rowspan]')) openModal(row);
+                };
+              }
+              dom.tbody.appendChild(tr);
+            });
           }
-        },
-        // y1 軸不顯示也不影響線條渲染（只是不顯示刻度）
-        y1: { display: false, position: "right", grid: { drawOnChartArea: false } },
-        x:  { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } }
+        }
+      });
+    }
+
+    function openModal(row) {
+      if (!isAdmin) return;
+      dom.entryModal.classList.remove("hidden");
+      dom.performanceForm.reset();
+
+      if (row) {
+        dom.editId.value = row.id;
+        dom.inputDate.value = row.week_start_date || "";
+        dom.inputLinan.value = row.linan_amount ?? 0;
+        dom.inputNanke.value = row.nanke_amount ?? 0;
+        dom.inputMsg.value = row.message_count ?? 0;
+        dom.inputNote.value = row.note ?? "";
+        dom.btnDeleteEntry.classList.remove("hidden");
+        if (row.week_start_date) showWeekRangeText(row.week_start_date);
+      } else {
+        dom.editId.value = "";
+        const today = new Date().toISOString().slice(0, 10);
+        dom.inputDate.value = today;
+        dom.btnDeleteEntry.classList.add("hidden");
+        showWeekRangeText(today);
       }
     }
-  });
 
-  if (performanceChart.getInitialScaleBounds) {
-    chartXOriginal = performanceChart.getInitialScaleBounds().x;
-  } else {
-    chartXOriginal = { min: performanceChart.scales.x.min, max: performanceChart.scales.x.max };
-  }
+    function closeModal() { dom.entryModal.classList.add("hidden"); }
 
-  const canvas = performanceChart.canvas;
-  canvas.onmousemove = null;
-  canvas.onmouseleave = null;
+    async function handleDelete() {
+      const id = dom.editId.value;
+      if (!id) return;
 
-  canvas.onmousemove = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const area = performanceChart.chartArea;
-    const xScale = performanceChart.scales.x;
+      const result = await Swal.fire({
+        title: '確定要刪除嗎？',
+        text: "刪除後將無法復原！",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#334155',
+        confirmButtonText: '是的，刪除',
+        cancelButtonText: '取消',
+        background: '#1e293b',
+        color: '#fff'
+      });
 
-    if (px < area.left || px > area.right) return;
-
-    hoverXRatio = (px - area.left) / (area.right - area.left);
-    hoverXRatio = Math.min(1, Math.max(0, hoverXRatio));
-    hoverXValue = xScale.getValueForPixel(px);
-  };
-
-  canvas.onmouseleave = () => {
-    hoverXValue = null;
-    hoverXRatio = 0.5;
-  };
-}
-
-function renderKPI() {
-  const elTotal  = document.getElementById("kpiTotal");
-  const elLinan  = document.getElementById("kpiLinan");
-  const elNanke  = document.getElementById("kpiNanke");
-  const elMsg    = document.getElementById("kpiMessages");
-  const elGrowth = document.getElementById("kpiGrowth");
-  const wrap     = document.getElementById("kpiGrowthWrap");
-
-  if (!allData.length) {
-    elTotal.textContent = "--";
-    elLinan.textContent = "--";
-    elNanke.textContent = "--";
-    elMsg.textContent = "--";
-    elGrowth.textContent = "--";
-    elGrowth.className = "text-slate-400";
-    wrap.className = "mt-2 text-xs flex items-center";
-    return;
-  }
-
-  // 只用週資料計 KPI（避免未來若有其它 period_type 影響）
-  const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
-  if (!weeklyRows.length) {
-    elTotal.textContent = "--";
-    elLinan.textContent = "--";
-    elNanke.textContent = "--";
-    elMsg.textContent = "--";
-    elGrowth.textContent = "--";
-    elGrowth.className = "text-slate-400";
-    wrap.className = "mt-2 text-xs flex items-center";
-    return;
-  }
-
-  const sorted = [...weeklyRows].sort((a, b) =>
-    parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime()
-  );
-
-  const latest = sorted[sorted.length - 1];
-  const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
-
-  const total = Number(latest.linan_amount || 0) + Number(latest.nanke_amount || 0);
-  elTotal.textContent = fmtTwd(total);
-  elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
-  elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
-  elMsg.textContent   = Number(latest.message_count || 0);
-
-  if (!prev) {
-    wrap.className = "mt-2 text-xs flex items-center text-slate-400";
-    elGrowth.className = "text-slate-400";
-    elGrowth.textContent = "尚無上週可比較";
-    return;
-  }
-
-  const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
-  if (!prevTotal) {
-    wrap.className = "mt-2 text-xs flex items-center text-slate-400";
-    elGrowth.className = "text-slate-400";
-    elGrowth.textContent = "上週為 0（無法計算）";
-    return;
-  }
-
-  const growth = ((total - prevTotal) / prevTotal) * 100;
-  const up = growth >= 0;
-  const colorClass = up ? "text-emerald-400" : "text-rose-400";
-  wrap.className = `mt-2 text-xs flex items-center ${colorClass}`;
-  elGrowth.className = colorClass;
-  elGrowth.innerHTML = `${up ? '<i class="fas fa-arrow-up mr-1"></i>' : '<i class="fas fa-arrow-down mr-1"></i>'}${growth.toFixed(1)}% 較上週`;
-}
-
-function timeKey(row) {
-  if (row.period_type === "weekly" && row.week_start_date) return parseISODateLocal(row.week_start_date).getTime();
-  return new Date(row.year || 1970, (row.month || 1) - 1, 1).getTime();
-}
-
-function getSortedRows() {
-  const rows = [...allData];
-  rows.sort((a, b) => {
-    const ta = timeKey(a);
-    const tb = timeKey(b);
-    return tableSortOrder === "asc" ? (ta - tb) : (tb - ta);
-  });
-  return rows;
-}
-
-function totalPages() { return Math.max(1, Math.ceil(allData.length / PAGE_SIZE)); }
-
-function clampPage() {
-  const tp = totalPages();
-  if (currentPage < 1) currentPage = 1;
-  if (currentPage > tp) currentPage = tp;
-}
-
-function setButtonsDisabled(disabled) {
-  dom.btnSortAsc.disabled = disabled;
-  dom.btnSortDesc.disabled = disabled;
-  dom.btnPrevPage.disabled = disabled;
-  dom.btnNextPage.disabled = disabled;
-  dom.btnSortAsc.classList.toggle("opacity-50", disabled);
-  dom.btnSortDesc.classList.toggle("opacity-50", disabled);
-  dom.btnPrevPage.classList.toggle("opacity-50", disabled);
-  dom.btnNextPage.classList.toggle("opacity-50", disabled);
-}
-
-function updateSortButtons() {
-  if (tableSortOrder === "desc") {
-    dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
-    dom.btnSortAsc.className  = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
-  } else {
-    dom.btnSortAsc.className  = "px-2 py-1 rounded bg-slate-700 text-slate-200 border border-slate-600 transition";
-    dom.btnSortDesc.className = "px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
-  }
-}
-
-function updatePageUI() {
-  const tp = totalPages();
-  dom.pageInfo.textContent = `第 ${currentPage} / ${tp} 頁`;
-  dom.btnPrevPage.disabled = (currentPage <= 1) || tableBusy;
-  dom.btnNextPage.disabled = (currentPage >= tp) || tableBusy;
-  dom.btnPrevPage.classList.toggle("opacity-50", dom.btnPrevPage.disabled);
-  dom.btnNextPage.classList.toggle("opacity-50", dom.btnNextPage.disabled);
-}
-
-async function setSort(order) {
-  if (tableSortOrder === order) return;
-  tableSortOrder = order;
-  currentPage = 1;
-  await animateTableSwitch(order === "desc" ? "next" : "prev");
-  updateSortButtons();
-  updatePageUI();
-}
-
-async function changePage(dir) {
-  const next = currentPage + dir;
-  const tp = totalPages();
-  if (next < 1 || next > tp) return;
-  currentPage = next;
-  await animateTableSwitch(dir > 0 ? "next" : "prev");
-  updatePageUI();
-}
-
-async function animateTableSwitch(direction) {
-  tableBusy = true;
-  setButtonsDisabled(true);
-
-  const oldRows = [...dom.tbody.querySelectorAll("tr")];
-  oldRows.forEach((tr, i) => {
-    tr.style.animationDelay = `${i * 18}ms`;
-    tr.classList.add(direction === "next" ? "row-exit-left" : "row-exit-right");
-  });
-
-  const waitOut = Math.min(520, 280 + oldRows.length * 18);
-  await new Promise(r => setTimeout(r, waitOut));
-
-  renderTable(true, direction);
-
-  const waitIn = Math.min(700, 420 + PAGE_SIZE * 28);
-  await new Promise(r => setTimeout(r, waitIn));
-
-  tableBusy = false;
-  setButtonsDisabled(false);
-  updatePageUI();
-}
-
-function renderTable(animate = false, direction = "next") {
-  clampPage();
-  const rows = getSortedRows();
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const pageRows = rows.slice(start, start + PAGE_SIZE);
-
-  dom.tbody.innerHTML = "";
-  pageRows.forEach((row, i) => {
-    const tr = document.createElement("tr");
-    tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer";
-
-    if (animate) {
-      tr.classList.add(direction === "next" ? "row-enter-right" : "row-enter-left");
-      tr.style.animationDelay = `${i * 28}ms`;
-    } else {
-      tr.style.animationDelay = "0ms";
+      if (result.isConfirmed) {
+        const { error } = await supabase.from('sales_performance').delete().eq('id', id);
+        if (error) {
+          Swal.fire({ icon: "error", title: "刪除失敗", text: error.message, background: "#1e293b", color: "#fff" });
+        } else {
+          closeModal();
+          Swal.fire({ icon: "success", title: "已刪除", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
+          await refreshData();
+        }
+      }
     }
 
-    if (isAdmin) tr.addEventListener("click", () => openModal(row));
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      if (!isAdmin) return;
 
-    let periodStr = "";
-    if (row.period_type === "weekly" && row.week_start_date) {
-      const s = parseISODateLocal(row.week_start_date);
-      const e = addDays(s, 6);
-      periodStr = `<span class="px-2 py-1 rounded bg-blue-900/30 text-xs text-blue-200 border border-blue-800">${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}</span>`;
-    } else {
-      periodStr = `<span class="px-2 py-1 rounded bg-slate-700 text-xs text-slate-200 border border-slate-600">${row.year}/${row.month}月</span>`;
+      const dateIso = dom.inputDate.value;
+      if (!dateIso) return;
+
+      const r = getWeekRange(dateIso);
+      const major = getMajorMonth(toISODateLocal(r.start));
+
+      const payload = {
+        period_type: "weekly",
+        year: major.year,
+        month: major.month,
+        week_start_date: toISODateLocal(r.start),
+        week_end_date: toISODateLocal(r.end),
+        linan_amount: Number(dom.inputLinan.value || 0),
+        nanke_amount: Number(dom.inputNanke.value || 0),
+        message_count: Number(dom.inputMsg.value || 0),
+        note: (dom.inputNote.value || "").trim() || null,
+        updated_at: new Date().toISOString()
+      };
+
+      const id = (dom.editId.value || "").trim();
+      let error = null;
+
+      if (id) {
+        const res = await supabase.from("sales_performance").update(payload).eq("id", id);
+        error = res.error;
+      } else {
+        const res = await supabase.from("sales_performance").insert([payload]);
+        error = res.error;
+      }
+
+      if (error) {
+        Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
+        return;
+      }
+
+      closeModal();
+      Swal.fire({ icon: "success", title: "儲存成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
+      await refreshData();
     }
-
-    const note = row.note
-      ? `<span class="px-2 py-0.5 rounded-full bg-yellow-900/25 text-yellow-300 text-xs border border-yellow-800">${row.note}</span>`
-      : `<span class="text-slate-500">-</span>`;
-
-    tr.innerHTML = `
-      <td class="px-6 py-4">${periodStr}</td>
-      <td class="px-6 py-4 font-mono text-sky-200">NT$${Number(row.linan_amount||0).toLocaleString()}</td>
-      <td class="px-6 py-4 font-mono text-pink-200">NT$${Number(row.nanke_amount||0).toLocaleString()}</td>
-      <td class="px-6 py-4 text-slate-300">${Number(row.message_count||0)}</td>
-      <td class="px-6 py-4">${note}</td>
-      <td class="px-6 py-4 text-right">${isAdmin ? '<span class="text-blue-400 hover:text-white"><i class="fas fa-pen"></i></span>' : '<span class="text-slate-600">-</span>'}</td>
-    `;
-    dom.tbody.appendChild(tr);
-  });
-
-  updateSortButtons();
-  updatePageUI();
-}
-
-function openModal(row) {
-  if (!isAdmin) return;
-
-  dom.entryModal.classList.remove("hidden");
-  dom.performanceForm.reset();
-
-  if (row) {
-    dom.editId.value = row.id;
-    dom.inputDate.value = row.week_start_date || "";
-    dom.inputLinan.value = row.linan_amount ?? 0;
-    dom.inputNanke.value = row.nanke_amount ?? 0;
-    dom.inputMsg.value = row.message_count ?? 0;
-    dom.inputNote.value = row.note ?? "";
-    if (row.week_start_date) showWeekRangeText(row.week_start_date);
-  } else {
-    dom.editId.value = "";
-    const today = new Date().toISOString().slice(0, 10);
-    dom.inputDate.value = today;
-    showWeekRangeText(today);
-  }
-}
-
-function closeModal() {
-  dom.entryModal.classList.add("hidden");
-}
-
-async function handleFormSubmit(e) {
-  e.preventDefault();
-  if (!isAdmin) return;
-
-  const dateIso = dom.inputDate.value;
-  if (!dateIso) return;
-
-  // 週一～週日固定
-  const r = getWeekRange(dateIso);
-
-  // 月歸類：以「當週多數月份」決定 year/month 欄位（確保月累計統計一致）
-  // 這裡直接沿用 renderChart 的邏輯（逐日計數）
-  const wkStart = r.start;
-  const counts = new Map();
-  for (let i = 0; i < 7; i++) {
-    const x = addDays(wkStart, i);
-    const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
-    counts.set(key, (counts.get(key) || 0) + 1);
-  }
-  let bestKey = null;
-  let bestDays = -1;
-  for (const [k, days] of counts.entries()) {
-    if (days > bestDays) { bestDays = days; bestKey = k; continue; }
-    if (days === bestDays && bestKey && k > bestKey) bestKey = k;
-  }
-  const [yy, mm] = String(bestKey).split("-");
-  const majorYear = Number(yy);
-  const majorMonth = Number(mm);
-
-  // 重要：欄位名稱改為 snake_case，與你目前 select/order/filter 的欄位一致
-  const payload = {
-    period_type: "weekly",
-    year: majorYear,
-    month: majorMonth,
-    week_start_date: toISODateLocal(r.start),
-    week_end_date: toISODateLocal(r.end),
-    linan_amount: Number(dom.inputLinan.value || 0),
-    nanke_amount: Number(dom.inputNanke.value || 0),
-    message_count: Number(dom.inputMsg.value || 0),
-    note: (dom.inputNote.value || "").trim() || null,
-    updated_at: new Date().toISOString()
-  };
-
-  const id = (dom.editId.value || "").trim();
-  let error = null;
-
-  if (id) {
-    const res = await supabase.from("sales_performance").update(payload).eq("id", id);
-    error = res.error;
-  } else {
-    const res = await supabase.from("sales_performance").insert([payload]);
-    error = res.error;
-  }
-
-  if (error) {
-    Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
-    return;
-  }
-
-  closeModal();
-  Swal.fire({ icon: "success", title: "儲存成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-  await refreshData();
-}
   </script>
 </body>
 </html>
-
