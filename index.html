@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%200%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V8.2</title>
+    href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
+  <title>和光堂戰情室 V9.4.4</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,7 +26,15 @@
   <style>
     :root { --bg:#f3f4f6; --card-bg:rgba(255,255,255,0.85); --accent:#3b82f6; }
     body { background:var(--bg); font-family:system-ui,-apple-system,sans-serif; color:#1e293b; }
-    .glass-card { background:var(--card-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03); }
+    .glass-card { background:var(--card-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+    
+    /* 收折功能 */
+    .section-content { transition: max-height 0.4s ease-out, opacity 0.3s ease; max-height: 2000px; opacity: 1; overflow: hidden; }
+    .section-content.collapsed { max-height: 0; opacity: 0; margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+    .toggle-icon { transition: transform 0.3s ease; cursor: pointer; font-weight: 900; color: #94a3b8; padding: 4px; }
+    .toggle-icon:hover { color: #3b82f6; }
+    .toggle-icon.rotated { transform: rotate(180deg); }
+
     .kpi-card { cursor:pointer; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; border:2px solid transparent; }
     .kpi-card:hover { transform:translateY(-4px); box-shadow:0 10px 15px -3px rgba(59,130,246,0.2); }
     .kpi-card.active { background:linear-gradient(135deg,#eff6ff 0%,#ffffff 100%); border-color:var(--accent); }
@@ -51,6 +59,11 @@
     .radio-btn:active { transform:scale(.96); }
     .radio-btn.selected { background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; border-color:#2563eb; font-weight:600; box-shadow:0 3px 8px rgba(59,130,246,0.4); }
 
+    .seg-group { display:flex; gap:4px; background:#e2e8f0; padding:3px; border-radius:8px; }
+    .seg-btn { padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; transition:all .2s; user-select:none; }
+    .seg-btn.selected { background:white; color:#3b82f6; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+    .seg-label { font-size:11px; font-weight:800; color:#94a3b8; margin-right:4px; text-transform:uppercase; letter-spacing:0.5px; }
+
     .chk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:6px; }
     .chk-btn { padding:8px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:12px; color:#4b5563; cursor:pointer; transition:all .15s; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px; background:white; }
     .chk-btn.checked { background:linear-gradient(135deg,#eff6ff,#dbeafe); color:#1e40af; border-color:#3b82f6; font-weight:700; box-shadow:0 2px 6px rgba(59,130,246,0.25); }
@@ -65,11 +78,14 @@
     .logout-btn { background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.3); padding:6px 14px; border-radius:8px; cursor:pointer; transition:all .2s; color:#dc2626; font-weight:600; font-size:.875rem; }
     .logout-btn:hover { background:rgba(239,68,68,0.2); border-color:#ef4444; transform:translateY(-1px); }
 
-    .filter-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:50px; font-size:12px; font-weight:700; background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; border:1.5px solid #3b82f6; box-shadow:0 2px 4px rgba(59,130,246,0.2); }
-    .filter-badge-close { cursor:pointer; font-size:14px; padding:2px 4px; border-radius:50%; transition:.15s; font-weight:900; line-height:1; }
+    /* V9.4 篩選標籤列 (Sticky) */
+    #stickyFilterBar { transition: all 0.3s ease; overflow: hidden; max-height: 0; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    #stickyFilterBar.show { max-height: 120px; padding: 8px 16px; overflow-y: auto; }
+    .filter-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:50px; font-size:11px; font-weight:700; background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; border:1px solid #3b82f6; box-shadow:0 1px 2px rgba(59,130,246,0.1); margin-bottom: 4px; }
+    .filter-badge-close { cursor:pointer; font-size:12px; padding:1px 3px; border-radius:50%; transition:.15s; font-weight:900; line-height:1; }
     .filter-badge-close:hover { background:rgba(239,68,68,0.3); transform:scale(1.2); }
-    .reset-all-btn { display:inline-flex; align-items:center; gap:4px; padding:6px 14px; border-radius:50px; font-size:13px; font-weight:800; background:linear-gradient(135deg,#fee2e2,#fecaca); color:#dc2626; border:1.5px solid #ef4444; box-shadow:0 2px 4px rgba(239,68,68,0.2); cursor:pointer; transition:all .2s; }
-    .reset-all-btn:hover { background:linear-gradient(135deg,#fecaca,#fca5a5); transform:scale(1.05); box-shadow:0 4px 8px rgba(239,68,68,0.3); }
+    .reset-all-btn { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:50px; font-size:11px; font-weight:800; background:linear-gradient(135deg,#fee2e2,#fecaca); color:#dc2626; border:1px solid #ef4444; box-shadow:0 1px 2px rgba(239,68,68,0.1); cursor:pointer; transition:all .2s; }
+    .reset-all-btn:hover { background:linear-gradient(135deg,#fecaca,#fca5a5); transform:scale(1.05); }
 
     .title-frame { display:inline-flex; align-items:center; padding:6px 12px; border-radius:14px; border:2px solid rgba(59,130,246,0.30); background:rgba(255,255,255,0.55); box-shadow:0 10px 25px rgba(59,130,246,0.10); }
 
@@ -78,6 +94,23 @@
     #frontGateInput { width:100%; padding:12px 14px; border:1.5px solid #e5e7eb; border-radius:12px; background:#fff; font-weight:800; letter-spacing:.5px; outline:none; }
     #frontGateHint { margin-top:10px; font-size:12px; color:#6b7280; line-height:1.5; }
     #frontGateError { display:none; margin-top:10px; font-size:12px; font-weight:800; color:#dc2626; background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:12px; }
+
+    /* iPhone 熱度圖 */
+    .iphone-bar-container { width:100%; height:36px; background:#f1f5f9; border-radius:12px; overflow:hidden; display:flex; margin-bottom:16px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; }
+    .iphone-segment { height:100%; transition:all 0.3s ease; position:relative; }
+    .iphone-segment:not(:last-child) { border-right:2px solid #fff; }
+    .iphone-segment:hover { transform: scaleY(1.1); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .iphone-segment::after {
+      content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.85); color: white; padding: 6px 10px; border-radius: 6px;
+      font-size: 12px; font-weight: bold; white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity 0.2s; margin-bottom: 6px;
+    }
+    .iphone-segment:hover::after { opacity: 1; }
+    .iphone-legend { display:flex; flex-wrap:wrap; gap:12px; }
+    .iphone-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:#475569; cursor: pointer; transition: opacity 0.2s; }
+    .iphone-legend-item:hover { opacity: 0.7; }
+    .iphone-dot { width:10px; height:10px; border-radius:50%; }
   </style>
 </head>
 
@@ -106,6 +139,31 @@
       <div id="importErrors" class="mt-6 text-xs text-red-300 max-h-48 overflow-y-auto w-[90%] max-w-lg bg-slate-900/50 p-4 rounded-lg hidden backdrop-blur"></div>
     </div>
 
+    <!-- 匯出設定 Modal -->
+    <div id="exportModal" class="modal-overlay" onclick="if(event.target===this)closeExportModal()">
+      <div class="modal-content relative max-w-md">
+        <button onclick="closeExportModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+        <h2 class="text-xl font-bold mb-4">📤 匯出設定</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">時間區間</label>
+            <input id="exportDateRange" class="w-full p-2 border rounded-lg bg-gray-50 font-bold text-sm">
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-bold text-gray-500">選擇欄位</label>
+              <div class="space-x-2">
+                <button onclick="toggleExportCols(true)" class="text-xs text-blue-600 font-bold">全選</button>
+                <button onclick="toggleExportCols(false)" class="text-xs text-gray-400 font-bold">全取消</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2" id="exportCols"></div>
+          </div>
+          <button onclick="doExport()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition">確認匯出 CSV</button>
+        </div>
+      </div>
+    </div>
+
     <div class="max-w-7xl mx-auto p-4 space-y-6 pb-8">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -113,7 +171,7 @@
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V8.2.2</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.4.4</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
               <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
                  id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
@@ -137,7 +195,7 @@
 
         <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
           <span class="text-green-400 font-bold">✓ 管理員模式</span>
-          <button onclick="exportCSV()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 匯出資料</button>
+          <button onclick="openExportModal()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 進階匯出</button>
           <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">
             📂 匯入 CSV
             <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)">
@@ -146,30 +204,55 @@
         </div>
       </div>
 
-      <div class="glass-card p-2 flex flex-wrap gap-2 items-center sticky top-2 z-40 shadow-lg border-blue-200/50">
-        <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
-          <span class="text-xl mr-2">📅</span>
-          <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
-          <span class="text-slate-300">/</span>
-          <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
-            <option value="">月份</option>
-            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
-            <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
-            <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-          </select>
-          <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
-          <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置全部</button>
-        </div>
+      <!-- 篩選列 (Sticky) -->
+      <div class="sticky top-2 z-40 space-y-2">
+        <div class="glass-card p-2 flex flex-wrap gap-2 items-center shadow-lg border-blue-200/50">
+          <div class="flex items-center bg-white/50 rounded-lg px-2 border border-slate-100">
+            <span class="text-xl mr-2">📅</span>
+            <select id="selYear" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-1" onchange="quickSelectDate()"></select>
+            <span class="text-slate-300">/</span>
+            <select id="selMonth" class="bg-transparent text-sm font-bold border-0 focus:ring-0 cursor-pointer text-slate-600 p-1 mr-2" onchange="quickSelectDate()">
+              <option value="">月份</option>
+              <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+              <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+              <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+            </select>
+            <input id="dateRange" class="bg-transparent border-0 p-2 w-32 text-xs text-slate-400 focus:ring-0 text-right opacity-50" placeholder="自訂範圍" readonly>
+            <button onclick="resetDate()" class="text-blue-600 hover:text-blue-800 px-2 text-sm font-bold border-l border-slate-200 ml-2">重置</button>
+          </div>
 
-        <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
-          <span class="text-gray-400 mr-2">🔍</span>
-          <input id="qSearch" class="bg-transparent border-0 p-2 w-full focus:ring-0" placeholder="搜尋姓名、手機、備註..." onkeyup="if(event.key==='Enter') applyFilter()">
-          <button onclick="clearSearch()" id="btnX" class="hidden absolute right-3 text-gray-400 hover:text-red-500 font-bold">✕</button>
-        </div>
+          <div class="flex items-center bg-white/50 rounded-lg px-2 py-1 border border-slate-100">
+            <span class="seg-label">身分</span>
+            <div class="seg-group" id="segCust">
+              <div class="seg-btn selected" onclick="setSegFilter('cust', null, this)">全部</div>
+              <div class="seg-btn" onclick="setSegFilter('cust', true, this)">新客</div>
+              <div class="seg-btn" onclick="setSegFilter('cust', false, this)">老客</div>
+            </div>
+          </div>
 
-        <button onclick="applyFilter()" class="btn-primary">查詢</button>
+          <div class="flex items-center bg-white/50 rounded-lg px-2 py-1 border border-slate-100">
+            <span class="seg-label">消費</span>
+            <div class="seg-group" id="segPay">
+              <div class="seg-btn selected" onclick="setSegFilter('pay', null, this)">全部</div>
+              <div class="seg-btn" onclick="setSegFilter('pay', true, this)">有</div>
+              <div class="seg-btn" onclick="setSegFilter('pay', false, this)">無</div>
+            </div>
+          </div>
+
+          <div class="flex-grow flex items-center bg-white/50 rounded-lg px-3 border border-slate-100 relative">
+            <span class="text-gray-400 mr-2">🔍</span>
+            <input id="qSearch" class="bg-transparent border-0 p-2 w-full focus:ring-0" placeholder="搜尋姓名、手機、備註..." onkeyup="if(event.key==='Enter') applyFilter()">
+            <button onclick="clearSearch()" id="btnX" class="hidden absolute right-3 text-gray-400 hover:text-red-500 font-bold">✕</button>
+          </div>
+
+          <button onclick="applyFilter()" class="btn-primary">查詢</button>
+        </div>
+        
+        <!-- V9.4.3 篩選標籤列 (動態顯示) -->
+        <div id="stickyFilterBar" class="glass-card flex flex-wrap gap-2 items-center"></div>
       </div>
 
+      <!-- KPI 卡片 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div onclick="setStore('全部')" id="kpiTotal" class="glass-card kpi-card p-6 flex flex-col items-center justify-center active">
           <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">總客數</div>
@@ -185,68 +268,124 @@
         </div>
       </div>
 
+      <!-- 客源與目的分析 -->
       <div class="glass-card p-6">
-        <div class="flex justify-between items-center mb-4">
-          <div>
+        <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secSource')">
+          <div class="flex items-center gap-3">
             <h3 class="text-xl font-bold text-slate-800">客源與目的分析</h3>
-            <p class="text-xs text-slate-400 mt-1">點擊任何圖表項目可連動其他分析</p>
+            <button onclick="event.stopPropagation(); toggleSplitView()" id="btnSplit" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition">🆚 門店對比</button>
           </div>
+          <div class="toggle-icon" id="icon-secSource">▼</div>
         </div>
 
-        <div id="filterBadgesContainer" class="hidden flex flex-wrap gap-2 mb-4 pb-4 border-b border-slate-100"></div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="space-y-6">
-            <div class="h-[350px] relative">
-              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計</h4>
-              <canvas id="chartSource"></canvas>
+        <div id="secSource" class="section-content">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-6">
+              <div id="chartSourceContainer" class="relative" style="height:350px">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計 (可複選)</h4>
+                <canvas id="chartSource"></canvas>
+              </div>
+              <div class="h-[250px] relative">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
+                <canvas id="chartTrend"></canvas>
+              </div>
             </div>
-            <div class="h-[250px] relative">
-              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
-              <canvas id="chartTrend"></canvas>
+
+            <div class="h-[620px] relative">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
+              <div class="h-full"><canvas id="chartPurpose"></canvas></div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="h-[620px] relative">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
-            <div class="h-full"><canvas id="chartPurpose"></canvas></div>
+      <!-- 融合圖表：消費轉換與客單價 -->
+      <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secConv')">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800">消費轉換與客單價分析</h3>
+            <p class="text-xs text-slate-400 mt-1">柱狀圖：轉換率 (%) | 折線圖：平均客單價 ($)</p>
           </div>
+          <div class="flex items-center gap-3">
+            <div class="seg-group" onclick="event.stopPropagation()">
+              <div class="seg-btn selected" onclick="setConvFilter('all', this)">全部</div>
+              <div class="seg-btn" onclick="setConvFilter('new', this)">只看新客</div>
+              <div class="seg-btn" onclick="setConvFilter('old', this)">只看老客</div>
+            </div>
+            <div class="toggle-icon" id="icon-secConv">▼</div>
+          </div>
+        </div>
+        <div id="secConv" class="section-content">
+          <div class="h-[400px] relative">
+            <canvas id="chartCombo"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 廣告熱度圖 -->
+      <div class="glass-card p-6">
+        <div class="flex items-end justify-between mb-4 cursor-pointer" onclick="toggleSection('secHeat')">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800">廣告熱度 (標籤)</h3>
+            <p class="text-xs text-slate-400 mt-1">點擊色塊可篩選</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-[11px] font-extrabold text-slate-400" id="adHeatMeta">--</div>
+            <div class="toggle-icon" id="icon-secHeat">▼</div>
+          </div>
+        </div>
+        <div id="secHeat" class="section-content">
+          <div id="iphoneHeatBar" class="iphone-bar-container"></div>
+          <div id="iphoneHeatLegend" class="iphone-legend"></div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass-card p-6 flex flex-col">
-          <h3 class="font-bold text-sm text-slate-500 mb-4">性別分佈</h3>
-          <div class="flex-grow relative"><canvas id="chartGender"></canvas></div>
+          <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secGender')">
+            <h3 class="font-bold text-sm text-slate-500">性別分佈</h3>
+            <div class="toggle-icon" id="icon-secGender">▼</div>
+          </div>
+          <div id="secGender" class="section-content flex-grow relative"><canvas id="chartGender"></canvas></div>
         </div>
         <div class="glass-card p-6 flex flex-col md:col-span-2">
-          <h3 class="font-bold text-sm text-slate-500 mb-4">年齡層分佈</h3>
-          <div class="flex-grow relative"><canvas id="chartAge"></canvas></div>
+          <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secAge')">
+            <h3 class="font-bold text-sm text-slate-500">年齡層分佈</h3>
+            <div class="toggle-icon" id="icon-secAge">▼</div>
+          </div>
+          <div id="secAge" class="section-content flex-grow relative"><canvas id="chartAge"></canvas></div>
         </div>
       </div>
 
       <div class="glass-card overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white/50">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white/50 cursor-pointer" onclick="toggleSection('secTable')">
           <h3 class="font-bold text-slate-700">最新顧客資料</h3>
-          <span class="text-xs font-mono text-slate-400" id="listCounter">--</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-slate-400" id="listCounter">--</span>
+            <div class="toggle-icon" id="icon-secTable">▼</div>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm whitespace-nowrap">
-            <thead>
-              <tr>
-                <th class="pl-6">日期</th>
-                <th>分店</th>
-                <th>姓名</th>
-                <th>性別/年齡</th>
-                <th>客源</th>
-                <th>目的</th>
-                <th class="w-10"></th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+        <div id="secTable" class="section-content">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm whitespace-nowrap">
+              <thead>
+                <tr>
+                  <th class="pl-6">日期</th>
+                  <th>分店</th>
+                  <th>姓名</th>
+                  <th>身分</th>
+                  <th>消費</th>
+                  <th>性別/年齡</th>
+                  <th>客源</th>
+                  <th>目的</th>
+                  <th class="w-10"></th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
         </div>
-        <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
       </div>
     </div>
 
@@ -281,6 +420,28 @@
                 <input type="checkbox" id="mTainan" class="w-4 h-4 text-blue-600" checked>
                 <span class="text-sm font-bold text-blue-800">住台南</span>
               </label>
+            </div>
+          </div>
+
+          <div id="adminExtraBox" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="text-xs font-black text-slate-500 mb-3">⚙️ 管理員欄位</div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2">顧客身分</label>
+                <div class="seg-group" id="segEditCust">
+                  <div class="seg-btn" onclick="setEditSeg('cust', null, this)">自動</div>
+                  <div class="seg-btn" onclick="setEditSeg('cust', true, this)">新客</div>
+                  <div class="seg-btn" onclick="setEditSeg('cust', false, this)">老客</div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2">消費金額 (TWD)</label>
+                <input id="mAmount" type="number" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="0">
+              </div>
+            </div>
+            <div class="mt-4">
+              <label class="block text-xs font-bold text-gray-500 mb-2">廣告標籤 (逗號分隔)</label>
+              <input id="mAdTags" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="例如：舜宇廣告, 見證-何先生">
             </div>
           </div>
 
@@ -335,62 +496,39 @@
   </div>
 
   <script>
-  /* =========================================================
-    AI 維護合約（不可逆 -> 可逆 的核心）
-    目標：讓未來任何 AI 都能「看得懂、可驗證、可持續升級」，而不是越改越像壓縮圖。
-
-    A) 不可破壞規則（最重要）
-      1. 圖表只允許在 updateAllCharts() 內建立/更新；其他地方不要碰 Chart 實例。
-      2. 狀態只改 ST；設定只改 CFG；流程只走 applyFilter()。
-      3. 改完要跑：APP.fn.selfTest({runCharts:true}) 先過再交付。
-
-    B) 你以後怎麼叫 AI 改（建議口令）
-      「請只修改 CFG / applyFilter / updateAllCharts / renderTable 相關段落；
-       改完執行 selfTest，回報 PASS/FAIL 與失敗原因。」
-
-    C) 版本策略（可逆）
-      - 這份檔案永遠保持可讀（母本）。
-      - 若要上線壓縮：用外部工具產出 dist 版本（不要回寫覆蓋母本）。
-  ========================================================= */
-
-  /* ===== 設定（只改這裡） ===== */
   const CFG = Object.freeze({
-    VERSION: "8.2.2",
+    VERSION: "9.4.4",
     FRONT_GATE_PASSWORD: "wakodo100",
     FRONT_GATE_KEY: "wakodo_gate_ok",
     PAGE_SIZE: 1000,
-
-    SOURCES: ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","業配貼文 (FB、IG)","老客回購","老客-未購","廣告看板","FB 社團文"],
+    SOURCES: ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","網紅推薦","老客回購","老客-未購","廣告看板","FB 社團文"],
     PURPOSES: ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查"],
     AGES: ["18歲以下","18-24","25-34","35-44","45-54","55歲以上"],
-
-    SOURCE_ORDER: ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","業配貼文 (FB、IG)","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"],
+    SOURCE_ORDER: ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","網紅推薦","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"],
     SOURCE_COLORS: Object.freeze({
       "Google 搜尋":"#f59e0b","Google Map":"#10b981","親友介紹":"#2563eb","Instagram 廣告":"#db2777","Facebook 廣告":"#7c3aed","FB、IG 一般文章":"#d97706",
-      "老客回購":"#0891b2","途經路過":"#ea580c","TikTok & YouTube":"#dc2626","老客-未購":"#9333ea","業配貼文 (FB、IG)":"#0d9488",
+      "老客回購":"#0891b2","途經路過":"#ea580c","TikTok & YouTube":"#dc2626","老客-未購":"#9333ea","網紅推薦":"#0d9488",
       "Dcard":"#e11d48","PTT":"#4f46e5","Mobile 01":"#059669","廣告看板":"#b45309","FB 社團文":"#6d28d9","其他":"#475569"
     }),
     PURPOSE_COLORS: ["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#db2777","#0d9488","#ea580c"],
-    INVALID_NAMES: ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"]
+    INVALID_NAMES: ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"],
+    AD_HEAT_TOP: 14,
+    EXPORT_COLS: [
+      {k:"form_date",n:"日期"},{k:"store_branch",n:"分店"},{k:"customer_name",n:"姓名"},
+      {k:"gender",n:"性別"},{k:"age_range",n:"年齡"},{k:"is_local",n:"住台南"},
+      {k:"source_tags",n:"客源"},{k:"visit_purposes",n:"目的"},{k:"search_keywords",n:"關鍵字"},
+      {k:"detail_desc",n:"備註"},{k:"is_new_customer",n:"新客"},{k:"amount",n:"金額"},
+      {k:"has_purchased",n:"有消費"},{k:"ad_source_detail",n:"廣告標籤"}
+    ]
   });
 
-  /* ===== 狀態（只改 ST） ===== */
   const ST = {
-    raw: [],
-    filtered: [],
-    limit: 20,
-    store: "全部",
-    filter: { source:null, purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false },
-    datePicker: null,
-    isAdmin: false,
-    editingId: null,
-    currentDetailId: null
+    raw: [], filtered: [], limit: 20, store: "全部",
+    filter: { source:[], purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false, cust:null, pay:null, adTag:null },
+    datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, editSeg: { cust: null }, splitView: false, convMode: 'all'
   };
 
-  /* ===== 私有區（不要從外部直接碰） ===== */
-  const CH = {}; // charts（刻意不放在 ST，降低被旁路改壞的機率）
-
-  /* ===== 小工具 ===== */
+  const CH = {};
   const $ = (id) => document.getElementById(id);
   const qa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const s = (v) => v == null ? "" : String(v);
@@ -399,38 +537,30 @@
 
   function makeBarGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
   function makeRadialGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
+  function fmtTwd(n){ const x = Number(n); return Number.isFinite(x) ? x.toLocaleString("zh-TW") : "--"; }
 
-  /* ===== Gate ===== */
+  /* Gate */
   function gateIsOk(){ return sessionStorage.getItem(CFG.FRONT_GATE_KEY) === "1"; }
   function showGate(){
     const gate=$("frontGate"), app=$("appRoot"), inp=$("frontGateInput"), btn=$("frontGateBtn"), err=$("frontGateError");
-    if(app) app.style.display="none";
-    if(gate) gate.style.display="flex";
-
+    if(app) app.style.display="none"; if(gate) gate.style.display="flex";
     const tryUnlock=()=>{
       const ok = s(inp && inp.value) === CFG.FRONT_GATE_PASSWORD;
       if(!ok){ if(err) err.style.display="block"; if(inp){ inp.value=""; inp.focus(); } return; }
-      if(err) err.style.display="none";
-      sessionStorage.setItem(CFG.FRONT_GATE_KEY,"1");
-      if(gate) gate.style.display="none";
-      if(app) app.style.display="block";
-      initMain();
+      if(err) err.style.display="none"; sessionStorage.setItem(CFG.FRONT_GATE_KEY,"1");
+      if(gate) gate.style.display="none"; if(app) app.style.display="block"; initMain();
     };
-
     if(btn) btn.onclick=tryUnlock;
     if(inp){ inp.onkeydown=(e)=>{ if(e.key==="Enter") tryUnlock(); }; setTimeout(()=>inp.focus(),0); }
   }
 
-  /* ===== Admin ===== */
+  /* Admin */
   function enableAdminUI(){
     ST.isAdmin=true;
-    $("adminPanel")?.classList.remove("hidden");
-    $("loginForm")?.classList.add("hidden");
-    $("adminActions")?.classList.remove("hidden");
-    $("logoutBtn")?.classList.remove("hidden");
+    $("adminPanel")?.classList.remove("hidden"); $("loginForm")?.classList.add("hidden");
+    $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden"); $("adminExtraBox")?.classList.remove("hidden");
   }
 
-  /* ===== 遮蔽姓名 ===== */
   function maskName(name){
     name = s(name).trim();
     if(!name) return "未留資料";
@@ -442,42 +572,104 @@
     return name;
   }
 
-  /* ===== 鎖定/清除篩選 ===== */
+  /* Filter Logic */
+  window.setSegFilter = (type, val, el) => {
+    if (type === "cust") ST.filter.cust = val;
+    if (type === "pay") ST.filter.pay = val;
+    const parent = el && el.parentElement;
+    if (parent) qa(".seg-btn", parent).forEach(b => b.classList.remove("selected"));
+    if (el) el.classList.add("selected");
+    applyFilter();
+  };
+
+  window.setEditSeg = (type, val, el) => {
+    if (type === "cust") ST.editSeg.cust = val;
+    const parent = el && el.parentElement;
+    if (parent) qa(".seg-btn", parent).forEach(b => b.classList.remove("selected"));
+    if (el) el.classList.add("selected");
+  };
+
+  function resetEditSegUI(){
+    ST.editSeg.cust = null;
+    const grp = $("segEditCust");
+    if (grp) {
+      qa(".seg-btn", grp).forEach(b => b.classList.remove("selected"));
+      const first = qa(".seg-btn", grp)[0];
+      if (first) first.classList.add("selected");
+    }
+  }
+
   function toggleLock(type, value){
     const lk = type + "Locked";
     if(ST.filter[type] === value){ ST.filter[type]=null; ST.filter[lk]=false; }
     else { ST.filter[type]=value; ST.filter[lk]=true; }
-    updateAllCharts();
+    applyFilter();
   }
   window.toggleLock = toggleLock;
 
-  window.clearFilter = (type)=>{
+  // V9.4.1 客源複選邏輯
+  window.toggleSource = (val) => {
+    const idx = ST.filter.source.indexOf(val);
+    if (idx > -1) ST.filter.source.splice(idx, 1);
+    else ST.filter.source.push(val);
+    applyFilter();
+  };
+
+  window.clearFilter = (type, val)=>{
     if(type==="all"){
-      Object.assign(ST.filter,{source:null,purpose:null,gender:null,age:null,sourceLocked:false,purposeLocked:false,genderLocked:false,ageLocked:false});
-      updateAllCharts();
+      Object.assign(ST.filter,{source:[],purpose:null,gender:null,age:null,sourceLocked:false,purposeLocked:false,genderLocked:false,ageLocked:false,cust:null,pay:null,adTag:null});
+      qa(".seg-group").forEach(g => {
+        qa(".seg-btn", g).forEach(b => b.classList.remove("selected"));
+        qa(".seg-btn", g)[0].classList.add("selected");
+      });
+      applyFilter();
       return;
     }
-    ST.filter[type]=null;
-    if(type==="source") ST.filter.sourceLocked=false;
+    
+    // V9.4.2 修正：支援單一客源移除
+    if(type==="source") {
+      if(val) {
+        const idx = ST.filter.source.indexOf(val);
+        if(idx > -1) ST.filter.source.splice(idx, 1);
+      } else {
+        ST.filter.source = [];
+      }
+    } else {
+      ST.filter[type]=null;
+    }
+    
+    if(type==="source" && ST.filter.source.length === 0) ST.filter.sourceLocked=false;
     if(type==="purpose") ST.filter.purposeLocked=false;
     if(type==="gender") ST.filter.genderLocked=false;
     if(type==="age") ST.filter.ageLocked=false;
-    updateAllCharts();
+    applyFilter();
   };
 
   function updateFilterBadges(){
-    const c=$("filterBadgesContainer"); if(!c) return;
+    const c=$("stickyFilterBar"); if(!c) return;
     const b=[];
-    const mk=(k)=>`<div class="filter-badge"><span>${ST.filter[k]}</span><span class="filter-badge-close" onclick="clearFilter('${k}')">✕</span></div>`;
-    if(ST.filter.source) b.push(mk("source"));
-    if(ST.filter.purpose) b.push(mk("purpose"));
-    if(ST.filter.gender) b.push(mk("gender"));
-    if(ST.filter.age) b.push(mk("age"));
-    if(b.length>=2) b.push(`<button onclick="clearFilter('all')" class="reset-all-btn" title="清除全部篩選">↻ 重置全部</button>`);
-    if(b.length){ c.innerHTML=b.join(""); c.classList.remove("hidden"); } else c.classList.add("hidden");
+    // V9.4.2 修正：客源標籤拆分
+    const mk=(k,v,val)=>`<div class="filter-badge"><span>${v}</span><span class="filter-badge-close" onclick="clearFilter('${k}'${val ? `,'${val}'` : ''})">✕</span></div>`;
+    
+    if(ST.filter.cust !== null) b.push(mk("cust", ST.filter.cust ? "新客" : "老客"));
+    if(ST.filter.pay !== null) b.push(mk("pay", ST.filter.pay ? "有消費" : "無消費"));
+    
+    ST.filter.source.forEach(s => {
+      b.push(mk("source", s, s));
+    });
+
+    if(ST.filter.purpose) b.push(mk("purpose", ST.filter.purpose));
+    if(ST.filter.gender) b.push(mk("gender", ST.filter.gender));
+    if(ST.filter.age) b.push(mk("age", ST.filter.age));
+    if(ST.filter.adTag) b.push(mk("adTag", "標籤: " + ST.filter.adTag));
+    
+    if(b.length>=2) b.push(`<button onclick="clearFilter('all')" class="reset-all-btn">↻ 重置全部</button>`);
+    
+    c.innerHTML=b.join("");
+    c.classList.toggle("show", b.length > 0);
   }
 
-  /* ===== 圖表：建立一次 + 更新動畫 ===== */
+  /* Charts */
   function ensureChart(key, canvasId, cfg){
     if(CH[key]) return CH[key];
     const el=$(canvasId); if(!el) return null;
@@ -485,75 +677,62 @@
     return CH[key];
   }
 
-  function buildSubset(){
-    const f=ST.filter;
-    return ST.filtered.filter(v=>{
-      if(f.source && !arr(v.source_tags).includes(f.source)) return false;
-      if(f.gender && s(v.gender)!==f.gender) return false;
-      if(f.age && s(v.age_range)!==f.age) return false;
-      if(f.purpose && !arr(v.visit_purposes).includes(f.purpose)) return false;
-      return true;
-    });
-  }
+  window.toggleSplitView = () => {
+    ST.splitView = !ST.splitView;
+    $("btnSplit").classList.toggle("bg-blue-100", ST.splitView);
+    $("btnSplit").classList.toggle("text-blue-700", ST.splitView);
+    $("btnSplit").classList.toggle("border-blue-300", ST.splitView);
+    updateAllCharts();
+  };
+
+  window.toggleSection = (id) => {
+    const el = $(id); const icon = $("icon-" + id);
+    if(el) el.classList.toggle("collapsed");
+    if(icon) icon.classList.toggle("rotated");
+  };
 
   function updSource(sub){
-    const map={};
-    sub.forEach(v=>arr(v.source_tags).forEach(t=>{ if(!t) return; map[t]=(map[t]||0)+1; }));
-    const labels = CFG.SOURCE_ORDER.filter(x => map[x] > 0);
-    const data = labels.map(x => map[x]);
-    const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
+    const labels = CFG.SOURCE_ORDER.filter(x => !x.includes("老客") && sub.some(v => arr(v.source_tags).includes(x)));
+    const container = $("chartSourceContainer");
+    const baseH = 350;
+    const dynH = Math.max(baseH, labels.length * (ST.splitView ? 50 : 30));
+    container.style.height = dynH + "px";
+
+    let datasets = [];
+    if (ST.splitView) {
+      const d1 = labels.map(k => sub.filter(v => v.store_branch==="臨安店" && arr(v.source_tags).includes(k)).length);
+      const d2 = labels.map(k => sub.filter(v => v.store_branch==="南科店" && arr(v.source_tags).includes(k)).length);
+      datasets = [
+        { label: "臨安店", data: d1, backgroundColor: "#3b82f6", borderRadius: 4, barPercentage: 0.7 },
+        { label: "南科店", data: d2, backgroundColor: "#10b981", borderRadius: 4, barPercentage: 0.7 }
+      ];
+    } else {
+      const d = labels.map(k => sub.filter(v => arr(v.source_tags).includes(k)).length);
+      const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
+      datasets = [{
+        data: d, baseColors: colors,
+        backgroundColor: c=>makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex]||"#94a3b8"),
+        borderRadius: 6,
+        borderWidth: (c) => ST.filter.source.includes(labels[c.dataIndex]) ? 3 : 0,
+        borderColor: "#1e40af"
+      }];
+    }
 
     const ch = ensureChart("source", "chartSource", {
       type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          data,
-          baseColors: colors,
-          backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
-          borderRadius: 6,
-          hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8")
-        }]
-      },
+      data: { labels, datasets },
       options: {
-        indexAxis: "y",
-        maintainAspectRatio: false,
-        animation: { duration: 800, easing: "easeOutQuart" },
+        indexAxis: "y", maintainAspectRatio: false, animation: { duration: 800 },
         plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: "end",
-            align: "right",
-            offset: 4,
-            formatter: (v, ctx) => {
-              const tot = (ctx.dataset.data || []).reduce((a, b) => a + b, 0);
-              return tot ? (Math.round(v / tot * 100) + "%") : "0%";
-            },
-            font: { size: 11, weight: "bold" },
-            color: "#475569",
-            backgroundColor: "rgba(255,255,255,0.9)",
-            borderRadius: 4,
-            padding: { top: 2, bottom: 2, left: 4, right: 4 }
-          },
-          tooltip: { backgroundColor: "rgba(0,0,0,0.85)", padding: 12, cornerRadius: 8 }
+          legend: { display: ST.splitView },
+          datalabels: { anchor: "end", align: "right", offset: 4, formatter: (v) => v > 0 ? v : "", font: { size: 11, weight: "bold" }, color: "#475569" }
         },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: { grid: { display: false }, ticks: { font: { size: 11, weight: "600" } } }
-        },
-        onClick: (e, els) => {
-          if (!els || !els.length) return;
-          const label = ch.data.labels[els[0].index];
-          toggleLock("source", label);
-        }
+        scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" }, autoSkip: false } } },
+        onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
       }
     });
 
-    if (!ch) return;
-    ch.data.labels = labels;
-    ch.data.datasets[0].data = data;
-    ch.data.datasets[0].baseColors = colors;
-    upd(ch, "active");
+    if(ch){ ch.data.labels = labels; ch.data.datasets = datasets; ch.options.plugins.legend.display = ST.splitView; upd(ch); }
   }
 
   function updPurpose(sub) {
@@ -567,72 +746,16 @@
 
     const ch = ensureChart("purpose", "chartPurpose", {
       type: "doughnut",
-      data: {
-        labels,
-        datasets: [{
-          data,
-          baseColors: colors,
-          backgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
-          hoverBackgroundColor: (c) => makeRadialGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
-          borderWidth: 0,
-          hoverOffset: 15
-        }]
-      },
+      data: { labels, datasets: [{ data, baseColors: colors, backgroundColor: c=>makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex]||"#94a3b8"), borderWidth:0, hoverOffset:15 }] },
       options: {
-        maintainAspectRatio: false,
-        cutout: "60%",
-        layout: { padding: 20 },
-        animation: { animateRotate: true, animateScale: true, duration: 800 },
-        events: ["mousemove", "mouseout", "touchstart", "touchmove"], /* 保留 hover tooltip；不綁 click */
+        maintainAspectRatio: false, cutout: "60%", layout: { padding: 20 }, animation: { animateRotate: true },
         plugins: {
-          legend: {
-            display: true,
-            position: "right",
-            labels: {
-              boxWidth: 14,
-              boxHeight: 14,
-              usePointStyle: true,
-              pointStyle: "circle",
-              padding: 14,
-              font: { size: 12, weight: "700" },
-              color: "#1e293b",
-              generateLabels: (chart) => {
-                const ds = chart.data.datasets[0] || {};
-                const tot = Number(chart.$purposeTotalAll || 0);
-                return (chart.data.labels || []).map((label, i) => {
-                  const val = Number((ds.data || [])[i] || 0);
-                  const pct = tot ? Math.round(val / tot * 100) : 0;
-                  return { text: `${label} ${pct}%`, fillStyle: (ds.baseColors || [])[i] || "#94a3b8", hidden: false, index: i, pointStyle: "circle" };
-                });
-              }
-            }
-          },
-          datalabels: { display: false },
-          tooltip: {
-            backgroundColor: "rgba(0,0,0,0.85)",
-            padding: 14,
-            cornerRadius: 8,
-            titleFont: { size: 14, weight: "bold" },
-            bodyFont: { size: 13 },
-            callbacks: {
-              label: (ctx) => {
-                const tot = Number(ctx.chart.$purposeTotalAll || 0);
-                const val = Number(ctx.raw || 0);
-                const pct = tot ? Math.round(val / tot * 100) : 0;
-                return ` ${ctx.label}: ${val} 人 (${pct}%)`;
-              }
-            }
-          }
+          legend: { position: "right", labels: { usePointStyle: true, pointStyle: "circle", font: { size: 12, weight: "700" }, generateLabels: (chart) => { const ds = chart.data.datasets[0] || {}; const tot = Number(chart.$purposeTotalAll || 0); return (chart.data.labels || []).map((label, i) => { const val = Number((ds.data || [])[i] || 0); const pct = tot ? Math.round(val / tot * 100) : 0; return { text: `${label} ${pct}%`, fillStyle: (ds.baseColors || [])[i] || "#94a3b8", hidden: false, index: i }; }); } } },
+          datalabels: { display: false }
         }
       }
     });
-
-    if (!ch) return;
-    ch.data.labels = labels;
-    ch.data.datasets[0].data = data;
-    ch.data.datasets[0].baseColors = colors;
-    ch.$purposeTotalAll = total;
-    upd(ch, "active");
+    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; ch.data.datasets[0].baseColors=colors; ch.$purposeTotalAll=total; upd(ch); }
   }
 
   function updTrend(sub) {
@@ -641,107 +764,27 @@
     const labels = Object.keys(map).sort();
     const data = labels.map(k => map[k]);
     const maxV = Math.max(...data, 1);
-    const suggestedMax = Math.ceil(maxV * 1.2);
 
     const ch = ensureChart("trend", "chartTrend", {
       type: "line",
-      data: {
-        labels,
-        datasets: [{
-          data,
-          borderColor: "#f59e0b",
-          borderWidth: 2.5,
-          pointBackgroundColor: "#fff",
-          pointBorderColor: "#f59e0b",
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          tension: 0.4,
-          fill: true,
-          backgroundColor: (ctx) => {
-            const chart = ctx.chart;
-            const g = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
-            g.addColorStop(0, "rgba(245,158,11,0.18)");
-            g.addColorStop(1, "rgba(245,158,11,0.04)");
-            return g;
-          }
-        }]
-      },
+      data: { labels, datasets: [{ data, borderColor: "#f59e0b", borderWidth: 2.5, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", tension: 0.4, fill: true, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, "rgba(245,158,11,0.18)"); g.addColorStop(1, "rgba(245,158,11,0.04)"); return g; } }] },
       options: {
-        maintainAspectRatio: false,
-        animation: { duration: 800, easing: "easeInOutQuart" },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: {
-            beginAtZero: true,
-            suggestedMax,
-            grid: { borderDash: [5, 5], color: "#f1f5f9" },
-            ticks: { font: { size: 10 } }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            align: "top",
-            anchor: "end",
-            offset: 4,
-            font: { size: 10, weight: "bold" },
-            color: "#f59e0b",
-            backgroundColor: "rgba(255,255,255,0.9)",
-            borderRadius: 4,
-            padding: { top: 2, bottom: 2, left: 3, right: 3 },
-            formatter: (v) => v
-          },
-          tooltip: {
-            backgroundColor: "rgba(0,0,0,0.8)",
-            padding: 10,
-            cornerRadius: 6,
-            callbacks: { label: (ctx) => ` 客數: ${ctx.raw} 人` }
-          }
-        }
+        maintainAspectRatio: false, scales: { x: { display: false }, y: { beginAtZero: true, suggestedMax: Math.ceil(maxV * 1.2), grid: { borderDash: [5, 5] } } },
+        plugins: { legend: { display: false }, datalabels: { align: "top", anchor: "end", offset: 4, font: { size: 10, weight: "bold" }, color: "#f59e0b", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 4, formatter: v=>v } }
       }
     });
-
-    if (!ch) return;
-    ch.data.labels = labels;
-    ch.data.datasets[0].data = data;
-    ch.options.scales.y.suggestedMax = suggestedMax;
-    upd(ch, "active");
+    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; ch.options.scales.y.suggestedMax=Math.ceil(maxV * 1.2); upd(ch); }
   }
 
   function updGender(sub) {
     const g = { 男: 0, 女: 0 };
     sub.forEach(v => { const x = s(v.gender); if (x === "男" || x === "女") g[x]++; });
-
     const ch = ensureChart("gender", "chartGender", {
       type: "doughnut",
-      data: {
-        labels: ["男", "女"],
-        datasets: [{
-          data: [g.男, g.女],
-          backgroundColor: ["#2563eb", "#db2777"],
-          hoverBackgroundColor: ["#2563eb", "#db2777"],
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        cutout: "60%",
-        animation: { animateRotate: true, duration: 600 },
-        plugins: {
-          legend: { position: "right", labels: { font: { size: 13, weight: "600" }, padding: 12 } },
-          tooltip: { backgroundColor: "rgba(0,0,0,0.8)", padding: 10, cornerRadius: 6 },
-          datalabels: { display: false }
-        },
-        onClick: (e, els) => {
-          if (!els || !els.length) return;
-          toggleLock("gender", els[0].index === 0 ? "男" : "女");
-        }
-      }
+      data: { labels: ["男", "女"], datasets: [{ data: [g.男, g.女], backgroundColor: ["#2563eb", "#db2777"], hoverOffset: 10 }] },
+      options: { maintainAspectRatio: false, cutout: "60%", plugins: { legend: { position: "right" }, datalabels: { display: false } }, onClick: (e, els) => { if(els.length) toggleLock("gender", els[0].index === 0 ? "男" : "女"); } }
     });
-
-    if (!ch) return;
-    ch.data.datasets[0].data = [g.男, g.女];
-    upd(ch, "active");
+    if(ch){ ch.data.datasets[0].data=[g.男, g.女]; upd(ch); }
   }
 
   function updAge(sub) {
@@ -749,64 +792,194 @@
     sub.forEach(v => { const a = s(v.age_range); if (a && a !== "未填") map[a] = (map[a] || 0) + 1; });
     const labels = CFG.AGES.filter(a => map[a] > 0);
     const data = labels.map(a => map[a]);
-
     const ch = ensureChart("age", "chartAge", {
+      type: "bar",
+      data: { labels, datasets: [{ data, backgroundColor: "#94a3b8", borderRadius: 6 }] },
+      options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false } } }, onClick: (e, els) => { if(els.length) toggleLock("age", ch.data.labels[els[0].index]); } }
+    });
+    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; upd(ch); }
+  }
+
+  /* V9.3 iPhone 風格熱度圖 */
+  const AD_PALETTE = ["#3b82f6","#22c55e","#f59e0b","#a855f7","#ef4444","#06b6d4","#f97316","#10b981","#6366f1","#e11d48","#14b8a6","#d97706","#0ea5e9","#84cc16"];
+  function hashStr(str){ str=s(str); let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return h; }
+  function colorForTag(name){ return AD_PALETTE[hashStr(name)%AD_PALETTE.length]; }
+  
+  function updAdHeat(sub){
+    const adMap = {}; let total = 0;
+    sub.forEach(v => {
+      const raw = s(v.ad_source_detail || "");
+      if(!raw.trim()) return;
+      const tags = raw.split(/[,，\n\r]+/).map(x => x.trim()).filter(Boolean);
+      tags.forEach(t => { adMap[t] = (adMap[t] || 0) + 1; total++; });
+    });
+
+    const entries = Object.entries(adMap).sort((a,b) => b[1] - a[1]).slice(0, CFG.AD_HEAT_TOP);
+    $("adHeatMeta").innerText = entries.length ? `標籤：${entries.length} | 總數：${total}` : "目前沒有標籤資料";
+
+    const barContainer = $("iphoneHeatBar");
+    const legendContainer = $("iphoneHeatLegend");
+    if (!barContainer || !legendContainer) return;
+
+    if (!entries.length) {
+      barContainer.innerHTML = `<div class="iphone-segment" style="width:100%; background:#e2e8f0;"></div>`;
+      legendContainer.innerHTML = `<div class="iphone-legend-item"><span class="iphone-dot" style="background:#e2e8f0"></span>無數據</div>`;
+      return;
+    }
+
+    barContainer.innerHTML = entries.map(([name, cnt]) => {
+      const pct = (cnt / total) * 100;
+      const col = colorForTag(name);
+      return `<div class="iphone-segment" style="width:${pct}%; background:${col};" data-tooltip="${name}: ${cnt} (${Math.round(pct)}%)" onclick="toggleLock('adTag', '${name}')"></div>`;
+    }).join("");
+
+    legendContainer.innerHTML = entries.map(([name, cnt]) => {
+      const col = colorForTag(name);
+      return `<div class="iphone-legend-item" onclick="toggleLock('adTag', '${name}')"><span class="iphone-dot" style="background:${col}"></span>${name} (${cnt})</div>`;
+    }).join("");
+  }
+
+  /* V9.4 融合圖表：消費轉換與客單價 */
+  window.setConvFilter = (mode, el) => {
+    ST.convMode = mode;
+    const parent = el.parentElement;
+    qa(".seg-btn", parent).forEach(b => b.classList.remove("selected"));
+    el.classList.add("selected");
+    updateAllCharts();
+  };
+
+  function updCombo(sub) {
+    // V9.4.4: 移除 metadata 限制，直接使用 has_purchased 和 is_new_customer
+    // 這樣可以確保補填的舊資料也能被納入統計
+    const v9Data = sub; 
+    
+    let targetData = v9Data;
+    if (ST.convMode === 'new') targetData = v9Data.filter(v => v.is_new_customer === true);
+    if (ST.convMode === 'old') targetData = v9Data.filter(v => v.is_new_customer === false);
+
+    const map = {};
+    if (ST.convMode === 'all') {
+      map["新客"] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
+      map["老客"] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
+      v9Data.forEach(v => {
+        // 確保 is_new_customer 不為 null
+        if (v.is_new_customer === null) return;
+        const k = v.is_new_customer ? "新客" : "老客";
+        map[k].total++;
+        if (v.has_purchased) { 
+          map[k].paid++; 
+          if (Number(v.amount) > 0) {
+            map[k].amount += Number(v.amount);
+            map[k].paidWithAmount++;
+          }
+        }
+      });
+    }
+
+    targetData.forEach(v => {
+      arr(v.source_tags).forEach(s => {
+        if (s.includes("老客")) return;
+        if (!map[s]) map[s] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
+        map[s].total++;
+        if (v.has_purchased) { 
+          map[s].paid++; 
+          if (Number(v.amount) > 0) {
+            map[s].amount += Number(v.amount);
+            map[s].paidWithAmount++;
+          }
+        }
+      });
+    });
+
+    const labels = Object.keys(map).sort((a, b) => {
+      if (a === "新客" || a === "老客") return -1;
+      if (b === "新客" || b === "老客") return 1;
+      return (map[b].paid / map[b].total) - (map[a].paid / map[a].total);
+    });
+
+    const rates = labels.map(k => Math.round((map[k].paid / map[k].total) * 100) || 0);
+    // V9.4.4: 客單價分母只計算有金額的筆數，避免被 0 元資料拉低
+    const aovs = labels.map(k => map[k].paidWithAmount ? Math.round(map[k].amount / map[k].paidWithAmount) : 0);
+
+    const ch = ensureChart("combo", "chartCombo", {
       type: "bar",
       data: {
         labels,
-        datasets: [{
-          label: "人數",
-          data,
-          baseColors: labels.map(() => "#94a3b8"),
-          backgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8"),
-          borderRadius: 6,
-          hoverBackgroundColor: (c) => makeBarGradient(c, (c.dataset.baseColors || [])[c.dataIndex] || "#94a3b8")
-        }]
+        datasets: [
+          { type: "bar", label: "轉換率 (%)", data: rates, backgroundColor: (c) => {
+            const ctx = c.chart.ctx;
+            const g = ctx.createLinearGradient(0, 0, 0, 400);
+            g.addColorStop(0, "rgba(59,130,246,0.8)");
+            g.addColorStop(1, "rgba(59,130,246,0.2)");
+            return g;
+          }, borderRadius: 4, yAxisID: "y", order: 2 },
+          { type: "line", label: "客單價 ($)", data: aovs, borderColor: "#f59e0b", borderWidth: 3, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", pointRadius: 6, pointHoverRadius: 8, yAxisID: "y1", order: 1 }
+        ]
       },
       options: {
         maintainAspectRatio: false,
-        indexAxis: "y",
-        animation: { duration: 600, easing: "easeOutQuart" },
-        plugins: {
-          legend: { display: false },
-          tooltip: { backgroundColor: "rgba(0,0,0,0.8)", padding: 10, cornerRadius: 6 },
-          datalabels: { display: false }
-        },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: { grid: { display: false }, ticks: { font: { size: 11, weight: "600" } } }
+          y: { type: "linear", position: "left", title: { display: true, text: "轉換率 (%)" }, max: 100, grid: { color: "#f1f5f9" } },
+          y1: { type: "linear", position: "right", title: { display: true, text: "客單價 ($)" }, grid: { drawOnChartArea: false } }
         },
-        onClick: (e, els) => {
-          if (!els || !els.length) return;
-          const label = ch.data.labels[els[0].index];
-          toggleLock("age", label);
+        plugins: {
+          tooltip: {
+            backgroundColor: "rgba(0,0,0,0.85)", padding: 12, cornerRadius: 8,
+            callbacks: {
+              label: (ctx) => {
+                if (ctx.dataset.type === "line") return `客單價: $${fmtTwd(ctx.raw)}`;
+                return `轉換率: ${ctx.raw}% (有消費: ${map[ctx.label].paid}/${map[ctx.label].total})`;
+              }
+            }
+          },
+          datalabels: {
+            align: (ctx) => ctx.dataset.type === 'line' ? 'top' : 'center',
+            anchor: (ctx) => ctx.dataset.type === 'line' ? 'end' : 'center',
+            color: (ctx) => ctx.dataset.type === 'line' ? '#f59e0b' : '#fff',
+            font: { weight: 'bold', size: 11 },
+            formatter: (v, ctx) => ctx.dataset.type === 'line' ? (v > 0 ? `$${Math.round(v/1000)}k` : "") : (v > 0 ? `${v}%` : "")
+          }
         }
       }
     });
 
-    if (!ch) return;
-    ch.data.labels = labels;
-    ch.data.datasets[0].data = data;
-    ch.data.datasets[0].baseColors = labels.map(() => "#94a3b8");
-    upd(ch, "active");
+    if (ch) {
+      ch.data.labels = labels;
+      ch.data.datasets[0].data = rates;
+      ch.data.datasets[1].data = aovs;
+      upd(ch);
+    }
   }
 
   function updateAllCharts() {
-    const sub = buildSubset();
-    updSource(sub);
+    let sourcePool = ST.raw.filter(v => {
+      const ds = ST.datePicker.selectedDates;
+      const start = ds[0] ? ST.datePicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
+      const end = ds[1] ? ST.datePicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
+      if (v.form_date < start || v.form_date > end) return false;
+      if (ST.store !== "全部" && v.store_branch !== ST.store) return false;
+      if (ST.filter.cust !== null && v.is_new_customer !== ST.filter.cust) return false;
+      if (ST.filter.pay !== null && v.has_purchased !== ST.filter.pay) return false;
+      if (ST.filter.purpose && !arr(v.visit_purposes).includes(ST.filter.purpose)) return false;
+      if (ST.filter.gender && s(v.gender) !== ST.filter.gender) return false;
+      if (ST.filter.age && s(v.age_range) !== ST.filter.age) return false;
+      if (ST.filter.adTag && !s(v.ad_source_detail).includes(ST.filter.adTag)) return false;
+      return true;
+    });
+
+    updSource(sourcePool);
+    
+    const sub = ST.filtered;
     updPurpose(sub);
     updTrend(sub);
     updGender(sub);
     updAge(sub);
+    updAdHeat(sub);
+    updCombo(sub);
     updateFilterBadges();
   }
-  window.updateAllCharts = updateAllCharts;
 
-  /* 主流程：保留原架構 */
-  function renderCharts(_data) { updateAllCharts(); }
-  window.renderCharts = renderCharts;
-
-  /* ===== Table ===== */
+  /* Table */
   function renderTable() {
     const tbody = $("tableBody"); if (!tbody) return;
     const page = ST.filtered.slice(0, ST.limit);
@@ -814,10 +987,16 @@
     page.forEach(v => {
       const tr = document.createElement("tr");
       const safeDesc = s(v.detail_desc || "無備註").replace(/'/g, "\\'").replace(/\n/g, " ");
+      const cust = v.is_new_customer ? "新客" : "老客";
+      const pay = v.has_purchased ? "有消費" : "無消費";
+      const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)}` : "";
+      
       tr.innerHTML = `
         <td class="pl-6 py-3 font-mono text-slate-500">${s(v.form_date)}</td>
         <td><span class="px-2 py-1 rounded-full text-xs font-bold ${s(v.store_branch) === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${s(v.store_branch)}</span></td>
         <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
+        <td class="text-xs font-bold ${cust === "新客" ? "text-blue-700" : "text-purple-700"}">${cust}</td>
+        <td class="text-xs font-bold ${pay === "有消費" ? "text-emerald-700" : "text-slate-500"}">${pay}${amt}</td>
         <td class="text-xs text-slate-500">${s(v.gender) || "-"} / ${s(v.age_range) || "-"}</td>
         <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.source_tags).join(", ")}</td>
         <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.visit_purposes).join(", ")}</td>
@@ -841,32 +1020,25 @@
     t.style.top = (e.clientY + 15) + "px";
   }
   function hidePreview() { $("hoverPreview").style.display = "none"; }
-  window.showPreview = showPreview;
-  window.hidePreview = hidePreview;
 
-  /* ===== Data ===== */
+  /* Data */
   async function fetchAllData() {
     let all = [], page = 0;
     $("valTotal").innerText = "...";
-
     while (true) {
       const { data, error } = await supabase.from("visits").select("*").range(page * CFG.PAGE_SIZE, (page + 1) * CFG.PAGE_SIZE - 1);
-      if (error) { console.error("資料載入錯誤:", error); alert("載入資料失敗：" + error.message); break; }
+      if (error) { console.error(error); alert("載入失敗：" + error.message); break; }
       if (!data || !data.length) break;
       all = all.concat(data);
       if (data.length < CFG.PAGE_SIZE) break;
       page++;
     }
-
     ST.raw = all.sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
-
     if (ST.raw.length) {
       const last = ST.raw[0].form_date.replace(/-/g, "/");
-      const disp = $("lastDataDisp"); if (disp) disp.innerText = "last data " + last;
-
+      $("lastDataDisp").innerText = "last data " + last;
       const years = [...new Set(ST.raw.map(d => s(d.form_date).slice(0, 4)))].sort().reverse();
       $("selYear").innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join("");
-
       const dates = ST.raw.map(d => d.form_date).sort();
       ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
     }
@@ -879,37 +1051,44 @@
     const end = ds[1] ? ST.datePicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
     const q = s($("qSearch").value).toLowerCase().trim();
 
-    const timeData = ST.raw.filter(v => v.form_date >= start && v.form_date <= end);
-    $("valTotal").innerText = timeData.length;
-    $("valLinAn").innerText = timeData.filter(v => v.store_branch === "臨安店").length;
-    $("valNanKe").innerText = timeData.filter(v => v.store_branch === "南科店").length;
-
-    ST.filtered = timeData.filter(v => {
-      if (ST.store !== "全部" && v.store_branch !== ST.store) return false;
-      if (q) {
+    let pool = ST.raw.filter(v => v.form_date >= start && v.form_date <= end);
+    if (q) {
+      pool = pool.filter(v => {
         const n = s(v.customer_name).toLowerCase();
         const d = s(v.detail_desc).toLowerCase();
-        if (!n.includes(q) && !d.includes(q)) return false;
-      }
-      return true;
-    });
+        return n.includes(q) || d.includes(q);
+      });
+    }
 
-    /* 保留鎖定，未鎖定者每次查詢重置 */
-    if (!ST.filter.sourceLocked) ST.filter.source = null;
+    if (ST.filter.cust !== null) pool = pool.filter(v => v.is_new_customer === ST.filter.cust);
+    if (ST.filter.pay !== null) pool = pool.filter(v => v.has_purchased === ST.filter.pay);
+    // V9.4.1: 客源複選邏輯 (聯集 OR)
+    if (ST.filter.source.length) pool = pool.filter(v => ST.filter.source.some(s => arr(v.source_tags).includes(s)));
+    if (ST.filter.purpose) pool = pool.filter(v => arr(v.visit_purposes).includes(ST.filter.purpose));
+    if (ST.filter.gender) pool = pool.filter(v => s(v.gender) === ST.filter.gender);
+    if (ST.filter.age) pool = pool.filter(v => s(v.age_range) === ST.filter.age);
+    if (ST.filter.adTag) pool = pool.filter(v => s(v.ad_source_detail).includes(ST.filter.adTag));
+
+    $("valTotal").innerText = pool.length;
+    $("valLinAn").innerText = pool.filter(v => v.store_branch === "臨安店").length;
+    $("valNanKe").innerText = pool.filter(v => v.store_branch === "南科店").length;
+
+    ST.filtered = pool.filter(v => (ST.store === "全部" || v.store_branch === ST.store));
+
+    // V9.4.4: 移除自動清空客源的邏輯，修復點擊無效問題
     if (!ST.filter.purposeLocked) ST.filter.purpose = null;
     if (!ST.filter.genderLocked) ST.filter.gender = null;
     if (!ST.filter.ageLocked) ST.filter.age = null;
 
     ST.limit = 20;
-    renderCharts(ST.filtered);
+    updateAllCharts();
     renderTable();
   }
   window.applyFilter = applyFilter;
 
-  /* ===== UI ===== */
+  /* UI Helpers */
   window.loadMore = () => { ST.limit += 20; renderTable(); };
   window.toggleAdminPanel = () => $("adminPanel").classList.toggle("hidden");
-
   window.setStore = (s0) => {
     ST.store = s0;
     qa(".kpi-card").forEach(c => c.classList.remove("active"));
@@ -918,36 +1097,22 @@
     if (s0 === "南科店") $("kpiNanKe").classList.add("active");
     applyFilter();
   };
-
   window.quickSelectDate = () => {
     const y = $("selYear").value, m = $("selMonth").value;
-    if (y && m) {
-      ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]);
-      applyFilter();
-    }
+    if (y && m) { ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]); applyFilter(); }
   };
-
   window.resetDate = () => {
-    if (ST.raw.length) {
-      const dates = ST.raw.map(x => x.form_date).sort();
-      ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
-    }
-    $("selMonth").value = "";
-    applyFilter();
+    if (ST.raw.length) { const dates = ST.raw.map(x => x.form_date).sort(); ST.datePicker.setDate([dates[0], dates[dates.length - 1]]); }
+    $("selMonth").value = ""; applyFilter();
   };
+  window.clearSearch = () => { $("qSearch").value = ""; $("btnX").classList.add("hidden"); applyFilter(); };
 
-  window.clearSearch = () => {
-    $("qSearch").value = "";
-    $("btnX").classList.add("hidden");
-    applyFilter();
-  };
-
-  /* ===== Modal / Edit ===== */
+  /* Modal */
   function setSaveButtonText() { $("btnSave").innerText = (ST.editingId && ST.isAdmin) ? "更新儲存" : "確認儲存"; }
-  function openAddModal() { $("addModal").style.display = "flex"; }
   function closeAddModal() {
     $("addModal").style.display = "none";
-    $("mName").value = ""; $("mDetail").value = ""; $("mKeyword").value = "";
+    $("mName").value = ""; $("mDetail").value = ""; $("mKeyword").value = ""; $("mAmount").value = ""; $("mAdTags").value = "";
+    resetEditSegUI();
     qa(".selected, .checked").forEach(e => e.classList.remove("selected", "checked"));
     $("boxKeyword").classList.add("hidden");
     ST.editingId = null; setSaveButtonText();
@@ -960,7 +1125,6 @@
     const target = btns.find(b => (b.dataset && b.dataset.value) === val) || btns.find(b => b.innerText.trim() === s(val).trim());
     if (target) window.selectRadio(groupId, val, target);
   }
-
   function checkMultiByTexts(groupId, texts) {
     const grp = $(groupId); if (!grp) return;
     const set = new Set(arr(texts).map(t => s(t).trim()));
@@ -970,17 +1134,10 @@
       $("boxKeyword").classList.toggle("hidden", !hasGoogle);
     }
   }
-
-  window.selectRadio = (grp, val, el) => {
-    qa(`#${grp} .radio-btn`).forEach(b => b.classList.remove("selected"));
-    el.classList.add("selected");
-    el.dataset.value = val;
-  };
-
+  window.selectRadio = (grp, val, el) => { qa(`#${grp} .radio-btn`).forEach(b => b.classList.remove("selected")); el.classList.add("selected"); el.dataset.value = val; };
   window.toggleChk = (el) => {
     el.classList.toggle("checked");
-    const grp = el.parentElement;
-    if (grp && grp.id === "grpSource") {
+    if (el.parentElement.id === "grpSource") {
       const hasGoogle = qa("#grpSource .checked").some(b => b.innerText.includes("Google"));
       $("boxKeyword").classList.toggle("hidden", !hasGoogle);
     }
@@ -990,10 +1147,7 @@
     if (!ST.isAdmin) { alert("⚠️ 需要管理員權限才能編輯！"); return; }
     const v = ST.raw.find(x => x.id === parseInt(ST.currentDetailId, 10));
     if (!v) return;
-
-    ST.editingId = v.id;
-    setSaveButtonText();
-
+    ST.editingId = v.id; setSaveButtonText();
     qa(".selected, .checked").forEach(el => el.classList.remove("selected", "checked"));
     $("boxKeyword").classList.add("hidden");
 
@@ -1001,6 +1155,11 @@
     $("mStore").value = v.store_branch || "臨安店";
     $("mName").value = v.customer_name || "";
     $("mTainan").checked = !!v.is_local;
+    $("mAmount").value = v.amount || "";
+    $("mAdTags").value = v.ad_source_detail || "";
+    
+    if (v.is_new_customer !== null) setEditSeg('cust', v.is_new_customer, qa("#segEditCust .seg-btn")[v.is_new_customer ? 1 : 2]);
+    else resetEditSegUI();
 
     selectRadioByValue("grpGender", v.gender || "");
     selectRadioByValue("grpAge", v.age_range || "");
@@ -1009,8 +1168,7 @@
     $("mKeyword").value = v.search_keywords || "";
     $("mDetail").value = v.detail_desc || "";
 
-    closeDetail();
-    openAddModal();
+    closeDetail(); $("addModal").style.display = "flex";
   };
 
   window.saveData = async () => {
@@ -1026,26 +1184,6 @@
       return;
     }
 
-    if (ST.editingId && ST.isAdmin) {
-      const payload = {
-        form_date: $("mDate").value,
-        store_branch: $("mStore").value,
-        customer_name: name,
-        gender: genderEl.dataset.value,
-        age_range: ageEl.dataset.value,
-        is_local: $("mTainan").checked,
-        source_tags: sources,
-        visit_purposes: purposes,
-        search_keywords: $("mKeyword").value,
-        detail_desc: detail
-      };
-      const { error } = await supabase.from("visits").update(payload).eq("id", ST.editingId);
-      if (error) { alert("更新失敗: " + error.message); console.error(error); return; }
-      alert("✅ 已更新");
-      ST.editingId = null; setSaveButtonText(); closeAddModal(); fetchAllData();
-      return;
-    }
-
     const rpcPayload = {
       p_date: $("mDate").value,
       p_store: $("mStore").value,
@@ -1056,18 +1194,49 @@
       p_sources: sources,
       p_purposes: purposes,
       p_keywords: $("mKeyword").value,
-      p_detail: detail
+      p_detail: detail,
+      p_is_new_customer: ST.editSeg.cust,
+      p_amount: Number($("mAmount").value) || 0,
+      p_ad_source_detail: $("mAdTags").value
     };
-    const { error } = await supabase.rpc("submit_visit_v7", rpcPayload);
+
+    if (ST.editingId && ST.isAdmin) {
+      const updatePayload = {
+        form_date: rpcPayload.p_date,
+        store_branch: rpcPayload.p_store,
+        customer_name: rpcPayload.p_name,
+        gender: rpcPayload.p_gender,
+        age_range: rpcPayload.p_age,
+        is_local: rpcPayload.p_is_local,
+        source_tags: rpcPayload.p_sources,
+        visit_purposes: rpcPayload.p_purposes,
+        search_keywords: rpcPayload.p_keywords,
+        detail_desc: rpcPayload.p_detail,
+        amount: rpcPayload.p_amount,
+        ad_source_detail: rpcPayload.p_ad_source_detail
+      };
+      if (rpcPayload.p_is_new_customer !== null) updatePayload.is_new_customer = rpcPayload.p_is_new_customer;
+      
+      const { error } = await supabase.from("visits").update(updatePayload).eq("id", ST.editingId);
+      if (error) { alert("更新失敗: " + error.message); return; }
+      ST.editingId = null; setSaveButtonText(); closeAddModal(); fetchAllData();
+      return;
+    }
+
+    const { error } = await supabase.rpc("submit_visit_v9", rpcPayload);
     if (error) { alert("儲存失敗: " + error.message); console.error(error); }
-    else { alert("🎉 新增成功！"); closeAddModal(); fetchAllData(); }
+    else { closeAddModal(); fetchAllData(); }
   };
 
-  /* ===== Detail ===== */
+  /* Detail */
   function showDetail(id) {
     const v = ST.raw.find(x => x.id === parseInt(id, 10));
     if (!v) return;
     ST.currentDetailId = v.id;
+    const cust = v.is_new_customer ? "新客" : "老客";
+    const pay = v.has_purchased ? "有消費" : "無消費";
+    const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)} TWD` : "";
+    const adTags = s(v.ad_source_detail);
 
     $("detailContent").innerHTML = `
       <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
@@ -1075,6 +1244,16 @@
         <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${v.store_branch}</span>
         <span>${v.form_date}</span><span>•</span><span>${v.gender || "-"} / ${v.age_range || "-"}</span>
       </p>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <div class="text-xs font-bold text-slate-500 mb-1">身分 / 消費</div>
+          <div class="text-sm font-black text-slate-900">${cust} / ${pay}${amt}</div>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <div class="text-xs font-bold text-slate-500 mb-1">廣告標籤</div>
+          <div class="text-sm font-black text-slate-900">${adTags || "無"}</div>
+        </div>
+      </div>
       <div class="grid grid-cols-2 gap-3 mb-4">
         <div class="bg-blue-50 p-3 rounded-lg">
           <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
@@ -1085,192 +1264,161 @@
           <div class="text-sm text-green-900">${arr(v.visit_purposes).join(", ") || "無"}</div>
         </div>
       </div>
-      ${v.search_keywords ? `
-        <div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200">
-          <div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div>
-          <div class="text-sm text-yellow-900">${v.search_keywords}</div>
-        </div>` : ""}
+      ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ""}
       <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || "無詳細描述"}</div>
     `;
-
     $("detailModal").style.display = "flex";
     $("detailActions").classList.toggle("hidden", !ST.isAdmin);
   }
   window.showDetail = showDetail;
-
-  function closeDetail() { $("detailModal").style.display = "none"; }
-  window.closeDetail = closeDetail;
-
+  window.closeDetail = () => $("detailModal").style.display = "none";
   window.deleteCurrentDetail = async () => {
-    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限才能刪除！"); return; }
-    if (!confirm("確定要刪除此筆資料？")) return;
+    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限！"); return; }
+    if (!confirm("確定刪除？")) return;
     const { error } = await supabase.from("visits").delete().eq("id", ST.currentDetailId);
-    if (error) alert("刪除失敗: " + error.message);
-    else { alert("已刪除"); closeDetail(); fetchAllData(); }
+    if (error) alert("刪除失敗: " + error.message); else { alert("已刪除"); closeDetail(); fetchAllData(); }
   };
 
-  /* ===== CSV ===== */
-  window.exportCSV = () => {
-    const csv = Papa.unparse(ST.raw);
+  /* CSV Export */
+  window.openExportModal = () => {
+    const ds = ST.datePicker.selectedDates;
+    const def = ds.length === 2 ? `${ST.datePicker.formatDate(ds[0], "Y-m-d")} to ${ST.datePicker.formatDate(ds[1], "Y-m-d")}` : "";
+    ST.exportPicker = flatpickr("#exportDateRange", { mode: "range", dateFormat: "Y-m-d", defaultDate: def });
+    
+    const cols = $("exportCols");
+    cols.innerHTML = CFG.EXPORT_COLS.map(c => `
+      <label class="flex items-center gap-2 text-sm p-2 border rounded cursor-pointer hover:bg-gray-50">
+        <input type="checkbox" class="exp-chk" value="${c.k}" checked>
+        <span>${c.n}</span>
+      </label>
+    `).join("");
+    $("exportModal").style.display = "flex";
+  };
+  window.closeExportModal = () => $("exportModal").style.display = "none";
+  window.toggleExportCols = (all) => qa(".exp-chk").forEach(c => c.checked = all);
+
+  window.doExport = () => {
+    const ds = ST.exportPicker.selectedDates;
+    const start = ds[0] ? ST.exportPicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
+    const end = ds[1] ? ST.exportPicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
+    const cols = qa(".exp-chk:checked").map(c => c.value);
+    
+    if(!cols.length) return alert("請至少選擇一個欄位");
+
+    const data = ST.raw.filter(v => v.form_date >= start && v.form_date <= end).map(v => {
+      const row = {};
+      cols.forEach(k => {
+        if(k==="source_tags" || k==="visit_purposes") row[k] = arr(v[k]).join(",");
+        else if(k==="is_local") row[k] = v[k] ? "是" : "否";
+        else if(k==="is_new_customer") row[k] = v[k] ? "新客" : "老客";
+        else if(k==="has_purchased") row[k] = v[k] ? "有" : "無";
+        else row[k] = v[k];
+      });
+      return row;
+    });
+
+    const csv = Papa.unparse(data);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
-    link.download = `wakodo_backup_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    link.download = `wakodo_export_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    closeExportModal();
   };
 
+  window.exportCSV = () => window.openExportModal();
+
   window.previewCSV = (input) => {
-    const f = input.files && input.files[0];
-    if (!f) return;
-
+    const f = input.files && input.files[0]; if (!f) return;
     Papa.parse(f, {
-      header: true,
-      skipEmptyLines: true,
+      header: true, skipEmptyLines: true,
       complete: async (res) => {
-        const total = res.data.length;
-        if (!confirm(`即將匯入 ${total} 筆資料，確認繼續？`)) return;
+        if (!confirm(`即將匯入 ${res.data.length} 筆資料，確認繼續？`)) return;
+        const overlay = $("importOverlay"); const progress = $("importProgress"); const status = $("importStatus"); const errLog = $("importErrors");
+        overlay.style.display = "flex"; errLog.innerHTML = ""; errLog.classList.add("hidden");
 
-        const overlay = $("importOverlay");
-        const progress = $("importProgress");
-        const status = $("importStatus");
-        const errLog = $("importErrors");
-
-        overlay.style.display = "flex";
-        errLog.innerHTML = "";
-        errLog.classList.add("hidden");
-
-        const norm = (row, idx) => {
+        const rows = res.data.map((row, idx) => {
           let d = row["form_date"] || row["填表日期"];
-          if (!d) { console.warn(`Row ${idx}: Missing date`); return null; }
+          if (!d) return null;
           d = s(d).trim().replace(/\//g, "-");
-          const p = d.split("-");
-          if (p.length === 3) d = `${p[0]}-${s(p[1]).padStart(2, "0")}-${s(p[2]).padStart(2, "0")}`;
-
           const n = row["customer_name"] || row["顧客姓名"];
-          if (!n) { console.warn(`Row ${idx}: Missing name`); return null; }
-          const cleanName = CFG.INVALID_NAMES.includes(s(n).trim()) ? "未留資料" : n;
-
-          const sRaw = s(row["source_tags"] || row["來源統計"] || "").replace(/，/g, ",");
-          const pRaw = s(row["visit_purposes"] || row["來店目的"] || "").replace(/，/g, ",");
-          let age = s(row["age_range"] || row["年齡範圍"] || "");
-          if (age === "18以下") age = "18歲以下";
-
+          if (!n) return null;
+          
           return {
             p_date: d,
             p_store: row["store_branch"] || row["門店"] || "臨安店",
-            p_name: cleanName,
+            p_name: CFG.INVALID_NAMES.includes(s(n).trim()) ? "未留資料" : n,
             p_gender: row["gender"] || row["性別"] || "",
-            p_age: age,
-            p_is_local: s(row["is_local"] || row["是否為台南人"] || "").includes("是"),
-            p_sources: sRaw.split(",").map(x => x.trim()).filter(Boolean),
-            p_purposes: pRaw.split(",").map(x => x.trim()).filter(Boolean),
+            p_age: row["age_range"] || row["年齡範圍"] || "",
+            p_is_local: s(row["is_local"] || row["是否為台南人"] || "").includes("true") || s(row["is_local"]).includes("是"),
+            p_sources: s(row["source_tags"] || row["來源統計"] || "").replace(/[\[\]"]/g, "").split(",").map(x=>x.trim()).filter(Boolean),
+            p_purposes: s(row["visit_purposes"] || row["來店目的"] || "").replace(/[\[\]"]/g, "").split(",").map(x=>x.trim()).filter(Boolean),
             p_keywords: row["search_keywords"] || row["搜尋關鍵字"] || "",
-            p_detail: row["detail_desc"] || row["詳細描述"] || ""
+            p_detail: row["detail_desc"] || row["詳細描述"] || "",
+            p_is_new_customer: row["is_new_customer"] === "true" ? true : (row["is_new_customer"] === "false" ? false : null),
+            p_amount: Number(row["amount"] || 0),
+            p_ad_source_detail: row["ad_source_detail"] || ""
           };
-        };
+        }).filter(Boolean);
 
-        const rows = res.data.map(norm).filter(Boolean);
-
-        let done = 0;
-        const errors = [];
-
+        let done = 0, errors = [];
         for (const row of rows) {
-          try {
-            const { error } = await supabase.rpc("submit_visit_v7", row);
-            if (error) throw error;
-          } catch (err) {
-            errors.push(`${row.p_date} ${row.p_name}: ${err.message}`);
-          }
-
-          done++;
-          progress.style.width = Math.round(done / rows.length * 100) + "%";
-          status.innerText = `處理中... ${done} / ${rows.length}`;
+          try { const { error } = await supabase.rpc("submit_visit_v9", row); if (error) throw error; }
+          catch (err) { errors.push(`${row.p_date} ${row.p_name}: ${err.message}`); }
+          done++; progress.style.width = Math.round(done / rows.length * 100) + "%"; status.innerText = `處理中... ${done} / ${rows.length}`;
         }
-
         status.innerText = `✅ 完成！成功: ${rows.length - errors.length} | 失敗: ${errors.length}`;
-        if (errors.length) {
-          errLog.classList.remove("hidden");
-          errLog.innerHTML = '<div class="font-bold mb-2">以下資料匯入失敗：</div>' + errors.map(e => `<div class="mb-1">• ${e}</div>`).join("");
-        }
-
-        setTimeout(() => {
-          overlay.style.display = "none";
-          if (!errors.length) location.reload();
-          else alert(`匯入完成，但有 ${errors.length} 筆失敗，請檢查錯誤記錄。`);
-        }, 2000);
+        if (errors.length) { errLog.classList.remove("hidden"); errLog.innerHTML = errors.map(e => `<div class="mb-1">• ${e}</div>`).join(""); }
+        setTimeout(() => { overlay.style.display = "none"; if (!errors.length) location.reload(); }, 2000);
       }
     });
   };
 
   window.wipeData = async () => {
     if (!ST.isAdmin) { alert("⚠️ 需要管理員權限！"); return; }
-    alert("⚠️ 安全機制：系統將強制下載備份 CSV。");
-    window.exportCSV();
+    const csv = Papa.unparse(ST.raw);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    link.download = `wakodo_backup_FORCE_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
 
     setTimeout(async () => {
-      if (!confirm("備份已下載。確定要清空所有資料？此動作無法復原！")) return;
-      const pwd = prompt("請輸入二次確認密碼：");
-      if (pwd === "628599") {
+      if (!confirm("⚠️ 系統已強制下載備份 CSV。\n\n確定要清空所有資料？此動作無法復原！")) return;
+      if (prompt("請輸入二次確認密碼：") === "628599") {
         const { error } = await supabase.from("visits").delete().neq("id", 0);
-        if (error) alert("失敗: " + error.message);
-        else { alert("✅ 資料庫已清空。"); location.reload(); }
+        if (error) alert("失敗: " + error.message); else { alert("✅ 資料庫已清空。"); location.reload(); }
       } else alert("❌ 密碼錯誤！");
-    }, 1500);
+    }, 1000);
   };
 
-  /* ===== Auth ===== */
+  /* Auth */
   window.loginSupabase = async () => {
-    const email = $("admEmail").value.trim();
-    const pwd = $("admPwd").value;
-    if (!email || !pwd) { alert("請輸入信箱和密碼"); return; }
+    const email = $("admEmail").value.trim(), pwd = $("admPwd").value;
+    if (!email || !pwd) return alert("請輸入信箱和密碼");
     const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-    if (error) alert("登入失敗：" + error.message);
-    else { enableAdminUI(); alert("✅ 登入成功！"); }
+    if (error) alert("登入失敗：" + error.message); else { enableAdminUI(); }
   };
-
   window.logout = async () => {
-    await supabase.auth.signOut();
-    ST.isAdmin = false;
-    $("adminPanel").classList.add("hidden");
-    $("loginForm").classList.remove("hidden");
-    $("adminActions").classList.add("hidden");
-    $("logoutBtn").classList.add("hidden");
-    $("admEmail").value = "";
-    $("admPwd").value = "";
-    alert("已登出管理模式");
+    await supabase.auth.signOut(); ST.isAdmin = false;
+    $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("adminExtraBox").classList.add("hidden");
+    alert("已登出");
   };
 
-  /* ===== init ===== */
+  /* Init */
   function initAddModal() {
     $("mDate").value = new Date().toISOString().split("T")[0];
     $("grpAge").innerHTML = CFG.AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join("");
-    $("grpSource").innerHTML = CFG.SOURCES.map(x => `<div class="chk-btn" onclick="toggleChk(this,'${x}')">${x}</div>`).join("");
-    $("grpPurpose").innerHTML = CFG.PURPOSES.map(x => `<div class="chk-btn" onclick="toggleChk(this,'${x}')">${x}</div>`).join("");
+    $("grpSource").innerHTML = CFG.SOURCES.map(x => `<div class="chk-btn" onclick="toggleChk(this)">${x}</div>`).join("");
+    $("grpPurpose").innerHTML = CFG.PURPOSES.map(x => `<div class="chk-btn" onclick="toggleChk(this)">${x}</div>`).join("");
+    resetEditSegUI();
   }
 
   async function initMain() {
     Chart.register(ChartDataLabels);
     flatpickr.l10ns.default.months.longhand = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
-
-    ST.datePicker = flatpickr("#dateRange", {
-      mode: "range",
-      dateFormat: "Y-m-d",
-      locale: "zh_tw",
-      monthSelectorType: "static",
-      onChange: (d) => { if (d.length === 2) applyFilter(); }
-    });
-
-    $("qSearch").addEventListener("input", function () {
-      this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden");
-    });
-
-    initAddModal();
-    setSaveButtonText();
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) enableAdminUI();
-
+    ST.datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: "static", onChange: (d) => { if (d.length === 2) applyFilter(); } });
+    $("qSearch").addEventListener("input", function () { this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden"); });
+    initAddModal(); setSaveButtonText();
+    const { data: { session } } = await supabase.auth.getSession(); if (session) enableAdminUI();
     await fetchAllData();
   }
 
@@ -1279,54 +1427,6 @@
     $("appRoot").style.display = "block";
     await initMain();
   };
-
-  /* ===== selfTest：不自動跑，只在你/AI 需要時跑 ===== */
-  function selfTest(opts = {}) {
-    const { runCharts = false } = opts;
-    const errors = [];
-
-    const mustIds = [
-      "appRoot","frontGate","frontGateInput","frontGateBtn","frontGateError",
-      "dateRange","qSearch","btnX","selYear","selMonth",
-      "valTotal","valLinAn","valNanKe","lastDataDisp",
-      "chartSource","chartPurpose","chartTrend","chartGender","chartAge",
-      "tableBody","listCounter","btnLoadMore",
-      "addModal","detailModal","detailContent","detailActions",
-      "importOverlay","importProgress","importStatus","importErrors"
-    ];
-    mustIds.forEach(id => { if (!$(id)) errors.push(`DOM 缺少 id: #${id}`); });
-
-    if (!Array.isArray(ST.raw)) errors.push("ST.raw 不是陣列");
-    if (!Array.isArray(ST.filtered)) errors.push("ST.filtered 不是陣列");
-    if (typeof ST.filter !== "object" || !ST.filter) errors.push("ST.filter 不是物件");
-    if (!ST.datePicker) errors.push("ST.datePicker 尚未初始化（flatpickr）");
-
-    if (runCharts) {
-      try {
-        if (!Array.isArray(ST.filtered)) ST.filtered = [];
-        updateAllCharts(); /* 若 Chart.js 或 canvas 出問題，這裡會丟錯 */
-      } catch (e) {
-        errors.push("updateAllCharts 執行失敗: " + (e && e.message ? e.message : String(e)));
-      }
-    }
-
-    const ok = errors.length === 0;
-    return { ok, errors, version: CFG.VERSION };
-  }
-
-  /* ===== 對外入口（給 AI/Console 用） ===== */
-  window.APP = {
-    cfg: CFG,
-    state: ST,
-    fn: { initMain, fetchAllData, applyFilter, updateAllCharts, renderTable, updateFilterBadges, toggleLock, selfTest },
-    debug: { chartKeys: () => Object.keys(CH) } /* 只提供 keys，避免旁路修改 Chart 實例 */
-  };
-
   </script>
 </body>
 </html>
-
-<!-- [file:13] -->
-
-
-
