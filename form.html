@@ -45,10 +45,11 @@
     .field-group:last-child { margin-bottom: 0; }
 
     .required-mark { color: #dc2626; margin-left: 4px; }
-    .text-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; outline: none; background: #fff; }
+    .text-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; outline: none; background: #fff; transition: all 0.2s; }
+    .text-input:focus { border-color: var(--primary); }
 
     /* 網格佈局 */
-    .btn-grid { display: grid; gap: 10px; }
+    .btn-grid { display: grid; gap: 10px; padding: 2px; border-radius: 12px; transition: all 0.2s; }
     @media (max-width: 768px) { .btn-grid { grid-template-columns: repeat(3, 1fr); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 769px) { .btn-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
 
@@ -58,6 +59,10 @@
     .toggle-btn { padding: 14px; border: 2px solid #10b981; border-radius: 10px; background: #d1fae5; color: #065f46; font-size: 15px; font-weight: 800; text-align: center; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; }
     .toggle-btn.unchecked { background: white; border-color: #e5e7eb; color: #6b7280; font-weight: 600; }
     .warn-msg { font-size: 12px; color: #dc2626; margin-top: 6px; font-weight: 700; }
+
+    /* 錯誤提示樣式 */
+    .error-highlight { border-color: #dc2626 !important; background-color: #fef2f2 !important; }
+    .error-highlight-grid { border: 2px dashed #dc2626 !important; background-color: #fef2f2 !important; }
   </style>
 </head>
 
@@ -95,7 +100,11 @@
     let cardCount = 0;
 
     window.onload = () => {
-      document.getElementById('globalDate').value = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('globalDate');
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.value = today;
+      dateInput.max = today; // 限制最大日期為今天，防止選到未來時間
+
       const saved = localStorage.getItem('wakodo_store');
       if (saved) selectSt(saved);
       addCustomerCard();
@@ -119,9 +128,9 @@
           
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="flex flex-col"><label class="section-label">顧客身份 <span class="required-mark">*</span></label><div class="btn-grid two-col" data-isnew="true"><div class="option-btn selected" onclick="tBtn(this)">全新客</div><div class="option-btn" onclick="tBtn(this)">老客戶</div></div></div>
-            <div class="flex flex-col"><label class="section-label">本次消費 <span class="required-mark">*</span></label><div class="btn-grid two-col"><div class="option-btn selected" onclick="tAmt(this, true, '${id}')">有</div><div class="option-btn" onclick="tAmt(this, false, '${id}')">無</div></div></div>
+            <div class="flex flex-col"><label class="section-label">本次消費 <span class="required-mark">*</span></label><div class="btn-grid two-col" data-has-purchase="true"><div class="option-btn selected" onclick="tAmt(this, true, '${id}')">有</div><div class="option-btn" onclick="tAmt(this, false, '${id}')">無</div></div></div>
           </div>
-          <div id="ab-${id}" class="field-group"><label class="section-label">消費金額 (TWD) <span class="required-mark">*</span></label><input type="number" class="text-input v-amt" placeholder="請輸入金額"></div>
+          <div id="ab-${id}" class="field-group"><label class="section-label">消費金額 (TWD) <span class="required-mark">*</span></label><input type="number" class="text-input v-amt" placeholder="請輸入金額 (需大於0)"></div>
           <div class="field-group"><label class="section-label">姓名 <span class="required-mark">*</span></label><input type="text" class="text-input v-name" placeholder="請輸入顧客姓名"></div>
           
           <div class="grid grid-cols-2 gap-4 mb-6">
@@ -144,47 +153,140 @@
       document.getElementById('cardsContainer').insertAdjacentHTML('beforeend', html);
     };
 
-    window.tBtn = (el) => { Array.from(el.parentElement.children).forEach(b => b.classList.remove('selected')); el.classList.add('selected'); };
-    window.tAmt = (el, has, id) => { tBtn(el); const b = document.getElementById(`ab-${id}`); b.classList.toggle('hidden', !has); if(!has) b.querySelector('input').value = 0; };
+    // 點擊按鈕時移除錯誤紅框
+    window.tBtn = (el) => { 
+      const parent = el.parentElement;
+      Array.from(parent.children).forEach(b => b.classList.remove('selected')); 
+      el.classList.add('selected'); 
+      parent.classList.remove('error-highlight-grid');
+    };
     
-    // 僅保留 Google 關鍵字連動，移除廣告彈窗邏輯
+    window.tAmt = (el, has, id) => { 
+      tBtn(el); 
+      const b = document.getElementById(`ab-${id}`); 
+      const input = b.querySelector('input');
+      b.classList.toggle('hidden', !has); 
+      if(!has) {
+        input.value = 0; 
+        input.classList.remove('error-highlight');
+      } else {
+        input.value = ''; // 切換回「有」時清空，強迫重新輸入
+      }
+    };
+    
     window.hSrc = (el, id, s) => {
       el.classList.toggle('selected');
+      el.parentElement.classList.remove('error-highlight-grid');
       if(s.includes('Google')) {
         const hG = Array.from(el.parentElement.querySelectorAll('.selected')).some(b => b.innerText.includes('Google'));
-        document.getElementById(`kb-${id}`).classList.toggle('hidden', !hG);
+        const kwContainer = document.getElementById(`kb-${id}`);
+        kwContainer.classList.toggle('hidden', !hG);
+        if(!hG) kwContainer.querySelector('input').classList.remove('error-highlight');
       }
     };
 
+    // 監聽輸入框，輸入時移除紅框
+    document.addEventListener('input', (e) => {
+      if(e.target.classList.contains('text-input')) {
+        e.target.classList.remove('error-highlight');
+      }
+    });
+
     async function submitAllData() {
       if(!globalSt) return alert("請先選擇分店");
+      
+      // 清除所有舊的錯誤標示
+      document.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
+      document.querySelectorAll('.error-highlight-grid').forEach(el => el.classList.remove('error-highlight-grid'));
+
       const btn = document.getElementById('btnSubmit');
       const cs = document.querySelectorAll('.customer-card');
       const dt = document.getElementById('globalDate').value;
       const fD = [];
+      let hasError = false;
       
-      for(let c of cs) {
-        const n = c.querySelector('.v-name').value.trim();
-        const iN = c.querySelector('[data-isnew] .selected').innerText === '全新客';
-        const a = parseFloat(c.querySelector('.v-amt').value);
-        const g = c.querySelector('[data-sex] .selected')?.innerText;
-        const ag = c.querySelector('[data-age] .selected')?.innerText;
-        const sc = Array.from(c.querySelectorAll('[data-src] .selected')).map(el => el.innerText);
-        const pu = Array.from(c.querySelectorAll('[data-pur] .selected')).map(el => el.innerText);
+      for(let i = 0; i < cs.length; i++) {
+        const c = cs[i];
+        const customerNum = i + 1;
         
+        // 取得各欄位元素
+        const elName = c.querySelector('.v-name');
+        const elAmt = c.querySelector('.v-amt');
+        const elKw = c.querySelector('.v-kw');
+        const elDet = c.querySelector('.v-det');
+        const gridSex = c.querySelector('[data-sex]');
+        const gridAge = c.querySelector('[data-age]');
+        const gridSrc = c.querySelector('[data-src]');
+        const gridPur = c.querySelector('[data-pur]');
+        
+        // 取得值
+        const n = elName.value.trim();
+        const iN = c.querySelector('[data-isnew] .selected').innerText === '全新客';
+        const hasPurchase = c.querySelector('[data-has-purchase] .selected').innerText === '有';
+        const a = parseFloat(elAmt.value);
+        const g = gridSex.querySelector('.selected')?.innerText;
+        const ag = gridAge.querySelector('.selected')?.innerText;
+        const sc = Array.from(gridSrc.querySelectorAll('.selected')).map(el => el.innerText);
+        const pu = Array.from(gridPur.querySelectorAll('.selected')).map(el => el.innerText);
+        const kw = elKw.value.trim();
+        const det = elDet.value.trim();
+        
+        // 驗證邏輯
+        let errorMsgs = [];
+
+        if(hasPurchase && (isNaN(a) || a <= 0)) {
+          elAmt.classList.add('error-highlight');
+          errorMsgs.push("消費金額必須大於 0");
+        }
+        if(!n) {
+          elName.classList.add('error-highlight');
+          errorMsgs.push("姓名未填寫");
+        }
+        if(!g) {
+          gridSex.classList.add('error-highlight-grid');
+          errorMsgs.push("性別未選擇");
+        }
+        if(!ag) {
+          gridAge.classList.add('error-highlight-grid');
+          errorMsgs.push("年齡層未選擇");
+        }
+        if(!sc.length) {
+          gridSrc.classList.add('error-highlight-grid');
+          errorMsgs.push("客源未選擇");
+        }
+        if(sc.some(s => s.includes('Google')) && !kw) {
+          elKw.classList.add('error-highlight');
+          errorMsgs.push("Google 搜尋關鍵字未填寫");
+        }
+        if(!pu.length) {
+          gridPur.classList.add('error-highlight-grid');
+          errorMsgs.push("來店目的未選擇");
+        }
+        if(!det) {
+          elDet.classList.add('error-highlight');
+          errorMsgs.push("動機和得知途徑未填寫");
+        }
+
+        if(errorMsgs.length > 0) {
+          alert(`【顧客 ${customerNum}】資料有誤：\n- ` + errorMsgs.join('\n- '));
+          hasError = true;
+          break; // 停止檢查，讓使用者先修正當前顧客
+        }
+
         if(!iN) { if(a > 0) sc.push('老客回購'); else sc.push('老客-未購'); }
-        if(!n || !g || !ag || !sc.length || !pu.length || isNaN(a)) return alert("請完整填寫必填欄位與金額");
         
         fD.push({
           p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag,
           p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'),
-          p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: c.querySelector('.v-kw').value,
-          p_detail: c.querySelector('.v-det').value.trim(),
-          p_is_new_customer: iN, p_amount: a, 
-          p_ad_source_detail: "" // 廣告標籤留空，不再收集
+          p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw,
+          p_detail: det,
+          p_is_new_customer: iN, p_amount: hasPurchase ? a : 0, 
+          p_ad_source_detail: "" 
         });
       }
       
+      if(hasError) return; // 有錯誤則中斷送出
+
       btn.disabled = true; btn.innerText = "傳送中...";
       try {
         for(let d of fD) await supabase.rpc('submit_visit_v8', d);
