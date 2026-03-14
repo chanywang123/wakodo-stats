@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V9.4.4</title>
+  <title>和光堂戰情室 V9.5.4</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +28,6 @@
     body { background:var(--bg); font-family:system-ui,-apple-system,sans-serif; color:#1e293b; }
     .glass-card { background:var(--card-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03); transition: all 0.3s ease; }
     
-    /* 收折功能 */
     .section-content { transition: max-height 0.4s ease-out, opacity 0.3s ease; max-height: 2000px; opacity: 1; overflow: hidden; }
     .section-content.collapsed { max-height: 0; opacity: 0; margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
     .toggle-icon { transition: transform 0.3s ease; cursor: pointer; font-weight: 900; color: #94a3b8; padding: 4px; }
@@ -46,6 +45,9 @@
     thead th { background:#fef9c3; color:#000; padding:14px; font-weight:800; border-bottom:2px solid #fde047; font-size:.9rem; }
     tbody tr { border-bottom:1px solid #f1f5f9; transition:all .2s; cursor:pointer; }
     tbody tr:hover { background:#fefce8; transform:translateX(2px); box-shadow:0 2px 4px rgba(251,191,36,0.1); }
+    
+    tbody tr.row-edit-requested { background: #fef2f2; border-left: 4px solid #ef4444; border-bottom: 1px solid #fecaca; }
+    tbody tr.row-edit-requested:hover { background: #fee2e2; }
 
     .btn-primary { background:var(--accent); color:white; padding:8px 20px; border-radius:8px; font-weight:600; box-shadow:0 4px 6px -1px rgba(59,130,246,0.3); transition:.2s; cursor:pointer; border:none; }
     .btn-primary:hover { background:#2563eb; transform:translateY(-1px); }
@@ -61,7 +63,7 @@
 
     .seg-group { display:flex; gap:4px; background:#e2e8f0; padding:3px; border-radius:8px; }
     .seg-btn { padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; transition:all .2s; user-select:none; }
-    .seg-btn.selected { background:white; color:#3b82f6; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+    .seg-btn.selected { background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; box-shadow:0 2px 6px rgba(59,130,246,0.3); }
     .seg-label { font-size:11px; font-weight:800; color:#94a3b8; margin-right:4px; text-transform:uppercase; letter-spacing:0.5px; }
 
     .chk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:6px; }
@@ -78,7 +80,6 @@
     .logout-btn { background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.3); padding:6px 14px; border-radius:8px; cursor:pointer; transition:all .2s; color:#dc2626; font-weight:600; font-size:.875rem; }
     .logout-btn:hover { background:rgba(239,68,68,0.2); border-color:#ef4444; transform:translateY(-1px); }
 
-    /* V9.4 篩選標籤列 (Sticky) */
     #stickyFilterBar { transition: all 0.3s ease; overflow: hidden; max-height: 0; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
     #stickyFilterBar.show { max-height: 120px; padding: 8px 16px; overflow-y: auto; }
     .filter-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:50px; font-size:11px; font-weight:700; background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; border:1px solid #3b82f6; box-shadow:0 1px 2px rgba(59,130,246,0.1); margin-bottom: 4px; }
@@ -171,7 +172,7 @@
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.4.4</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.5.4</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
               <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
                  id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
@@ -195,6 +196,7 @@
 
         <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
           <span class="text-green-400 font-bold">✓ 管理員模式</span>
+          <button onclick="openAdStatsModal()" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded text-sm font-bold">📊 廣告成效管理</button>
           <button onclick="openExportModal()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 進階匯出</button>
           <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">
             📂 匯入 CSV
@@ -248,7 +250,6 @@
           <button onclick="applyFilter()" class="btn-primary">查詢</button>
         </div>
         
-        <!-- V9.4.3 篩選標籤列 (動態顯示) -->
         <div id="stickyFilterBar" class="glass-card flex flex-wrap gap-2 items-center"></div>
       </div>
 
@@ -304,7 +305,7 @@
         <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secConv')">
           <div>
             <h3 class="text-xl font-bold text-slate-800">消費轉換與客單價分析</h3>
-            <p class="text-xs text-slate-400 mt-1">柱狀圖：轉換率 (%) | 折線圖：平均客單價 ($)</p>
+            <p class="text-xs text-slate-400 mt-1">點擊柱狀圖可直接篩選該客源資料</p>
           </div>
           <div class="flex items-center gap-3">
             <div class="seg-group" onclick="event.stopPropagation()">
@@ -326,8 +327,8 @@
       <div class="glass-card p-6">
         <div class="flex items-end justify-between mb-4 cursor-pointer" onclick="toggleSection('secHeat')">
           <div>
-            <h3 class="text-xl font-bold text-slate-800">廣告熱度 (標籤)</h3>
-            <p class="text-xs text-slate-400 mt-1">點擊色塊可篩選</p>
+            <h3 class="text-xl font-bold text-slate-800">廣告成效熱度</h3>
+            <p class="text-xs text-slate-400 mt-1">資料來源：獨立廣告統計庫</p>
           </div>
           <div class="flex items-center gap-3">
             <div class="text-[11px] font-extrabold text-slate-400" id="adHeatMeta">--</div>
@@ -439,10 +440,6 @@
                 <input id="mAmount" type="number" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="0">
               </div>
             </div>
-            <div class="mt-4">
-              <label class="block text-xs font-bold text-gray-500 mb-2">廣告標籤 (逗號分隔)</label>
-              <input id="mAdTags" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="例如：舜宇廣告, 見證-何先生">
-            </div>
           </div>
 
           <div>
@@ -487,17 +484,63 @@
       <div class="modal-content relative">
         <button onclick="closeDetail()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
         <div id="detailContent"></div>
-        <div id="detailActions" class="mt-6 flex gap-3 hidden border-t pt-4">
+        
+        <div id="requestEditSection" class="mt-4 pt-4 border-t border-slate-100">
+          <button id="btnRequestEdit" onclick="openRequestEdit()" class="w-full bg-orange-50 text-orange-600 border border-orange-200 py-2 rounded-lg font-bold text-sm hover:bg-orange-100 transition">🙋‍♂️ 提出修改申請</button>
+        </div>
+
+        <div id="detailActions" class="mt-4 flex gap-3 hidden border-t pt-4">
           <button onclick="startEditCurrent()" class="text-blue-600 border border-blue-200 px-4 py-2 rounded hover:bg-blue-50 font-bold text-sm transition">編輯此筆</button>
           <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition">刪除此筆</button>
         </div>
       </div>
     </div>
+
+    <!-- Request Edit Modal -->
+    <div id="requestEditModal" class="modal-overlay" style="z-index: 105;" onclick="if(event.target===this)closeRequestEdit()">
+      <div class="modal-content relative max-w-sm">
+        <button onclick="closeRequestEdit()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+        <h2 class="text-lg font-bold mb-2 text-orange-600">🙋‍♂️ 提出修改申請</h2>
+        <p class="text-xs text-slate-500 mb-4">請描述要修改的內容，管理員審核後將為您修改。</p>
+        <textarea id="reqEditReason" class="w-full p-3 border rounded-lg h-24 resize-none text-sm" placeholder="EX：日期錯誤、門店錯誤或其他請描述..."></textarea>
+        <button onclick="submitRequestEdit()" class="w-full bg-orange-500 text-white py-2 mt-4 rounded-lg font-bold shadow hover:bg-orange-600 transition">送出申請</button>
+      </div>
+    </div>
+
+    <!-- Ad Stats Modal -->
+    <div id="adStatsModal" class="modal-overlay" onclick="if(event.target===this)closeAdStatsModal()">
+      <div class="modal-content relative max-w-2xl">
+        <button onclick="closeAdStatsModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold flex items-center gap-2">📊 廣告成效管理</h2>
+          <button onclick="openAdLogModal()" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition">📝 修改日誌</button>
+        </div>
+        
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+          <div class="flex gap-2">
+            <input id="newAdName" type="text" class="flex-grow p-2 border rounded-lg text-sm" placeholder="輸入新廣告名稱...">
+            <button onclick="addAdStat()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">新增</button>
+          </div>
+        </div>
+
+        <div class="space-y-3" id="adStatsList"></div>
+      </div>
+    </div>
+
+    <!-- Ad Log Modal -->
+    <div id="adLogModal" class="modal-overlay" style="z-index: 105;" onclick="if(event.target===this)closeAdLogModal()">
+      <div class="modal-content relative max-w-lg">
+        <button onclick="closeAdLogModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+        <h2 class="text-lg font-bold mb-4">📝 廣告修改日誌</h2>
+        <div class="max-h-[60vh] overflow-y-auto pr-2 space-y-2" id="adLogList"></div>
+      </div>
+    </div>
+
   </div>
 
   <script>
   const CFG = Object.freeze({
-    VERSION: "9.4.4",
+    VERSION: "9.5.4",
     FRONT_GATE_PASSWORD: "wakodo100",
     FRONT_GATE_KEY: "wakodo_gate_ok",
     PAGE_SIZE: 1000,
@@ -518,14 +561,15 @@
       {k:"gender",n:"性別"},{k:"age_range",n:"年齡"},{k:"is_local",n:"住台南"},
       {k:"source_tags",n:"客源"},{k:"visit_purposes",n:"目的"},{k:"search_keywords",n:"關鍵字"},
       {k:"detail_desc",n:"備註"},{k:"is_new_customer",n:"新客"},{k:"amount",n:"金額"},
-      {k:"has_purchased",n:"有消費"},{k:"ad_source_detail",n:"廣告標籤"}
+      {k:"has_purchased",n:"有消費"}
     ]
   });
 
   const ST = {
     raw: [], filtered: [], limit: 20, store: "全部",
-    filter: { source:[], purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false, cust:null, pay:null, adTag:null },
-    datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, editSeg: { cust: null }, splitView: false, convMode: 'all'
+    filter: { source:[], purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false, cust:null, pay:null },
+    datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, editSeg: { cust: null }, splitView: false, convMode: 'all',
+    adStats: []
   };
 
   const CH = {};
@@ -559,6 +603,7 @@
     ST.isAdmin=true;
     $("adminPanel")?.classList.remove("hidden"); $("loginForm")?.classList.add("hidden");
     $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden"); $("adminExtraBox")?.classList.remove("hidden");
+    applyFilter();
   }
 
   function maskName(name){
@@ -607,7 +652,6 @@
   }
   window.toggleLock = toggleLock;
 
-  // V9.4.1 客源複選邏輯
   window.toggleSource = (val) => {
     const idx = ST.filter.source.indexOf(val);
     if (idx > -1) ST.filter.source.splice(idx, 1);
@@ -617,7 +661,7 @@
 
   window.clearFilter = (type, val)=>{
     if(type==="all"){
-      Object.assign(ST.filter,{source:[],purpose:null,gender:null,age:null,sourceLocked:false,purposeLocked:false,genderLocked:false,ageLocked:false,cust:null,pay:null,adTag:null});
+      Object.assign(ST.filter,{source:[],purpose:null,gender:null,age:null,sourceLocked:false,purposeLocked:false,genderLocked:false,ageLocked:false,cust:null,pay:null});
       qa(".seg-group").forEach(g => {
         qa(".seg-btn", g).forEach(b => b.classList.remove("selected"));
         qa(".seg-btn", g)[0].classList.add("selected");
@@ -626,7 +670,6 @@
       return;
     }
     
-    // V9.4.2 修正：支援單一客源移除
     if(type==="source") {
       if(val) {
         const idx = ST.filter.source.indexOf(val);
@@ -648,7 +691,6 @@
   function updateFilterBadges(){
     const c=$("stickyFilterBar"); if(!c) return;
     const b=[];
-    // V9.4.2 修正：客源標籤拆分
     const mk=(k,v,val)=>`<div class="filter-badge"><span>${v}</span><span class="filter-badge-close" onclick="clearFilter('${k}'${val ? `,'${val}'` : ''})">✕</span></div>`;
     
     if(ST.filter.cust !== null) b.push(mk("cust", ST.filter.cust ? "新客" : "老客"));
@@ -661,7 +703,6 @@
     if(ST.filter.purpose) b.push(mk("purpose", ST.filter.purpose));
     if(ST.filter.gender) b.push(mk("gender", ST.filter.gender));
     if(ST.filter.age) b.push(mk("age", ST.filter.age));
-    if(ST.filter.adTag) b.push(mk("adTag", "標籤: " + ST.filter.adTag));
     
     if(b.length>=2) b.push(`<button onclick="clearFilter('all')" class="reset-all-btn">↻ 重置全部</button>`);
     
@@ -800,21 +841,15 @@
     if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; upd(ch); }
   }
 
-  /* V9.3 iPhone 風格熱度圖 */
   const AD_PALETTE = ["#3b82f6","#22c55e","#f59e0b","#a855f7","#ef4444","#06b6d4","#f97316","#10b981","#6366f1","#e11d48","#14b8a6","#d97706","#0ea5e9","#84cc16"];
   function hashStr(str){ str=s(str); let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return h; }
   function colorForTag(name){ return AD_PALETTE[hashStr(name)%AD_PALETTE.length]; }
   
-  function updAdHeat(sub){
-    const adMap = {}; let total = 0;
-    sub.forEach(v => {
-      const raw = s(v.ad_source_detail || "");
-      if(!raw.trim()) return;
-      const tags = raw.split(/[,，\n\r]+/).map(x => x.trim()).filter(Boolean);
-      tags.forEach(t => { adMap[t] = (adMap[t] || 0) + 1; total++; });
-    });
+  function updAdHeat(){
+    let total = 0;
+    const entries = [...ST.adStats].sort((a,b) => b.ad_count - a.ad_count).filter(ad => ad.ad_count > 0);
+    entries.forEach(ad => total += ad.ad_count);
 
-    const entries = Object.entries(adMap).sort((a,b) => b[1] - a[1]).slice(0, CFG.AD_HEAT_TOP);
     $("adHeatMeta").innerText = entries.length ? `標籤：${entries.length} | 總數：${total}` : "目前沒有標籤資料";
 
     const barContainer = $("iphoneHeatBar");
@@ -827,19 +862,18 @@
       return;
     }
 
-    barContainer.innerHTML = entries.map(([name, cnt]) => {
-      const pct = (cnt / total) * 100;
-      const col = colorForTag(name);
-      return `<div class="iphone-segment" style="width:${pct}%; background:${col};" data-tooltip="${name}: ${cnt} (${Math.round(pct)}%)" onclick="toggleLock('adTag', '${name}')"></div>`;
+    barContainer.innerHTML = entries.map(ad => {
+      const pct = (ad.ad_count / total) * 100;
+      const col = colorForTag(ad.ad_name);
+      return `<div class="iphone-segment" style="width:${pct}%; background:${col};" data-tooltip="${ad.ad_name}: ${ad.ad_count} (${Math.round(pct)}%)"></div>`;
     }).join("");
 
-    legendContainer.innerHTML = entries.map(([name, cnt]) => {
-      const col = colorForTag(name);
-      return `<div class="iphone-legend-item" onclick="toggleLock('adTag', '${name}')"><span class="iphone-dot" style="background:${col}"></span>${name} (${cnt})</div>`;
+    legendContainer.innerHTML = entries.map(ad => {
+      const col = colorForTag(ad.ad_name);
+      return `<div class="iphone-legend-item"><span class="iphone-dot" style="background:${col}"></span>${ad.ad_name} (${ad.ad_count})</div>`;
     }).join("");
   }
 
-  /* V9.4 融合圖表：消費轉換與客單價 */
   window.setConvFilter = (mode, el) => {
     ST.convMode = mode;
     const parent = el.parentElement;
@@ -849,10 +883,7 @@
   };
 
   function updCombo(sub) {
-    // V9.4.4: 移除 metadata 限制，直接使用 has_purchased 和 is_new_customer
-    // 這樣可以確保補填的舊資料也能被納入統計
     const v9Data = sub; 
-    
     let targetData = v9Data;
     if (ST.convMode === 'new') targetData = v9Data.filter(v => v.is_new_customer === true);
     if (ST.convMode === 'old') targetData = v9Data.filter(v => v.is_new_customer === false);
@@ -862,7 +893,6 @@
       map["新客"] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
       map["老客"] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
       v9Data.forEach(v => {
-        // 確保 is_new_customer 不為 null
         if (v.is_new_customer === null) return;
         const k = v.is_new_customer ? "新客" : "老客";
         map[k].total++;
@@ -892,13 +922,14 @@
     });
 
     const labels = Object.keys(map).sort((a, b) => {
-      if (a === "新客" || a === "老客") return -1;
-      if (b === "新客" || b === "老客") return 1;
-      return (map[b].paid / map[b].total) - (map[a].paid / map[a].total);
+      if (a === "新客") return -1;
+      if (b === "新客") return 1;
+      if (a === "老客") return -1;
+      if (b === "老客") return 1;
+      return map[b].total - map[a].total;
     });
 
     const rates = labels.map(k => Math.round((map[k].paid / map[k].total) * 100) || 0);
-    // V9.4.4: 客單價分母只計算有金額的筆數，避免被 0 元資料拉低
     const aovs = labels.map(k => map[k].paidWithAmount ? Math.round(map[k].amount / map[k].paidWithAmount) : 0);
 
     const ch = ensureChart("combo", "chartCombo", {
@@ -926,9 +957,11 @@
           tooltip: {
             backgroundColor: "rgba(0,0,0,0.85)", padding: 12, cornerRadius: 8,
             callbacks: {
-              label: (ctx) => {
+              label: function(ctx) {
+                const currentMap = ctx.chart.$comboMap || {};
                 if (ctx.dataset.type === "line") return `客單價: $${fmtTwd(ctx.raw)}`;
-                return `轉換率: ${ctx.raw}% (有消費: ${map[ctx.label].paid}/${map[ctx.label].total})`;
+                const data = currentMap[ctx.label] || { paid: 0, total: 0 };
+                return `轉換率: ${ctx.raw}% (有消費: ${data.paid}/${data.total})`;
               }
             }
           },
@@ -939,11 +972,42 @@
             font: { weight: 'bold', size: 11 },
             formatter: (v, ctx) => ctx.dataset.type === 'line' ? (v > 0 ? `$${Math.round(v/1000)}k` : "") : (v > 0 ? `${v}%` : "")
           }
+        },
+        onClick: (e, els) => {
+          if (els.length) {
+            const clickedLabel = ch.data.labels[els[0].index];
+            
+            if (clickedLabel === "新客") {
+              ST.filter.cust = true;
+              qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected'));
+              if(qa('#segCust .seg-btn')[1]) qa('#segCust .seg-btn')[1].classList.add('selected');
+            } else if (clickedLabel === "老客") {
+              ST.filter.cust = false;
+              qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected'));
+              if(qa('#segCust .seg-btn')[2]) qa('#segCust .seg-btn')[2].classList.add('selected');
+            } else {
+              ST.filter.source = [clickedLabel];
+              ST.filter.sourceLocked = true;
+            }
+            
+            applyFilter();
+            
+            const secTable = $("secTable");
+            const iconTable = $("icon-secTable");
+            if (secTable && secTable.classList.contains("collapsed")) {
+              secTable.classList.remove("collapsed");
+              if (iconTable) iconTable.classList.remove("rotated");
+            }
+            setTimeout(() => {
+              secTable.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 100);
+          }
         }
       }
     });
 
     if (ch) {
+      ch.$comboMap = map;
       ch.data.labels = labels;
       ch.data.datasets[0].data = rates;
       ch.data.datasets[1].data = aovs;
@@ -963,7 +1027,6 @@
       if (ST.filter.purpose && !arr(v.visit_purposes).includes(ST.filter.purpose)) return false;
       if (ST.filter.gender && s(v.gender) !== ST.filter.gender) return false;
       if (ST.filter.age && s(v.age_range) !== ST.filter.age) return false;
-      if (ST.filter.adTag && !s(v.ad_source_detail).includes(ST.filter.adTag)) return false;
       return true;
     });
 
@@ -974,7 +1037,6 @@
     updTrend(sub);
     updGender(sub);
     updAge(sub);
-    updAdHeat(sub);
     updCombo(sub);
     updateFilterBadges();
   }
@@ -991,10 +1053,14 @@
       const pay = v.has_purchased ? "有消費" : "無消費";
       const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)}` : "";
       
+      if (v.edit_requested && ST.isAdmin) {
+        tr.classList.add("row-edit-requested");
+      }
+
       tr.innerHTML = `
         <td class="pl-6 py-3 font-mono text-slate-500">${s(v.form_date)}</td>
         <td><span class="px-2 py-1 rounded-full text-xs font-bold ${s(v.store_branch) === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${s(v.store_branch)}</span></td>
-        <td class="font-bold text-slate-800">${maskName(v.customer_name)}</td>
+        <td class="font-bold text-slate-800">${maskName(v.customer_name)} ${v.edit_requested && ST.isAdmin ? '<span class="text-red-500 text-xs ml-1">⚠️</span>' : ''}</td>
         <td class="text-xs font-bold ${cust === "新客" ? "text-blue-700" : "text-purple-700"}">${cust}</td>
         <td class="text-xs font-bold ${pay === "有消費" ? "text-emerald-700" : "text-slate-500"}">${pay}${amt}</td>
         <td class="text-xs text-slate-500">${s(v.gender) || "-"} / ${s(v.age_range) || "-"}</td>
@@ -1023,26 +1089,61 @@
 
   /* Data */
   async function fetchAllData() {
-    let all = [], page = 0;
-    $("valTotal").innerText = "...";
-    while (true) {
-      const { data, error } = await supabase.from("visits").select("*").range(page * CFG.PAGE_SIZE, (page + 1) * CFG.PAGE_SIZE - 1);
-      if (error) { console.error(error); alert("載入失敗：" + error.message); break; }
-      if (!data || !data.length) break;
-      all = all.concat(data);
-      if (data.length < CFG.PAGE_SIZE) break;
-      page++;
+    try {
+      let all = [], page = 0;
+      $("valTotal").innerText = "...";
+      while (true) {
+        const { data, error } = await supabase.from("visits").select("*").range(page * CFG.PAGE_SIZE, (page + 1) * CFG.PAGE_SIZE - 1);
+        if (error) throw error;
+        if (!data || !data.length) break;
+        all = all.concat(data);
+        if (data.length < CFG.PAGE_SIZE) break;
+        page++;
+      }
+      
+      // V9.5.4 防呆與自動校正器 (Sanitizer)
+      ST.raw = all.map(v => {
+        if (v.source_tags && Array.isArray(v.source_tags)) {
+          v.source_tags = v.source_tags.map(tag => {
+            if (CFG.SOURCES.includes(tag)) return tag;
+            if (tag === "FB、IG 社團") return "FB 社團文";
+            if (tag === "業配貼文（FB、IG）") return "網紅推薦";
+            return "其他"; // 任何不在名單內的幽靈標籤，一律歸類為其他
+          });
+          v.source_tags = [...new Set(v.source_tags)];
+        }
+        return v;
+      });
+
+      if (ST.raw.length) {
+        // 安全的日期排序與顯示，避免 null 導致 replace 報錯
+        ST.raw.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
+        const lastDate = ST.raw[0].form_date;
+        $("lastDataDisp").innerText = "last data " + (lastDate ? String(lastDate).replace(/-/g, "/") : "--/--/--");
+        
+        const years = [...new Set(ST.raw.map(d => s(d.form_date).slice(0, 4)).filter(y => y && y !== "null"))].sort().reverse();
+        $("selYear").innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join("");
+        
+        const dates = ST.raw.map(d => d.form_date).filter(Boolean).sort();
+        if (dates.length) ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+      }
+      applyFilter();
+    } catch (err) {
+      console.error("載入資料失敗:", err);
+      alert("載入資料失敗：" + err.message);
     }
-    ST.raw = all.sort((a, b) => new Date(b.form_date) - new Date(a.form_date));
-    if (ST.raw.length) {
-      const last = ST.raw[0].form_date.replace(/-/g, "/");
-      $("lastDataDisp").innerText = "last data " + last;
-      const years = [...new Set(ST.raw.map(d => s(d.form_date).slice(0, 4)))].sort().reverse();
-      $("selYear").innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join("");
-      const dates = ST.raw.map(d => d.form_date).sort();
-      ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+  }
+
+  async function fetchAdStats() {
+    try {
+      const { data, error } = await supabase.from("ad_stats").select("*").order("ad_count", { ascending: false });
+      if (error) throw error;
+      ST.adStats = data || [];
+    } catch (err) {
+      console.error("載入廣告統計失敗", err);
+      ST.adStats = [];
     }
-    applyFilter();
+    updAdHeat();
   }
 
   function applyFilter() {
@@ -1062,12 +1163,10 @@
 
     if (ST.filter.cust !== null) pool = pool.filter(v => v.is_new_customer === ST.filter.cust);
     if (ST.filter.pay !== null) pool = pool.filter(v => v.has_purchased === ST.filter.pay);
-    // V9.4.1: 客源複選邏輯 (聯集 OR)
     if (ST.filter.source.length) pool = pool.filter(v => ST.filter.source.some(s => arr(v.source_tags).includes(s)));
     if (ST.filter.purpose) pool = pool.filter(v => arr(v.visit_purposes).includes(ST.filter.purpose));
     if (ST.filter.gender) pool = pool.filter(v => s(v.gender) === ST.filter.gender);
     if (ST.filter.age) pool = pool.filter(v => s(v.age_range) === ST.filter.age);
-    if (ST.filter.adTag) pool = pool.filter(v => s(v.ad_source_detail).includes(ST.filter.adTag));
 
     $("valTotal").innerText = pool.length;
     $("valLinAn").innerText = pool.filter(v => v.store_branch === "臨安店").length;
@@ -1075,7 +1174,16 @@
 
     ST.filtered = pool.filter(v => (ST.store === "全部" || v.store_branch === ST.store));
 
-    // V9.4.4: 移除自動清空客源的邏輯，修復點擊無效問題
+    if (ST.isAdmin) {
+      ST.filtered.sort((a, b) => {
+        if (a.edit_requested && !b.edit_requested) return -1;
+        if (!a.edit_requested && b.edit_requested) return 1;
+        return new Date(b.form_date || 0) - new Date(a.form_date || 0);
+      });
+    } else {
+      ST.filtered.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
+    }
+
     if (!ST.filter.purposeLocked) ST.filter.purpose = null;
     if (!ST.filter.genderLocked) ST.filter.gender = null;
     if (!ST.filter.ageLocked) ST.filter.age = null;
@@ -1102,7 +1210,7 @@
     if (y && m) { ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]); applyFilter(); }
   };
   window.resetDate = () => {
-    if (ST.raw.length) { const dates = ST.raw.map(x => x.form_date).sort(); ST.datePicker.setDate([dates[0], dates[dates.length - 1]]); }
+    if (ST.raw.length) { const dates = ST.raw.map(x => x.form_date).filter(Boolean).sort(); if(dates.length) ST.datePicker.setDate([dates[0], dates[dates.length - 1]]); }
     $("selMonth").value = ""; applyFilter();
   };
   window.clearSearch = () => { $("qSearch").value = ""; $("btnX").classList.add("hidden"); applyFilter(); };
@@ -1111,7 +1219,7 @@
   function setSaveButtonText() { $("btnSave").innerText = (ST.editingId && ST.isAdmin) ? "更新儲存" : "確認儲存"; }
   function closeAddModal() {
     $("addModal").style.display = "none";
-    $("mName").value = ""; $("mDetail").value = ""; $("mKeyword").value = ""; $("mAmount").value = ""; $("mAdTags").value = "";
+    $("mName").value = ""; $("mDetail").value = ""; $("mKeyword").value = ""; $("mAmount").value = "";
     resetEditSegUI();
     qa(".selected, .checked").forEach(e => e.classList.remove("selected", "checked"));
     $("boxKeyword").classList.add("hidden");
@@ -1156,7 +1264,6 @@
     $("mName").value = v.customer_name || "";
     $("mTainan").checked = !!v.is_local;
     $("mAmount").value = v.amount || "";
-    $("mAdTags").value = v.ad_source_detail || "";
     
     if (v.is_new_customer !== null) setEditSeg('cust', v.is_new_customer, qa("#segEditCust .seg-btn")[v.is_new_customer ? 1 : 2]);
     else resetEditSegUI();
@@ -1197,7 +1304,7 @@
       p_detail: detail,
       p_is_new_customer: ST.editSeg.cust,
       p_amount: Number($("mAmount").value) || 0,
-      p_ad_source_detail: $("mAdTags").value
+      p_ad_source_detail: ""
     };
 
     if (ST.editingId && ST.isAdmin) {
@@ -1213,7 +1320,7 @@
         search_keywords: rpcPayload.p_keywords,
         detail_desc: rpcPayload.p_detail,
         amount: rpcPayload.p_amount,
-        ad_source_detail: rpcPayload.p_ad_source_detail
+        ad_source_detail: ""
       };
       if (rpcPayload.p_is_new_customer !== null) updatePayload.is_new_customer = rpcPayload.p_is_new_customer;
       
@@ -1236,23 +1343,32 @@
     const cust = v.is_new_customer ? "新客" : "老客";
     const pay = v.has_purchased ? "有消費" : "無消費";
     const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)} TWD` : "";
-    const adTags = s(v.ad_source_detail);
+
+    let editWarning = "";
+    if (v.edit_requested && ST.isAdmin) {
+      editWarning = `
+        <div class="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-red-600 font-bold text-sm mb-1">⚠️ 收到修改申請</div>
+              <div class="text-red-800 text-sm">${v.edit_reason}</div>
+            </div>
+            <button onclick="resolveEditRequest(${v.id})" class="bg-white border border-red-200 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 transition">✅ 標記為已處理</button>
+          </div>
+        </div>
+      `;
+    }
 
     $("detailContent").innerHTML = `
+      ${editWarning}
       <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
       <p class="text-sm text-gray-500 mb-4 flex items-center gap-2">
         <span class="px-2 py-1 rounded-full text-xs font-bold ${v.store_branch === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${v.store_branch}</span>
         <span>${v.form_date}</span><span>•</span><span>${v.gender || "-"} / ${v.age_range || "-"}</span>
       </p>
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-          <div class="text-xs font-bold text-slate-500 mb-1">身分 / 消費</div>
-          <div class="text-sm font-black text-slate-900">${cust} / ${pay}${amt}</div>
-        </div>
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-          <div class="text-xs font-bold text-slate-500 mb-1">廣告標籤</div>
-          <div class="text-sm font-black text-slate-900">${adTags || "無"}</div>
-        </div>
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+        <div class="text-xs font-bold text-slate-500 mb-1">身分 / 消費</div>
+        <div class="text-sm font-black text-slate-900">${cust} / ${pay}${amt}</div>
       </div>
       <div class="grid grid-cols-2 gap-3 mb-4">
         <div class="bg-blue-50 p-3 rounded-lg">
@@ -1267,8 +1383,10 @@
       ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ""}
       <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || "無詳細描述"}</div>
     `;
+    
     $("detailModal").style.display = "flex";
     $("detailActions").classList.toggle("hidden", !ST.isAdmin);
+    $("requestEditSection").classList.toggle("hidden", ST.isAdmin);
   }
   window.showDetail = showDetail;
   window.closeDetail = () => $("detailModal").style.display = "none";
@@ -1278,6 +1396,128 @@
     const { error } = await supabase.from("visits").delete().eq("id", ST.currentDetailId);
     if (error) alert("刪除失敗: " + error.message); else { alert("已刪除"); closeDetail(); fetchAllData(); }
   };
+
+  window.openRequestEdit = () => {
+    $("reqEditReason").value = "";
+    $("requestEditModal").style.display = "flex";
+  };
+  window.closeRequestEdit = () => $("requestEditModal").style.display = "none";
+  window.submitRequestEdit = async () => {
+    const reason = $("reqEditReason").value.trim();
+    if (!reason) return alert("請輸入修改原因");
+    
+    const { error } = await supabase.from("visits").update({ edit_requested: true, edit_reason: reason }).eq("id", ST.currentDetailId);
+    if (error) { alert("申請失敗: " + error.message); }
+    else {
+      alert("✅ 申請已送出，管理員將會處理。");
+      closeRequestEdit(); closeDetail(); fetchAllData();
+    }
+  };
+  window.resolveEditRequest = async (id) => {
+    if (!ST.isAdmin) return;
+    const { error } = await supabase.from("visits").update({ edit_requested: false, edit_reason: "" }).eq("id", id);
+    if (error) alert("處理失敗: " + error.message);
+    else { closeDetail(); fetchAllData(); }
+  };
+
+  window.openAdStatsModal = () => {
+    renderAdStatsList();
+    $("adStatsModal").style.display = "flex";
+  };
+  window.closeAdStatsModal = () => $("adStatsModal").style.display = "none";
+  
+  function renderAdStatsList() {
+    const list = $("adStatsList");
+    if (!ST.adStats.length) {
+      list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有廣告資料</div>`;
+      return;
+    }
+    list.innerHTML = ST.adStats.map(ad => `
+      <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+        <div class="font-bold text-slate-700 flex-grow">${ad.ad_name}</div>
+        <div class="flex items-center gap-2">
+          <input id="adInput_${ad.id}" type="text" class="w-20 p-1.5 border rounded text-center font-bold text-blue-600" value="${ad.ad_count}" placeholder="數量">
+          <button onclick="saveAdStat(${ad.id}, 'adInput_${ad.id}')" class="bg-green-100 text-green-700 px-3 py-1.5 rounded font-bold text-xs hover:bg-green-200">儲存</button>
+          <button onclick="deleteAdStat(${ad.id}, '${ad.ad_name}')" class="bg-red-50 text-red-500 px-2 py-1.5 rounded font-bold text-xs hover:bg-red-100">刪除</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.addAdStat = async () => {
+    const name = $("newAdName").value.trim();
+    if (!name) return alert("請輸入廣告名稱");
+    const { error } = await supabase.from("ad_stats").insert([{ ad_name: name, ad_count: 0 }]);
+    if (error) alert("新增失敗: " + error.message);
+    else { $("newAdName").value = ""; await fetchAdStats(); renderAdStatsList(); }
+  };
+
+  window.saveAdStat = async (id, inputId) => {
+    const ad = ST.adStats.find(a => a.id === id);
+    if (!ad) return;
+    
+    const rawVal = $(inputId).value.trim();
+    let newVal;
+    try {
+      newVal = new Function('return ' + rawVal)();
+      newVal = parseInt(newVal, 10);
+      if (isNaN(newVal)) throw new Error();
+    } catch (e) {
+      return alert("數量格式錯誤，請輸入數字或算式 (如 10+3)");
+    }
+
+    const changeAmount = newVal - ad.ad_count;
+    if (changeAmount === 0) return alert("數量沒有變更");
+
+    const { error: updateErr } = await supabase.from("ad_stats").update({ ad_count: newVal, updated_at: new Date().toISOString() }).eq("id", id);
+    if (updateErr) return alert("更新失敗: " + updateErr.message);
+
+    await supabase.from("ad_stats_log").insert([{
+      ad_id: id, ad_name: ad.ad_name, old_count: ad.ad_count, new_count: newVal, change_amount: changeAmount
+    }]);
+
+    alert(`✅ 已更新！變更幅度: ${changeAmount > 0 ? '+' : ''}${changeAmount}`);
+    await fetchAdStats(); renderAdStatsList();
+  };
+
+  window.deleteAdStat = async (id, name) => {
+    if (!confirm(`確定要刪除廣告「${name}」嗎？相關日誌也會一併刪除。`)) return;
+    const { error } = await supabase.from("ad_stats").delete().eq("id", id);
+    if (error) alert("刪除失敗: " + error.message);
+    else { await fetchAdStats(); renderAdStatsList(); }
+  };
+
+  window.openAdLogModal = async () => {
+    $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">載入中...</div>`;
+    $("adLogModal").style.display = "flex";
+    
+    const { data, error } = await supabase.from("ad_stats_log").select("*").order("changed_at", { ascending: false }).limit(100);
+    if (error) { $("adLogList").innerHTML = `<div class="text-red-500 text-sm">載入失敗</div>`; return; }
+    
+    if (!data || !data.length) {
+      $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有修改紀錄</div>`;
+      return;
+    }
+
+    $("adLogList").innerHTML = data.map(log => {
+      const date = new Date(log.changed_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      const sign = log.change_amount > 0 ? '+' : '';
+      const color = log.change_amount > 0 ? 'text-green-600' : 'text-red-500';
+      return `
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm flex justify-between items-center">
+          <div>
+            <div class="font-bold text-slate-700">${log.ad_name}</div>
+            <div class="text-xs text-slate-400">${date}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-black ${color}">${sign}${log.change_amount}</div>
+            <div class="text-xs text-slate-500">${log.old_count} ➔ ${log.new_count}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  };
+  window.closeAdLogModal = () => $("adLogModal").style.display = "none";
 
   /* CSV Export */
   window.openExportModal = () => {
@@ -1356,7 +1596,7 @@
             p_detail: row["detail_desc"] || row["詳細描述"] || "",
             p_is_new_customer: row["is_new_customer"] === "true" ? true : (row["is_new_customer"] === "false" ? false : null),
             p_amount: Number(row["amount"] || 0),
-            p_ad_source_detail: row["ad_source_detail"] || ""
+            p_ad_source_detail: ""
           };
         }).filter(Boolean);
 
@@ -1400,6 +1640,7 @@
   window.logout = async () => {
     await supabase.auth.signOut(); ST.isAdmin = false;
     $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("adminExtraBox").classList.add("hidden");
+    applyFilter();
     alert("已登出");
   };
 
@@ -1419,6 +1660,7 @@
     $("qSearch").addEventListener("input", function () { this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden"); });
     initAddModal(); setSaveButtonText();
     const { data: { session } } = await supabase.auth.getSession(); if (session) enableAdminUI();
+    await fetchAdStats();
     await fetchAllData();
   }
 
