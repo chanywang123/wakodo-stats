@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V9.5.4</title>
+  <title>和光堂戰情室 V9.5.5</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -172,7 +172,7 @@
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.5.4</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.5.5</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
               <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
                  id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
@@ -390,20 +390,21 @@
       </div>
     </div>
 
-    <!-- Add Modal -->
+    <!-- V9.5.5 Add/Edit Modal (對標 form-v3.html) -->
     <div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
       <div class="modal-content relative">
         <button onclick="closeAddModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增顧客資料</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增/編輯顧客資料</h2>
 
         <div class="space-y-5">
+          <!-- 日期與分店 -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
+              <label class="block text-xs font-bold text-gray-500 mb-1">日期 <span class="required-mark">*</span></label>
               <input type="date" id="mDate" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-500 mb-1">分店</label>
+              <label class="block text-xs font-bold text-gray-500 mb-1">分店 <span class="required-mark">*</span></label>
               <select id="mStore" class="w-full p-2 border rounded-lg bg-gray-50 font-bold">
                 <option>臨安店</option>
                 <option>南科店</option>
@@ -411,6 +412,32 @@
             </div>
           </div>
 
+          <!-- 顧客身分與本次消費 -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-2">顧客身分 <span class="required-mark">*</span></label>
+              <div class="seg-group" id="segEditCust">
+                <div class="seg-btn" onclick="setEditSeg('cust', null, this)">自動</div>
+                <div class="seg-btn" onclick="setEditSeg('cust', true, this)">新客</div>
+                <div class="seg-btn" onclick="setEditSeg('cust', false, this)">老客</div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-2">本次消費 <span class="required-mark">*</span></label>
+              <div class="seg-group" id="segEditPay">
+                <div class="seg-btn selected" onclick="setEditPay(true, this)">有</div>
+                <div class="seg-btn" onclick="setEditPay(false, this)">無</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 消費金額 (動態顯示) -->
+          <div id="boxAmount">
+            <label class="block text-xs font-bold text-gray-500 mb-2">消費金額 (TWD) <span class="required-mark">*</span></label>
+            <input id="mAmount" type="number" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="請輸入金額 (需大於0)">
+          </div>
+
+          <!-- 姓名與居住地 -->
           <div class="flex gap-4">
             <div class="flex-grow">
               <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
@@ -424,24 +451,7 @@
             </div>
           </div>
 
-          <div id="adminExtraBox" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div class="text-xs font-black text-slate-500 mb-3">⚙️ 管理員欄位</div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2">顧客身分</label>
-                <div class="seg-group" id="segEditCust">
-                  <div class="seg-btn" onclick="setEditSeg('cust', null, this)">自動</div>
-                  <div class="seg-btn" onclick="setEditSeg('cust', true, this)">新客</div>
-                  <div class="seg-btn" onclick="setEditSeg('cust', false, this)">老客</div>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2">消費金額 (TWD)</label>
-                <input id="mAmount" type="number" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="0">
-              </div>
-            </div>
-          </div>
-
+          <!-- 性別 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
             <div class="radio-group" id="grpGender">
@@ -450,11 +460,13 @@
             </div>
           </div>
 
+          <!-- 年齡層 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
             <div class="radio-group" id="grpAge"></div>
           </div>
 
+          <!-- 客源 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
             <div class="chk-grid" id="grpSource"></div>
@@ -464,11 +476,13 @@
             </div>
           </div>
 
+          <!-- 目的 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
             <div class="chk-grid" id="grpPurpose"></div>
           </div>
 
+          <!-- 備註 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-1">詳細備註 <span class="required-mark">*</span></label>
             <textarea id="mDetail" class="w-full p-3 border rounded-lg h-24 resize-none" placeholder="客人描述..."></textarea>
@@ -540,7 +554,7 @@
 
   <script>
   const CFG = Object.freeze({
-    VERSION: "9.5.4",
+    VERSION: "9.5.5",
     FRONT_GATE_PASSWORD: "wakodo100",
     FRONT_GATE_KEY: "wakodo_gate_ok",
     PAGE_SIZE: 1000,
@@ -568,7 +582,9 @@
   const ST = {
     raw: [], filtered: [], limit: 20, store: "全部",
     filter: { source:[], purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false, cust:null, pay:null },
-    datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, editSeg: { cust: null }, splitView: false, convMode: 'all',
+    datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, 
+    editSeg: { cust: null, pay: true }, // V9.5.5 新增 pay 狀態
+    splitView: false, convMode: 'all',
     adStats: []
   };
 
@@ -602,7 +618,7 @@
   function enableAdminUI(){
     ST.isAdmin=true;
     $("adminPanel")?.classList.remove("hidden"); $("loginForm")?.classList.add("hidden");
-    $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden"); $("adminExtraBox")?.classList.remove("hidden");
+    $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden");
     applyFilter();
   }
 
@@ -634,6 +650,18 @@
     if (el) el.classList.add("selected");
   };
 
+  // V9.5.5 新增：處理「本次消費」切換邏輯
+  window.setEditPay = (hasPay, el) => {
+    ST.editSeg.pay = hasPay;
+    const parent = el.parentElement;
+    qa(".seg-btn", parent).forEach(b => b.classList.remove("selected"));
+    el.classList.add("selected");
+    
+    // 控制金額輸入框的顯示與隱藏
+    $("boxAmount").classList.toggle("hidden", !hasPay);
+    if (!hasPay) $("mAmount").value = ""; // 選擇無消費時清空金額
+  };
+
   function resetEditSegUI(){
     ST.editSeg.cust = null;
     const grp = $("segEditCust");
@@ -642,6 +670,10 @@
       const first = qa(".seg-btn", grp)[0];
       if (first) first.classList.add("selected");
     }
+    
+    // 重置消費狀態為「有」
+    const payBtns = qa("#segEditPay .seg-btn");
+    if(payBtns.length) setEditPay(true, payBtns[0]);
   }
 
   function toggleLock(type, value){
@@ -1101,14 +1133,13 @@
         page++;
       }
       
-      // V9.5.4 防呆與自動校正器 (Sanitizer)
       ST.raw = all.map(v => {
         if (v.source_tags && Array.isArray(v.source_tags)) {
           v.source_tags = v.source_tags.map(tag => {
             if (CFG.SOURCES.includes(tag)) return tag;
             if (tag === "FB、IG 社團") return "FB 社團文";
             if (tag === "業配貼文（FB、IG）") return "網紅推薦";
-            return "其他"; // 任何不在名單內的幽靈標籤，一律歸類為其他
+            return "其他";
           });
           v.source_tags = [...new Set(v.source_tags)];
         }
@@ -1116,7 +1147,6 @@
       });
 
       if (ST.raw.length) {
-        // 安全的日期排序與顯示，避免 null 導致 replace 報錯
         ST.raw.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
         const lastDate = ST.raw[0].form_date;
         $("lastDataDisp").innerText = "last data " + (lastDate ? String(lastDate).replace(/-/g, "/") : "--/--/--");
@@ -1263,10 +1293,15 @@
     $("mStore").value = v.store_branch || "臨安店";
     $("mName").value = v.customer_name || "";
     $("mTainan").checked = !!v.is_local;
-    $("mAmount").value = v.amount || "";
     
+    // V9.5.5 載入時設定身分與消費狀態
     if (v.is_new_customer !== null) setEditSeg('cust', v.is_new_customer, qa("#segEditCust .seg-btn")[v.is_new_customer ? 1 : 2]);
     else resetEditSegUI();
+
+    const hasPay = v.has_purchased || Number(v.amount) > 0;
+    const payBtns = qa("#segEditPay .seg-btn");
+    setEditPay(hasPay, hasPay ? payBtns[0] : payBtns[1]);
+    $("mAmount").value = v.amount || ""; // 必須在 setEditPay 之後設定，避免被清空
 
     selectRadioByValue("grpGender", v.gender || "");
     selectRadioByValue("grpAge", v.age_range || "");
@@ -1286,6 +1321,13 @@
     const purposes = qa("#grpPurpose .checked").map(e => e.innerText.trim());
     const detail = $("mDetail").value.trim();
 
+    // V9.5.5 驗證邏輯
+    const finalAmount = ST.editSeg.pay ? (Number($("mAmount").value) || 0) : 0;
+    if (ST.editSeg.pay && finalAmount <= 0) {
+      alert("⚠️ 有消費時，請輸入大於 0 的消費金額！");
+      return;
+    }
+
     if (!name || !genderEl || !ageEl || !sources.length || !purposes.length || !detail) {
       alert("⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。");
       return;
@@ -1303,7 +1345,7 @@
       p_keywords: $("mKeyword").value,
       p_detail: detail,
       p_is_new_customer: ST.editSeg.cust,
-      p_amount: Number($("mAmount").value) || 0,
+      p_amount: finalAmount,
       p_ad_source_detail: ""
     };
 
@@ -1319,7 +1361,8 @@
         visit_purposes: rpcPayload.p_purposes,
         search_keywords: rpcPayload.p_keywords,
         detail_desc: rpcPayload.p_detail,
-        amount: rpcPayload.p_amount,
+        amount: finalAmount,
+        has_purchased: ST.editSeg.pay, // V9.5.5 強制寫入管理員選擇的消費狀態
         ad_source_detail: ""
       };
       if (rpcPayload.p_is_new_customer !== null) updatePayload.is_new_customer = rpcPayload.p_is_new_customer;
@@ -1639,7 +1682,7 @@
   };
   window.logout = async () => {
     await supabase.auth.signOut(); ST.isAdmin = false;
-    $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("adminExtraBox").classList.add("hidden");
+    $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden");
     applyFilter();
     alert("已登出");
   };
