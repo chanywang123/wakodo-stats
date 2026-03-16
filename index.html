@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V9.5.7</title>
+  <title>和光堂戰情室 V9.6.0</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +28,6 @@
     body { background:var(--bg); font-family:system-ui,-apple-system,sans-serif; color:#1e293b; }
     .glass-card { background:var(--card-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03); transition: all 0.3s ease; }
     
-    /* 高度限制放寬到 50000px，確保無限載入時不會被截斷 */
     .section-content { transition: max-height 0.4s ease-out, opacity 0.3s ease; max-height: 50000px; opacity: 1; overflow: hidden; }
     .section-content.collapsed { max-height: 0; opacity: 0; margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
     .toggle-icon { transition: transform 0.3s ease; cursor: pointer; font-weight: 900; color: #94a3b8; padding: 4px; }
@@ -173,7 +172,7 @@
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.5.7</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.6.0</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
               <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
                  id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
@@ -190,20 +189,23 @@
 
       <div id="adminPanel" class="hidden glass-card bg-slate-900 text-white p-4 border-slate-700">
         <div id="loginForm" class="flex gap-2">
-          <input id="admEmail" type="email" class="p-2 rounded text-black flex-1" placeholder="管理員信箱">
+          <input id="admEmail" type="text" class="p-2 rounded text-black flex-1" placeholder="管理員信箱或帳號">
           <input id="admPwd" type="password" class="p-2 rounded text-black flex-1" placeholder="密碼" onkeyup="if(event.key==='Enter') loginSupabase()">
-          <button onclick="loginSupabase()" class="btn-primary">Supabase 登入</button>
+          <button onclick="loginSupabase()" class="btn-primary">登入</button>
         </div>
 
         <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
-          <span class="text-green-400 font-bold">✓ 管理員模式</span>
+          <span class="text-green-400 font-bold" id="adminRoleLabel">✓ 管理員模式</span>
+          <!-- V9.6.0 新增：帳號管理按鈕 (僅主管理員可見) -->
+          <button id="btnManageAccounts" onclick="openAccountModal()" class="bg-teal-600 hover:bg-teal-500 px-4 py-2 rounded text-sm font-bold hidden">👥 帳號管理</button>
           <button onclick="openAdStatsModal()" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded text-sm font-bold">📊 廣告成效管理</button>
           <button onclick="openExportModal()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 進階匯出</button>
           <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold">
             📂 匯入 CSV
             <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)">
           </label>
-          <button onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition">⚠ 清空資料庫</button>
+          <!-- V9.6.0 修正：清空資料庫按鈕 (僅主管理員可見) -->
+          <button id="btnWipeData" onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition hidden">⚠ 清空資料庫</button>
         </div>
       </div>
 
@@ -386,7 +388,6 @@
               <tbody id="tableBody"></tbody>
             </table>
           </div>
-          <!-- V9.5.7 修正：改回每次載入 20 筆 -->
           <button onclick="loadMore()" id="btnLoadMore" class="w-full py-4 text-slate-400 bg-slate-50 hover:bg-slate-100 font-bold text-xs transition border-t border-slate-100">▼ 載入更多資料</button>
         </div>
       </div>
@@ -399,7 +400,6 @@
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增/編輯顧客資料</h2>
 
         <div class="space-y-5">
-          <!-- 日期與分店 -->
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-gray-500 mb-1">日期 <span class="required-mark">*</span></label>
@@ -414,7 +414,6 @@
             </div>
           </div>
 
-          <!-- 顧客身分與本次消費 -->
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-gray-500 mb-2">顧客身分 <span class="required-mark">*</span></label>
@@ -433,13 +432,11 @@
             </div>
           </div>
 
-          <!-- 消費金額 (動態顯示) -->
           <div id="boxAmount">
             <label class="block text-xs font-bold text-gray-500 mb-2">消費金額 (TWD) <span class="required-mark">*</span></label>
             <input id="mAmount" type="number" class="w-full p-2 border rounded-lg bg-white font-bold" placeholder="請輸入金額 (需大於0)">
           </div>
 
-          <!-- 姓名與居住地 -->
           <div class="flex gap-4">
             <div class="flex-grow">
               <label class="block text-xs font-bold text-gray-500 mb-1">姓名 <span class="required-mark">*</span></label>
@@ -453,7 +450,6 @@
             </div>
           </div>
 
-          <!-- 性別 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">性別 <span class="required-mark">*</span></label>
             <div class="radio-group" id="grpGender">
@@ -462,13 +458,11 @@
             </div>
           </div>
 
-          <!-- 年齡層 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">年齡層 <span class="required-mark">*</span></label>
             <div class="radio-group" id="grpAge"></div>
           </div>
 
-          <!-- 客源 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
             <div class="chk-grid" id="grpSource"></div>
@@ -478,13 +472,11 @@
             </div>
           </div>
 
-          <!-- 目的 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-2">目的 (可多選) <span class="required-mark">*</span></label>
             <div class="chk-grid" id="grpPurpose"></div>
           </div>
 
-          <!-- 備註 -->
           <div>
             <label class="block text-xs font-bold text-gray-500 mb-1">詳細備註 <span class="required-mark">*</span></label>
             <textarea id="mDetail" class="w-full p-3 border rounded-lg h-24 resize-none" placeholder="客人描述..."></textarea>
@@ -507,7 +499,8 @@
 
         <div id="detailActions" class="mt-4 flex gap-3 hidden border-t pt-4">
           <button onclick="startEditCurrent()" class="text-blue-600 border border-blue-200 px-4 py-2 rounded hover:bg-blue-50 font-bold text-sm transition">編輯此筆</button>
-          <button onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition">刪除此筆</button>
+          <!-- V9.6.0 修正：刪除按鈕加上 ID 以便控制權限 -->
+          <button id="btnDeleteDetail" onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition hidden">刪除此筆</button>
         </div>
       </div>
     </div>
@@ -520,6 +513,22 @@
         <p class="text-xs text-slate-500 mb-4">請描述要修改的內容，管理員審核後將為您修改。</p>
         <textarea id="reqEditReason" class="w-full p-3 border rounded-lg h-24 resize-none text-sm" placeholder="EX：日期錯誤、門店錯誤或其他請描述..."></textarea>
         <button onclick="submitRequestEdit()" class="w-full bg-orange-500 text-white py-2 mt-4 rounded-lg font-bold shadow hover:bg-orange-600 transition">送出申請</button>
+      </div>
+    </div>
+
+    <!-- V9.6.0 新增：次級管理員帳號管理 Modal -->
+    <div id="accountModal" class="modal-overlay" style="z-index: 110;" onclick="if(event.target===this)closeAccountModal()">
+      <div class="modal-content relative max-w-2xl">
+        <button onclick="closeAccountModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
+        <h2 class="text-xl font-bold mb-4">👥 次級管理員帳號管理</h2>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+          <div class="flex gap-2">
+            <input id="newSubAccount" type="text" class="flex-grow p-2 border rounded-lg text-sm" placeholder="輸入新帳號...">
+            <input id="newSubPassword" type="text" class="flex-grow p-2 border rounded-lg text-sm" placeholder="輸入新密碼...">
+            <button onclick="addSubAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">新增</button>
+          </div>
+        </div>
+        <div class="space-y-3" id="subAdminList"></div>
       </div>
     </div>
 
@@ -556,7 +565,7 @@
 
   <script>
   const CFG = Object.freeze({
-    VERSION: "9.5.7",
+    VERSION: "9.6.0",
     FRONT_GATE_PASSWORD: "wakodo100",
     FRONT_GATE_KEY: "wakodo_gate_ok",
     PAGE_SIZE: 1000,
@@ -587,7 +596,9 @@
     datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, 
     editSeg: { cust: null, pay: true },
     splitView: false, convMode: 'all',
-    adStats: []
+    adStats: [],
+    adminRole: null, // V9.6.0 新增：'main' 或 'sub'
+    subAdmins: []    // V9.6.0 新增：存放次級管理員名單
   };
 
   const CH = {};
@@ -621,6 +632,18 @@
     ST.isAdmin=true;
     $("adminPanel")?.classList.remove("hidden"); $("loginForm")?.classList.add("hidden");
     $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden");
+    
+    // V9.6.0 權限分級 UI 控制
+    if (ST.adminRole === 'main') {
+      $("adminRoleLabel").innerText = "✓ 主管理員模式";
+      $("btnManageAccounts")?.classList.remove("hidden");
+      $("btnWipeData")?.classList.remove("hidden");
+    } else {
+      $("adminRoleLabel").innerText = "✓ 次級管理員模式";
+      $("btnManageAccounts")?.classList.add("hidden");
+      $("btnWipeData")?.classList.add("hidden");
+    }
+    
     applyFilter();
   }
 
@@ -1224,7 +1247,6 @@
   window.applyFilter = applyFilter;
 
   /* UI Helpers */
-  // V9.5.7 修正：改回每次載入 20 筆
   window.loadMore = () => { ST.limit += 20; renderTable(); };
   
   window.toggleAdminPanel = () => $("adminPanel").classList.toggle("hidden");
@@ -1429,11 +1451,15 @@
     $("detailModal").style.display = "flex";
     $("detailActions").classList.toggle("hidden", !ST.isAdmin);
     $("requestEditSection").classList.toggle("hidden", ST.isAdmin);
+    
+    // V9.6.0 權限分級：次級管理員隱藏刪除按鈕
+    $("btnDeleteDetail").classList.toggle("hidden", ST.adminRole !== 'main');
   }
   window.showDetail = showDetail;
   window.closeDetail = () => $("detailModal").style.display = "none";
+  
   window.deleteCurrentDetail = async () => {
-    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限！"); return; }
+    if (ST.adminRole !== 'main') { alert("⚠️ 只有主管理員可以刪除資料！"); return; }
     if (!confirm("確定刪除？")) return;
     const { error } = await supabase.from("visits").delete().eq("id", ST.currentDetailId);
     if (error) alert("刪除失敗: " + error.message); else { alert("已刪除"); closeDetail(); fetchAllData(); }
@@ -1462,6 +1488,66 @@
     else { closeDetail(); fetchAllData(); }
   };
 
+  /* V9.6.0 次級管理員帳號管理邏輯 */
+  window.openAccountModal = async () => {
+    if (ST.adminRole !== 'main') return;
+    $("accountModal").style.display = "flex";
+    await fetchSubAdmins();
+  };
+  window.closeAccountModal = () => $("accountModal").style.display = "none";
+
+  async function fetchSubAdmins() {
+    $("subAdminList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">載入中...</div>`;
+    const { data, error } = await supabase.from("sub_admins").select("*").order("created_at", { ascending: false });
+    if (error) {
+      $("subAdminList").innerHTML = `<div class="text-red-500 text-sm">載入失敗: ${error.message}</div>`;
+      return;
+    }
+    ST.subAdmins = data || [];
+    renderSubAdmins();
+  }
+
+  function renderSubAdmins() {
+    const list = $("subAdminList");
+    if (!ST.subAdmins.length) {
+      list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有次級管理員</div>`;
+      return;
+    }
+    list.innerHTML = ST.subAdmins.map(admin => `
+      <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+        <div class="flex-grow">
+          <div class="font-bold text-slate-700">帳號：${admin.account}</div>
+          <div class="text-sm text-slate-500">密碼：${admin.password}</div>
+        </div>
+        <button onclick="deleteSubAdmin(${admin.id}, '${admin.account}')" class="bg-red-50 text-red-500 px-3 py-1.5 rounded font-bold text-xs hover:bg-red-100">刪除</button>
+      </div>
+    `).join("");
+  }
+
+  window.addSubAdmin = async () => {
+    const account = $("newSubAccount").value.trim();
+    const password = $("newSubPassword").value.trim();
+    if (!account || !password) return alert("請輸入帳號與密碼");
+
+    const { error } = await supabase.from("sub_admins").insert([{ account, password }]);
+    if (error) {
+      if (error.code === '23505') alert("新增失敗：帳號已存在");
+      else alert("新增失敗: " + error.message);
+    } else {
+      $("newSubAccount").value = "";
+      $("newSubPassword").value = "";
+      await fetchSubAdmins();
+    }
+  };
+
+  window.deleteSubAdmin = async (id, account) => {
+    if (!confirm(`確定要刪除次級管理員「${account}」嗎？`)) return;
+    const { error } = await supabase.from("sub_admins").delete().eq("id", id);
+    if (error) alert("刪除失敗: " + error.message);
+    else await fetchSubAdmins();
+  };
+
+  /* 廣告成效管理 */
   window.openAdStatsModal = () => {
     renderAdStatsList();
     $("adStatsModal").style.display = "flex";
@@ -1656,7 +1742,7 @@
   };
 
   window.wipeData = async () => {
-    if (!ST.isAdmin) { alert("⚠️ 需要管理員權限！"); return; }
+    if (ST.adminRole !== 'main') { alert("⚠️ 只有主管理員可以清空資料庫！"); return; }
     const csv = Papa.unparse(ST.raw);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
@@ -1672,16 +1758,45 @@
     }, 1000);
   };
 
-  /* Auth */
+  /* V9.6.0 登入分流邏輯 */
   window.loginSupabase = async () => {
     const email = $("admEmail").value.trim(), pwd = $("admPwd").value;
-    if (!email || !pwd) return alert("請輸入信箱和密碼");
+    if (!email || !pwd) return alert("請輸入信箱/帳號和密碼");
+
+    // 1. 先檢查是否為次級管理員
+    const { data: subData, error: subErr } = await supabase
+      .from("sub_admins")
+      .select("*")
+      .eq("account", email)
+      .eq("password", pwd)
+      .single();
+
+    if (subData) {
+      ST.adminRole = 'sub';
+      enableAdminUI();
+      return;
+    }
+
+    // 2. 如果不是次級管理員，則嘗試主管理員 (Supabase Auth) 登入
     const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-    if (error) alert("登入失敗：" + error.message); else { enableAdminUI(); }
+    if (error) {
+      alert("登入失敗：帳號或密碼錯誤");
+    } else {
+      ST.adminRole = 'main';
+      enableAdminUI();
+    }
   };
+
   window.logout = async () => {
-    await supabase.auth.signOut(); ST.isAdmin = false;
-    $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden");
+    await supabase.auth.signOut(); 
+    ST.isAdmin = false;
+    ST.adminRole = null;
+    $("adminPanel").classList.add("hidden"); 
+    $("loginForm").classList.remove("hidden"); 
+    $("adminActions").classList.add("hidden"); 
+    $("logoutBtn").classList.add("hidden");
+    $("admEmail").value = "";
+    $("admPwd").value = "";
     applyFilter();
     alert("已登出");
   };
@@ -1701,7 +1816,14 @@
     ST.datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: "static", onChange: (d) => { if (d.length === 2) applyFilter(); } });
     $("qSearch").addEventListener("input", function () { this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden"); });
     initAddModal(); setSaveButtonText();
-    const { data: { session } } = await supabase.auth.getSession(); if (session) enableAdminUI();
+    
+    // 檢查是否已有主管理員登入狀態
+    const { data: { session } } = await supabase.auth.getSession(); 
+    if (session) {
+      ST.adminRole = 'main';
+      enableAdminUI();
+    }
+    
     await fetchAdStats();
     await fetchAllData();
   }
