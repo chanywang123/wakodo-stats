@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="15.6" fill="%23fff"/%3E%3Cg fill="none" stroke="%23111" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="16" cy="16" r="14.2" stroke-width="1.1"/%3E%3Ccircle cx="16" cy="16" r="11.9" stroke-width="0.8"/%3E%3Cg stroke-width="0.85"%3E%3Ccircle cx="16" cy="11.0" r="4.4"/%3E%3Ccircle cx="20.8" cy="13.6" r="4.4"/%3E%3Ccircle cx="19.6" cy="19.1" r="4.4"/%3E%3Ccircle cx="12.4" cy="19.1" r="4.4"/%3E%3Ccircle cx="11.2" cy="13.6" r="4.4"/%3E%3C/g%3E%3Ccircle cx="16" cy="15.2" r="2.2" stroke-width="0.7"/%3E%3C/g%3E%3C/svg%3E' />
-  <title>📝 顧客登記 v4.0</title>
+  <title>📝 顧客登記 v4.0 (極簡版)</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -84,10 +84,32 @@
     <div id="cardsContainer"></div>
   </div>
 
+  <!-- 浮動的查看結果按鈕 -->
+  <a href="index.html" class="fixed bottom-[90px] right-4 bg-slate-800 text-white px-4 py-3 rounded-full shadow-lg font-bold text-sm z-40 flex items-center gap-2 hover:bg-slate-700 transition-colors">
+    📊 查看結果
+  </a>
+
   <!-- 底部固定按鈕 -->
-  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3">
+  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex gap-3 z-50">
     <button onclick="addCustomerCard()" class="flex-1 bg-white theme-primary-text theme-primary-border border-2 py-3 rounded-xl font-bold">+ 增加顧客</button>
     <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] theme-primary-bg theme-contrast-text py-3 px-6 rounded-xl font-bold text-lg">確認並送出</button>
+  </div>
+
+  <!-- 送出成功彈窗 (預設隱藏) -->
+  <div id="successModal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl transform transition-all">
+      <div class="text-6xl mb-4">🎉</div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">送出成功！</h2>
+      <p class="text-gray-500 mb-8 font-medium">顧客資料已成功寫入資料庫</p>
+      <div class="flex flex-col gap-3">
+        <button onclick="window.location.href='index.html'" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl text-lg hover:bg-slate-700 transition-colors">
+          📊 查看填寫結果
+        </button>
+        <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl text-lg hover:bg-gray-200 transition-colors">
+          📝 繼續填寫下一位
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -290,8 +312,19 @@
       btn.disabled = true; btn.innerText = "傳送中...";
       try {
         for(let d of fD) await supabase.rpc('submit_visit_v8', d);
-        alert("🎉 送出成功！"); location.reload();
-      } catch(e) { alert(e.message); btn.disabled = false; btn.innerText = "確認並送出"; }
+        
+        // 成功後顯示彈窗，取代原本的 alert 和 reload
+        document.getElementById('successModal').classList.remove('hidden');
+        
+        // 恢復按鈕狀態 (以防使用者關閉彈窗，雖然目前沒做關閉按鈕)
+        btn.disabled = false; 
+        btn.innerText = "確認並送出";
+        
+      } catch(e) { 
+        alert(e.message); 
+        btn.disabled = false; 
+        btn.innerText = "確認並送出"; 
+      }
     }
   </script>
 </body>
