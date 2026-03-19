@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="15.6" fill="%23fff"/%3E%3Cg fill="none" stroke="%23111" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="16" cy="16" r="14.2" stroke-width="1.1"/%3E%3Ccircle cx="16" cy="16" r="11.9" stroke-width="0.8"/%3E%3Cg stroke-width="0.85"%3E%3Ccircle cx="16" cy="11.0" r="4.4"/%3E%3Ccircle cx="20.8" cy="13.6" r="4.4"/%3E%3Ccircle cx="19.6" cy="19.1" r="4.4"/%3E%3Ccircle cx="12.4" cy="19.1" r="4.4"/%3E%3Ccircle cx="11.2" cy="13.6" r="4.4"/%3E%3C/g%3E%3Ccircle cx="16" cy="15.2" r="2.2" stroke-width="0.7"/%3E%3C/g%3E%3C/svg%3E' />
-  <title>📝 顧客登記 v4.0 (極簡版)</title>
+  <title>📝 顧客登記 v4.5 (旅程視覺化版)</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -23,7 +23,7 @@
     
     :root { --primary: #9ca3af; --primary-rgb: 156 163 175; --primary-dark: #6b7280; --primary-contrast: #ffffff; }
     body[data-theme="linan"] { --primary: #2563eb; --primary-rgb: 37 99 235; --primary-dark: #1d4ed8; --primary-contrast: #ffffff; }
-    body[data-theme="nanke"] { --primary: #FDE68A; --primary-rgb: 253 230 138; --primary-dark: #FBBF24; --primary-contrast: #111827; }
+    body[data-theme="nanke"] { --primary: #FBBF24; --primary-rgb: 251 191 36; --primary-dark: #D97706; --primary-contrast: #111827; }
 
     .wrap-wider { max-width: 43.2rem !important; }
     .theme-primary-bg { background: var(--primary) !important; }
@@ -42,25 +42,28 @@
     
     .section-label { font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 10px; display: block; }
     .field-group { margin-bottom: 28px; } 
-    .field-group:last-child { margin-bottom: 0; }
 
     .required-mark { color: #dc2626; margin-left: 4px; }
     .text-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; outline: none; background: #fff; transition: all 0.2s; }
-    .text-input:focus { border-color: var(--primary); }
 
     /* 網格佈局 */
-    .btn-grid { display: grid; gap: 10px; padding: 2px; border-radius: 12px; transition: all 0.2s; }
+    .btn-grid { display: grid; gap: 10px; }
     @media (max-width: 768px) { .btn-grid { grid-template-columns: repeat(3, 1fr); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 769px) { .btn-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } .btn-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
 
-    .option-btn { padding: 14px 8px; border: 2px solid #e5e7eb; border-radius: 10px; background: white; color: #4b5563; font-size: 15px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.12s; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+    .option-btn { padding: 14px 8px; border: 2px solid #e5e7eb; border-radius: 10px; background: white; color: #4b5563; font-size: 14px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.12s; min-height: 50px; display: flex; align-items: center; justify-content: center; position: relative; }
     .option-btn.selected { background: var(--primary); border-color: var(--primary); color: var(--primary-contrast); font-weight: 700; }
+    
+    /* 旅程視覺化樣式 */
+    .journey-track { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; min-height: 50px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .journey-step { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; }
+    .step-badge { padding: 2px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; }
+    .step-origin { background: #dcfce7; color: #166534; } /* 如何得知 */
+    .step-motive { background: #e0f2fe; color: #075985; } /* 來店動機 */
     
     .toggle-btn { padding: 14px; border: 2px solid #10b981; border-radius: 10px; background: #d1fae5; color: #065f46; font-size: 15px; font-weight: 800; text-align: center; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; }
     .toggle-btn.unchecked { background: white; border-color: #e5e7eb; color: #6b7280; font-weight: 600; }
-    .warn-msg { font-size: 12px; color: #dc2626; margin-top: 6px; font-weight: 700; }
-
-    /* 錯誤提示樣式 */
+    
     .error-highlight { border-color: #dc2626 !important; background-color: #fef2f2 !important; }
     .error-highlight-grid { border: 2px dashed #dc2626 !important; background-color: #fef2f2 !important; }
   </style>
@@ -71,7 +74,7 @@
     <!-- Header -->
     <div class="theme-primary-bg theme-contrast-text p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40 transition-colors">
       <div class="flex items-center gap-2">
-        <h1 class="font-bold text-lg">📝 顧客登記 v4.0</h1>
+        <h1 class="font-bold text-lg">📝 顧客登記 v4.5</h1>
         <input type="date" id="globalDate" class="text-sm bg-black/10 border-0 rounded px-2 py-1 text-inherit">
       </div>
       <div class="st-selector">
@@ -84,30 +87,26 @@
     <div id="cardsContainer"></div>
   </div>
 
-  <!-- 浮動的查看結果按鈕 -->
+  <!-- 浮動按鈕 -->
   <a href="index.html" class="fixed bottom-[90px] right-4 bg-slate-800 text-white px-4 py-3 rounded-full shadow-lg font-bold text-sm z-40 flex items-center gap-2 hover:bg-slate-700 transition-colors">
     📊 查看結果
   </a>
 
   <!-- 底部固定按鈕 -->
-  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex gap-3 z-50">
+  <div class="max-w-xl wrap-wider mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex gap-3 z-50">
     <button onclick="addCustomerCard()" class="flex-1 bg-white theme-primary-text theme-primary-border border-2 py-3 rounded-xl font-bold">+ 增加顧客</button>
     <button onclick="submitAllData()" id="btnSubmit" class="flex-[2] theme-primary-bg theme-contrast-text py-3 px-6 rounded-xl font-bold text-lg">確認並送出</button>
   </div>
 
-  <!-- 送出成功彈窗 (預設隱藏) -->
-  <div id="successModal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl transform transition-all">
+  <!-- 成功彈窗 -->
+  <div id="successModal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl">
       <div class="text-6xl mb-4">🎉</div>
       <h2 class="text-2xl font-bold text-gray-800 mb-2">送出成功！</h2>
-      <p class="text-gray-500 mb-8 font-medium">顧客資料已成功寫入資料庫</p>
+      <p class="text-gray-500 mb-8 font-medium">顧客旅程已成功記錄</p>
       <div class="flex flex-col gap-3">
-        <button onclick="window.location.href='index.html'" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl text-lg hover:bg-slate-700 transition-colors">
-          📊 查看填寫結果
-        </button>
-        <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl text-lg hover:bg-gray-200 transition-colors">
-          📝 繼續填寫下一位
-        </button>
+        <button onclick="window.location.href='index.html'" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl text-lg hover:bg-slate-700">📊 查看填寫結果</button>
+        <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl text-lg hover:bg-gray-200">📝 繼續填寫下一位</button>
       </div>
     </div>
   </div>
@@ -116,17 +115,18 @@
     const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "網紅推薦", "廣告看板", "FB、IG 社團"];
     const PURPOSES = ["驗光配鏡", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
     const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
-    const DESC_P = "客人「眼鏡壞掉」或「度數不足」是「需求」\n但什麼「原因」讓他會選擇來和光堂\n是看了廣告？還是本來就是老客習慣來和光堂？或者覺得裝潢...等等 ";
+    const DESC_P = "客人「眼鏡壞掉」是需求，但什麼「原因」讓他選擇來和光堂？是看了廣告？還是老客習慣？覺得裝潢好？";
 
     let globalSt = '';
     let cardCount = 0;
+    // 用來儲存每張卡片的點擊順序
+    const cardJourneys = {};
 
     window.onload = () => {
       const dateInput = document.getElementById('globalDate');
       const today = new Date().toISOString().split('T')[0];
       dateInput.value = today;
-      dateInput.max = today; // 限制最大日期為今天，防止選到未來時間
-
+      dateInput.max = today;
       const saved = localStorage.getItem('wakodo_store');
       if (saved) selectSt(saved);
       addCustomerCard();
@@ -144,28 +144,33 @@
     window.addCustomerCard = () => {
       cardCount++;
       const id = `c-${cardCount}`;
+      cardJourneys[id] = []; // 初始化該卡片的旅程陣列
+
       const html = `
         <div class="customer-card" id="${id}">
-          <div class="card-header"><span class="font-bold text-lg text-slate-800">👤 顧客 ${cardCount}</span>${cardCount > 1 ? `<button onclick="document.getElementById('${id}').remove()" class="text-red-500 text-xs font-bold" style="background:#fee; padding:4px 8px; border-radius:4px;">移除</button>` : ''}</div>
+          <div class="card-header"><span class="font-bold text-lg text-slate-800">👤 顧客 ${cardCount}</span>${cardCount > 1 ? `<button onclick="removeCard('${id}')" class="text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">移除</button>` : ''}</div>
           
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="flex flex-col"><label class="section-label">顧客身份 <span class="required-mark">*</span></label><div class="btn-grid two-col" data-isnew="true"><div class="option-btn selected" onclick="tBtn(this)">全新客</div><div class="option-btn" onclick="tBtn(this)">老客戶</div></div></div>
             <div class="flex flex-col"><label class="section-label">本次消費 <span class="required-mark">*</span></label><div class="btn-grid two-col" data-has-purchase="true"><div class="option-btn selected" onclick="tAmt(this, true, '${id}')">有</div><div class="option-btn" onclick="tAmt(this, false, '${id}')">無</div></div></div>
           </div>
-          <div id="ab-${id}" class="field-group"><label class="section-label">消費金額 (TWD) <span class="required-mark">*</span></label><input type="number" class="text-input v-amt" placeholder="請輸入金額 (需大於0)"></div>
+          <div id="ab-${id}" class="field-group"><label class="section-label">消費金額 (TWD) <span class="required-mark">*</span></label><input type="number" class="text-input v-amt" placeholder="請輸入金額"></div>
           <div class="field-group"><label class="section-label">姓名 <span class="required-mark">*</span></label><input type="text" class="text-input v-name" placeholder="請輸入顧客姓名"></div>
           
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="flex flex-col"><label class="section-label">性別 <span class="required-mark">*</span></label><div class="btn-grid two-col" data-sex="true"><div class="option-btn" onclick="tBtn(this)">男</div><div class="option-btn" onclick="tBtn(this)">女</div></div></div>
-            <div class="flex flex-col"><label class="section-label">居住地 <span class="required-mark">*</span></label><div class="toggle-btn" onclick="this.classList.toggle('unchecked'); this.innerText=this.classList.contains('unchecked')?'❌ 非台南住戶':'🏠 台南住戶'">🏠 台南住戶</div><div class="warn-msg">⚠️ 非台南住戶請取消</div></div>
+            <div class="flex flex-col"><label class="section-label">居住地 <span class="required-mark">*</span></label><div class="toggle-btn" onclick="this.classList.toggle('unchecked'); this.innerText=this.classList.contains('unchecked')?'❌ 非台南住戶':'🏠 台南住戶'">🏠 台南住戶</div></div>
           </div>
           
           <div class="field-group"><label class="section-label">年齡層 <span class="required-mark">*</span></label><div class="btn-grid" data-age="true">${AGES.map(a => `<div class="option-btn" onclick="tBtn(this)">${a}</div>`).join('')}</div></div>
           
           <div class="field-group">
-            <label class="section-label">客源 <span class="required-mark">*</span> (可多選)</label>
+            <label class="section-label">客源旅程追蹤 <span class="required-mark">*</span> (請依客人敘述順序點擊)</label>
+            <!-- 視覺化軌跡顯示區 -->
+            <div id="jt-${id}" class="journey-track"><span class="text-gray-400 text-xs italic">尚未選擇路徑...</span></div>
+            
             <div id="kb-${id}" class="hidden mb-3"><input type="text" class="text-input v-kw" placeholder="請輸入 Google 搜尋關鍵字"></div>
-            <div class="btn-grid" data-src="true">${SOURCES.map(s => `<div class="option-btn" onclick="hSrc(this, '${id}', '${s}')">${s}</div>`).join('')}</div>
+            <div class="btn-grid" data-src="true">${SOURCES.map(s => `<div class="option-btn" data-val="${s}" onclick="hSrc(this, '${id}', '${s}')">${s}</div>`).join('')}</div>
           </div>
 
           <div class="field-group"><label class="section-label">來店目的 <span class="required-mark">*</span> (可多選)</label><div class="btn-grid" data-pur="true">${PURPOSES.map(p => `<div class="option-btn" onclick="this.classList.toggle('selected')">${p}</div>`).join('')}</div></div>
@@ -175,156 +180,135 @@
       document.getElementById('cardsContainer').insertAdjacentHTML('beforeend', html);
     };
 
-    // 點擊按鈕時移除錯誤紅框
+    window.removeCard = (id) => { delete cardJourneys[id]; document.getElementById(id).remove(); };
+
     window.tBtn = (el) => { 
-      const parent = el.parentElement;
-      Array.from(parent.children).forEach(b => b.classList.remove('selected')); 
+      const p = el.parentElement;
+      Array.from(p.children).forEach(b => b.classList.remove('selected')); 
       el.classList.add('selected'); 
-      parent.classList.remove('error-highlight-grid');
+      p.classList.remove('error-highlight-grid');
     };
-    
+
     window.tAmt = (el, has, id) => { 
       tBtn(el); 
       const b = document.getElementById(`ab-${id}`); 
-      const input = b.querySelector('input');
       b.classList.toggle('hidden', !has); 
-      if(!has) {
-        input.value = 0; 
-        input.classList.remove('error-highlight');
-      } else {
-        input.value = ''; // 切換回「有」時清空，強迫重新輸入
-      }
-    };
-    
-    window.hSrc = (el, id, s) => {
-      el.classList.toggle('selected');
-      el.parentElement.classList.remove('error-highlight-grid');
-      if(s.includes('Google')) {
-        const hG = Array.from(el.parentElement.querySelectorAll('.selected')).some(b => b.innerText.includes('Google'));
-        const kwContainer = document.getElementById(`kb-${id}`);
-        kwContainer.classList.toggle('hidden', !hG);
-        if(!hG) kwContainer.querySelector('input').classList.remove('error-highlight');
-      }
+      if(!has) b.querySelector('input').value = 0;
     };
 
-    // 監聽輸入框，輸入時移除紅框
-    document.addEventListener('input', (e) => {
-      if(e.target.classList.contains('text-input')) {
-        e.target.classList.remove('error-highlight');
+    // 核心邏輯：處理時序點擊與視覺化
+    window.hSrc = (el, cardId, val) => {
+      const journey = cardJourneys[cardId];
+      const index = journey.indexOf(val);
+
+      if (index > -1) {
+        // 取消選取
+        journey.splice(index, 1);
+        el.classList.remove('selected');
+      } else {
+        // 新增選取
+        journey.push(val);
+        el.classList.add('selected');
       }
-    });
+
+      // 更新 Google 關鍵字輸入框顯示
+      const hasGoogle = journey.some(s => s.includes('Google'));
+      document.getElementById(`kb-${cardId}`).classList.toggle('hidden', !hasGoogle);
+
+      // 重新渲染所有按鈕上的數字與軌跡列
+      renderJourney(cardId);
+    };
+
+    function renderJourney(cardId) {
+      const journey = cardJourneys[cardId];
+      const cardEl = document.getElementById(cardId);
+      const trackEl = document.getElementById(`jt-${cardId}`);
+      
+      // 1. 更新按鈕上的數字 (改為紅底白字，極高對比)
+      const btns = cardEl.querySelectorAll('[data-src] .option-btn');
+      btns.forEach(btn => {
+        const val = btn.getAttribute('data-val');
+        const idx = journey.indexOf(val);
+        if (idx > -1) {
+          // 這裡使用了 bg-red-600 (亮紅色) 和 text-white (白色文字)
+          btn.innerHTML = `<span class="absolute top-1 left-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[11px] font-black shadow-md border border-white/20">${idx + 1}</span>${val}`;
+        } else {
+          btn.innerHTML = val;
+        }
+      });
+
+      // 2. 更新軌跡列 (A -> B -> C)
+      if (journey.length === 0) {
+        trackEl.innerHTML = `<span class="text-gray-400 text-xs italic">尚未選擇路徑...</span>`;
+        return;
+      }
+
+      let html = '';
+      journey.forEach((step, i) => {
+        const isFirst = i === 0;
+        html += `
+          <div class="journey-step">
+            <span class="step-badge ${isFirst ? 'step-origin' : 'step-motive'}">${isFirst ? '如何得知' : '來店動機'}</span>
+            <span class="text-slate-700">${step}</span>
+            ${i < journey.length - 1 ? '<span class="text-gray-400 mx-1">➡️</span>' : ''}
+          </div>
+        `;
+      });
+      trackEl.innerHTML = html;
+      cardEl.querySelector('[data-src]').classList.remove('error-highlight-grid');
+    }
 
     async function submitAllData() {
       if(!globalSt) return alert("請先選擇分店");
-      
-      // 清除所有舊的錯誤標示
-      document.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
-      document.querySelectorAll('.error-highlight-grid').forEach(el => el.classList.remove('error-highlight-grid'));
+      document.querySelectorAll('.error-highlight, .error-highlight-grid').forEach(el => el.classList.remove('error-highlight', 'error-highlight-grid'));
 
       const btn = document.getElementById('btnSubmit');
       const cs = document.querySelectorAll('.customer-card');
       const dt = document.getElementById('globalDate').value;
       const fD = [];
-      let hasError = false;
       
-      for(let i = 0; i < cs.length; i++) {
+      for(let i=0; i<cs.length; i++) {
         const c = cs[i];
-        const customerNum = i + 1;
-        
-        // 取得各欄位元素
-        const elName = c.querySelector('.v-name');
-        const elAmt = c.querySelector('.v-amt');
-        const elKw = c.querySelector('.v-kw');
-        const elDet = c.querySelector('.v-det');
-        const gridSex = c.querySelector('[data-sex]');
-        const gridAge = c.querySelector('[data-age]');
-        const gridSrc = c.querySelector('[data-src]');
-        const gridPur = c.querySelector('[data-pur]');
-        
-        // 取得值
-        const n = elName.value.trim();
+        const id = c.id;
+        const n = c.querySelector('.v-name').value.trim();
         const iN = c.querySelector('[data-isnew] .selected').innerText === '全新客';
-        const hasPurchase = c.querySelector('[data-has-purchase] .selected').innerText === '有';
-        const a = parseFloat(elAmt.value);
-        const g = gridSex.querySelector('.selected')?.innerText;
-        const ag = gridAge.querySelector('.selected')?.innerText;
-        const sc = Array.from(gridSrc.querySelectorAll('.selected')).map(el => el.innerText);
-        const pu = Array.from(gridPur.querySelectorAll('.selected')).map(el => el.innerText);
-        const kw = elKw.value.trim();
-        const det = elDet.value.trim();
-        
-        // 驗證邏輯
-        let errorMsgs = [];
+        const hasP = c.querySelector('[data-has-purchase] .selected').innerText === '有';
+        const a = parseFloat(c.querySelector('.v-amt').value);
+        const g = c.querySelector('[data-sex] .selected')?.innerText;
+        const ag = c.querySelector('[data-age] .selected')?.innerText;
+        const sc = [...cardJourneys[id]]; // 使用我們記錄的時序陣列
+        const pu = Array.from(c.querySelectorAll('[data-pur] .selected')).map(el => el.innerText);
+        const kw = c.querySelector('.v-kw').value.trim();
+        const det = c.querySelector('.v-det').value.trim();
 
-        if(hasPurchase && (isNaN(a) || a <= 0)) {
-          elAmt.classList.add('error-highlight');
-          errorMsgs.push("消費金額必須大於 0");
-        }
-        if(!n) {
-          elName.classList.add('error-highlight');
-          errorMsgs.push("姓名未填寫");
-        }
-        if(!g) {
-          gridSex.classList.add('error-highlight-grid');
-          errorMsgs.push("性別未選擇");
-        }
-        if(!ag) {
-          gridAge.classList.add('error-highlight-grid');
-          errorMsgs.push("年齡層未選擇");
-        }
-        if(!sc.length) {
-          gridSrc.classList.add('error-highlight-grid');
-          errorMsgs.push("客源未選擇");
-        }
-        if(sc.some(s => s.includes('Google')) && !kw) {
-          elKw.classList.add('error-highlight');
-          errorMsgs.push("Google 搜尋關鍵字未填寫");
-        }
-        if(!pu.length) {
-          gridPur.classList.add('error-highlight-grid');
-          errorMsgs.push("來店目的未選擇");
-        }
-        if(!det) {
-          elDet.classList.add('error-highlight');
-          errorMsgs.push("動機和得知途徑未填寫");
-        }
+        // 驗證
+        let errs = [];
+        if(!n) { c.querySelector('.v-name').classList.add('error-highlight'); errs.push("姓名"); }
+        if(hasP && (isNaN(a) || a <= 0)) { c.querySelector('.v-amt').classList.add('error-highlight'); errs.push("消費金額(需>0)"); }
+        if(!g) { c.querySelector('[data-sex]').classList.add('error-highlight-grid'); errs.push("性別"); }
+        if(!ag) { c.querySelector('[data-age]').classList.add('error-highlight-grid'); errs.push("年齡層"); }
+        if(!sc.length) { c.querySelector('[data-src]').classList.add('error-highlight-grid'); errs.push("客源旅程"); }
+        if(sc.some(s => s.includes('Google')) && !kw) { c.querySelector('.v-kw').classList.add('error-highlight'); errs.push("Google關鍵字"); }
+        if(!pu.length) { c.querySelector('[data-pur]').classList.add('error-highlight-grid'); errs.push("來店目的"); }
+        if(!det) { c.querySelector('.v-det').classList.add('error-highlight'); errs.push("動機詳情"); }
 
-        if(errorMsgs.length > 0) {
-          alert(`【顧客 ${customerNum}】資料有誤：\n- ` + errorMsgs.join('\n- '));
-          hasError = true;
-          break; // 停止檢查，讓使用者先修正當前顧客
-        }
+        if(errs.length) return alert(`顧客 ${i+1} 資料不完整：\n${errs.join(', ')}`);
 
-        if(!iN) { if(a > 0) sc.push('老客回購'); else sc.push('老客-未購'); }
+        if(!iN) { if(a > 0) sc.unshift('老客回購'); else sc.unshift('老客-未購'); }
         
         fD.push({
           p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag,
           p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'),
           p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw,
-          p_detail: det,
-          p_is_new_customer: iN, p_amount: hasPurchase ? a : 0, 
-          p_ad_source_detail: "" 
+          p_detail: det, p_is_new_customer: iN, p_amount: hasP ? a : 0, p_ad_source_detail: ""
         });
       }
       
-      if(hasError) return; // 有錯誤則中斷送出
-
       btn.disabled = true; btn.innerText = "傳送中...";
       try {
         for(let d of fD) await supabase.rpc('submit_visit_v8', d);
-        
-        // 成功後顯示彈窗，取代原本的 alert 和 reload
         document.getElementById('successModal').classList.remove('hidden');
-        
-        // 恢復按鈕狀態 (以防使用者關閉彈窗，雖然目前沒做關閉按鈕)
-        btn.disabled = false; 
-        btn.innerText = "確認並送出";
-        
-      } catch(e) { 
-        alert(e.message); 
-        btn.disabled = false; 
-        btn.innerText = "確認並送出"; 
-      }
+      } catch(e) { alert(e.message); btn.disabled = false; btn.innerText = "確認並送出"; }
     }
   </script>
 </body>
