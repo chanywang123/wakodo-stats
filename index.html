@@ -1714,7 +1714,7 @@
           return {
             p_date: d,
             p_store: row["store_branch"] || row["門店"] || "臨安店",
-            p_name: CFG.INVALID_NAMES.includes(s(n).trim()) ? "未留資料" : n,
+            p_name: n,
             p_gender: row["gender"] || row["性別"] || "",
             p_age: row["age_range"] || row["年齡範圍"] || "",
             p_is_local: s(row["is_local"] || row["是否為台南人"] || "").includes("true") || s(row["is_local"]).includes("是"),
