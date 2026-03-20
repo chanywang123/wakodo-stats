@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V9.6.0</title>
+  <title>和光堂戰情室 V9.9.1</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -58,7 +58,6 @@
 
     .radio-group { display:flex; flex-wrap:wrap; gap:6px; }
     .radio-btn { padding:6px 14px; border:1.5px solid #e5e7eb; border-radius:50px; font-size:13px; color:#4b5563; cursor:pointer; transition:all .15s; user-select:none; background:white; }
-    .radio-btn:active { transform:scale(.96); }
     .radio-btn.selected { background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; border-color:#2563eb; font-weight:600; box-shadow:0 3px 8px rgba(59,130,246,0.4); }
 
     .seg-group { display:flex; gap:4px; background:#e2e8f0; padding:3px; border-radius:8px; }
@@ -67,8 +66,16 @@
     .seg-label { font-size:11px; font-weight:800; color:#94a3b8; margin-right:4px; text-transform:uppercase; letter-spacing:0.5px; }
 
     .chk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:6px; }
-    .chk-btn { padding:8px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:12px; color:#4b5563; cursor:pointer; transition:all .15s; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px; background:white; }
+    .chk-btn { padding:8px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:12px; color:#4b5563; cursor:pointer; transition:all .15s; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px; background:white; position:relative; }
     .chk-btn.checked { background:linear-gradient(135deg,#eff6ff,#dbeafe); color:#1e40af; border-color:#3b82f6; font-weight:700; box-shadow:0 2px 6px rgba(59,130,246,0.25); }
+
+    .journey-track { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; min-height: 50px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .journey-step { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; background: white; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; }
+    .journey-step:hover { background: #fef2f2; border-color: #fecaca; }
+    .step-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; font-weight: 800; }
+    .step-origin { background: #dcfce7; color: #166534; }
+    .step-motive { background: #e0f2fe; color: #075985; }
+    .step-num { position: absolute; top: -6px; left: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; }
 
     .modal-content { background:white; width:95%; max-width:650px; border-radius:20px; padding:24px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; z-index:100; }
@@ -96,7 +103,6 @@
     #frontGateHint { margin-top:10px; font-size:12px; color:#6b7280; line-height:1.5; }
     #frontGateError { display:none; margin-top:10px; font-size:12px; font-weight:800; color:#dc2626; background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:12px; }
 
-    /* iPhone 熱度圖 */
     .iphone-bar-container { width:100%; height:36px; background:#f1f5f9; border-radius:12px; overflow:hidden; display:flex; margin-bottom:16px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; }
     .iphone-segment { height:100%; transition:all 0.3s ease; position:relative; }
     .iphone-segment:not(:last-child) { border-right:2px solid #fff; }
@@ -112,6 +118,47 @@
     .iphone-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:#475569; cursor: pointer; transition: opacity 0.2s; }
     .iphone-legend-item:hover { opacity: 0.7; }
     .iphone-dot { width:10px; height:10px; border-radius:50%; }
+
+    /* V9.9.1 純 CSS 穩定樹狀結構 */
+    .mindmap-container { background: #0f172a; border-radius: 16px; padding: 40px; overflow: auto; color: #e2e8f0; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); min-height: 400px; }
+    
+    /* 每一列 (包含父節點與其子節點群) */
+    .mm-row { display: flex; align-items: center; position: relative; margin-bottom: 16px; }
+    
+    /* 節點外觀 */
+    .mm-node-wrapper { position: relative; z-index: 10; }
+    .mm-node { padding: 12px 20px; border-radius: 14px; background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; font-weight: 800; font-size: 14px; white-space: nowrap; display: flex; align-items: center; gap: 10px; transition: all 0.3s; backdrop-filter: blur(8px); cursor: pointer; user-select: none; }
+    .mm-node:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+    .mm-node.is-end { border-color: var(--node-color); animation: rhythm-pulse 2s infinite; }
+    .mm-node.is-end .end-badge { background: var(--node-color); color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; box-shadow: 0 0 10px var(--node-color); }
+    
+    /* 展開/收合按鈕 */
+    .mm-toggle-btn { width: 20px; height: 20px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; margin-left: 8px; transition: 0.2s; }
+    .mm-node:hover .mm-toggle-btn { background: var(--node-color, #3b82f6); }
+
+    /* 子節點容器 */
+    .mm-children-container { display: flex; flex-direction: column; position: relative; padding-left: 50px; margin-left: 10px; }
+    .mm-children-container.collapsed { display: none; }
+    
+    /* --- CSS 畫線魔法開始 --- */
+    .mm-children-container::before {
+      content: ''; position: absolute; left: -10px; top: 50%; width: 30px; height: 2px;
+      background: var(--parent-color); box-shadow: 0 0 8px var(--parent-color); opacity: 0.6;
+    }
+    .mm-row-child { position: relative; padding-left: 30px; padding-top: 12px; padding-bottom: 12px; margin-bottom: 0; }
+    .mm-row-child::before {
+      content: ''; position: absolute; left: 0; top: 50%; width: 30px; height: 2px;
+      background: var(--node-color); box-shadow: 0 0 8px var(--node-color); opacity: 0.6;
+    }
+    .mm-row-child::after {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--parent-color); box-shadow: 0 0 8px var(--parent-color); opacity: 0.6;
+    }
+    .mm-row-child:first-child::after { top: 50%; }
+    .mm-row-child:last-child::after { bottom: 50%; }
+    .mm-row-child:first-child:last-child::after { display: none; }
+
+    @keyframes rhythm-pulse { 0%, 100% { box-shadow: 0 0 15px var(--node-color), inset 0 0 5px var(--node-color); } 50% { box-shadow: 0 0 35px var(--node-color), inset 0 0 15px var(--node-color); } }
   </style>
 </head>
 
@@ -122,6 +169,12 @@
       <div class="text-2xl font-extrabold text-slate-800 tracking-tight mb-2">🔒 請輸入密碼</div>
       <div class="text-xs text-slate-500 font-bold mb-4">請輸入密碼以檢視填表資料</div>
       <input id="frontGateInput" type="password" placeholder="輸入密碼後按 Enter" autocomplete="off" />
+      
+      <label class="flex items-center gap-2 mt-4 text-sm text-slate-600 font-bold cursor-pointer select-none">
+        <input type="checkbox" id="frontGateRemember" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+        記住我 (48小時內免輸入)
+      </label>
+
       <div class="flex gap-2 mt-4">
         <button id="frontGateBtn" class="btn-primary w-full">進入</button>
       </div>
@@ -172,7 +225,7 @@
             <span class="tech-glow"></span>
             <span class="title-frame">和光堂戰情室</span>
             <div class="ml-3 pl-3 border-l-2 border-slate-200 flex flex-col justify-center items-end gap-[3px]">
-              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.6.0</div>
+              <div class="text-xs font-extrabold text-slate-600 leading-none tracking-wide text-center">V9.9.1</div>
               <div class="text-[10px] font-mono font-bold text-slate-400 leading-none text-center" id="lastDataDisp">last data --/--/--</div>
               <a class="inline-block px-2 py-[1px] rounded border border-slate-300 bg-white/50 hover:bg-white hover:border-blue-400 text-[10px] font-mono text-slate-500 font-bold no-underline hover:text-blue-600 hover:shadow-sm transition-all leading-tight text-center"
                  id="perfLink" href="performance.html" target="_blank" rel="noopener">觀看業績</a>
@@ -196,7 +249,6 @@
 
         <div id="adminActions" class="hidden flex flex-wrap gap-4 items-center">
           <span class="text-green-400 font-bold" id="adminRoleLabel">✓ 管理員模式</span>
-          <!-- V9.6.0 新增：帳號管理按鈕 (僅主管理員可見) -->
           <button id="btnManageAccounts" onclick="openAccountModal()" class="bg-teal-600 hover:bg-teal-500 px-4 py-2 rounded text-sm font-bold hidden">👥 帳號管理</button>
           <button onclick="openAdStatsModal()" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded text-sm font-bold">📊 廣告成效管理</button>
           <button onclick="openExportModal()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold">⬇ 進階匯出</button>
@@ -204,7 +256,6 @@
             📂 匯入 CSV
             <input type="file" accept=".csv" class="hidden" onchange="previewCSV(this)">
           </label>
-          <!-- V9.6.0 修正：清空資料庫按鈕 (僅主管理員可見) -->
           <button id="btnWipeData" onclick="wipeData()" class="ml-auto text-red-400 border border-red-400 px-3 py-1 rounded text-xs hover:bg-red-900 hover:text-white transition hidden">⚠ 清空資料庫</button>
         </div>
       </div>
@@ -272,33 +323,57 @@
         </div>
       </div>
 
-      <!-- 客源與目的分析 -->
+      <!-- 顧客旅程與歸因分析 -->
       <div class="glass-card p-6">
         <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSection('secSource')">
           <div class="flex items-center gap-3">
-            <h3 class="text-xl font-bold text-slate-800">客源與目的分析</h3>
+            <h3 class="text-xl font-bold text-slate-800">顧客旅程與歸因分析</h3>
             <button onclick="event.stopPropagation(); toggleSplitView()" id="btnSplit" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition">🆚 門店對比</button>
           </div>
           <div class="toggle-icon" id="icon-secSource">▼</div>
         </div>
 
         <div id="secSource" class="section-content">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="space-y-6">
-              <div id="chartSourceContainer" class="relative" style="height:350px">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客源統計 (可複選)</h4>
-                <canvas id="chartSource"></canvas>
-              </div>
-              <div class="h-[250px] relative">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">客流趨勢</h4>
-                <canvas id="chartTrend"></canvas>
-              </div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="relative h-[350px]">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">🌱 如何得知我們 (源頭歸因)</h4>
+              <canvas id="chartSourceOrigin"></canvas>
             </div>
+            <div class="relative h-[350px]">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">🔥 決定來店動機 (決策歸因)</h4>
+              <canvas id="chartSourceMotive"></canvas>
+            </div>
+            <div class="relative h-[350px]">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">🎯 來店目的佔比</h4>
+              <canvas id="chartPurpose"></canvas>
+            </div>
+          </div>
+          <div class="relative h-[250px]">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">📈 客流趨勢</h4>
+            <canvas id="chartTrend"></canvas>
+          </div>
+        </div>
+      </div>
 
-            <div class="h-[620px] relative">
-              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">來店目的佔比</h4>
-              <div class="h-full"><canvas id="chartPurpose"></canvas></div>
-            </div>
+      <!-- V9.9.1 動態黃金轉換路徑 (獨立區塊，預設收折，純 CSS 穩定版，內部節點預設展開) -->
+      <div class="glass-card p-6">
+        <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('secGoldenPath')">
+          <div class="flex items-center gap-3">
+            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <span class="tech-glow"></span> 🏆 動態黃金轉換路徑 (組合拳)
+            </h3>
+            <div class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">自動分析資料庫中所有主流路徑組合</div>
+          </div>
+          <div class="toggle-icon rotated" id="icon-secGoldenPath">▼</div>
+        </div>
+        
+        <div id="secGoldenPath" class="section-content collapsed mt-4">
+          <div class="flex justify-end gap-2 mb-3">
+            <button onclick="toggleAllMindmap(true)" class="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 transition shadow-sm">➕ 展開全部節點</button>
+            <button onclick="toggleAllMindmap(false)" class="text-xs font-bold bg-slate-50 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition shadow-sm">➖ 收折全部節點</button>
+          </div>
+          <div id="goldenPathContainer" class="mindmap-container">
+            <div id="mindmapContent" class="flex flex-col"></div>
           </div>
         </div>
       </div>
@@ -380,7 +455,7 @@
                   <th>身分</th>
                   <th>消費</th>
                   <th>性別/年齡</th>
-                  <th>客源</th>
+                  <th>客源旅程</th>
                   <th>目的</th>
                   <th class="w-10"></th>
                 </tr>
@@ -397,7 +472,7 @@
     <div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
       <div class="modal-content relative">
         <button onclick="closeAddModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 新增/編輯顧客資料</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">📝 編輯顧客資料</h2>
 
         <div class="space-y-5">
           <div class="grid grid-cols-2 gap-4">
@@ -464,12 +539,12 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-2">客源 (可多選) <span class="required-mark">*</span></label>
-            <div class="chk-grid" id="grpSource"></div>
-            <div id="boxKeyword" class="hidden mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-              <label class="block text-xs font-bold text-yellow-700 mb-1">Google 搜尋了什麼？</label>
-              <input id="mKeyword" type="text" class="w-full p-2 border border-yellow-400 rounded text-sm" placeholder="例如：...">
+            <label class="block text-xs font-bold text-gray-500 mb-2">客源旅程追蹤 <span class="required-mark">*</span> (依序點擊)</label>
+            <div id="mJourneyTrack" class="journey-track"></div>
+            <div id="boxKeyword" class="hidden mb-3">
+              <input id="mKeyword" type="text" class="w-full p-2 border border-blue-400 rounded-lg text-sm" placeholder="Google 搜尋關鍵字...">
             </div>
+            <div class="chk-grid" id="grpSource"></div>
           </div>
 
           <div>
@@ -499,7 +574,6 @@
 
         <div id="detailActions" class="mt-4 flex gap-3 hidden border-t pt-4">
           <button onclick="startEditCurrent()" class="text-blue-600 border border-blue-200 px-4 py-2 rounded hover:bg-blue-50 font-bold text-sm transition">編輯此筆</button>
-          <!-- V9.6.0 修正：刪除按鈕加上 ID 以便控制權限 -->
           <button id="btnDeleteDetail" onclick="deleteCurrentDetail()" class="text-red-500 border border-red-200 px-4 py-2 rounded hover:bg-red-50 font-bold text-sm transition hidden">刪除此筆</button>
         </div>
       </div>
@@ -516,7 +590,7 @@
       </div>
     </div>
 
-    <!-- V9.6.0 新增：次級管理員帳號管理 Modal -->
+    <!-- 次級管理員帳號管理 Modal -->
     <div id="accountModal" class="modal-overlay" style="z-index: 110;" onclick="if(event.target===this)closeAccountModal()">
       <div class="modal-content relative max-w-2xl">
         <button onclick="closeAccountModal()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-slate-600 transition">×</button>
@@ -565,26 +639,26 @@
 
   <script>
   const CFG = Object.freeze({
-    VERSION: "9.6.0",
+    VERSION: "9.9.1",
     FRONT_GATE_PASSWORD: "wakodo100",
     FRONT_GATE_KEY: "wakodo_gate_ok",
     PAGE_SIZE: 1000,
-    SOURCES: ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","網紅推薦","老客回購","老客-未購","廣告看板","FB 社團文"],
-    PURPOSES: ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查"],
+    SOURCES: ["Google 搜尋","Google Map","Facebook 廣告","Instagram 廣告","FB、IG 一般文章","TikTok & YouTube","Dcard","Mobile 01","PTT","親友介紹","途經路過","其他","網紅推薦","廣告看板","FB 社團文","Threads","AI推薦"],
+    PURPOSES: ["驗光配鏡","購買隱形眼鏡","調整眼鏡","單純買框","問題諮詢","單純看看","購買其他商品","住戶視力檢查","單純配鏡不驗光"],
     AGES: ["18歲以下","18-24","25-34","35-44","45-54","55歲以上"],
-    SOURCE_ORDER: ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","網紅推薦","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","其他"],
+    SOURCE_ORDER: ["Google 搜尋","Google Map","親友介紹","Instagram 廣告","Facebook 廣告","FB、IG 一般文章","老客回購","途經路過","TikTok & YouTube","老客-未購","網紅推薦","Dcard","PTT","Mobile 01","廣告看板","FB 社團文","Threads","AI推薦","其他"],
     SOURCE_COLORS: Object.freeze({
       "Google 搜尋":"#f59e0b","Google Map":"#10b981","親友介紹":"#2563eb","Instagram 廣告":"#db2777","Facebook 廣告":"#7c3aed","FB、IG 一般文章":"#d97706",
       "老客回購":"#0891b2","途經路過":"#ea580c","TikTok & YouTube":"#dc2626","老客-未購":"#9333ea","網紅推薦":"#0d9488",
-      "Dcard":"#e11d48","PTT":"#4f46e5","Mobile 01":"#059669","廣告看板":"#b45309","FB 社團文":"#6d28d9","其他":"#475569"
+      "Dcard":"#e11d48","PTT":"#4f46e5","Mobile 01":"#059669","廣告看板":"#b45309","FB 社團文":"#6d28d9","Threads":"#171717","AI推薦":"#8b5cf6","其他":"#475569"
     }),
-    PURPOSE_COLORS: ["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#db2777","#0d9488","#ea580c"],
+    PURPOSE_COLORS: ["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#db2777","#0d9488","#ea580c","#14b8a6"],
     INVALID_NAMES: ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"],
     AD_HEAT_TOP: 14,
     EXPORT_COLS: [
       {k:"form_date",n:"日期"},{k:"store_branch",n:"分店"},{k:"customer_name",n:"姓名"},
-      {k:"gender",n:"性別"},{k:"age_range",n:"年齡"},{k:"is_local",n:"住台南"},
-      {k:"source_tags",n:"客源"},{k:"visit_purposes",n:"目的"},{k:"search_keywords",n:"關鍵字"},
+      {k:"gender",n:"性別"},{k:"age_range",n:"年齡"},{k:"is_local",n:"台南住戶"},
+      {k:"source_tags",n:"客源旅程"},{k:"visit_purposes",n:"目的"},{k:"search_keywords",n:"關鍵字"},
       {k:"detail_desc",n:"備註"},{k:"is_new_customer",n:"新客"},{k:"amount",n:"金額"},
       {k:"has_purchased",n:"有消費"}
     ]
@@ -595,32 +669,43 @@
     filter: { source:[], purpose:null, gender:null, age:null, sourceLocked:false, purposeLocked:false, genderLocked:false, ageLocked:false, cust:null, pay:null },
     datePicker: null, exportPicker: null, isAdmin: false, editingId: null, currentDetailId: null, 
     editSeg: { cust: null, pay: true },
+    editJourney: [],
     splitView: false, convMode: 'all',
     adStats: [],
-    adminRole: null, // V9.6.0 新增：'main' 或 'sub'
-    subAdmins: []    // V9.6.0 新增：存放次級管理員名單
+    adminRole: null,
+    subAdmins: []
   };
 
   const CH = {};
+	  
   const $ = (id) => document.getElementById(id);
   const qa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const s = (v) => v == null ? "" : String(v);
   const arr = (v) => Array.isArray(v) ? v : [];
   const upd = (ch, mode="active") => { try { ch && ch.update(mode); } catch { ch && ch.update(); } };
 
-  function makeBarGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
-  function makeRadialGradient(_ctx, baseHex){ return baseHex || "#94a3b8"; }
   function fmtTwd(n){ const x = Number(n); return Number.isFinite(x) ? x.toLocaleString("zh-TW") : "--"; }
 
-  /* Gate */
-  function gateIsOk(){ return sessionStorage.getItem(CFG.FRONT_GATE_KEY) === "1"; }
+  /* Gate (48小時記住我) */
+  function gateIsOk(){ 
+    if (sessionStorage.getItem(CFG.FRONT_GATE_KEY) === "1") return true;
+    const savedTime = localStorage.getItem(CFG.FRONT_GATE_KEY + "_time");
+    if (savedTime) {
+      const now = new Date().getTime();
+      if (now - parseInt(savedTime, 10) < 48 * 60 * 60 * 1000) return true;
+      else localStorage.removeItem(CFG.FRONT_GATE_KEY + "_time");
+    }
+    return false;
+  }
   function showGate(){
-    const gate=$("frontGate"), app=$("appRoot"), inp=$("frontGateInput"), btn=$("frontGateBtn"), err=$("frontGateError");
+    const gate=$("frontGate"), app=$("appRoot"), inp=$("frontGateInput"), btn=$("frontGateBtn"), err=$("frontGateError"), rem=$("frontGateRemember");
     if(app) app.style.display="none"; if(gate) gate.style.display="flex";
     const tryUnlock=()=>{
       const ok = s(inp && inp.value) === CFG.FRONT_GATE_PASSWORD;
       if(!ok){ if(err) err.style.display="block"; if(inp){ inp.value=""; inp.focus(); } return; }
-      if(err) err.style.display="none"; sessionStorage.setItem(CFG.FRONT_GATE_KEY,"1");
+      if(err) err.style.display="none"; 
+      sessionStorage.setItem(CFG.FRONT_GATE_KEY,"1");
+      if(rem && rem.checked) localStorage.setItem(CFG.FRONT_GATE_KEY + "_time", new Date().getTime().toString());
       if(gate) gate.style.display="none"; if(app) app.style.display="block"; initMain();
     };
     if(btn) btn.onclick=tryUnlock;
@@ -632,8 +717,6 @@
     ST.isAdmin=true;
     $("adminPanel")?.classList.remove("hidden"); $("loginForm")?.classList.add("hidden");
     $("adminActions")?.classList.remove("hidden"); $("logoutBtn")?.classList.remove("hidden");
-    
-    // V9.6.0 權限分級 UI 控制
     if (ST.adminRole === 'main') {
       $("adminRoleLabel").innerText = "✓ 主管理員模式";
       $("btnManageAccounts")?.classList.remove("hidden");
@@ -643,7 +726,6 @@
       $("btnManageAccounts")?.classList.add("hidden");
       $("btnWipeData")?.classList.add("hidden");
     }
-    
     applyFilter();
   }
 
@@ -680,7 +762,6 @@
     const parent = el.parentElement;
     qa(".seg-btn", parent).forEach(b => b.classList.remove("selected"));
     el.classList.add("selected");
-    
     $("boxAmount").classList.toggle("hidden", !hasPay);
     if (!hasPay) $("mAmount").value = "";
   };
@@ -693,7 +774,6 @@
       const first = qa(".seg-btn", grp)[0];
       if (first) first.classList.add("selected");
     }
-    
     const payBtns = qa("#segEditPay .seg-btn");
     if(payBtns.length) setEditPay(true, payBtns[0]);
   }
@@ -723,18 +803,12 @@
       applyFilter();
       return;
     }
-    
     if(type==="source") {
       if(val) {
         const idx = ST.filter.source.indexOf(val);
         if(idx > -1) ST.filter.source.splice(idx, 1);
-      } else {
-        ST.filter.source = [];
-      }
-    } else {
-      ST.filter[type]=null;
-    }
-    
+      } else ST.filter.source = [];
+    } else ST.filter[type]=null;
     if(type==="source" && ST.filter.source.length === 0) ST.filter.sourceLocked=false;
     if(type==="purpose") ST.filter.purposeLocked=false;
     if(type==="gender") ST.filter.genderLocked=false;
@@ -746,22 +820,52 @@
     const c=$("stickyFilterBar"); if(!c) return;
     const b=[];
     const mk=(k,v,val)=>`<div class="filter-badge"><span>${v}</span><span class="filter-badge-close" onclick="clearFilter('${k}'${val ? `,'${val}'` : ''})">✕</span></div>`;
-    
     if(ST.filter.cust !== null) b.push(mk("cust", ST.filter.cust ? "新客" : "老客"));
     if(ST.filter.pay !== null) b.push(mk("pay", ST.filter.pay ? "有消費" : "無消費"));
-    
-    ST.filter.source.forEach(s => {
-      b.push(mk("source", s, s));
-    });
-
+    ST.filter.source.forEach(s => b.push(mk("source", s, s)));
     if(ST.filter.purpose) b.push(mk("purpose", ST.filter.purpose));
     if(ST.filter.gender) b.push(mk("gender", ST.filter.gender));
     if(ST.filter.age) b.push(mk("age", ST.filter.age));
-    
     if(b.length>=2) b.push(`<button onclick="clearFilter('all')" class="reset-all-btn">↻ 重置全部</button>`);
-    
     c.innerHTML=b.join("");
     c.classList.toggle("show", b.length > 0);
+  }
+
+  window.hEditSrc = (val) => {
+    const idx = ST.editJourney.indexOf(val);
+    if (idx > -1) ST.editJourney.splice(idx, 1);
+    else ST.editJourney.push(val);
+    renderEditJourney();
+  };
+
+  function renderEditJourney() {
+    const track = $("mJourneyTrack");
+    if (!ST.editJourney.length) {
+      track.innerHTML = `<span class="text-gray-400 text-xs italic">尚未選擇路徑...</span>`;
+    } else {
+      track.innerHTML = ST.editJourney.map((step, i) => `
+        <div class="journey-step" onclick="hEditSrc('${step}')" title="點擊移除">
+          <span class="step-badge ${i === 0 ? 'step-origin' : 'step-motive'}">${i === 0 ? '1. 認知源頭' : (i+1)+'. 決策動機'}</span>
+          <span class="text-slate-700">${step}</span>
+          <span class="text-red-400 ml-1 hover:text-red-600">✖</span>
+        </div>
+      `).join('<span class="text-gray-300 font-bold">➡️</span>');
+    }
+    qa("#grpSource .chk-btn").forEach(btn => {
+      const val = btn.dataset.val;
+      const idx = ST.editJourney.indexOf(val);
+      if (idx > -1) {
+        btn.classList.add("checked");
+        let numEl = btn.querySelector('.step-num');
+        if (!numEl) btn.innerHTML = `<span class="step-num">${idx + 1}</span>` + val;
+        else numEl.innerText = idx + 1;
+      } else {
+        btn.classList.remove("checked");
+        btn.innerHTML = val;
+      }
+    });
+    const hasGoogle = ST.editJourney.some(s => s.includes("Google"));
+    $("boxKeyword").classList.toggle("hidden", !hasGoogle);
   }
 
   /* Charts */
@@ -786,48 +890,113 @@
     if(icon) icon.classList.toggle("rotated");
   };
 
-  function updSource(sub){
-    const labels = CFG.SOURCE_ORDER.filter(x => !x.includes("老客") && sub.some(v => arr(v.source_tags).includes(x)));
-    const container = $("chartSourceContainer");
-    const baseH = 350;
-    const dynH = Math.max(baseH, labels.length * (ST.splitView ? 50 : 30));
-    container.style.height = dynH + "px";
-
-    let datasets = [];
+  function updSourceOrigin(sub){
     if (ST.splitView) {
-      const d1 = labels.map(k => sub.filter(v => v.store_branch==="臨安店" && arr(v.source_tags).includes(k)).length);
-      const d2 = labels.map(k => sub.filter(v => v.store_branch==="南科店" && arr(v.source_tags).includes(k)).length);
-      datasets = [
-        { label: "臨安店", data: d1, backgroundColor: "#3b82f6", borderRadius: 4, barPercentage: 0.7 },
-        { label: "南科店", data: d2, backgroundColor: "#10b981", borderRadius: 4, barPercentage: 0.7 }
-      ];
-    } else {
-      const d = labels.map(k => sub.filter(v => arr(v.source_tags).includes(k)).length);
-      const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
-      datasets = [{
-        data: d, baseColors: colors,
-        backgroundColor: c=>makeBarGradient(c, (c.dataset.baseColors||[])[c.dataIndex]||"#94a3b8"),
-        borderRadius: 6,
-        borderWidth: (c) => ST.filter.source.includes(labels[c.dataIndex]) ? 3 : 0,
-        borderColor: "#1e40af"
-      }];
-    }
-
-    const ch = ensureChart("source", "chartSource", {
-      type: "bar",
-      data: { labels, datasets },
-      options: {
-        indexAxis: "y", maintainAspectRatio: false, animation: { duration: 800 },
-        plugins: {
-          legend: { display: ST.splitView },
-          datalabels: { anchor: "end", align: "right", offset: 4, formatter: (v) => v > 0 ? v : "", font: { size: 11, weight: "bold" }, color: "#475569" }
-        },
-        scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" }, autoSkip: false } } },
-        onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
+      const mapLin = {}, mapNan = {};
+      const labelsSet = new Set();
+      sub.forEach(v => {
+        const tags = arr(v.source_tags);
+        if (tags.length > 0) {
+          const first = tags[0];
+          labelsSet.add(first);
+          if (v.store_branch === "臨安店") mapLin[first] = (mapLin[first] || 0) + 1;
+          else if (v.store_branch === "南科店") mapNan[first] = (mapNan[first] || 0) + 1;
+        }
+      });
+      const labels = Array.from(labelsSet).sort((a, b) => ((mapLin[b]||0)+(mapNan[b]||0)) - ((mapLin[a]||0)+(mapNan[a]||0)));
+      const dataLin = labels.map(x => mapLin[x] || 0);
+      const dataNan = labels.map(x => mapNan[x] || 0);
+      const ch = ensureChart("sourceOrigin", "chartSourceOrigin", {
+        type: "bar", data: { labels: [], datasets: [] },
+        options: {
+          indexAxis: "y", maintainAspectRatio: false,
+          plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 10, weight: 'bold' } } }, datalabels: { anchor: "end", align: "right", font: { size: 10, weight: "bold" } } },
+          scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" } } } },
+          onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
+        }
+      });
+      if(ch){
+        ch.data.labels = labels;
+        ch.data.datasets = [
+          { label: '臨安店', data: dataLin, backgroundColor: "#3b82f6", borderRadius: 4 },
+          { label: '南科店', data: dataNan, backgroundColor: "#10b981", borderRadius: 4 }
+        ];
+        ch.options.plugins.legend.display = true;
+        upd(ch);
       }
-    });
+    } else {
+      const map = {};
+      sub.forEach(v => { const tags = arr(v.source_tags); if (tags.length > 0) map[tags[0]] = (map[tags[0]] || 0) + 1; });
+      const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
+      const labels = sorted.map(x => x[0]);
+      const data = sorted.map(x => x[1]);
+      const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
+      const ch = ensureChart("sourceOrigin", "chartSourceOrigin", {
+        type: "bar", data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4 }] },
+        options: {
+          indexAxis: "y", maintainAspectRatio: false,
+          plugins: { legend: { display: false }, datalabels: { anchor: "end", align: "right", font: { size: 11, weight: "bold" } } },
+          scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" } } } },
+          onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
+        }
+      });
+      if(ch){ ch.data.labels = labels; ch.data.datasets = [{ data, backgroundColor: colors, borderRadius: 4 }]; ch.options.plugins.legend.display = false; upd(ch); }
+    }
+  }
 
-    if(ch){ ch.data.labels = labels; ch.data.datasets = datasets; ch.options.plugins.legend.display = ST.splitView; upd(ch); }
+  function updSourceMotive(sub){
+    if (ST.splitView) {
+      const mapLin = {}, mapNan = {};
+      const labelsSet = new Set();
+      sub.forEach(v => {
+        const tags = arr(v.source_tags);
+        if (tags.length > 1) {
+          tags.slice(1).forEach(t => {
+            labelsSet.add(t);
+            if (v.store_branch === "臨安店") mapLin[t] = (mapLin[t] || 0) + 1;
+            else if (v.store_branch === "南科店") mapNan[t] = (mapNan[t] || 0) + 1;
+          });
+        }
+      });
+      const labels = Array.from(labelsSet).sort((a, b) => ((mapLin[b]||0)+(mapNan[b]||0)) - ((mapLin[a]||0)+(mapNan[a]||0)));
+      const dataLin = labels.map(x => mapLin[x] || 0);
+      const dataNan = labels.map(x => mapNan[x] || 0);
+      const ch = ensureChart("sourceMotive", "chartSourceMotive", {
+        type: "bar", data: { labels: [], datasets: [] },
+        options: {
+          indexAxis: "y", maintainAspectRatio: false,
+          plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 10, weight: 'bold' } } }, datalabels: { anchor: "end", align: "right", font: { size: 10, weight: "bold" } } },
+          scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" } } } },
+          onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
+        }
+      });
+      if(ch){
+        ch.data.labels = labels;
+        ch.data.datasets = [
+          { label: '臨安店', data: dataLin, backgroundColor: "#3b82f6", borderRadius: 4 },
+          { label: '南科店', data: dataNan, backgroundColor: "#10b981", borderRadius: 4 }
+        ];
+        ch.options.plugins.legend.display = true;
+        upd(ch);
+      }
+    } else {
+      const map = {};
+      sub.forEach(v => { const tags = arr(v.source_tags); if (tags.length > 1) tags.slice(1).forEach(t => { map[t] = (map[t] || 0) + 1; }); });
+      const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
+      const labels = sorted.map(x => x[0]);
+      const data = sorted.map(x => x[1]);
+      const colors = labels.map(x => CFG.SOURCE_COLORS[x] || "#94a3b8");
+      const ch = ensureChart("sourceMotive", "chartSourceMotive", {
+        type: "bar", data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4 }] },
+        options: {
+          indexAxis: "y", maintainAspectRatio: false,
+          plugins: { legend: { display: false }, datalabels: { anchor: "end", align: "right", font: { size: 11, weight: "bold" } } },
+          scales: { x: { display: false }, y: { ticks: { font: { size: 11, weight: "bold" } } } },
+          onClick: (e, els) => { if(els.length) toggleSource(ch.data.labels[els[0].index]); }
+        }
+      });
+      if(ch){ ch.data.labels = labels; ch.data.datasets = [{ data, backgroundColor: colors, borderRadius: 4 }]; ch.options.plugins.legend.display = false; upd(ch); }
+    }
   }
 
   function updPurpose(sub) {
@@ -837,39 +1006,197 @@
     const top = Object.entries(map).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const labels = top.map(x => x[0]);
     const data = top.map(x => x[1]);
-    const colors = CFG.PURPOSE_COLORS.slice(0, labels.length);
-
+    const colors = labels.map((_, i) => CFG.PURPOSE_COLORS[i % CFG.PURPOSE_COLORS.length]);
     const ch = ensureChart("purpose", "chartPurpose", {
       type: "doughnut",
-      data: { labels, datasets: [{ data, baseColors: colors, backgroundColor: c=>makeRadialGradient(c, (c.dataset.baseColors||[])[c.dataIndex]||"#94a3b8"), borderWidth:0, hoverOffset:15 }] },
+      data: { labels, datasets: [{ data, backgroundColor: colors }] },
       options: {
         maintainAspectRatio: false, cutout: "60%", layout: { padding: 20 }, animation: { animateRotate: true },
         plugins: {
-          legend: { position: "right", labels: { usePointStyle: true, pointStyle: "circle", font: { size: 12, weight: "700" }, generateLabels: (chart) => { const ds = chart.data.datasets[0] || {}; const tot = Number(chart.$purposeTotalAll || 0); return (chart.data.labels || []).map((label, i) => { const val = Number((ds.data || [])[i] || 0); const pct = tot ? Math.round(val / tot * 100) : 0; return { text: `${label} ${pct}%`, fillStyle: (ds.baseColors || [])[i] || "#94a3b8", hidden: false, index: i }; }); } } },
+          legend: { position: "right", labels: { usePointStyle: true, pointStyle: "circle", font: { size: 12, weight: "700" }, generateLabels: (chart) => { const ds = chart.data.datasets[0] || {}; const tot = Number(chart.$purposeTotalAll || 0); return (chart.data.labels || []).map((label, i) => { const val = Number((ds.data || [])[i] || 0); const pct = tot ? Math.round(val / tot * 100) : 0; return { text: `${label} ${pct}%`, fillStyle: (ds.backgroundColor || [])[i] || "#94a3b8", hidden: false, index: i }; }); } } },
           datalabels: { display: false }
         }
       }
     });
-    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; ch.data.datasets[0].baseColors=colors; ch.$purposeTotalAll=total; upd(ch); }
+    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; ch.data.datasets[0].backgroundColor=colors; ch.$purposeTotalAll=total; upd(ch); }
   }
 
   function updTrend(sub) {
-    const map = {};
-    sub.forEach(v => { const m = s(v.form_date).slice(0, 7); if (m) map[m] = (map[m] || 0) + 1; });
-    const labels = Object.keys(map).sort();
-    const data = labels.map(k => map[k]);
-    const maxV = Math.max(...data, 1);
+    if (ST.splitView) {
+      const mapLin = {}, mapNan = {};
+      const labelsSet = new Set();
+      sub.forEach(v => {
+        const m = s(v.form_date).slice(0, 7);
+        if (m) {
+          labelsSet.add(m);
+          if (v.store_branch === "臨安店") mapLin[m] = (mapLin[m] || 0) + 1;
+          else if (v.store_branch === "南科店") mapNan[m] = (mapNan[m] || 0) + 1;
+        }
+      });
+      const labels = Array.from(labelsSet).sort();
+      const dataLin = labels.map(l => mapLin[l] || 0);
+      const dataNan = labels.map(l => mapNan[l] || 0);
+      const maxV = Math.max(...dataLin, ...dataNan, 1);
+      const ch = ensureChart("trend", "chartTrend", { type: "line", data: { labels: [], datasets: [] }, options: { maintainAspectRatio: false } });
+      ch.data.labels = labels;
+      ch.data.datasets = [
+        { label: "臨安店", data: dataLin, borderColor: "#3b82f6", backgroundColor: "rgba(59,130,246,0.1)", fill: true, tension: 0.4, pointBackgroundColor: "#fff", pointBorderColor: "#3b82f6" },
+        { label: "南科店", data: dataNan, borderColor: "#10b981", backgroundColor: "rgba(16,185,129,0.1)", fill: true, tension: 0.4, pointBackgroundColor: "#fff", pointBorderColor: "#10b981" }
+      ];
+      ch.options.plugins.legend = { display: true, position: 'top', labels: { font: { size: 11, weight: 'bold' } } };
+      ch.options.plugins.datalabels = { display: false };
+      ch.options.scales = { x: { display: false }, y: { beginAtZero: true, suggestedMax: Math.ceil(maxV * 1.2), grid: { borderDash: [5, 5] } } };
+      upd(ch);
+    } else {
+      const map = {};
+      sub.forEach(v => { const m = s(v.form_date).slice(0, 7); if (m) map[m] = (map[m] || 0) + 1; });
+      const labels = Object.keys(map).sort();
+      const data = labels.map(k => map[k]);
+      const maxV = Math.max(...data, 1);
+      const ch = ensureChart("trend", "chartTrend", {
+        type: "line",
+        data: { labels, datasets: [{ data, borderColor: "#f59e0b", borderWidth: 2.5, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", tension: 0.4, fill: true, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, "rgba(245,158,11,0.18)"); g.addColorStop(1, "rgba(245,158,11,0.04)"); return g; } }] },
+        options: {
+          maintainAspectRatio: false, scales: { x: { display: false }, y: { beginAtZero: true, suggestedMax: Math.ceil(maxV * 1.2), grid: { borderDash: [5, 5] } } },
+          plugins: { legend: { display: false }, datalabels: { align: "top", anchor: "end", offset: 4, font: { size: 10, weight: "bold" }, color: "#f59e0b", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 4, formatter: v=>v } }
+        }
+      });
+      if(ch){ ch.data.labels=labels; ch.data.datasets=[{ data, borderColor: "#f59e0b", borderWidth: 2.5, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", tension: 0.4, fill: true, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, "rgba(245,158,11,0.18)"); g.addColorStop(1, "rgba(245,158,11,0.04)"); return g; } }]; ch.options.plugins.legend.display=false; ch.options.plugins.datalabels.display=true; ch.options.scales.y.suggestedMax=Math.ceil(maxV * 1.2); upd(ch); }
+    }
+  }
 
-    const ch = ensureChart("trend", "chartTrend", {
-      type: "line",
-      data: { labels, datasets: [{ data, borderColor: "#f59e0b", borderWidth: 2.5, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", tension: 0.4, fill: true, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, "rgba(245,158,11,0.18)"); g.addColorStop(1, "rgba(245,158,11,0.04)"); return g; } }] },
-      options: {
-        maintainAspectRatio: false, scales: { x: { display: false }, y: { beginAtZero: true, suggestedMax: Math.ceil(maxV * 1.2), grid: { borderDash: [5, 5] } } },
-        plugins: { legend: { display: false }, datalabels: { align: "top", anchor: "end", offset: 4, font: { size: 10, weight: "bold" }, color: "#f59e0b", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 4, formatter: v=>v } }
+  /* V9.9.1 動態黃金轉換路徑 (純 CSS 穩定樹狀結構 + 預設展開 + 一鍵收折) */
+  window.mindmapData = null;
+
+  function renderGoldenPath(data) {
+    const content = $("mindmapContent");
+    if (!content) return;
+
+    content.innerHTML = "";
+
+    const root = { name: 'root', count: 0, children: {} };
+    let totalPaths = 0;
+
+    data.forEach(v => {
+      const tags = arr(v.source_tags);
+      if (tags.length === 0) return;
+      totalPaths++;
+      let current = root;
+      tags.forEach((tag) => {
+        if (!current.children[tag]) current.children[tag] = { name: tag, count: 0, children: {}, isCollapsed: false };
+        current = current.children[tag];
+        current.count++;
+      });
+      if (!current.children["🎯 來店"]) current.children["🎯 來店"] = { name: "🎯 來店", count: 0, children: {}, isFinal: true, isCollapsed: false };
+      current.children["🎯 來店"].count++;
+    });
+
+    window.mindmapData = root;
+
+    if (totalPaths === 0) {
+      content.innerHTML = `<div class="text-slate-500 text-center py-8 font-bold">無路徑資料</div>`;
+      return;
+    }
+
+    function createNodeHTML(node, parentColor, isRootChild = false) {
+      const color = CFG.SOURCE_COLORS[node.name] || parentColor || "#3b82f6";
+      const isEnd = node.isFinal || Object.keys(node.children).length === 0;
+      const pct = Math.round((node.count / totalPaths) * 100);
+      
+      const children = Object.values(node.children)
+        .filter(c => c.count >= 2 || (c.count / node.count) > 0.05)
+        .sort((a, b) => b.count - a.count);
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "mm-node-wrapper";
+      
+      const nodeEl = document.createElement("div");
+      nodeEl.className = `mm-node ${isEnd ? 'is-end' : ''}`;
+      nodeEl.style.setProperty('--node-color', color);
+      
+      if (children.length > 0) {
+        nodeEl.onclick = (e) => {
+          e.stopPropagation();
+          node.isCollapsed = !node.isCollapsed;
+          const container = wrapper.nextElementSibling;
+          if (container) {
+            container.classList.toggle("collapsed", node.isCollapsed);
+            nodeEl.querySelector(".mm-toggle-btn").innerText = node.isCollapsed ? "+" : "-";
+          }
+        };
+      }
+
+      nodeEl.innerHTML = `
+        <span class="w-2.5 h-2.5 rounded-full" style="background:${color};"></span>
+        <span>${node.name}</span>
+        ${isEnd ? `<span class="end-badge">${pct}% (${node.count})</span>` : ''}
+        ${children.length > 0 ? `<span class="mm-toggle-btn">${node.isCollapsed ? "+" : "-"}</span>` : ''}
+      `;
+      wrapper.appendChild(nodeEl);
+
+      if (children.length > 0) {
+        const childrenContainer = document.createElement("div");
+        childrenContainer.className = `mm-children-container ${node.isCollapsed ? 'collapsed' : ''}`;
+        childrenContainer.style.setProperty('--parent-color', color);
+        
+        children.forEach(child => {
+          const childRow = document.createElement("div");
+          childRow.className = "mm-row mm-row-child";
+          childRow.style.setProperty('--node-color', CFG.SOURCE_COLORS[child.name] || color);
+          childRow.style.setProperty('--parent-color', color);
+          
+          const childContent = createNodeHTML(child, color, false);
+          if (childContent.classList.contains("mm-row")) {
+            while (childContent.firstChild) {
+              childRow.appendChild(childContent.firstChild);
+            }
+          } else {
+            childRow.appendChild(childContent);
+          }
+          childrenContainer.appendChild(childRow);
+        });
+        
+        const row = document.createElement("div");
+        row.className = "mm-row";
+        row.appendChild(wrapper);
+        row.appendChild(childrenContainer);
+        return row;
+      }
+      return wrapper;
+    }
+
+    const topLevel = Object.values(root.children).sort((a, b) => b.count - a.count);
+    topLevel.forEach(c => {
+      c.isCollapsed = false;
+      const row = createNodeHTML(c, null, true);
+      if (!row.classList.contains("mm-row")) {
+        const wrapRow = document.createElement("div");
+        wrapRow.className = "mm-row";
+        wrapRow.appendChild(row);
+        content.appendChild(wrapRow);
+      } else {
+        content.appendChild(row);
       }
     });
-    if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; ch.options.scales.y.suggestedMax=Math.ceil(maxV * 1.2); upd(ch); }
   }
+
+  window.toggleAllMindmap = (expand) => {
+    if (!window.mindmapData) return;
+    const traverse = (node) => {
+      node.isCollapsed = !expand;
+      Object.values(node.children).forEach(traverse);
+    };
+    Object.values(window.mindmapData.children).forEach(traverse);
+    
+    qa("#mindmapContent .mm-children-container").forEach(c => {
+      if (expand) c.classList.remove("collapsed");
+      else c.classList.add("collapsed");
+    });
+    
+    qa("#mindmapContent .mm-toggle-btn").forEach(b => {
+      b.innerText = expand ? "-" : "+";
+    });
+  };
 
   function updGender(sub) {
     const g = { 男: 0, 女: 0 };
@@ -895,33 +1222,26 @@
     if(ch){ ch.data.labels=labels; ch.data.datasets[0].data=data; upd(ch); }
   }
 
-  const AD_PALETTE = ["#3b82f6","#22c55e","#f59e0b","#a855f7","#ef4444","#06b6d4","#f97316","#10b981","#6366f1","#e11d48","#14b8a6","#d97706","#0ea5e9","#84cc16"];
-  function hashStr(str){ str=s(str); let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return h; }
-  function colorForTag(name){ return AD_PALETTE[hashStr(name)%AD_PALETTE.length]; }
+  function colorForTag(name){ return CFG.SOURCE_COLORS[name] || "#94a3b8"; }
   
   function updAdHeat(){
     let total = 0;
     const entries = [...ST.adStats].sort((a,b) => b.ad_count - a.ad_count).filter(ad => ad.ad_count > 0);
     entries.forEach(ad => total += ad.ad_count);
-
     $("adHeatMeta").innerText = entries.length ? `標籤：${entries.length} | 總數：${total}` : "目前沒有標籤資料";
-
     const barContainer = $("iphoneHeatBar");
     const legendContainer = $("iphoneHeatLegend");
     if (!barContainer || !legendContainer) return;
-
     if (!entries.length) {
       barContainer.innerHTML = `<div class="iphone-segment" style="width:100%; background:#e2e8f0;"></div>`;
       legendContainer.innerHTML = `<div class="iphone-legend-item"><span class="iphone-dot" style="background:#e2e8f0"></span>無數據</div>`;
       return;
     }
-
     barContainer.innerHTML = entries.map(ad => {
       const pct = (ad.ad_count / total) * 100;
       const col = colorForTag(ad.ad_name);
       return `<div class="iphone-segment" style="width:${pct}%; background:${col};" data-tooltip="${ad.ad_name}: ${ad.ad_count} (${Math.round(pct)}%)"></div>`;
     }).join("");
-
     legendContainer.innerHTML = entries.map(ad => {
       const col = colorForTag(ad.ad_name);
       return `<div class="iphone-legend-item"><span class="iphone-dot" style="background:${col}"></span>${ad.ad_name} (${ad.ad_count})</div>`;
@@ -941,7 +1261,6 @@
     let targetData = v9Data;
     if (ST.convMode === 'new') targetData = v9Data.filter(v => v.is_new_customer === true);
     if (ST.convMode === 'old') targetData = v9Data.filter(v => v.is_new_customer === false);
-
     const map = {};
     if (ST.convMode === 'all') {
       map["新客"] = { total: 0, paid: 0, amount: 0, paidWithAmount: 0 };
@@ -952,14 +1271,10 @@
         map[k].total++;
         if (v.has_purchased) { 
           map[k].paid++; 
-          if (Number(v.amount) > 0) {
-            map[k].amount += Number(v.amount);
-            map[k].paidWithAmount++;
-          }
+          if (Number(v.amount) > 0) { map[k].amount += Number(v.amount); map[k].paidWithAmount++; }
         }
       });
     }
-
     targetData.forEach(v => {
       arr(v.source_tags).forEach(s => {
         if (s.includes("老客")) return;
@@ -967,37 +1282,23 @@
         map[s].total++;
         if (v.has_purchased) { 
           map[s].paid++; 
-          if (Number(v.amount) > 0) {
-            map[s].amount += Number(v.amount);
-            map[s].paidWithAmount++;
-          }
+          if (Number(v.amount) > 0) { map[s].amount += Number(v.amount); map[s].paidWithAmount++; }
         }
       });
     });
-
     const labels = Object.keys(map).sort((a, b) => {
-      if (a === "新客") return -1;
-      if (b === "新客") return 1;
-      if (a === "老客") return -1;
-      if (b === "老客") return 1;
+      if (a === "新客") return -1; if (b === "新客") return 1;
+      if (a === "老客") return -1; if (b === "老客") return 1;
       return map[b].total - map[a].total;
     });
-
     const rates = labels.map(k => Math.round((map[k].paid / map[k].total) * 100) || 0);
     const aovs = labels.map(k => map[k].paidWithAmount ? Math.round(map[k].amount / map[k].paidWithAmount) : 0);
-
     const ch = ensureChart("combo", "chartCombo", {
       type: "bar",
       data: {
         labels,
         datasets: [
-          { type: "bar", label: "轉換率 (%)", data: rates, backgroundColor: (c) => {
-            const ctx = c.chart.ctx;
-            const g = ctx.createLinearGradient(0, 0, 0, 400);
-            g.addColorStop(0, "rgba(59,130,246,0.8)");
-            g.addColorStop(1, "rgba(59,130,246,0.2)");
-            return g;
-          }, borderRadius: 4, yAxisID: "y", order: 2 },
+          { type: "bar", label: "轉換率 (%)", data: rates, backgroundColor: (c) => { const ctx = c.chart.ctx; const g = ctx.createLinearGradient(0, 0, 0, 400); g.addColorStop(0, "rgba(59,130,246,0.8)"); g.addColorStop(1, "rgba(59,130,246,0.2)"); return g; }, borderRadius: 4, yAxisID: "y", order: 2 },
           { type: "line", label: "客單價 ($)", data: aovs, borderColor: "#f59e0b", borderWidth: 3, pointBackgroundColor: "#fff", pointBorderColor: "#f59e0b", pointRadius: 6, pointHoverRadius: 8, yAxisID: "y1", order: 1 }
         ]
       },
@@ -1030,47 +1331,22 @@
         onClick: (e, els) => {
           if (els.length) {
             const clickedLabel = ch.data.labels[els[0].index];
-            
-            if (clickedLabel === "新客") {
-              ST.filter.cust = true;
-              qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected'));
-              if(qa('#segCust .seg-btn')[1]) qa('#segCust .seg-btn')[1].classList.add('selected');
-            } else if (clickedLabel === "老客") {
-              ST.filter.cust = false;
-              qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected'));
-              if(qa('#segCust .seg-btn')[2]) qa('#segCust .seg-btn')[2].classList.add('selected');
-            } else {
-              ST.filter.source = [clickedLabel];
-              ST.filter.sourceLocked = true;
-            }
-            
+            if (clickedLabel === "新客") { ST.filter.cust = true; qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected')); if(qa('#segCust .seg-btn')[1]) qa('#segCust .seg-btn')[1].classList.add('selected'); }
+            else if (clickedLabel === "老客") { ST.filter.cust = false; qa('#segCust .seg-btn').forEach(b => b.classList.remove('selected')); if(qa('#segCust .seg-btn')[2]) qa('#segCust .seg-btn')[2].classList.add('selected'); }
+            else { ST.filter.source = [clickedLabel]; ST.filter.sourceLocked = true; }
             applyFilter();
-            
-            const secTable = $("secTable");
-            const iconTable = $("icon-secTable");
-            if (secTable && secTable.classList.contains("collapsed")) {
-              secTable.classList.remove("collapsed");
-              if (iconTable) iconTable.classList.remove("rotated");
-            }
-            setTimeout(() => {
-              secTable.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 100);
+            const secTable = $("secTable"); const iconTable = $("icon-secTable");
+            if (secTable && secTable.classList.contains("collapsed")) { secTable.classList.remove("collapsed"); if (iconTable) iconTable.classList.remove("rotated"); }
+            setTimeout(() => { secTable.scrollIntoView({ behavior: "smooth", block: "start" }); }, 100);
           }
         }
       }
     });
-
-    if (ch) {
-      ch.$comboMap = map;
-      ch.data.labels = labels;
-      ch.data.datasets[0].data = rates;
-      ch.data.datasets[1].data = aovs;
-      upd(ch);
-    }
+    if (ch) { ch.$comboMap = map; ch.data.labels = labels; ch.data.datasets[0].data = rates; ch.data.datasets[1].data = aovs; upd(ch); }
   }
 
   function updateAllCharts() {
-    let sourcePool = ST.raw.filter(v => {
+    let pool = ST.raw.filter(v => {
       const ds = ST.datePicker.selectedDates;
       const start = ds[0] ? ST.datePicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
       const end = ds[1] ? ST.datePicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
@@ -1083,12 +1359,12 @@
       if (ST.filter.age && s(v.age_range) !== ST.filter.age) return false;
       return true;
     });
-
-    updSource(sourcePool);
-    
+    updSourceOrigin(pool);
+    updSourceMotive(pool);
     const sub = ST.filtered;
     updPurpose(sub);
     updTrend(sub);
+    renderGoldenPath(sub);
     updGender(sub);
     updAge(sub);
     updCombo(sub);
@@ -1106,11 +1382,8 @@
       const cust = v.is_new_customer ? "新客" : "老客";
       const pay = v.has_purchased ? "有消費" : "無消費";
       const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)}` : "";
-      
-      if (v.edit_requested && ST.isAdmin) {
-        tr.classList.add("row-edit-requested");
-      }
-
+      if (v.edit_requested && ST.isAdmin) tr.classList.add("row-edit-requested");
+      const journeyHtml = arr(v.source_tags).map((t, i) => `<span class="text-[10px] font-bold text-slate-400">${i+1}.</span>${t}`).join(" ➡️ ");
       tr.innerHTML = `
         <td class="pl-6 py-3 font-mono text-slate-500">${s(v.form_date)}</td>
         <td><span class="px-2 py-1 rounded-full text-xs font-bold ${s(v.store_branch) === "臨安店" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}">${s(v.store_branch)}</span></td>
@@ -1118,7 +1391,7 @@
         <td class="text-xs font-bold ${cust === "新客" ? "text-blue-700" : "text-purple-700"}">${cust}</td>
         <td class="text-xs font-bold ${pay === "有消費" ? "text-emerald-700" : "text-slate-500"}">${pay}${amt}</td>
         <td class="text-xs text-slate-500">${s(v.gender) || "-"} / ${s(v.age_range) || "-"}</td>
-        <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.source_tags).join(", ")}</td>
+        <td class="text-xs text-slate-500 max-w-[200px] truncate">${journeyHtml}</td>
         <td class="text-xs text-slate-500 max-w-[120px] truncate">${arr(v.visit_purposes).join(", ")}</td>
         <td class="text-slate-300">›</td>
       `;
@@ -1154,36 +1427,32 @@
         if (data.length < CFG.PAGE_SIZE) break;
         page++;
       }
-      
       ST.raw = all.map(v => {
         if (v.source_tags && Array.isArray(v.source_tags)) {
           v.source_tags = v.source_tags.map(tag => {
             if (CFG.SOURCES.includes(tag)) return tag;
             if (tag === "FB、IG 社團") return "FB 社團文";
             if (tag === "業配貼文（FB、IG）") return "網紅推薦";
+            if (tag.includes("老客")) return tag;
             return "其他";
           });
           v.source_tags = [...new Set(v.source_tags)];
         }
         return v;
       });
-
       if (ST.raw.length) {
         ST.raw.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
         const lastDate = ST.raw[0].form_date;
         $("lastDataDisp").innerText = "last data " + (lastDate ? String(lastDate).replace(/-/g, "/") : "--/--/--");
-        
         const years = [...new Set(ST.raw.map(d => s(d.form_date).slice(0, 4)).filter(y => y && y !== "null"))].sort().reverse();
         $("selYear").innerHTML = '<option value="">年份</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join("");
-        
         const dates = ST.raw.map(d => d.form_date).filter(Boolean).sort();
-        if (dates.length) ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+        if (dates.length && ST.datePicker && typeof ST.datePicker.setDate === 'function') {
+          ST.datePicker.setDate([dates[0], dates[dates.length - 1]]);
+        }
       }
       applyFilter();
-    } catch (err) {
-      console.error("載入資料失敗:", err);
-      alert("載入資料失敗：" + err.message);
-    }
+    } catch (err) { console.error("載入資料失敗:", err); alert("載入資料失敗：" + err.message); }
   }
 
   async function fetchAdStats() {
@@ -1191,55 +1460,32 @@
       const { data, error } = await supabase.from("ad_stats").select("*").order("ad_count", { ascending: false });
       if (error) throw error;
       ST.adStats = data || [];
-    } catch (err) {
-      console.error("載入廣告統計失敗", err);
-      ST.adStats = [];
-    }
+    } catch (err) { console.error("載入廣告統計失敗", err); ST.adStats = []; }
     updAdHeat();
   }
 
   function applyFilter() {
-    const ds = ST.datePicker.selectedDates || [];
+    const ds = ST.datePicker && ST.datePicker.selectedDates ? ST.datePicker.selectedDates : [];
     const start = ds[0] ? ST.datePicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
     const end = ds[1] ? ST.datePicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
     const q = s($("qSearch").value).toLowerCase().trim();
-
     let pool = ST.raw.filter(v => v.form_date >= start && v.form_date <= end);
-    if (q) {
-      pool = pool.filter(v => {
-        const n = s(v.customer_name).toLowerCase();
-        const d = s(v.detail_desc).toLowerCase();
-        return n.includes(q) || d.includes(q);
-      });
-    }
-
+    if (q) pool = pool.filter(v => s(v.customer_name).toLowerCase().includes(q) || s(v.detail_desc).toLowerCase().includes(q));
     if (ST.filter.cust !== null) pool = pool.filter(v => v.is_new_customer === ST.filter.cust);
     if (ST.filter.pay !== null) pool = pool.filter(v => v.has_purchased === ST.filter.pay);
     if (ST.filter.source.length) pool = pool.filter(v => ST.filter.source.some(s => arr(v.source_tags).includes(s)));
     if (ST.filter.purpose) pool = pool.filter(v => arr(v.visit_purposes).includes(ST.filter.purpose));
     if (ST.filter.gender) pool = pool.filter(v => s(v.gender) === ST.filter.gender);
     if (ST.filter.age) pool = pool.filter(v => s(v.age_range) === ST.filter.age);
-
     $("valTotal").innerText = pool.length;
     $("valLinAn").innerText = pool.filter(v => v.store_branch === "臨安店").length;
     $("valNanKe").innerText = pool.filter(v => v.store_branch === "南科店").length;
-
     ST.filtered = pool.filter(v => (ST.store === "全部" || v.store_branch === ST.store));
-
-    if (ST.isAdmin) {
-      ST.filtered.sort((a, b) => {
-        if (a.edit_requested && !b.edit_requested) return -1;
-        if (!a.edit_requested && b.edit_requested) return 1;
-        return new Date(b.form_date || 0) - new Date(a.form_date || 0);
-      });
-    } else {
-      ST.filtered.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
-    }
-
+    if (ST.isAdmin) ST.filtered.sort((a, b) => { if (a.edit_requested && !b.edit_requested) return -1; if (!a.edit_requested && b.edit_requested) return 1; return new Date(b.form_date || 0) - new Date(a.form_date || 0); });
+    else ST.filtered.sort((a, b) => new Date(b.form_date || 0) - new Date(a.form_date || 0));
     if (!ST.filter.purposeLocked) ST.filter.purpose = null;
     if (!ST.filter.genderLocked) ST.filter.gender = null;
     if (!ST.filter.ageLocked) ST.filter.age = null;
-
     ST.limit = 20;
     updateAllCharts();
     renderTable();
@@ -1248,7 +1494,6 @@
 
   /* UI Helpers */
   window.loadMore = () => { ST.limit += 20; renderTable(); };
-  
   window.toggleAdminPanel = () => $("adminPanel").classList.toggle("hidden");
   window.setStore = (s0) => {
     ST.store = s0;
@@ -1258,14 +1503,8 @@
     if (s0 === "南科店") $("kpiNanKe").classList.add("active");
     applyFilter();
   };
-  window.quickSelectDate = () => {
-    const y = $("selYear").value, m = $("selMonth").value;
-    if (y && m) { ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]); applyFilter(); }
-  };
-  window.resetDate = () => {
-    if (ST.raw.length) { const dates = ST.raw.map(x => x.form_date).filter(Boolean).sort(); if(dates.length) ST.datePicker.setDate([dates[0], dates[dates.length - 1]]); }
-    $("selMonth").value = ""; applyFilter();
-  };
+  window.quickSelectDate = () => { const y = $("selYear").value, m = $("selMonth").value; if (y && m && ST.datePicker) { ST.datePicker.setDate([new Date(y, m - 1, 1), new Date(y, m, 0)]); applyFilter(); } };
+  window.resetDate = () => { if (ST.raw.length && ST.datePicker) { const dates = ST.raw.map(x => x.form_date).filter(Boolean).sort(); if(dates.length) ST.datePicker.setDate([dates[0], dates[dates.length - 1]]); } $("selMonth").value = ""; applyFilter(); };
   window.clearSearch = () => { $("qSearch").value = ""; $("btnX").classList.add("hidden"); applyFilter(); };
 
   /* Modal */
@@ -1311,27 +1550,23 @@
     ST.editingId = v.id; setSaveButtonText();
     qa(".selected, .checked").forEach(el => el.classList.remove("selected", "checked"));
     $("boxKeyword").classList.add("hidden");
-
     $("mDate").value = v.form_date || "";
     $("mStore").value = v.store_branch || "臨安店";
     $("mName").value = v.customer_name || "";
     $("mTainan").checked = !!v.is_local;
-    
     if (v.is_new_customer !== null) setEditSeg('cust', v.is_new_customer, qa("#segEditCust .seg-btn")[v.is_new_customer ? 1 : 2]);
     else resetEditSegUI();
-
     const hasPay = v.has_purchased || Number(v.amount) > 0;
     const payBtns = qa("#segEditPay .seg-btn");
     setEditPay(hasPay, hasPay ? payBtns[0] : payBtns[1]);
     $("mAmount").value = v.amount || "";
-
     selectRadioByValue("grpGender", v.gender || "");
     selectRadioByValue("grpAge", v.age_range || "");
-    checkMultiByTexts("grpSource", v.source_tags || []);
+    ST.editJourney = arr(v.source_tags).filter(t => !t.includes("老客"));
+    renderEditJourney();
     checkMultiByTexts("grpPurpose", v.visit_purposes || []);
     $("mKeyword").value = v.search_keywords || "";
     $("mDetail").value = v.detail_desc || "";
-
     closeDetail(); $("addModal").style.display = "flex";
   };
 
@@ -1339,61 +1574,35 @@
     const name = $("mName").value.trim();
     const genderEl = document.querySelector("#grpGender .selected");
     const ageEl = document.querySelector("#grpAge .selected");
-    const sources = qa("#grpSource .checked").map(e => e.innerText.trim());
     const purposes = qa("#grpPurpose .checked").map(e => e.innerText.trim());
     const detail = $("mDetail").value.trim();
-
     const finalAmount = ST.editSeg.pay ? (Number($("mAmount").value) || 0) : 0;
-    if (ST.editSeg.pay && finalAmount <= 0) {
-      alert("⚠️ 有消費時，請輸入大於 0 的消費金額！");
-      return;
+    if (ST.editSeg.pay && finalAmount <= 0) return alert("⚠️ 有消費時，請輸入大於 0 的消費金額！");
+    if (!name || !genderEl || !ageEl || !ST.editJourney.length || !purposes.length || !detail) return alert("⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。");
+    let finalSources = [...ST.editJourney];
+    if (!ST.editSeg.cust) {
+      const tag = finalAmount > 0 ? '老客回購' : '老客-未購';
+      finalSources.unshift(tag);
     }
-
-    if (!name || !genderEl || !ageEl || !sources.length || !purposes.length || !detail) {
-      alert("⚠️ 資料不完整！請檢查姓名、性別、年齡、客源、目的、備註。");
-      return;
-    }
-
+    finalSources = [...new Set(finalSources)];
     const rpcPayload = {
-      p_date: $("mDate").value,
-      p_store: $("mStore").value,
-      p_name: name,
-      p_gender: genderEl.dataset.value,
-      p_age: ageEl.dataset.value,
-      p_is_local: $("mTainan").checked,
-      p_sources: sources,
-      p_purposes: purposes,
-      p_keywords: $("mKeyword").value,
-      p_detail: detail,
-      p_is_new_customer: ST.editSeg.cust,
-      p_amount: finalAmount,
-      p_ad_source_detail: ""
+      p_date: $("mDate").value, p_store: $("mStore").value, p_name: name, p_gender: genderEl.dataset.value,
+      p_age: ageEl.dataset.value, p_is_local: $("mTainan").checked, p_sources: finalSources, p_purposes: purposes,
+      p_keywords: $("mKeyword").value, p_detail: detail, p_is_new_customer: ST.editSeg.cust, p_amount: finalAmount, p_ad_source_detail: ""
     };
-
     if (ST.editingId && ST.isAdmin) {
       const updatePayload = {
-        form_date: rpcPayload.p_date,
-        store_branch: rpcPayload.p_store,
-        customer_name: rpcPayload.p_name,
-        gender: rpcPayload.p_gender,
-        age_range: rpcPayload.p_age,
-        is_local: rpcPayload.p_is_local,
-        source_tags: rpcPayload.p_sources,
-        visit_purposes: rpcPayload.p_purposes,
-        search_keywords: rpcPayload.p_keywords,
-        detail_desc: rpcPayload.p_detail,
-        amount: finalAmount,
-        has_purchased: ST.editSeg.pay,
-        ad_source_detail: ""
+        form_date: rpcPayload.p_date, store_branch: rpcPayload.p_store, customer_name: rpcPayload.p_name,
+        gender: rpcPayload.p_gender, age_range: rpcPayload.p_age, is_local: rpcPayload.p_is_local,
+        source_tags: rpcPayload.p_sources, visit_purposes: rpcPayload.p_purposes, search_keywords: rpcPayload.p_keywords,
+        detail_desc: rpcPayload.p_detail, amount: finalAmount, has_purchased: ST.editSeg.pay, ad_source_detail: ""
       };
       if (rpcPayload.p_is_new_customer !== null) updatePayload.is_new_customer = rpcPayload.p_is_new_customer;
-      
       const { error } = await supabase.from("visits").update(updatePayload).eq("id", ST.editingId);
       if (error) { alert("更新失敗: " + error.message); return; }
       ST.editingId = null; setSaveButtonText(); closeAddModal(); fetchAllData();
       return;
     }
-
     const { error } = await supabase.rpc("submit_visit_v9", rpcPayload);
     if (error) { alert("儲存失敗: " + error.message); console.error(error); }
     else { closeAddModal(); fetchAllData(); }
@@ -1407,22 +1616,23 @@
     const cust = v.is_new_customer ? "新客" : "老客";
     const pay = v.has_purchased ? "有消費" : "無消費";
     const amt = Number(v.amount) > 0 ? ` / ${fmtTwd(v.amount)} TWD` : "";
-
     let editWarning = "";
     if (v.edit_requested && ST.isAdmin) {
       editWarning = `
         <div class="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
           <div class="flex justify-between items-start">
-            <div>
-              <div class="text-red-600 font-bold text-sm mb-1">⚠️ 收到修改申請</div>
-              <div class="text-red-800 text-sm">${v.edit_reason}</div>
-            </div>
+            <div><div class="text-red-600 font-bold text-sm mb-1">⚠️ 收到修改申請</div><div class="text-red-800 text-sm">${v.edit_reason}</div></div>
             <button onclick="resolveEditRequest(${v.id})" class="bg-white border border-red-200 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 transition">✅ 標記為已處理</button>
           </div>
         </div>
       `;
     }
-
+    const journeyHtml = arr(v.source_tags).map((t, i) => `
+      <div class="flex items-center gap-2 mb-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
+        <span class="step-badge ${i === 0 ? 'step-origin' : 'step-motive'}">${i === 0 ? '🌱 認知源頭' : '🔥 決策動機'}</span>
+        <span class="text-sm font-bold ${t.includes('老客') ? 'text-purple-600' : 'text-slate-700'}">${t}</span>
+      </div>
+    `).join('<div class="text-slate-300 text-center text-xs my-1">⬇️</div>');
     $("detailContent").innerHTML = `
       ${editWarning}
       <h2 class="font-bold text-2xl mb-3 text-slate-800">${maskName(v.customer_name)}</h2>
@@ -1435,131 +1645,84 @@
         <div class="text-sm font-black text-slate-900">${cust} / ${pay}${amt}</div>
       </div>
       <div class="grid grid-cols-2 gap-3 mb-4">
-        <div class="bg-blue-50 p-3 rounded-lg">
-          <div class="text-xs font-bold text-blue-700 mb-1">客源</div>
-          <div class="text-sm text-blue-900">${arr(v.source_tags).join(", ") || "無"}</div>
-        </div>
-        <div class="bg-green-50 p-3 rounded-lg">
-          <div class="text-xs font-bold text-green-700 mb-1">目的</div>
-          <div class="text-sm text-green-900">${arr(v.visit_purposes).join(", ") || "無"}</div>
-        </div>
+        <div class="bg-blue-50 p-3 rounded-lg"><div class="text-xs font-bold text-blue-700 mb-1">客源</div><div class="text-sm text-blue-900">${arr(v.source_tags).join(", ") || "無"}</div></div>
+        <div class="bg-green-50 p-3 rounded-lg"><div class="text-xs font-bold text-green-700 mb-1">目的</div><div class="text-sm text-green-900">${arr(v.visit_purposes).join(", ") || "無"}</div></div>
+      </div>
+      <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-4">
+        <div class="text-[10px] font-bold text-blue-400 mb-2 uppercase tracking-widest">顧客旅程軌跡</div>
+        ${journeyHtml}
       </div>
       ${v.search_keywords ? `<div class="bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200"><div class="text-xs font-bold text-yellow-700 mb-1">🔍 搜尋關鍵字</div><div class="text-sm text-yellow-900">${v.search_keywords}</div></div>` : ""}
       <div class="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${v.detail_desc || "無詳細描述"}</div>
     `;
-    
     $("detailModal").style.display = "flex";
     $("detailActions").classList.toggle("hidden", !ST.isAdmin);
     $("requestEditSection").classList.toggle("hidden", ST.isAdmin);
-    
-    // V9.6.0 權限分級：次級管理員隱藏刪除按鈕
     $("btnDeleteDetail").classList.toggle("hidden", ST.adminRole !== 'main');
   }
   window.showDetail = showDetail;
   window.closeDetail = () => $("detailModal").style.display = "none";
   
   window.deleteCurrentDetail = async () => {
-    if (ST.adminRole !== 'main') { alert("⚠️ 只有主管理員可以刪除資料！"); return; }
+    if (ST.adminRole !== 'main') return alert("⚠️ 只有主管理員可以刪除資料！");
     if (!confirm("確定刪除？")) return;
     const { error } = await supabase.from("visits").delete().eq("id", ST.currentDetailId);
     if (error) alert("刪除失敗: " + error.message); else { alert("已刪除"); closeDetail(); fetchAllData(); }
   };
 
-  window.openRequestEdit = () => {
-    $("reqEditReason").value = "";
-    $("requestEditModal").style.display = "flex";
-  };
+  window.openRequestEdit = () => { $("reqEditReason").value = ""; $("requestEditModal").style.display = "flex"; };
   window.closeRequestEdit = () => $("requestEditModal").style.display = "none";
   window.submitRequestEdit = async () => {
     const reason = $("reqEditReason").value.trim();
     if (!reason) return alert("請輸入修改原因");
-    
     const { error } = await supabase.from("visits").update({ edit_requested: true, edit_reason: reason }).eq("id", ST.currentDetailId);
-    if (error) { alert("申請失敗: " + error.message); }
-    else {
-      alert("✅ 申請已送出，管理員將會處理。");
-      closeRequestEdit(); closeDetail(); fetchAllData();
-    }
+    if (error) alert("申請失敗: " + error.message);
+    else { alert("✅ 申請已送出，管理員將會處理。"); closeRequestEdit(); closeDetail(); fetchAllData(); }
   };
   window.resolveEditRequest = async (id) => {
     if (!ST.isAdmin) return;
     const { error } = await supabase.from("visits").update({ edit_requested: false, edit_reason: "" }).eq("id", id);
-    if (error) alert("處理失敗: " + error.message);
-    else { closeDetail(); fetchAllData(); }
+    if (error) alert("處理失敗: " + error.message); else { closeDetail(); fetchAllData(); }
   };
 
-  /* V9.6.0 次級管理員帳號管理邏輯 */
-  window.openAccountModal = async () => {
-    if (ST.adminRole !== 'main') return;
-    $("accountModal").style.display = "flex";
-    await fetchSubAdmins();
-  };
+  /* 帳號管理 */
+  window.openAccountModal = async () => { if (ST.adminRole !== 'main') return; $("accountModal").style.display = "flex"; await fetchSubAdmins(); };
   window.closeAccountModal = () => $("accountModal").style.display = "none";
-
   async function fetchSubAdmins() {
     $("subAdminList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">載入中...</div>`;
     const { data, error } = await supabase.from("sub_admins").select("*").order("created_at", { ascending: false });
-    if (error) {
-      $("subAdminList").innerHTML = `<div class="text-red-500 text-sm">載入失敗: ${error.message}</div>`;
-      return;
-    }
-    ST.subAdmins = data || [];
-    renderSubAdmins();
+    if (error) { $("subAdminList").innerHTML = `<div class="text-red-500 text-sm">載入失敗: ${error.message}</div>`; return; }
+    ST.subAdmins = data || []; renderSubAdmins();
   }
-
   function renderSubAdmins() {
     const list = $("subAdminList");
-    if (!ST.subAdmins.length) {
-      list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有次級管理員</div>`;
-      return;
-    }
+    if (!ST.subAdmins.length) return list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有次級管理員</div>`;
     list.innerHTML = ST.subAdmins.map(admin => `
       <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-        <div class="flex-grow">
-          <div class="font-bold text-slate-700">帳號：${admin.account}</div>
-          <div class="text-sm text-slate-500">密碼：${admin.password}</div>
-        </div>
+        <div class="flex-grow"><div class="font-bold text-slate-700">帳號：${admin.account}</div><div class="text-sm text-slate-500">密碼：${admin.password}</div></div>
         <button onclick="deleteSubAdmin(${admin.id}, '${admin.account}')" class="bg-red-50 text-red-500 px-3 py-1.5 rounded font-bold text-xs hover:bg-red-100">刪除</button>
       </div>
     `).join("");
   }
-
   window.addSubAdmin = async () => {
-    const account = $("newSubAccount").value.trim();
-    const password = $("newSubPassword").value.trim();
+    const account = $("newSubAccount").value.trim(), password = $("newSubPassword").value.trim();
     if (!account || !password) return alert("請輸入帳號與密碼");
-
     const { error } = await supabase.from("sub_admins").insert([{ account, password }]);
-    if (error) {
-      if (error.code === '23505') alert("新增失敗：帳號已存在");
-      else alert("新增失敗: " + error.message);
-    } else {
-      $("newSubAccount").value = "";
-      $("newSubPassword").value = "";
-      await fetchSubAdmins();
-    }
+    if (error) { if (error.code === '23505') alert("新增失敗：帳號已存在"); else alert("新增失敗: " + error.message); }
+    else { $("newSubAccount").value = ""; $("newSubPassword").value = ""; await fetchSubAdmins(); }
   };
-
   window.deleteSubAdmin = async (id, account) => {
     if (!confirm(`確定要刪除次級管理員「${account}」嗎？`)) return;
     const { error } = await supabase.from("sub_admins").delete().eq("id", id);
-    if (error) alert("刪除失敗: " + error.message);
-    else await fetchSubAdmins();
+    if (error) alert("刪除失敗: " + error.message); else await fetchSubAdmins();
   };
 
   /* 廣告成效管理 */
-  window.openAdStatsModal = () => {
-    renderAdStatsList();
-    $("adStatsModal").style.display = "flex";
-  };
+  window.openAdStatsModal = () => { renderAdStatsList(); $("adStatsModal").style.display = "flex"; };
   window.closeAdStatsModal = () => $("adStatsModal").style.display = "none";
-  
   function renderAdStatsList() {
     const list = $("adStatsList");
-    if (!ST.adStats.length) {
-      list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有廣告資料</div>`;
-      return;
-    }
+    if (!ST.adStats.length) return list.innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有廣告資料</div>`;
     list.innerHTML = ST.adStats.map(ad => `
       <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
         <div class="font-bold text-slate-700 flex-grow">${ad.ad_name}</div>
@@ -1571,108 +1734,56 @@
       </div>
     `).join("");
   }
-
   window.addAdStat = async () => {
     const name = $("newAdName").value.trim();
     if (!name) return alert("請輸入廣告名稱");
     const { error } = await supabase.from("ad_stats").insert([{ ad_name: name, ad_count: 0 }]);
-    if (error) alert("新增失敗: " + error.message);
-    else { $("newAdName").value = ""; await fetchAdStats(); renderAdStatsList(); }
+    if (error) alert("新增失敗: " + error.message); else { $("newAdName").value = ""; await fetchAdStats(); renderAdStatsList(); }
   };
-
   window.saveAdStat = async (id, inputId) => {
-    const ad = ST.adStats.find(a => a.id === id);
-    if (!ad) return;
-    
-    const rawVal = $(inputId).value.trim();
-    let newVal;
-    try {
-      newVal = new Function('return ' + rawVal)();
-      newVal = parseInt(newVal, 10);
-      if (isNaN(newVal)) throw new Error();
-    } catch (e) {
-      return alert("數量格式錯誤，請輸入數字或算式 (如 10+3)");
-    }
-
-    const changeAmount = newVal - ad.ad_count;
-    if (changeAmount === 0) return alert("數量沒有變更");
-
+    const ad = ST.adStats.find(a => a.id === id); if (!ad) return;
+    const rawVal = $(inputId).value.trim(); let newVal;
+    try { newVal = parseInt(new Function('return ' + rawVal)(), 10); if (isNaN(newVal)) throw new Error(); } catch (e) { return alert("數量格式錯誤，請輸入數字或算式 (如 10+3)"); }
+    const changeAmount = newVal - ad.ad_count; if (changeAmount === 0) return alert("數量沒有變更");
     const { error: updateErr } = await supabase.from("ad_stats").update({ ad_count: newVal, updated_at: new Date().toISOString() }).eq("id", id);
     if (updateErr) return alert("更新失敗: " + updateErr.message);
-
-    await supabase.from("ad_stats_log").insert([{
-      ad_id: id, ad_name: ad.ad_name, old_count: ad.ad_count, new_count: newVal, change_amount: changeAmount
-    }]);
-
-    alert(`✅ 已更新！變更幅度: ${changeAmount > 0 ? '+' : ''}${changeAmount}`);
-    await fetchAdStats(); renderAdStatsList();
+    await supabase.from("ad_stats_log").insert([{ ad_id: id, ad_name: ad.ad_name, old_count: ad.ad_count, new_count: newVal, change_amount: changeAmount }]);
+    alert(`✅ 已更新！變更幅度: ${changeAmount > 0 ? '+' : ''}${changeAmount}`); await fetchAdStats(); renderAdStatsList();
   };
-
   window.deleteAdStat = async (id, name) => {
     if (!confirm(`確定要刪除廣告「${name}」嗎？相關日誌也會一併刪除。`)) return;
     const { error } = await supabase.from("ad_stats").delete().eq("id", id);
-    if (error) alert("刪除失敗: " + error.message);
-    else { await fetchAdStats(); renderAdStatsList(); }
+    if (error) alert("刪除失敗: " + error.message); else { await fetchAdStats(); renderAdStatsList(); }
   };
-
   window.openAdLogModal = async () => {
-    $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">載入中...</div>`;
-    $("adLogModal").style.display = "flex";
-    
+    $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">載入中...</div>`; $("adLogModal").style.display = "flex";
     const { data, error } = await supabase.from("ad_stats_log").select("*").order("changed_at", { ascending: false }).limit(100);
-    if (error) { $("adLogList").innerHTML = `<div class="text-red-500 text-sm">載入失敗</div>`; return; }
-    
-    if (!data || !data.length) {
-      $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有修改紀錄</div>`;
-      return;
-    }
-
+    if (error) return $("adLogList").innerHTML = `<div class="text-red-500 text-sm">載入失敗</div>`;
+    if (!data || !data.length) return $("adLogList").innerHTML = `<div class="text-center text-slate-400 py-4 text-sm">目前沒有修改紀錄</div>`;
     $("adLogList").innerHTML = data.map(log => {
       const date = new Date(log.changed_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-      const sign = log.change_amount > 0 ? '+' : '';
-      const color = log.change_amount > 0 ? 'text-green-600' : 'text-red-500';
-      return `
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm flex justify-between items-center">
-          <div>
-            <div class="font-bold text-slate-700">${log.ad_name}</div>
-            <div class="text-xs text-slate-400">${date}</div>
-          </div>
-          <div class="text-right">
-            <div class="font-black ${color}">${sign}${log.change_amount}</div>
-            <div class="text-xs text-slate-500">${log.old_count} ➔ ${log.new_count}</div>
-          </div>
-        </div>
-      `;
+      const sign = log.change_amount > 0 ? '+' : ''; const color = log.change_amount > 0 ? 'text-green-600' : 'text-red-500';
+      return `<div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm flex justify-between items-center"><div><div class="font-bold text-slate-700">${log.ad_name}</div><div class="text-xs text-slate-400">${date}</div></div><div class="text-right"><div class="font-black ${color}">${sign}${log.change_amount}</div><div class="text-xs text-slate-500">${log.old_count} ➔ ${log.new_count}</div></div></div>`;
     }).join("");
   };
   window.closeAdLogModal = () => $("adLogModal").style.display = "none";
 
   /* CSV Export */
   window.openExportModal = () => {
-    const ds = ST.datePicker.selectedDates;
+    const ds = ST.datePicker && ST.datePicker.selectedDates ? ST.datePicker.selectedDates : [];
     const def = ds.length === 2 ? `${ST.datePicker.formatDate(ds[0], "Y-m-d")} to ${ST.datePicker.formatDate(ds[1], "Y-m-d")}` : "";
-    ST.exportPicker = flatpickr("#exportDateRange", { mode: "range", dateFormat: "Y-m-d", defaultDate: def });
-    
-    const cols = $("exportCols");
-    cols.innerHTML = CFG.EXPORT_COLS.map(c => `
-      <label class="flex items-center gap-2 text-sm p-2 border rounded cursor-pointer hover:bg-gray-50">
-        <input type="checkbox" class="exp-chk" value="${c.k}" checked>
-        <span>${c.n}</span>
-      </label>
-    `).join("");
+    ST.exportPicker = flatpickr($("exportDateRange"), { mode: "range", dateFormat: "Y-m-d", defaultDate: def });
+    $("exportCols").innerHTML = CFG.EXPORT_COLS.map(c => `<label class="flex items-center gap-2 text-sm p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="checkbox" class="exp-chk" value="${c.k}" checked><span>${c.n}</span></label>`).join("");
     $("exportModal").style.display = "flex";
   };
   window.closeExportModal = () => $("exportModal").style.display = "none";
   window.toggleExportCols = (all) => qa(".exp-chk").forEach(c => c.checked = all);
-
   window.doExport = () => {
     const ds = ST.exportPicker.selectedDates;
     const start = ds[0] ? ST.exportPicker.formatDate(ds[0], "Y-m-d") : "1900-01-01";
     const end = ds[1] ? ST.exportPicker.formatDate(ds[1], "Y-m-d") : "2100-12-31";
     const cols = qa(".exp-chk:checked").map(c => c.value);
-    
     if(!cols.length) return alert("請至少選擇一個欄位");
-
     const data = ST.raw.filter(v => v.form_date >= start && v.form_date <= end).map(v => {
       const row = {};
       cols.forEach(k => {
@@ -1684,15 +1795,11 @@
       });
       return row;
     });
-
     const csv = Papa.unparse(data);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
     link.download = `wakodo_export_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    closeExportModal();
+    document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal();
   };
-
   window.exportCSV = () => window.openExportModal();
 
   window.previewCSV = (input) => {
@@ -1703,31 +1810,20 @@
         if (!confirm(`即將匯入 ${res.data.length} 筆資料，確認繼續？`)) return;
         const overlay = $("importOverlay"); const progress = $("importProgress"); const status = $("importStatus"); const errLog = $("importErrors");
         overlay.style.display = "flex"; errLog.innerHTML = ""; errLog.classList.add("hidden");
-
         const rows = res.data.map((row, idx) => {
-          let d = row["form_date"] || row["填表日期"];
-          if (!d) return null;
-          d = s(d).trim().replace(/\//g, "-");
-          const n = row["customer_name"] || row["顧客姓名"];
-          if (!n) return null;
-          
+          let d = row["form_date"] || row["填表日期"]; if (!d) return null; d = s(d).trim().replace(/\//g, "-");
+          const n = row["customer_name"] || row["顧客姓名"]; if (!n) return null;
           return {
-            p_date: d,
-            p_store: row["store_branch"] || row["門店"] || "臨安店",
-            p_name: n,
-            p_gender: row["gender"] || row["性別"] || "",
-            p_age: row["age_range"] || row["年齡範圍"] || "",
+            p_date: d, p_store: row["store_branch"] || row["門店"] || "臨安店", p_name: CFG.INVALID_NAMES.includes(s(n).trim()) ? "未留資料" : n,
+            p_gender: row["gender"] || row["性別"] || "", p_age: row["age_range"] || row["年齡範圍"] || "",
             p_is_local: s(row["is_local"] || row["是否為台南人"] || "").includes("true") || s(row["is_local"]).includes("是"),
             p_sources: s(row["source_tags"] || row["來源統計"] || "").replace(/[\[\]"]/g, "").split(",").map(x=>x.trim()).filter(Boolean),
             p_purposes: s(row["visit_purposes"] || row["來店目的"] || "").replace(/[\[\]"]/g, "").split(",").map(x=>x.trim()).filter(Boolean),
-            p_keywords: row["search_keywords"] || row["搜尋關鍵字"] || "",
-            p_detail: row["detail_desc"] || row["詳細描述"] || "",
+            p_keywords: row["search_keywords"] || row["搜尋關鍵字"] || "", p_detail: row["detail_desc"] || row["詳細描述"] || "",
             p_is_new_customer: row["is_new_customer"] === "true" ? true : (row["is_new_customer"] === "false" ? false : null),
-            p_amount: Number(row["amount"] || 0),
-            p_ad_source_detail: ""
+            p_amount: Number(row["amount"] || 0), p_ad_source_detail: ""
           };
         }).filter(Boolean);
-
         let done = 0, errors = [];
         for (const row of rows) {
           try { const { error } = await supabase.rpc("submit_visit_v9", row); if (error) throw error; }
@@ -1742,13 +1838,11 @@
   };
 
   window.wipeData = async () => {
-    if (ST.adminRole !== 'main') { alert("⚠️ 只有主管理員可以清空資料庫！"); return; }
+    if (ST.adminRole !== 'main') return alert("⚠️ 只有主管理員可以清空資料庫！");
     const csv = Papa.unparse(ST.raw);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
     link.download = `wakodo_backup_FORCE_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
-
     setTimeout(async () => {
       if (!confirm("⚠️ 系統已強制下載備份 CSV。\n\n確定要清空所有資料？此動作無法復原！")) return;
       if (prompt("請輸入二次確認密碼：") === "628599") {
@@ -1758,72 +1852,48 @@
     }, 1000);
   };
 
-  /* V9.6.0 登入分流邏輯 */
+  /* Auth */
   window.loginSupabase = async () => {
     const email = $("admEmail").value.trim(), pwd = $("admPwd").value;
     if (!email || !pwd) return alert("請輸入信箱/帳號和密碼");
-
-    // 1. 先檢查是否為次級管理員
-    const { data: subData, error: subErr } = await supabase
-      .from("sub_admins")
-      .select("*")
-      .eq("account", email)
-      .eq("password", pwd)
-      .single();
-
-    if (subData) {
-      ST.adminRole = 'sub';
-      enableAdminUI();
-      return;
-    }
-
-    // 2. 如果不是次級管理員，則嘗試主管理員 (Supabase Auth) 登入
+    const { data: subData } = await supabase.from("sub_admins").select("*").eq("account", email).eq("password", pwd).single();
+    if (subData) { ST.adminRole = 'sub'; enableAdminUI(); return; }
     const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-    if (error) {
-      alert("登入失敗：帳號或密碼錯誤");
-    } else {
-      ST.adminRole = 'main';
-      enableAdminUI();
-    }
+    if (error) alert("登入失敗：帳號或密碼錯誤"); else { ST.adminRole = 'main'; enableAdminUI(); }
   };
 
   window.logout = async () => {
     await supabase.auth.signOut(); 
-    ST.isAdmin = false;
-    ST.adminRole = null;
-    $("adminPanel").classList.add("hidden"); 
-    $("loginForm").classList.remove("hidden"); 
-    $("adminActions").classList.add("hidden"); 
-    $("logoutBtn").classList.add("hidden");
-    $("admEmail").value = "";
-    $("admPwd").value = "";
-    applyFilter();
-    alert("已登出");
+    ST.isAdmin = false; ST.adminRole = null;
+    $("adminPanel").classList.add("hidden"); $("loginForm").classList.remove("hidden"); 
+    $("adminActions").classList.add("hidden"); $("logoutBtn").classList.add("hidden");
+    $("admEmail").value = ""; $("admPwd").value = "";
+    applyFilter(); alert("已登出");
   };
 
   /* Init */
   function initAddModal() {
     $("mDate").value = new Date().toISOString().split("T")[0];
     $("grpAge").innerHTML = CFG.AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join("");
-    $("grpSource").innerHTML = CFG.SOURCES.map(x => `<div class="chk-btn" onclick="toggleChk(this)">${x}</div>`).join("");
-    $("grpPurpose").innerHTML = CFG.PURPOSES.map(x => `<div class="chk-btn" onclick="toggleChk(this)">${x}</div>`).join("");
+    $("grpSource").innerHTML = CFG.SOURCES.map(x => `<div class="chk-btn" data-val="${x}" onclick="hEditSrc('${x}')">${x}</div>`).join("");
+    $("grpPurpose").innerHTML = CFG.PURPOSES.map(x => `<div class="chk-btn" onclick="this.classList.toggle('checked')">${x}</div>`).join("");
     resetEditSegUI();
   }
 
   async function initMain() {
     Chart.register(ChartDataLabels);
     flatpickr.l10ns.default.months.longhand = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
-    ST.datePicker = flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: "static", onChange: (d) => { if (d.length === 2) applyFilter(); } });
+    
+    // 修正：直接傳入 DOM 元素，確保回傳單一物件
+    const dpEl = $("dateRange");
+    if (dpEl) {
+      ST.datePicker = flatpickr(dpEl, { mode: "range", dateFormat: "Y-m-d", locale: "zh_tw", monthSelectorType: "static", onChange: (d) => { if (d.length === 2) applyFilter(); } });
+    }
+
     $("qSearch").addEventListener("input", function () { this.value ? $("btnX").classList.remove("hidden") : $("btnX").classList.add("hidden"); });
     initAddModal(); setSaveButtonText();
-    
-    // 檢查是否已有主管理員登入狀態
     const { data: { session } } = await supabase.auth.getSession(); 
-    if (session) {
-      ST.adminRole = 'main';
-      enableAdminUI();
-    }
-    
+    if (session) { ST.adminRole = 'main'; enableAdminUI(); }
     await fetchAdStats();
     await fetchAllData();
   }
@@ -1835,4 +1905,3 @@
   };
   </script>
 </body>
-</html>
