@@ -133,11 +133,7 @@
         </div>
         <p class="text-xs text-white mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
       </div>
-      <div class="glass-panel p-5">
-        <p class="text-white text-xs mb-1">最新週訊息數</p>
-        <h3 class="text-2xl font-bold text-[#FFFF33]" id="kpiMessages">--</h3>
-        <p class="text-xs text-white mt-1">當週詢問熱度</p>
-      </div>
+
       <div id="btnAddData" class="hidden glass-panel p-5 flex-col justify-center items-center cursor-pointer hover:bg-slate-800/50 transition">
         <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-900/50"><i class="fas fa-plus text-white"></i></div>
         <span class="text-sm font-medium text-blue-300">新增/更新本週</span>
@@ -165,14 +161,11 @@
             <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF3EFF]">
               <input type="checkbox" id="toggleNankeSales" checked class="w-3.5 h-3.5 accent-[#FF3EFF] cursor-pointer"> 南科業績
             </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FFFF33]">
-              <input type="checkbox" id="toggleMsg" checked class="w-3.5 h-3.5 accent-[#FFFF33] cursor-pointer"> 訊息數
-            </label>
             <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#00ffff]">
-              <input type="checkbox" id="toggleLinanVisits" checked class="w-3.5 h-3.5 accent-[#00ffff] cursor-pointer"> 臨安來客
+              <input type="checkbox" id="toggleLinanVisits" class="w-3.5 h-3.5 accent-[#00ffff] cursor-pointer"> 臨安來客
             </label>
             <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#39ff14]">
-              <input type="checkbox" id="toggleNankeVisits" checked class="w-3.5 h-3.5 accent-[#39ff14] cursor-pointer"> 南科來客
+              <input type="checkbox" id="toggleNankeVisits" class="w-3.5 h-3.5 accent-[#39ff14] cursor-pointer"> 南科來客
             </label>
           </div>
         </div>
@@ -209,7 +202,6 @@
               <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF0088]">臨安店</th>
               <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF3EFF]">南科店</th>
               <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 text-center leading-tight">來客數<br><span class="text-[10px] text-white font-normal tracking-wider"><span class="text-[#00ffff]">臨安</span> / <span class="text-[#39ff14]">南科</span></span></th>
-              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 leading-tight">後台新私<br>訊則數</th>
               <th rowspan="2" class="px-4 py-3 border-b border-slate-700 bg-slate-800">備註檔期</th>
             </tr>
             <tr>
@@ -248,15 +240,9 @@
             <input type="number" id="inputNanke" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs text-white mb-1">當週訊息數</label>
-            <input type="number" id="inputMsg" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
-          </div>
-          <div>
-            <label class="block text-xs text-white mb-1">備註檔期說明</label>
-            <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
-          </div>
+        <div>
+          <label class="block text-xs text-white mb-1">備註檔期說明</label>
+          <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
         </div>
         <div class="pt-2 flex gap-3">
           <button type="button" id="btnDeleteEntry" class="hidden flex-1 py-2 rounded bg-red-900/80 hover:bg-red-800 text-white transition border border-red-700">刪除</button>
@@ -276,7 +262,7 @@
 
     const FRONT_PASS = "wakodo";
     const FRONT_KEY  = "wakodo_perf_front_access_v3";
-    const FRONT_TTL  = 48 * 60 * 60 * 1000;
+    const FRONT_TTL  = 10 * 24 * 60 * 60 * 1000;
 
     let isAdmin = false;
     let allData = [];
@@ -319,7 +305,6 @@
       inputDate: document.getElementById("inputDate"),
       inputLinan: document.getElementById("inputLinan"),
       inputNanke: document.getElementById("inputNanke"),
-      inputMsg: document.getElementById("inputMsg"),
       inputNote: document.getElementById("inputNote"),
       editId: document.getElementById("editId"),
       weekRangeDisplay: document.getElementById("weekRangeDisplay"),
@@ -327,7 +312,6 @@
       btnCollapseAll: document.getElementById("btnCollapseAll"),
       toggleLinanSales: document.getElementById("toggleLinanSales"),
       toggleNankeSales: document.getElementById("toggleNankeSales"),
-      toggleMsg: document.getElementById("toggleMsg"),
       toggleLinanVisits: document.getElementById("toggleLinanVisits"),
       toggleNankeVisits: document.getElementById("toggleNankeVisits")
     };
@@ -416,13 +400,20 @@
       try {
         const obj = JSON.parse(raw);
         if (!obj?.expire || Date.now() > obj.expire) return false;
+        setFrontAccess(); // Rolling：每次有效開頁面自動延後10天
         return true;
       } catch { return false; }
     }
 
-    dom.lockScreen.classList.remove("hidden");
-    dom.lockScreen.classList.add("flex");
-    setTimeout(() => dom.accessPassword.focus(), 80);
+    if (checkFrontAccess()) {
+      dom.lockScreen.classList.add("hidden");
+      dom.lockScreen.classList.remove("flex");
+      initApp();
+    } else {
+      dom.lockScreen.classList.remove("hidden");
+      dom.lockScreen.classList.add("flex");
+      setTimeout(() => dom.accessPassword.focus(), 80);
+    }
 
     dom.btnEnter.addEventListener("click", doFrontUnlock);
     dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doFrontUnlock(); });
@@ -507,9 +498,8 @@
     const toggleMap = [
       { el: dom.toggleLinanSales, index: 0 },
       { el: dom.toggleNankeSales, index: 1 },
-      { el: dom.toggleMsg, index: 2 },
-      { el: dom.toggleLinanVisits, index: 3 },
-      { el: dom.toggleNankeVisits, index: 4 }
+      { el: dom.toggleLinanVisits, index: 2 },
+      { el: dom.toggleNankeVisits, index: 3 }
     ];
 
     toggleMap.forEach(item => {
@@ -646,7 +636,7 @@
         return;
       }
 
-      let chartData, labels, linanData, nankeData, msgData, linanVisitsData, nankeVisitsData;
+      let chartData, labels, linanData, nankeData, linanVisitsData, nankeVisitsData;
 
       if (chartViewMode === "weekly") {
         chartData = [...weeklyData].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
@@ -657,7 +647,6 @@
         });
         linanData = chartData.map(d => Number(d.linan_amount || 0));
         nankeData = chartData.map(d => Number(d.nanke_amount || 0));
-        msgData   = chartData.map(d => Number(d.message_count || 0));
         
         linanVisitsData = chartData.map(d => {
           const c = getVisitCounts(d.week_start_date, d.week_end_date);
@@ -673,11 +662,10 @@
           const major = getMajorMonth(d.week_start_date);
           const key = major.key;
           if (!monthMap[key]) {
-            monthMap[key] = { year: major.year, month: major.month, linan: 0, nanke: 0, msg: 0, linanVisits: 0, nankeVisits: 0, notes: [] };
+            monthMap[key] = { year: major.year, month: major.month, linan: 0, nanke: 0, linanVisits: 0, nankeVisits: 0, notes: [] };
           }
           monthMap[key].linan += Number(d.linan_amount || 0);
           monthMap[key].nanke += Number(d.nanke_amount || 0);
-          monthMap[key].msg   += Number(d.message_count || 0);
           
           const counts = getVisitCounts(d.week_start_date, d.week_end_date);
           monthMap[key].linanVisits += (counts.linan === '-' ? 0 : counts.linan);
@@ -692,24 +680,12 @@
         labels    = chartData.map(d => `${d.year}/${d.month}月`);
         linanData = chartData.map(d => d.linan);
         nankeData = chartData.map(d => d.nanke);
-        msgData   = chartData.map(d => d.msg);
         linanVisitsData = chartData.map(d => d.linanVisits);
         nankeVisitsData = chartData.map(d => d.nankeVisits);
       }
 
-      // 處理訊息數：去除前導零，讓線條從第一筆有資料的地方開始畫
-      let firstNonZeroMsgIdx = msgData.findIndex(v => v > 0);
-      if (firstNonZeroMsgIdx > -1) {
-        for (let i = 0; i < firstNonZeroMsgIdx; i++) {
-          msgData[i] = null;
-        }
-      } else {
-        msgData = msgData.map(() => null);
-      }
-
       // 計算全局最大值，鎖定 Y 軸高度防止跳動
       const maxSales = Math.max(...linanData, ...nankeData, 100000);
-      const maxMsg = Math.max(...msgData.filter(v => v !== null), 10);
       const maxVisits = Math.max(...linanVisitsData, ...nankeVisitsData, 10);
 
       const ctx = document.getElementById("mainChart").getContext("2d");
@@ -723,7 +699,6 @@
           datasets: [
             { label: "臨安店", data: linanData, borderColor: "#FF0088", backgroundColor: "rgba(255, 0, 136, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleLinanSales.checked },
             { label: "南科店", data: nankeData, borderColor: "#FFB3FF", backgroundColor: "rgba(255, 179, 255, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleNankeSales.checked },
-            { label: "訊息數", data: msgData, borderColor: "#FFFF33", borderDash: [6, 6], borderWidth: 1.6, pointRadius: 0, yAxisID: "y1", hidden: !dom.toggleMsg.checked },
             { label: "臨安來客數", data: linanVisitsData, borderColor: "#00ffff", backgroundColor: "rgba(0, 255, 255, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleLinanVisits.checked },
             { label: "南科來客數", data: nankeVisitsData, borderColor: "#39ff14", backgroundColor: "rgba(57, 255, 20, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleNankeVisits.checked }
           ]
@@ -745,8 +720,7 @@
                   const label = context.dataset.label || "";
                   const val = context.parsed.y ?? 0;
                   let base = "";
-                  if (label === "訊息數") base = `${label}: ${val}`;
-                  else if (label.includes("來客數")) base = `${label}: ${val} 人`;
+                  if (label.includes("來客數")) base = `${label}: ${val} 人`;
                   else base = `${label}: ${fmtTwd(val)}`;
                   
                   const row = chartData[context.dataIndex] || {};
@@ -759,7 +733,6 @@
           },
           scales: {
             y: { min: 0, suggestedMax: maxSales * 1.1, grid: { color: "#334155" }, ticks: { color: "#ffffff", callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v) } },
-            y1: { min: 0, suggestedMax: maxMsg * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
             y2: { min: 0, suggestedMax: maxVisits * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
             x:  { grid: { display: false }, ticks: { color: "#ffffff", maxTicksLimit: 10 } }
           }
@@ -785,11 +758,11 @@
     }
 
     function renderKPI() {
-      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elMsg = document.getElementById("kpiMessages"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount");
+      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount");
       const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
       
       if (!weeklyRows.length) {
-        elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elMsg.textContent = "--"; elGrowth.textContent = "--";
+        elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elGrowth.textContent = "--";
         elVisit.textContent = "來客數：-- / -- 人";
         elGrowth.className = "text-white"; wrap.className = "mt-2 text-xs flex items-center"; return;
       }
@@ -802,7 +775,6 @@
       elTotal.textContent = fmtTwd(total);
       elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
       elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
-      elMsg.textContent   = Number(latest.message_count || 0);
 
       // 計算最新週來客數
       const counts = getVisitCounts(latest.week_start_date, latest.week_end_date);
@@ -853,14 +825,13 @@
           groups[groupKey] = {
             key: groupKey, isHistorical, year: y, month: m,
             title: isHistorical ? "2025年6月以前 (歷史資料)" : `${y}/${m}月`,
-            rows: [], totalLinan: 0, totalNanke: 0, totalMsg: 0, totalLinanVisits: 0, totalNankeVisits: 0
+            rows: [], totalLinan: 0, totalNanke: 0, totalLinanVisits: 0, totalNankeVisits: 0
           };
         }
 
         groups[groupKey].rows.push(row);
         groups[groupKey].totalLinan += Number(row.linan_amount || 0);
         groups[groupKey].totalNanke += Number(row.nanke_amount || 0);
-        groups[groupKey].totalMsg += Number(row.message_count || 0);
         
         const counts = getVisitCounts(row.week_start_date, row.week_end_date);
         groups[groupKey].totalLinanVisits += (counts.linan === '-' ? 0 : counts.linan);
@@ -914,7 +885,6 @@
             <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
             <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</td>
             <td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${group.totalLinanVisits}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${group.totalNankeVisits}</span></td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-[#FFFF33] font-bold">${group.totalMsg}</td>
             <td class="px-4 py-3 text-center text-white">-</td>
           `;
           dom.tbody.appendChild(tr);
@@ -943,7 +913,6 @@
                 <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
                 <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</td>
                 <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.message_count || '-'}</td>
                 <td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>
               `;
               
@@ -991,7 +960,6 @@
               // 來客數欄位
               html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${counts.linan}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${counts.nanke}</span></td>`;
               
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.message_count || '-'}</td>`;
               html += `<td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>`;
 
               tr.innerHTML = html;
@@ -1019,7 +987,6 @@
         dom.inputDate.value = row.week_start_date || "";
         dom.inputLinan.value = row.linan_amount ?? 0;
         dom.inputNanke.value = row.nanke_amount ?? 0;
-        dom.inputMsg.value = row.message_count ?? 0;
         dom.inputNote.value = row.note ?? "";
         dom.btnDeleteEntry.classList.remove("hidden");
         if (row.week_start_date) showWeekRangeText(row.week_start_date);
@@ -1081,7 +1048,6 @@
         week_end_date: toISODateLocal(r.end),
         linan_amount: Number(dom.inputLinan.value || 0),
         nanke_amount: Number(dom.inputNanke.value || 0),
-        message_count: Number(dom.inputMsg.value || 0),
         note: (dom.inputNote.value || "").trim() || null,
         updated_at: new Date().toISOString()
       };
