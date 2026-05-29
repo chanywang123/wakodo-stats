@@ -21,6 +21,16 @@
     ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
     .ratio-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 10px; background: #E2E8F0; outline: none; }
     .ratio-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #EA580C; cursor: pointer; box-shadow: 0 0 10px rgba(234, 88, 12, 0.4); }
+
+    /* 密碼框呼吸燈 */
+    @keyframes breathing-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(234, 88, 12, 0.15); border-color: rgba(234, 88, 12, 0.3); }
+      50% { box-shadow: 0 0 15px rgba(234, 88, 12, 0.55); border-color: rgba(234, 88, 12, 0.7); }
+    }
+    .cyber-input:focus {
+      animation: breathing-glow 2s infinite ease-in-out;
+      outline: none;
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12 relative">
@@ -31,15 +41,17 @@
     <div class="blob w-[400px] h-[400px] bg-amber-100 top-[30%] right-[10%]"></div>
   </div>
 
-  <!-- 密碼驗證畫面 -->
+  <!-- 驗證密碼鎖定畫面 -->
   <div id="lockScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-xl">
     <div class="glass-panel p-8 max-w-sm w-full mx-4 text-center border border-white/60 shadow-2xl">
       <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fas fa-lock text-[#EA580C] text-2xl"></i>
       </div>
-      <h2 class="text-xl font-bold mb-2 text-slate-800">請輸入驗證密碼</h2>
-      <p class="text-xs text-slate-500 mb-6">輸入密碼以進入行銷開支計算系統</p>
-      <input type="password" id="accessPassword" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 text-slate-800 text-center focus:outline-none focus:ring-2 focus:ring-[#EA580C] tracking-widest text-sm" placeholder="••••••••" autocomplete="current-password" />
+      <h2 class="text-xl font-bold mb-1 text-slate-800">請輸入驗證密碼</h2>
+      <p class="text-xs text-slate-400 mb-6 font-semibold">🔒 密碼請詢問阿旺</p>
+      
+      <!-- 標準安全密碼輸入框（帶呼吸燈） -->
+      <input type="password" id="accessPassword" class="cyber-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 text-slate-800 text-center tracking-widest text-sm transition-all" placeholder="輸入解密密碼" autocomplete="current-password" />
       <button id="btnEnter" class="w-full bg-gradient-to-r from-[#EA580C] to-[#F97316] text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-orange-500/20 active:scale-95">驗證進入</button>
     </div>
   </div>
@@ -178,7 +190,7 @@
     const FRONT_KEY  = "wakodo_mkt_access_v3";
     const FRONT_TTL  = 7 * 24 * 60 * 60 * 1000;
 
-    // ─── 1. 全域變數狀態宣告（統一狀態，拒絕變數衝突） ───
+    // ─── 1. 全域變數狀態宣告（統一狀態變數，防衝突） ───
     let _sessionUnlocked = false; 
     let isEditMode = false;
     let allSales = [];
@@ -214,22 +226,13 @@
       logsContainer: document.getElementById("logsContainer")
     };
 
-    // ─── 3. 頂層集中 Window 掛載（優先編譯，杜絕 "not defined" 的時序錯誤） ───
+    // ─── 3. 頂層集中 Window 宣告（最優先編譯，絕不漏掛、絕不報 undefined） ───
     window.openExpenseModal = openExpenseModal;
     window.closeExpenseModal = closeExpenseModal;
     window.editExpense = editExpense;
     window.deleteExpense = deleteExpense;
     window.openLogsModal = openLogsModal;
     window.closeLogsModal = closeLogsModal;
-
-    // 初始化年份選單
-    const thisYear = new Date().getFullYear();
-    for(let y = thisYear - 1; y <= thisYear + 1; y++) {
-      const opt = document.createElement("option");
-      opt.value = y; opt.textContent = `${y} 年`;
-      if(y === thisYear) opt.selected = true;
-      dom.inputYear.appendChild(opt);
-    }
 
     // ─── 4. 工具與計算函式 ───
     function fmtTwd(n) { return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0)); }
@@ -282,13 +285,13 @@
       return 0.72;
     }
 
-    // ─── 5. 密碼保護機制（安全 Try-Catch 容錯模式） ───
+    // ─── 5. 密碼驗證與 LocalStorage 容錯保護 ───
     function setAccess() { 
       _sessionUnlocked = true;
       try { 
         localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL })); 
       } catch (e) {
-        console.warn("LocalStorage 寫入受阻，已切換至記憶體會話驗證機制");
+        console.warn("LocalStorage 寫入受阻，已啟用記憶體會話驗證");
       }
     }
     
@@ -306,7 +309,7 @@
       }
     }
 
-    // 啟動檢測流程
+    // 啟動檢測
     if (checkAccess()) {
       dom.lockScreen.classList.add("hidden");
       initApp();
@@ -321,7 +324,7 @@
     function doUnlock() {
       const val = dom.accessPassword.value.trim();
       if (val !== FRONT_PASS) {
-        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入正確的前台密碼！", background: "#FFFFFF", color: "#1F1F1F" });
+        Swal.fire({ icon: "error", title: "驗證失敗", text: "密碼金鑰不符合！", background: "#FFFFFF", color: "#1F1F1F" });
         return;
       }
       setAccess();
@@ -329,13 +332,13 @@
       initApp();
     }
 
-    // ===== 6. 系統啟動進入點（帶有全域 Swal 回報機制） =====
+    // ===== 6. 系統啟動進入點 =====
     async function initApp() {
       try {
         bindEvents();
         await refreshData();
         if (allMonthKeys.length > 0) {
-          expandedGroups.add(allMonthKeys[0]); // 預設打開最新月份
+          expandedGroups.add(allMonthKeys[0]); 
           currentFocusMonth = allMonthKeys[0];
         }
         renderAll();
@@ -345,7 +348,7 @@
       }
     }
 
-    // ===== 7. DOM 事件綁定（完美對接 onSubmit 接口） =====
+    // ===== 7. DOM 事件綁定 =====
     function bindEvents() {
       dom.btnToggleMode.addEventListener("click", () => {
         isEditMode = !isEditMode;
@@ -366,7 +369,6 @@
       dom.inputYear.addEventListener("change", handleDateChangeToInherit);
       dom.inputMonth.addEventListener("change", handleDateChangeToInherit);
       
-      // 綁定表單送出（修復儲存無反應之痛點）
       dom.expenseForm.addEventListener("submit", handleExpenseSubmit);
     }
 
@@ -406,7 +408,7 @@
       }
     }
 
-    // ===== 9. 各月業績與加權分攤計算邏輯 =====
+    // ===== 9. 加權分攤核心運算 =====
     function buildMonthlyData(key) {
       const [year, month] = key.split("-").map(Number);
       const days = getDaysInMonth(year, month);
@@ -415,7 +417,6 @@
       const totalExpense = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
       const dailyExpense = totalExpense / days;
 
-      // 每筆費用各自套用其獨立 Linan Ratio 計算分攤
       let totalLinanExpense = 0, totalNankeExpense = 0;
       expenses.forEach(e => {
         const ratio = e.linan_ratio != null ? Number(e.linan_ratio) : 0.72;
@@ -434,7 +435,7 @@
       };
     }
 
-    // ===== 10. 渲染控制（修復補回 updateSummaryCard 遺失問題） =====
+    // ===== 10. 畫面渲染與核心看板更新 =====
     function renderAll() {
       try {
         dom.monthlyContainer.innerHTML = "";
@@ -455,7 +456,6 @@
       }
     }
 
-    // 補回先前意外被遺留清除的 updateSummaryCard 函數本體
     function updateSummaryCard(mData) {
       if(!mData) {
         dom.summaryTotal.textContent = "--";
@@ -498,7 +498,7 @@
         const body = document.createElement("div");
         body.className = "p-4 border-t border-slate-100 bg-white/20 space-y-5";
 
-        // 行銷開支明細列表
+        // 行銷開支明細
         const mktSection = document.createElement("div");
         mktSection.className = "space-y-2.5";
         let mktHeadHTML = `
@@ -539,7 +539,7 @@
         }
         body.appendChild(mktSection);
 
-        // 週店別獨立業績比對分析
+        // 週對比（營收倍數 + 行銷費用率佔比與燈號 + 日損益指標）
         const salesSection = document.createElement("div");
         salesSection.className = "space-y-2.5 pt-1.5";
         salesSection.innerHTML = `<div class="border-b border-slate-100 pb-1.5"><span class="text-xs font-bold text-slate-600"><i class="fas fa-chart-line text-blue-500"></i> 週店別獨立對比分析</span></div>`;
@@ -561,17 +561,36 @@
               const empty = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-400">無支出</span>`;
               lBadge = nBadge = empty; lText1 = nText1 = "（未設定支出，無法對比）";
             } else {
-              // 臨安店 (加權 72% / 28% 分攤)
+              // 🟢🟡🔴 行銷成本佔比燈號計算
+              const getRatioUI = (rev, alloc) => {
+                const ratioPct = (alloc / (rev || 1)) * 100;
+                let light = "text-emerald-600 bg-emerald-50 border-emerald-200";
+                let status = "佔比安全";
+                if (ratioPct >= 3 && ratioPct <= 10) {
+                  light = "text-amber-600 bg-amber-50 border-amber-200";
+                  status = "佔比健康";
+                } else if (ratioPct > 10) {
+                  light = "text-rose-600 bg-rose-50 border-rose-200";
+                  status = "佔比預警";
+                }
+                return { ratioPct, light, status };
+              };
+
+              // 臨安店
               const lRatio1 = linanRev / (linanWAlloc || 1), isLProf = linanRev >= linanWAlloc;
+              const lRatioData = getRatioUI(linanRev, linanWAlloc);
               lBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] ${isLProf ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'} font-bold">臨安 ${isLProf ? '賺' : '賠'} ${lRatio1.toFixed(1)} 倍</span>`;
-              lText1 = `營收約為分攤行銷的 <strong class="${isLProf ? 'text-emerald-600' : 'text-rose-600'} font-mono">${lRatio1.toFixed(1)} 倍</strong>`;
-              lText2 = `日均營收是分攤支出的 <strong class="text-slate-800 font-mono">${((linanRev/7)/(mData.dailyLinanExpense||1)).toFixed(1)} 倍</strong> <span class="text-slate-400 text-[10px] block">（每日最少需達 ${fmtTwd(mData.dailyLinanExpense)} 才不賠）</span>`;
+              lText1 = `營收倍數：是行銷費用的 <strong class="${isLProf ? 'text-emerald-600' : 'text-rose-600'} font-mono">${lRatio1.toFixed(1)} 倍</strong>`;
+              lText2 = `行銷佔營收：<strong class="font-mono">${lRatioData.ratioPct.toFixed(1)}%</strong> <span class="px-1.5 py-0.5 ml-1 rounded-full text-[9px] border font-bold ${lRatioData.light}">${lRatioData.status}</span>
+                <span class="text-slate-400 text-[10px] block mt-1">（臨安日營業額最少需達 ${fmtTwd(mData.dailyLinanExpense)} 元才不賠行銷成本）</span>`;
 
               // 南科店
               const nRatio1 = nankeRev / (nankeWAlloc || 1), isNProf = nankeRev >= nankeWAlloc;
+              const nRatioData = getRatioUI(nankeRev, nankeWAlloc);
               nBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] ${isNProf ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'} font-bold">南科 ${isNProf ? '賺' : '賠'} ${nRatio1.toFixed(1)} 倍</span>`;
-              nText1 = `營收約為分攤行銷的 <strong class="${isNProf ? 'text-emerald-600' : 'text-rose-600'} font-mono">${nRatio1.toFixed(1)} 倍</strong>`;
-              nText2 = `日均營收是分攤支出的 <strong class="text-slate-800 font-mono">${((nankeRev/7)/(mData.dailyNankeExpense||1)).toFixed(1)} 倍</strong> <span class="text-slate-400 text-[10px] block">（每日最少需達 ${fmtTwd(mData.dailyNankeExpense)} 才不賠）</span>`;
+              nText1 = `營收倍數：是行銷費用的 <strong class="${isNProf ? 'text-emerald-600' : 'text-rose-600'} font-mono">${nRatio1.toFixed(1)} 倍</strong>`;
+              nText2 = `行銷佔營收：<strong class="font-mono">${nRatioData.ratioPct.toFixed(1)}%</strong> <span class="px-1.5 py-0.5 ml-1 rounded-full text-[9px] border font-bold ${nRatioData.light}">${nRatioData.status}</span>
+                <span class="text-slate-400 text-[10px] block mt-1">（南科日營業額最少需達 ${fmtTwd(mData.dailyNankeExpense)} 元才不賠行銷成本）</span>`;
             }
 
             const item = document.createElement("div");
@@ -582,15 +601,15 @@
                 <div class="flex gap-1.5">${lBadge}${nBadge}</div>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-600 divide-y md:divide-y-0 md:divide-l divide-slate-100">
-                <div class="space-y-1">
+                <div class="space-y-1.5">
                   <div class="font-bold text-slate-800 flex items-center gap-1.5"><span class="w-2 h-3.5 bg-orange-500 rounded-full"></span> 臨安店</div>
-                  <p>週收支比：${lText1}</p><p>日均指標：${lText2}</p>
-                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(linanRev)} / 週攤: ${fmtTwd(linanWAlloc)}</div>
+                  <p>${lText1}</p><p>${lText2}</p>
+                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(linanRev)} / 週分攤: ${fmtTwd(linanWAlloc)}</div>
                 </div>
-                <div class="space-y-1 pt-3 md:pt-0 md:pl-4">
+                <div class="space-y-1.5 pt-3.5 md:pt-0 md:pl-4">
                   <div class="font-bold text-slate-800 flex items-center gap-1.5"><span class="w-2 h-3.5 bg-blue-500 rounded-full"></span> 南科店</div>
-                  <p>週收支比：${nText1}</p><p>日均指標：${nText2}</p>
-                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(nankeRev)} / 週攤: ${fmtTwd(nankeWAlloc)}</div>
+                  <p>${nText1}</p><p>${nText2}</p>
+                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(nankeRev)} / 週分攤: ${fmtTwd(nankeWAlloc)}</div>
                 </div>
               </div>
             `;
@@ -664,7 +683,7 @@
         renderAll();
       } catch (err) {
         console.error("儲存失敗:", err);
-        Swal.fire({ icon: "error", title: "儲存失敗", text: err.message || "資料庫寫入受阻，請檢查 Supabase 設定與欄位結構是否完整！", background: "#FFFFFF", color: "#1F1F1F" });
+        Swal.fire({ icon: "error", title: "儲存失敗", text: err.message || "資料庫寫入受阻，請檢查欄位結構！", background: "#FFFFFF", color: "#1F1F1F" });
       }
     }
 
