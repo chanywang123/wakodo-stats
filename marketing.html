@@ -89,7 +89,7 @@
     <!-- 控制區 -->
     <div class="flex justify-between items-center bg-white/50 backdrop-blur p-3.5 rounded-2xl border border-slate-100 shadow-sm">
       <div class="text-xs text-slate-500 font-medium">
-        <i class="fas fa-info-circle mr-1 text-blue-500"></i> 已啟用智慧比例繼承。兩店依各筆比例加權分攤。
+        <i class="fas fa-info-circle mr-1 text-blue-500"></i> 智慧比例繼承已啟用。兩店依各筆比例加權分攤。
       </div>
       <div class="flex gap-2">
         <button id="btnExpandAll" class="bg-white hover:bg-slate-50 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 transition flex items-center gap-1">
@@ -178,6 +178,8 @@
     const FRONT_KEY  = "wakodo_mkt_access_v3";
     const FRONT_TTL  = 7 * 24 * 60 * 60 * 1000;
 
+    // ─── 1. 全域變數狀態宣告（統一狀態，拒絕變數衝突） ───
+    let _sessionUnlocked = false; 
     let isEditMode = false;
     let allSales = [];
     let allExpenses = [];
@@ -185,6 +187,7 @@
     const expandedGroups = new Set();
     let currentFocusMonth = null;
 
+    // ─── 2. DOM 節點物件 ───
     const dom = {
       lockScreen: document.getElementById("lockScreen"),
       accessPassword: document.getElementById("accessPassword"),
@@ -211,6 +214,14 @@
       logsContainer: document.getElementById("logsContainer")
     };
 
+    // ─── 3. 頂層集中 Window 掛載（優先編譯，杜絕 "not defined" 的時序錯誤） ───
+    window.openExpenseModal = openExpenseModal;
+    window.closeExpenseModal = closeExpenseModal;
+    window.editExpense = editExpense;
+    window.deleteExpense = deleteExpense;
+    window.openLogsModal = openLogsModal;
+    window.closeLogsModal = closeLogsModal;
+
     // 初始化年份選單
     const thisYear = new Date().getFullYear();
     for(let y = thisYear - 1; y <= thisYear + 1; y++) {
@@ -220,41 +231,7 @@
       dom.inputYear.appendChild(opt);
     }
 
-    // ===== 密碼驗證 =====
-    function setAccess() { localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL })); }
-    function checkAccess() {
-      const raw = localStorage.getItem(FRONT_KEY);
-      if (!raw) return false;
-      try {
-        const obj = JSON.parse(raw);
-        if (!obj?.expire || Date.now() > obj.expire) return false;
-        setAccess(); return true;
-      } catch { return false; }
-    }
-
-    if (checkAccess()) {
-      dom.lockScreen.classList.add("hidden");
-      initApp();
-    } else {
-      dom.lockScreen.classList.remove("hidden");
-      dom.accessPassword.focus();
-    }
-
-    dom.btnEnter.addEventListener("click", doUnlock);
-    dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doUnlock(); });
-
-    function doUnlock() {
-      const val = dom.accessPassword.value.trim();
-      if (val !== FRONT_PASS) {
-        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入正確的前台密碼！", background: "#FFFFFF", color: "#1F1F1F" });
-        return;
-      }
-      setAccess();
-      dom.lockScreen.classList.add("hidden");
-      initApp();
-    }
-
-    // ===== 基礎運算工具 =====
+    // ─── 4. 工具與計算函式 ───
     function fmtTwd(n) { return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0)); }
     function getDaysInMonth(year, month) { return new Date(year, month, 0).getDate(); }
     function parseISODateLocal(dateStr){
@@ -281,38 +258,6 @@
       return { year: Number(yy), month: Number(mm), key: bestKey };
     }
 
-    // ===== 系統初始化與一鍵全載入 =====
-    async function initApp() {
-      bindEvents();
-      await refreshData();
-      if (allMonthKeys.length > 0) {
-        expandedGroups.add(allMonthKeys[0]); // 預設打開最新月份
-        currentFocusMonth = allMonthKeys[0];
-      }
-      renderAll();
-    }
-
-    function bindEvents() {
-      dom.btnToggleMode.addEventListener("click", () => {
-        isEditMode = !isEditMode;
-        if(isEditMode) {
-          dom.btnToggleMode.innerHTML = `<i class="fas fa-check text-green-500"></i> <span>結束編輯</span>`;
-          dom.btnToggleMode.className = "text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-1.5 rounded-lg border border-green-200 transition shadow-sm flex items-center gap-1.5";
-        } else {
-          dom.btnToggleMode.innerHTML = `<i class="fas fa-edit text-slate-400"></i> <span>進入編輯</span>`;
-          dom.btnToggleMode.className = "text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 transition shadow-sm flex items-center gap-1.5";
-        }
-        renderAll();
-      });
-
-      dom.btnShowLogs.addEventListener("click", openLogsModal);
-      dom.btnExpandAll.addEventListener("click", () => { allMonthKeys.forEach(k => expandedGroups.add(k)); renderAll(); });
-      dom.btnCollapseAll.addEventListener("click", () => { expandedGroups.clear(); renderAll(); });
-      dom.inputLinanRatio.addEventListener("input", (e) => updateRatioDisplay(e.target.value));
-      dom.inputYear.addEventListener("change", handleDateChangeToInherit);
-      dom.inputMonth.addEventListener("change", handleDateChangeToInherit);
-    }
-
     function updateRatioDisplay(val) {
       const linan = parseInt(val);
       dom.ratioDisplay.textContent = `${linan}% : ${100 - linan}%`;
@@ -337,7 +282,95 @@
       return 0.72;
     }
 
-    // 一次性極速撈取所有數據，確保百分之百成功，絕不卡死
+    // ─── 5. 密碼保護機制（安全 Try-Catch 容錯模式） ───
+    function setAccess() { 
+      _sessionUnlocked = true;
+      try { 
+        localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL })); 
+      } catch (e) {
+        console.warn("LocalStorage 寫入受阻，已切換至記憶體會話驗證機制");
+      }
+    }
+    
+    function checkAccess() {
+      if (_sessionUnlocked) return true;
+      try {
+        const raw = localStorage.getItem(FRONT_KEY);
+        if (!raw) return false;
+        const obj = JSON.parse(raw);
+        if (!obj?.expire || Date.now() > obj.expire) return false;
+        _sessionUnlocked = true;
+        return true;
+      } catch (e) { 
+        return false; 
+      }
+    }
+
+    // 啟動檢測流程
+    if (checkAccess()) {
+      dom.lockScreen.classList.add("hidden");
+      initApp();
+    } else {
+      dom.lockScreen.classList.remove("hidden");
+      dom.accessPassword.focus();
+    }
+
+    dom.btnEnter.addEventListener("click", doUnlock);
+    dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doUnlock(); });
+
+    function doUnlock() {
+      const val = dom.accessPassword.value.trim();
+      if (val !== FRONT_PASS) {
+        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入正確的前台密碼！", background: "#FFFFFF", color: "#1F1F1F" });
+        return;
+      }
+      setAccess();
+      dom.lockScreen.classList.add("hidden");
+      initApp();
+    }
+
+    // ===== 6. 系統啟動進入點（帶有全域 Swal 回報機制） =====
+    async function initApp() {
+      try {
+        bindEvents();
+        await refreshData();
+        if (allMonthKeys.length > 0) {
+          expandedGroups.add(allMonthKeys[0]); // 預設打開最新月份
+          currentFocusMonth = allMonthKeys[0];
+        }
+        renderAll();
+      } catch (err) {
+        console.error("系統啟動失敗:", err);
+        Swal.fire({ icon: "error", title: "系統啟動失敗", text: err.message || err, background: "#FFFFFF", color: "#1F1F1F" });
+      }
+    }
+
+    // ===== 7. DOM 事件綁定（完美對接 onSubmit 接口） =====
+    function bindEvents() {
+      dom.btnToggleMode.addEventListener("click", () => {
+        isEditMode = !isEditMode;
+        if(isEditMode) {
+          dom.btnToggleMode.innerHTML = `<i class="fas fa-check text-green-500"></i> <span>結束編輯</span>`;
+          dom.btnToggleMode.className = "text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-1.5 rounded-lg border border-green-200 transition shadow-sm flex items-center gap-1.5";
+        } else {
+          dom.btnToggleMode.innerHTML = `<i class="fas fa-edit text-slate-400"></i> <span>進入編輯</span>`;
+          dom.btnToggleMode.className = "text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 transition shadow-sm flex items-center gap-1.5";
+        }
+        renderAll();
+      });
+
+      dom.btnShowLogs.addEventListener("click", openLogsModal);
+      dom.btnExpandAll.addEventListener("click", () => { allMonthKeys.forEach(k => expandedGroups.add(k)); renderAll(); });
+      dom.btnCollapseAll.addEventListener("click", () => { expandedGroups.clear(); renderAll(); });
+      dom.inputLinanRatio.addEventListener("input", (e) => updateRatioDisplay(e.target.value));
+      dom.inputYear.addEventListener("change", handleDateChangeToInherit);
+      dom.inputMonth.addEventListener("change", handleDateChangeToInherit);
+      
+      // 綁定表單送出（修復儲存無反應之痛點）
+      dom.expenseForm.addEventListener("submit", handleExpenseSubmit);
+    }
+
+    // ===== 8. 銷售與行銷數據同步撈取 =====
     async function refreshData() {
       try {
         const [salesRes, mktRes] = await Promise.all([
@@ -351,10 +384,21 @@
         allSales = salesRes.data || [];
         allExpenses = mktRes.data || [];
 
-        // 建構月份清單 (由新到舊排列)
         const keys = new Set();
-        allSales.forEach(row => { if (row.year && row.month) keys.add(`${row.year}-${String(row.month).padStart(2, "0")}`); });
-        allExpenses.forEach(row => { if (row.year && row.month) keys.add(`${row.year}-${String(row.month).padStart(2, "0")}`); });
+        allSales.forEach(row => { 
+          if (row.week_start_date) {
+            const major = getMajorMonth(row.week_start_date);
+            keys.add(major.key);
+          } else if (row.year && row.month) {
+            keys.add(`${row.year}-${String(row.month).padStart(2, "0")}`);
+          }
+        });
+        allExpenses.forEach(row => { 
+          if (row.year && row.month) {
+            keys.add(`${row.year}-${String(row.month).padStart(2, "0")}`);
+          }
+        });
+        
         allMonthKeys = Array.from(keys).sort().reverse();
       } catch (err) {
         console.error("載入數據失敗:", err);
@@ -362,7 +406,7 @@
       }
     }
 
-    // ===== 運算核心 =====
+    // ===== 9. 各月業績與加權分攤計算邏輯 =====
     function buildMonthlyData(key) {
       const [year, month] = key.split("-").map(Number);
       const days = getDaysInMonth(year, month);
@@ -371,7 +415,7 @@
       const totalExpense = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
       const dailyExpense = totalExpense / days;
 
-      // 各筆支出獨立加權分攤
+      // 每筆費用各自套用其獨立 Linan Ratio 計算分攤
       let totalLinanExpense = 0, totalNankeExpense = 0;
       expenses.forEach(e => {
         const ratio = e.linan_ratio != null ? Number(e.linan_ratio) : 0.72;
@@ -390,18 +434,37 @@
       };
     }
 
+    // ===== 10. 渲染控制（修復補回 updateSummaryCard 遺失問題） =====
     function renderAll() {
-      dom.monthlyContainer.innerHTML = "";
-      if(allMonthKeys.length === 0) {
-        dom.monthlyContainer.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm">目前無任何數據紀錄。</div>`;
-        updateSummaryCard(null); return;
-      }
-      if(!currentFocusMonth || !allMonthKeys.includes(currentFocusMonth)) currentFocusMonth = allMonthKeys[0];
-      updateSummaryCard(buildMonthlyData(currentFocusMonth));
+      try {
+        dom.monthlyContainer.innerHTML = "";
+        if(allMonthKeys.length === 0) {
+          dom.monthlyContainer.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm">目前無任何數據紀錄。</div>`;
+          updateSummaryCard(null); return;
+        }
+        if(!currentFocusMonth || !allMonthKeys.includes(currentFocusMonth)) currentFocusMonth = allMonthKeys[0];
+        
+        updateSummaryCard(buildMonthlyData(currentFocusMonth));
 
-      allMonthKeys.forEach(key => {
-        dom.monthlyContainer.appendChild(createMonthlyCard(key));
-      });
+        allMonthKeys.forEach(key => {
+          dom.monthlyContainer.appendChild(createMonthlyCard(key));
+        });
+      } catch (err) {
+        console.error("渲染出錯:", err);
+        Swal.fire({ icon: "error", title: "畫面渲染失敗", text: err.message || err, background: "#FFFFFF", color: "#1F1F1F" });
+      }
+    }
+
+    // 補回先前意外被遺留清除的 updateSummaryCard 函數本體
+    function updateSummaryCard(mData) {
+      if(!mData) {
+        dom.summaryTotal.textContent = "--";
+        dom.summaryDaily.textContent = "--";
+        dom.summaryMonthLabel.textContent = ""; return;
+      }
+      dom.summaryTotal.textContent = fmtTwd(mData.totalExpense);
+      dom.summaryDaily.textContent = fmtTwd(mData.dailyExpense);
+      dom.summaryMonthLabel.textContent = `▌ ${mData.year}年 ${mData.month}月份 (${mData.days}天)`;
     }
 
     function createMonthlyCard(key) {
@@ -435,7 +498,7 @@
         const body = document.createElement("div");
         body.className = "p-4 border-t border-slate-100 bg-white/20 space-y-5";
 
-        // 行銷開支明細
+        // 行銷開支明細列表
         const mktSection = document.createElement("div");
         mktSection.className = "space-y-2.5";
         let mktHeadHTML = `
@@ -476,7 +539,7 @@
         }
         body.appendChild(mktSection);
 
-        // 週對比
+        // 週店別獨立業績比對分析
         const salesSection = document.createElement("div");
         salesSection.className = "space-y-2.5 pt-1.5";
         salesSection.innerHTML = `<div class="border-b border-slate-100 pb-1.5"><span class="text-xs font-bold text-slate-600"><i class="fas fa-chart-line text-blue-500"></i> 週店別獨立對比分析</span></div>`;
@@ -498,7 +561,7 @@
               const empty = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-400">無支出</span>`;
               lBadge = nBadge = empty; lText1 = nText1 = "（未設定支出，無法對比）";
             } else {
-              // 臨安店
+              // 臨安店 (加權 72% / 28% 分攤)
               const lRatio1 = linanRev / (linanWAlloc || 1), isLProf = linanRev >= linanWAlloc;
               lBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] ${isLProf ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'} font-bold">臨安 ${isLProf ? '賺' : '賠'} ${lRatio1.toFixed(1)} 倍</span>`;
               lText1 = `營收約為分攤行銷的 <strong class="${isLProf ? 'text-emerald-600' : 'text-rose-600'} font-mono">${lRatio1.toFixed(1)} 倍</strong>`;
@@ -541,8 +604,8 @@
       return div;
     }
 
-    // ===== 行銷支出新增/修改/刪除運作 =====
-    window.openExpenseModal = function(id = null, defYear = null, defMonth = null) {
+    // ===== 11. 儲存/新增/刪除業務函數（統一由最上層 Window 掛載） =====
+    function openExpenseModal(id = null, defYear = null, defMonth = null) {
       dom.expenseModal.classList.remove("hidden");
       dom.expenseForm.reset();
 
@@ -566,9 +629,9 @@
         const linanRatioPct = Math.round(inheritRatio(targetYear, targetMonth) * 100);
         dom.inputLinanRatio.value = linanRatioPct; updateRatioDisplay(linanRatioPct);
       }
-    };
+    }
 
-    window.closeExpenseModal = function() { dom.expenseModal.classList.add("hidden"); };
+    function closeExpenseModal() { dom.expenseModal.classList.add("hidden"); }
 
     async function handleExpenseSubmit(e) {
       e.preventDefault();
@@ -601,13 +664,13 @@
         renderAll();
       } catch (err) {
         console.error("儲存失敗:", err);
-        Swal.fire({ icon: "error", title: "儲存失敗", text: err.message || "請檢查資料庫欄位或SQL腳本是否完整執行", background: "#FFFFFF", color: "#1F1F1F" });
+        Swal.fire({ icon: "error", title: "儲存失敗", text: err.message || "資料庫寫入受阻，請檢查 Supabase 設定與欄位結構是否完整！", background: "#FFFFFF", color: "#1F1F1F" });
       }
     }
 
-    window.editExpense = function(id) { openExpenseModal(id); };
+    function editExpense(id) { openExpenseModal(id); }
 
-    window.deleteExpense = async function(id, amount, desc) {
+    async function deleteExpense(id, amount, desc) {
       const confirm = await Swal.fire({
         title: "確認刪除此筆支出？", text: `金額：${fmtTwd(amount)} (${desc})`, icon: "warning",
         showCancelButton: true, confirmButtonColor: "#ef4444", cancelButtonColor: "#64748B", confirmButtonText: "確定刪除", background: "#FFFFFF", color: "#1F1F1F"
@@ -625,15 +688,14 @@
           Swal.fire({ icon: "error", title: "刪除失敗", text: err.message, background: "#FFFFFF", color: "#1F1F1F" });
         }
       }
-    };
+    }
 
     async function writeLog(action, details) {
       try { await supabase.from("marketing_logs").insert([{ action, details }]); } 
       catch (err) { console.error("日誌寫入失敗:", err); }
     }
 
-    // ===== 操作日誌 =====
-    window.openLogsModal = async function() {
+    async function openLogsModal() {
       dom.logsModal.classList.remove("hidden");
       dom.logsContainer.innerHTML = `<div class="text-xs text-slate-500 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> 讀取紀錄中...</div>`;
       try {
@@ -666,9 +728,9 @@
       } catch (err) {
         dom.logsContainer.innerHTML = `<p class="text-xs text-red-500 p-4">載入失敗: ${err.message}</p>`;
       }
-    };
+    }
 
-    window.closeLogsModal = function() { dom.logsModal.classList.add("hidden"); };
+    function closeLogsModal() { dom.logsModal.classList.add("hidden"); }
   </script>
 </body>
 </html>
