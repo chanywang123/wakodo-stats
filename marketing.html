@@ -22,7 +22,7 @@
     .ratio-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 10px; background: #E2E8F0; outline: none; }
     .ratio-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #EA580C; cursor: pointer; box-shadow: 0 0 10px rgba(234, 88, 12, 0.4); }
 
-    /* 密碼框呼吸燈 */
+    /* 密碼框科技感呼吸燈 */
     @keyframes breathing-glow {
       0%, 100% { box-shadow: 0 0 5px rgba(234, 88, 12, 0.15); border-color: rgba(234, 88, 12, 0.3); }
       50% { box-shadow: 0 0 15px rgba(234, 88, 12, 0.55); border-color: rgba(234, 88, 12, 0.7); }
@@ -41,7 +41,7 @@
     <div class="blob w-[400px] h-[400px] bg-amber-100 top-[30%] right-[10%]"></div>
   </div>
 
-  <!-- 驗證密碼鎖定畫面 -->
+  <!-- 密碼驗證畫面 -->
   <div id="lockScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-xl">
     <div class="glass-panel p-8 max-w-sm w-full mx-4 text-center border border-white/60 shadow-2xl">
       <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -50,7 +50,7 @@
       <h2 class="text-xl font-bold mb-1 text-slate-800">請輸入驗證密碼</h2>
       <p class="text-xs text-slate-400 mb-6 font-semibold">🔒 密碼請詢問阿旺</p>
       
-      <!-- 標準安全密碼輸入框（帶呼吸燈） -->
+      <!-- 原生安全性密碼輸入框（帶呼吸燈） -->
       <input type="password" id="accessPassword" class="cyber-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 text-slate-800 text-center tracking-widest text-sm transition-all" placeholder="輸入解密密碼" autocomplete="current-password" />
       <button id="btnEnter" class="w-full bg-gradient-to-r from-[#EA580C] to-[#F97316] text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-orange-500/20 active:scale-95">驗證進入</button>
     </div>
@@ -190,7 +190,7 @@
     const FRONT_KEY  = "wakodo_mkt_access_v3";
     const FRONT_TTL  = 7 * 24 * 60 * 60 * 1000;
 
-    // ─── 1. 全域變數狀態宣告（統一狀態變數，防衝突） ───
+    // ─── 1. 全域狀態變數宣告 ───
     let _sessionUnlocked = false; 
     let isEditMode = false;
     let allSales = [];
@@ -226,13 +226,22 @@
       logsContainer: document.getElementById("logsContainer")
     };
 
-    // ─── 3. 頂層集中 Window 宣告（最優先編譯，絕不漏掛、絕不報 undefined） ───
-    window.openExpenseModal = openExpenseModal;
+    // ─── 3. 頂層 Window 掛載 ───
+    window.openExpenseModal  = openExpenseModal;
     window.closeExpenseModal = closeExpenseModal;
-    window.editExpense = editExpense;
-    window.deleteExpense = deleteExpense;
-    window.openLogsModal = openLogsModal;
-    window.closeLogsModal = closeLogsModal;
+    window.editExpense       = editExpense;
+    window.deleteExpense     = deleteExpense;
+    window.openLogsModal     = openLogsModal;
+    window.closeLogsModal    = closeLogsModal;
+
+    // 初始化年份選單
+    const thisYear = new Date().getFullYear();
+    for(let y = thisYear - 1; y <= thisYear + 1; y++) {
+      const opt = document.createElement("option");
+      opt.value = y; opt.textContent = `${y} 年`;
+      if(y === thisYear) opt.selected = true;
+      dom.inputYear.appendChild(opt);
+    }
 
     // ─── 4. 工具與計算函式 ───
     function fmtTwd(n) { return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0)); }
@@ -285,7 +294,7 @@
       return 0.72;
     }
 
-    // ─── 5. 密碼驗證與 LocalStorage 容錯保護 ───
+    // ─── 5. 密碼驗證邏輯 ───
     function setAccess() { 
       _sessionUnlocked = true;
       try { 
@@ -417,6 +426,7 @@
       const totalExpense = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
       const dailyExpense = totalExpense / days;
 
+      // 各筆支出獨立加權分攤
       let totalLinanExpense = 0, totalNankeExpense = 0;
       expenses.forEach(e => {
         const ratio = e.linan_ratio != null ? Number(e.linan_ratio) : 0.72;
@@ -601,16 +611,41 @@
                 <div class="flex gap-1.5">${lBadge}${nBadge}</div>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-600 divide-y md:divide-y-0 md:divide-l divide-slate-100">
-                <div class="space-y-1.5">
-                  <div class="font-bold text-slate-800 flex items-center gap-1.5"><span class="w-2 h-3.5 bg-orange-500 rounded-full"></span> 臨安店</div>
-                  <p>${lText1}</p><p>${lText2}</p>
-                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(linanRev)} / 週分攤: ${fmtTwd(linanWAlloc)}</div>
+                
+                <!-- 臨安店 -->
+                <div class="space-y-2">
+                  <div class="font-bold text-slate-800 flex items-center gap-1.5 text-[13px]">
+                    <span class="w-2 h-3.5 bg-orange-500 rounded-full"></span> 臨安店
+                  </div>
+                  <!-- 週收、週分攤大字化與顏色區隔 -->
+                  <div class="text-sm border-b border-slate-100 pb-1.5">
+                    <span class="text-slate-500 font-semibold">週收:</span> <strong class="text-slate-800 font-mono font-bold">${fmtTwd(linanRev)}</strong>
+                    <span class="text-slate-300 mx-2">|</span>
+                    <span class="text-slate-500 font-semibold">週分攤:</span> <strong class="text-[#EA580C] font-mono font-bold">${fmtTwd(linanWAlloc)}</strong>
+                  </div>
+                  <div class="space-y-1 text-xs">
+                    <p>${lText1}</p>
+                    <p>${lText2}</p>
+                  </div>
                 </div>
-                <div class="space-y-1.5 pt-3.5 md:pt-0 md:pl-4">
-                  <div class="font-bold text-slate-800 flex items-center gap-1.5"><span class="w-2 h-3.5 bg-blue-500 rounded-full"></span> 南科店</div>
-                  <p>${nText1}</p><p>${nText2}</p>
-                  <div class="text-[10px] text-slate-400 font-mono mt-1">週收: ${fmtTwd(nankeRev)} / 週分攤: ${fmtTwd(nankeWAlloc)}</div>
+
+                <!-- 南科店 -->
+                <div class="space-y-2 pt-3.5 md:pt-0 md:pl-4">
+                  <div class="font-bold text-slate-800 flex items-center gap-1.5 text-[13px]">
+                    <span class="w-2 h-3.5 bg-blue-500 rounded-full"></span> 南科店
+                  </div>
+                  <!-- 週收、週分攤大字化與顏色區隔 -->
+                  <div class="text-sm border-b border-slate-100 pb-1.5">
+                    <span class="text-slate-500 font-semibold">週收:</span> <strong class="text-slate-800 font-mono font-bold">${fmtTwd(nankeRev)}</strong>
+                    <span class="text-slate-300 mx-2">|</span>
+                    <span class="text-slate-500 font-semibold">週分攤:</span> <strong class="text-[#EA580C] font-mono font-bold">${fmtTwd(nankeWAlloc)}</strong>
+                  </div>
+                  <div class="space-y-1 text-xs">
+                    <p>${nText1}</p>
+                    <p>${nText2}</p>
+                  </div>
                 </div>
+
               </div>
             `;
             list.appendChild(item);
@@ -623,7 +658,7 @@
       return div;
     }
 
-    // ===== 11. 儲存/新增/刪除業務函數（統一由最上層 Window 掛載） =====
+    // ===== 11. 儲存/新增/刪除業務函數 =====
     function openExpenseModal(id = null, defYear = null, defMonth = null) {
       dom.expenseModal.classList.remove("hidden");
       dom.expenseForm.reset();
