@@ -118,7 +118,7 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="glass-panel p-5">
         <p class="text-white text-xs mb-1">最新週總業績</p>
         <h3 class="text-2xl font-bold text-white" id="kpiTotal">--</h3>
@@ -130,10 +130,11 @@
           <span class="text-xl font-bold text-[#FF0088]" id="kpiLinan">--</span>
           <span class="text-white">/</span>
           <span class="text-xl font-bold text-[#FF3EFF]" id="kpiNanke">--</span>
+          <span class="text-white text-xs ml-1">萬</span>
         </div>
+        <p class="text-xs text-slate-400 mt-1" id="kpiNewReturning">新客 / 舊客：--</p>
         <p class="text-xs text-white mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
       </div>
-
       <div id="btnAddData" class="hidden glass-panel p-5 flex-col justify-center items-center cursor-pointer hover:bg-slate-800/50 transition">
         <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-900/50"><i class="fas fa-plus text-white"></i></div>
         <span class="text-sm font-medium text-blue-300">新增/更新本週</span>
@@ -230,16 +231,45 @@
           <input type="date" id="inputDate" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none">
           <p id="weekRangeDisplay" class="text-xs text-blue-400 mt-1 h-4"></p>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs text-white mb-1">臨安店業績（NT$）</label>
-            <input type="number" id="inputLinan" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
+
+        <!-- 臨安店 -->
+        <div class="bg-slate-700/30 rounded-lg p-3 border border-slate-600/60">
+          <p class="text-xs font-bold text-[#FF0088] mb-2"><i class="fas fa-store mr-1"></i>臨安店</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">新客消費金額</label>
+              <input type="number" id="inputLinanNew" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-pink-500 outline-none text-right" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">舊客消費金額</label>
+              <input type="number" id="inputLinanReturning" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-pink-500 outline-none text-right" placeholder="0" min="0">
+            </div>
           </div>
-          <div>
-            <label class="block text-xs text-white mb-1">南科店業績（NT$）</label>
-            <input type="number" id="inputNanke" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-right" placeholder="0">
+          <div class="mt-2 flex items-center justify-between">
+            <span class="text-xs text-slate-400">臨安合計</span>
+            <span id="linanTotal" class="text-sm font-bold text-[#FF0088]">$0</span>
           </div>
         </div>
+
+        <!-- 南科店 -->
+        <div class="bg-slate-700/30 rounded-lg p-3 border border-slate-600/60">
+          <p class="text-xs font-bold text-[#FFB3FF] mb-2"><i class="fas fa-store mr-1"></i>南科店</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">新客消費金額</label>
+              <input type="number" id="inputNankeNew" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-purple-400 outline-none text-right" placeholder="0" min="0">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">舊客消費金額</label>
+              <input type="number" id="inputNankeReturning" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-purple-400 outline-none text-right" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="mt-2 flex items-center justify-between">
+            <span class="text-xs text-slate-400">南科合計</span>
+            <span id="nankeTotal" class="text-sm font-bold text-[#FFB3FF]">$0</span>
+          </div>
+        </div>
+
         <div>
           <label class="block text-xs text-white mb-1">備註檔期說明</label>
           <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
@@ -303,8 +333,10 @@
       btnDeleteEntry: document.getElementById("btnDeleteEntry"),
       performanceForm: document.getElementById("performanceForm"),
       inputDate: document.getElementById("inputDate"),
-      inputLinan: document.getElementById("inputLinan"),
-      inputNanke: document.getElementById("inputNanke"),
+      inputLinanNew: document.getElementById("inputLinanNew"),
+      inputLinanReturning: document.getElementById("inputLinanReturning"),
+      inputNankeNew: document.getElementById("inputNankeNew"),
+      inputNankeReturning: document.getElementById("inputNankeReturning"),
       inputNote: document.getElementById("inputNote"),
       editId: document.getElementById("editId"),
       weekRangeDisplay: document.getElementById("weekRangeDisplay"),
@@ -429,6 +461,9 @@
     dom.btnDeleteEntry.addEventListener("click", handleDelete);
     dom.performanceForm.addEventListener("submit", handleFormSubmit);
     dom.inputDate.addEventListener("change", (e) => { if (e.target.value) showWeekRangeText(e.target.value); });
+    ["inputLinanNew","inputLinanReturning","inputNankeNew","inputNankeReturning"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", updateModalTotals);
+    });
 
     dom.btnExpandAll.addEventListener("click", () => {
       const grouped = groupData(allData);
@@ -684,7 +719,6 @@
         nankeVisitsData = chartData.map(d => d.nankeVisits);
       }
 
-      // 計算全局最大值，鎖定 Y 軸高度防止跳動
       const maxSales = Math.max(...linanData, ...nankeData, 100000);
       const maxVisits = Math.max(...linanVisitsData, ...nankeVisitsData, 10);
 
@@ -758,12 +792,13 @@
     }
 
     function renderKPI() {
-      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount");
+      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount"), elNewRet = document.getElementById("kpiNewReturning");
       const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
       
       if (!weeklyRows.length) {
         elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elGrowth.textContent = "--";
         elVisit.textContent = "來客數：-- / -- 人";
+        elNewRet.textContent = "新客 / 舊客：--";
         elGrowth.className = "text-white"; wrap.className = "mt-2 text-xs flex items-center"; return;
       }
 
@@ -775,6 +810,16 @@
       elTotal.textContent = fmtTwd(total);
       elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
       elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
+
+      // 新/舊客細分（若有資料才顯示）
+      const lNew = Number(latest.linan_new || 0), lRet = Number(latest.linan_returning || 0);
+      const nNew = Number(latest.nanke_new || 0), nRet = Number(latest.nanke_returning || 0);
+      const totalNew = lNew + nNew, totalRet = lRet + nRet;
+      if (totalNew > 0 || totalRet > 0) {
+        elNewRet.innerHTML = `新客 <span class="text-emerald-400 font-bold">${fmtTwd(totalNew)}</span> / 舊客 <span class="text-amber-300 font-bold">${fmtTwd(totalRet)}</span>`;
+      } else {
+        elNewRet.textContent = "新客 / 舊客：尚無細分資料";
+      }
 
       // 計算最新週來客數
       const counts = getVisitCounts(latest.week_start_date, latest.week_end_date);
@@ -945,13 +990,26 @@
               }
 
               html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white text-xs">${periodStr}</td>`;
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</td>`;
+
+              // 臨安週變化 + 新/舊客細分
+              const linanNew = Number(row.linan_new || 0), linanRet = Number(row.linan_returning || 0);
+              const hasLinanBreakdown = linanNew > 0 || linanRet > 0;
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50">
+                <div class="font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</div>
+                ${hasLinanBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">新 ${fmtNum(linanNew)} / 舊 ${fmtNum(linanRet)}</div>` : ''}
+              </td>`;
 
               if (i === 0) {
                 html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalLinan)}</td>`;
               }
 
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</td>`;
+              // 南科週變化 + 新/舊客細分
+              const nankeNew = Number(row.nanke_new || 0), nankeRet = Number(row.nanke_returning || 0);
+              const hasNankeBreakdown = nankeNew > 0 || nankeRet > 0;
+              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50">
+                <div class="font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</div>
+                ${hasNankeBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">新 ${fmtNum(nankeNew)} / 舊 ${fmtNum(nankeRet)}</div>` : ''}
+              </td>`;
 
               if (i === 0) {
                 html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalNanke)}</td>`;
@@ -981,12 +1039,18 @@
       if (!isAdmin) return;
       dom.entryModal.classList.remove("hidden");
       dom.performanceForm.reset();
+      updateModalTotals();
 
       if (row) {
         dom.editId.value = row.id;
         dom.inputDate.value = row.week_start_date || "";
-        dom.inputLinan.value = row.linan_amount ?? 0;
-        dom.inputNanke.value = row.nanke_amount ?? 0;
+        // 若有新/舊客細分資料，直接填入；否則將舊有總額放入舊客欄位做為預設
+        const lNew = Number(row.linan_new || 0), lRet = Number(row.linan_returning || 0);
+        const nNew = Number(row.nanke_new || 0), nRet = Number(row.nanke_returning || 0);
+        dom.inputLinanNew.value = lNew;
+        dom.inputLinanReturning.value = (lNew === 0 && lRet === 0) ? (row.linan_amount ?? 0) : lRet;
+        dom.inputNankeNew.value = nNew;
+        dom.inputNankeReturning.value = (nNew === 0 && nRet === 0) ? (row.nanke_amount ?? 0) : nRet;
         dom.inputNote.value = row.note ?? "";
         dom.btnDeleteEntry.classList.remove("hidden");
         if (row.week_start_date) showWeekRangeText(row.week_start_date);
@@ -997,6 +1061,18 @@
         dom.btnDeleteEntry.classList.add("hidden");
         showWeekRangeText(today);
       }
+      updateModalTotals();
+    }
+
+    function updateModalTotals() {
+      const lNew = Number(dom.inputLinanNew?.value || 0);
+      const lRet = Number(dom.inputLinanReturning?.value || 0);
+      const nNew = Number(dom.inputNankeNew?.value || 0);
+      const nRet = Number(dom.inputNankeReturning?.value || 0);
+      const ltEl = document.getElementById("linanTotal");
+      const ntEl = document.getElementById("nankeTotal");
+      if (ltEl) ltEl.textContent = fmtTwd(lNew + lRet);
+      if (ntEl) ntEl.textContent = fmtTwd(nNew + nRet);
     }
 
     function closeModal() { dom.entryModal.classList.add("hidden"); }
@@ -1040,14 +1116,23 @@
       const r = getWeekRange(dateIso);
       const major = getMajorMonth(toISODateLocal(r.start));
 
+      const lNew = Number(dom.inputLinanNew.value || 0);
+      const lRet = Number(dom.inputLinanReturning.value || 0);
+      const nNew = Number(dom.inputNankeNew.value || 0);
+      const nRet = Number(dom.inputNankeReturning.value || 0);
+
       const payload = {
         period_type: "weekly",
         year: major.year,
         month: major.month,
         week_start_date: toISODateLocal(r.start),
         week_end_date: toISODateLocal(r.end),
-        linan_amount: Number(dom.inputLinan.value || 0),
-        nanke_amount: Number(dom.inputNanke.value || 0),
+        linan_new: lNew,
+        linan_returning: lRet,
+        linan_amount: lNew + lRet,
+        nanke_new: nNew,
+        nanke_returning: nRet,
+        nanke_amount: nNew + nRet,
         note: (dom.inputNote.value || "").trim() || null,
         updated_at: new Date().toISOString()
       };
