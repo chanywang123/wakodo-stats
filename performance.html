@@ -297,6 +297,7 @@
     let isAdmin = false;
     let allData = [];
     let allVisits = []; // 儲存客源資料以計算來客數
+    let allCorrections = {}; // key: "${year}_${month}" → { linan_correction, nanke_correction }
     let performanceChart = null;
     let chartXOriginal = null;
 
@@ -460,7 +461,19 @@
     dom.btnCloseEntry.addEventListener("click", closeModal);
     dom.btnDeleteEntry.addEventListener("click", handleDelete);
     dom.performanceForm.addEventListener("submit", handleFormSubmit);
-    dom.inputDate.addEventListener("change", (e) => { if (e.target.value) showWeekRangeText(e.target.value); });
+    // 修正數字輸入框：blur 或 Enter 儲存
+    dom.tbody.addEventListener("change", async (e) => {
+      const input = e.target.closest("input[data-store]");
+      if (!input || !isAdmin) return;
+      const { year, month, store } = input.dataset;
+      await saveCorrection(year, month, store, input.value);
+    });
+    dom.tbody.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const input = e.target.closest("input[data-store]");
+        if (input) { input.blur(); }
+      }
+    });
     ["inputLinanNew","inputLinanReturning","inputNankeNew","inputNankeReturning"].forEach(id => {
       document.getElementById(id)?.addEventListener("input", updateModalTotals);
     });
@@ -641,10 +654,10 @@
     async function refreshData() {
       dom.dataStatus.textContent = "載入中...";
       
-      // 平行抓取業績與客源資料
-      const [salesRes, visitsData] = await Promise.all([
+      const [salesRes, visitsData, corrRes] = await Promise.all([
         supabase.from("sales_performance").select("*").order("year", { ascending: true }).order("month", { ascending: true }).order("week_start_date", { ascending: true }),
-        fetchVisitsData()
+        fetchVisitsData(),
+        supabase.from("monthly_corrections").select("*")
       ]);
 
       if (salesRes.error) {
@@ -655,6 +668,11 @@
       } else {
         allData = salesRes.data || [];
         allVisits = visitsData || [];
+        // 整理修正資料為 Map
+        allCorrections = {};
+        (corrRes.data || []).forEach(c => {
+          allCorrections[`${c.year}_${c.month}`] = c;
+        });
         dom.dataStatus.textContent = `共 ${allData.length} 筆`;
       }
       
@@ -849,6 +867,31 @@
       renderTable();
     };
 
+    // ===== 月修正數字 upsert =====
+    window.saveCorrection = async function(year, month, store, value) {
+      if (!isAdmin) return;
+      const corrKey = `${year}_${month}`;
+      const existing = allCorrections[corrKey] || {};
+      const payload = {
+        year: Number(year),
+        month: Number(month),
+        linan_correction: store === 'linan' ? (value === '' ? null : Number(value)) : (existing.linan_correction ?? null),
+        nanke_correction: store === 'nanke' ? (value === '' ? null : Number(value)) : (existing.nanke_correction ?? null),
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from("monthly_corrections")
+        .upsert(payload, { onConflict: "year,month" })
+        .select()
+        .single();
+      if (error) {
+        console.error("修正數字儲存失敗", error);
+        Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
+      } else {
+        allCorrections[corrKey] = data;
+      }
+    };
+
     // ===== 資料群組化邏輯 (固定升冪：舊到新) =====
     function groupData(data) {
       const groups = {};
@@ -870,13 +913,20 @@
           groups[groupKey] = {
             key: groupKey, isHistorical, year: y, month: m,
             title: isHistorical ? "2025年6月以前 (歷史資料)" : `${y}/${m}月`,
-            rows: [], totalLinan: 0, totalNanke: 0, totalLinanVisits: 0, totalNankeVisits: 0
+            rows: [], totalLinan: 0, totalNanke: 0,
+            totalLinanNew: 0, totalLinanReturning: 0,
+            totalNankeNew: 0, totalNankeReturning: 0,
+            totalLinanVisits: 0, totalNankeVisits: 0
           };
         }
 
         groups[groupKey].rows.push(row);
         groups[groupKey].totalLinan += Number(row.linan_amount || 0);
         groups[groupKey].totalNanke += Number(row.nanke_amount || 0);
+        groups[groupKey].totalLinanNew += Number(row.linan_new || 0);
+        groups[groupKey].totalLinanReturning += Number(row.linan_returning || 0);
+        groups[groupKey].totalNankeNew += Number(row.nanke_new || 0);
+        groups[groupKey].totalNankeReturning += Number(row.nanke_returning || 0);
         
         const counts = getVisitCounts(row.week_start_date, row.week_end_date);
         groups[groupKey].totalLinanVisits += (counts.linan === '-' ? 0 : counts.linan);
@@ -917,6 +967,36 @@
 
         if (!isExpanded) {
           // 收折狀態：顯示單列總計
+          const corrKey = `${group.year}_${group.month}`;
+          const corr = (!group.isHistorical && allCorrections[corrKey]) || {};
+          const linanCorr = corr.linan_correction;
+          const nankeCorr = corr.nanke_correction;
+
+          const hasLinanBreakdown = group.totalLinanNew > 0 || group.totalLinanReturning > 0;
+          const hasNankeBreakdown = group.totalNankeNew > 0 || group.totalNankeReturning > 0;
+
+          // 修正後欄位 HTML（管理員可編輯，一般使用者唯讀）
+          const corrField = (store, val, color) => {
+            if (group.isHistorical) return '';
+            if (isAdmin) {
+              return `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
+                <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
+                <input type="number"
+                  class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
+                  style="color:${color}"
+                  data-year="${group.year}" data-month="${group.month}" data-store="${store}"
+                  value="${val !== null && val !== undefined ? val : ''}"
+                  placeholder="輸入修正數字">
+              </div>`;
+            } else if (val !== null && val !== undefined) {
+              return `<div class="mt-2 pt-1.5 border-t border-slate-600/40">
+                <div class="text-[10px] text-slate-400 mb-0.5">修正後</div>
+                <div class="font-mono text-xs" style="color:${color}">${fmtNum(val)}</div>
+              </div>`;
+            }
+            return '';
+          };
+
           const tr = document.createElement("tr");
           tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer bg-slate-800/30";
           tr.onclick = () => toggleGroup(group.key);
@@ -926,9 +1006,17 @@
             </td>
             <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">共 ${rowCount} ${group.isHistorical ? '個月' : '週'}</td>
             <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50" onclick="event.stopPropagation()">
+              <div class="font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</div>
+              ${hasLinanBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalLinanNew)} / 舊 ${fmtNum(group.totalLinanReturning)}</div>` : ''}
+              ${corrField('linan', linanCorr, '#FF0088')}
+            </td>
             <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</td>
+            <td class="px-4 py-3 text-right border-r border-slate-700/50" onclick="event.stopPropagation()">
+              <div class="font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</div>
+              ${hasNankeBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalNankeNew)} / 舊 ${fmtNum(group.totalNankeReturning)}</div>` : ''}
+              ${corrField('nanke', nankeCorr, '#FFB3FF')}
+            </td>
             <td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${group.totalLinanVisits}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${group.totalNankeVisits}</span></td>
             <td class="px-4 py-3 text-center text-white">-</td>
           `;
@@ -1000,7 +1088,28 @@
               </td>`;
 
               if (i === 0) {
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalLinan)}</td>`;
+                const corrKey2 = `${group.year}_${group.month}`;
+                const corr2 = allCorrections[corrKey2] || {};
+                const linanCorr2 = corr2.linan_correction;
+                const hasLBreakdown = group.totalLinanNew > 0 || group.totalLinanReturning > 0;
+                const linanCorrHtml = isAdmin
+                  ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
+                      <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
+                      <input type="number"
+                        class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
+                        style="color:#FF0088"
+                        data-year="${group.year}" data-month="${group.month}" data-store="linan"
+                        value="${linanCorr2 !== null && linanCorr2 !== undefined ? linanCorr2 : ''}"
+                        placeholder="輸入修正數字">
+                    </div>`
+                  : (linanCorr2 !== null && linanCorr2 !== undefined
+                      ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40"><div class="text-[10px] text-slate-400 mb-0.5">修正後</div><div class="font-mono text-xs text-[#FF0088]">${fmtNum(linanCorr2)}</div></div>`
+                      : '');
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 align-top pt-4 bg-slate-800/10" onclick="event.stopPropagation()">
+                  <div class="font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</div>
+                  ${hasLBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalLinanNew)} / 舊 ${fmtNum(group.totalLinanReturning)}</div>` : ''}
+                  ${linanCorrHtml}
+                </td>`;
               }
 
               // 南科週變化 + 新/舊客細分
@@ -1012,7 +1121,26 @@
               </td>`;
 
               if (i === 0) {
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF] font-bold align-top pt-4 bg-slate-800/10">${fmtNum(group.totalNanke)}</td>`;
+                const nankeCorr2 = (allCorrections[`${group.year}_${group.month}`] || {}).nanke_correction;
+                const hasNBreakdown = group.totalNankeNew > 0 || group.totalNankeReturning > 0;
+                const nankeCorrHtml = isAdmin
+                  ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
+                      <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
+                      <input type="number"
+                        class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
+                        style="color:#FFB3FF"
+                        data-year="${group.year}" data-month="${group.month}" data-store="nanke"
+                        value="${nankeCorr2 !== null && nankeCorr2 !== undefined ? nankeCorr2 : ''}"
+                        placeholder="輸入修正數字">
+                    </div>`
+                  : (nankeCorr2 !== null && nankeCorr2 !== undefined
+                      ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40"><div class="text-[10px] text-slate-400 mb-0.5">修正後</div><div class="font-mono text-xs text-[#FFB3FF]">${fmtNum(nankeCorr2)}</div></div>`
+                      : '');
+                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 align-top pt-4 bg-slate-800/10" onclick="event.stopPropagation()">
+                  <div class="font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</div>
+                  ${hasNBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalNankeNew)} / 舊 ${fmtNum(group.totalNankeReturning)}</div>` : ''}
+                  ${nankeCorrHtml}
+                </td>`;
               }
 
               // 來客數欄位
