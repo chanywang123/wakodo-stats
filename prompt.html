@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和光堂眼鏡 AI Prompt 組合器 (雲端版)</title>
+    <style>
+        /* CSS 變數定義 */
+        :root {
+            --bg-color: #0f0f0f; --panel-bg: #1a1a1a; --text-main: #ffffff;
+            --text-muted: #888888; --gold: #c9a84c; --gold-hover: #e0bc55;
+            --border-color: #333333; --danger: #ff4d4d;
+            --font-en: 'Inter', system-ui, sans-serif; --font-zh: system-ui, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-zh); line-height: 1.6; padding: 20px; font-size: 14px; }
+        h1, h2, h3 { font-family: var(--font-en); }
+
+        header { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        header h1 { color: var(--gold); font-size: 24px; }
+        #status { color: var(--gold); font-size: 14px; font-weight: bold; }
+
+        .container { display: flex; gap: 20px; height: calc(100vh - 80px); min-height: 600px; }
+        .col-left, .col-right { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; }
+        .col-left { flex: 1; overflow-y: auto; }
+        .col-right { flex: 1; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--gold); font-weight: 500; }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .form-header label { margin-bottom: 0; }
+        
+        select, input, textarea { width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; font-family: var(--font-zh); font-size: 14px; outline: none; }
+        select:focus, input:focus, textarea:focus { border-color: var(--gold); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .gender-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+        .gender-btn { flex: 1; padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; border-radius: 4px; text-align: center; font-weight: bold; }
+        .gender-btn.active { background: var(--gold); color: var(--bg-color); border-color: var(--gold); }
+
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: 0.2s; }
+        .btn-primary { background-color: var(--gold); color: var(--bg-color); padding: 12px; font-size: 16px; width: 100%; margin-top: 10px; }
+        .btn-primary:hover { background-color: var(--gold-hover); }
+        .btn-primary:disabled { background-color: var(--text-muted); cursor: not-allowed; }
+        .btn-secondary { background-color: transparent; color: var(--gold); border: 1px solid var(--gold); font-size: 12px; }
+        .btn-secondary:hover { background-color: var(--gold); color: var(--bg-color); }
+        .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); color: #fff; }
+
+        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #promptOutput { flex: 1; width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; font-family: var(--font-en); font-size: 13px; line-height: 1.5; resize: none; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--panel-bg); border: 1px solid var(--gold); border-radius: 8px; width: 800px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+        .modal-header h2 { color: var(--gold); }
+        .close-btn { background: none; color: var(--text-muted); font-size: 24px; padding: 0; border: none; }
+        .close-btn:hover { color: var(--text-main); }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; display: flex; gap: 20px; }
+        
+        .item-list { flex: 1; border-right: 1px solid var(--border-color); padding-right: 20px; max-height: 60vh; overflow-y: auto;}
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); }
+        .item-info strong { display: block; margin-bottom: 4px; }
+        .item-info span { font-size: 12px; color: var(--text-muted); }
+        
+        .item-form { flex: 1; }
+        .item-form h3 { margin-bottom: 15px; color: var(--gold); }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Wako Eyewear AI Prompt Builder</h1>
+        <div id="status">🔄 連線中...</div>
+    </header>
+
+    <div class="container">
+        <!-- 左欄：參數設定 -->
+        <div class="col-left">
+            <div class="gender-toggle">
+                <div class="gender-btn active" onclick="setGender('female')" id="btn-female">👩 女模 (Female)</div>
+                <div class="gender-btn" onclick="setGender('male')" id="btn-male">👨 男模 (Male)</div>
+            </div>
+
+            <div class="form-group">
+                <label>眼鏡描述 (Eyewear Prompt)</label>
+                <textarea id="input-eyewear" placeholder="請貼入眼鏡產品的特徵描述 (英文)...">Black thick acetate square frame sunglasses with dark tinted lenses.</textarea>
+            </div>
+
+            <div class="form-group">
+                <div class="form-header">
+                    <label>外貌與妝髮 (APPEARANCES)</label>
+                    <button class="btn-secondary" onclick="openModal('APPEARANCES', '外貌與妝髮')">管理</button>
+                </div>
+                <select id="select-appearances" onchange="generatePrompt()"></select>
+            </div>
+
+            <div class="form-group">
+                <div class="form-header">
+                    <label>服裝風格 (OUTFITS)</label>
+                    <button class="btn-secondary" onclick="openModal('OUTFITS', '服裝風格')">管理</button>
+                </div>
+                <select id="select-outfits" onchange="generatePrompt()"></select>
+            </div>
+
+            <div class="form-group">
+                <div class="form-header">
+                    <label>場景與背景 (SCENES)</label>
+                    <button class="btn-secondary" onclick="openModal('SCENES', '場景與背景')">管理</button>
+                </div>
+                <select id="select-scenes" onchange="generatePrompt()"></select>
+            </div>
+
+            <div class="form-group">
+                <div class="form-header">
+                    <label>姿勢與鏡頭 (POSES)</label>
+                    <button class="btn-secondary" onclick="openModal('POSES', '姿勢與鏡頭')">管理</button>
+                </div>
+                <select id="select-poses" onchange="generatePrompt()"></select>
+            </div>
+
+            <button class="btn-primary" onclick="generatePrompt()">生成 Prompt</button>
+        </div>
+
+        <!-- 右欄：預覽與輸出 -->
+        <div class="col-right">
+            <div class="preview-header">
+                <h2 style="color: var(--gold);">Prompt 預覽</h2>
+                <button class="btn-secondary" onclick="copyPrompt()">📋 一鍵複製</button>
+            </div>
+            <textarea id="promptOutput" readonly placeholder="等待資料載入中..."></textarea>
+        </div>
+    </div>
+
+    <!-- 管理 Modal -->
+    <div class="modal-overlay" id="manageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">管理資料</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="item-list" id="modalItemList">
+                    <!-- 列表動態生成 -->
+                </div>
+                <div class="item-form">
+                    <h3 id="formTitle">新增項目</h3>
+                    <input type="hidden" id="edit-id">
+                    <div class="form-group">
+                        <label>顯示名稱 (中文 Label)</label>
+                        <input type="text" id="edit-label" placeholder="例如：韓系玻璃肌模特兒">
+                    </div>
+                    <div class="form-group">
+                        <label>適用性別 (Gender)</label>
+                        <select id="edit-gender">
+                            <option value="both">通用 (Both)</option>
+                            <option value="female">限女性 (Female)</option>
+                            <option value="male">限男性 (Male)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>英文描述 (Prompt)</label>
+                        <textarea id="edit-prompt" style="height: 150px;" placeholder="輸入完整英文 Prompt 片段..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" id="saveBtn" onclick="saveItem()">儲存至雲端</button>
+                        <button class="btn-secondary" onclick="resetForm()" style="padding: 12px; font-size: 16px;">取消 / 清空</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Supabase JS SDK (使用 module 方式) -->
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        
+        // 初始化 Supabase
+        const supabase = createClient(
+            "https://yxalpzculcyhzvnyvecb.supabase.co",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
+        );
+
+        // 全域變數
+        let currentGender = 'female';
+        let currentManageCategory = '';
+        let DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [] };
+
+        // 載入資料庫資料
+        async function loadData() {
+            document.getElementById('status').innerText = '🔄 載入資料中...';
+            document.getElementById('status').style.color = 'var(--text-muted)';
+            
+            const { data, error } = await supabase
+                .from('wako_prompts')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error("讀取失敗:", error);
+                document.getElementById('status').innerText = '❌ 連線失敗';
+                document.getElementById('status').style.color = 'var(--danger)';
+                alert("無法讀取資料庫，請檢查網路或資料表設定。");
+                return;
+            }
+
+            // 清空並重新分類資料
+            DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [] };
+            data.forEach(item => {
+                if(DATA_MAP[item.category]) {
+                    DATA_MAP[item.category].push(item);
+                }
+            });
+
+            document.getElementById('status').innerText = '🟢 雲端同步完成';
+            document.getElementById('status').style.color = '#10b981';
+            
+            refreshAllSelects();
+            window.generatePrompt();
+        }
+
+        // 性別切換
+        window.setGender = function(gender) {
+            currentGender = gender;
+            document.getElementById('btn-female').classList.toggle('active', gender === 'female');
+            document.getElementById('btn-male').classList.toggle('active', gender === 'male');
+            refreshAllSelects();
+            window.generatePrompt();
+        }
+
+        // 更新下拉選單
+        function refreshAllSelects() {
+            populateSelect('select-appearances', DATA_MAP.APPEARANCES);
+            populateSelect('select-outfits', DATA_MAP.OUTFITS);
+            populateSelect('select-scenes', DATA_MAP.SCENES);
+            populateSelect('select-poses', DATA_MAP.POSES);
+        }
+
+        function populateSelect(selectId, dataArray) {
+            const select = document.getElementById(selectId);
+            const currentVal = select.value;
+            select.innerHTML = '';
+            
+            const filtered = dataArray.filter(item => item.gender === 'both' || item.gender === currentGender);
+            
+            if(filtered.length === 0) {
+                select.innerHTML = '<option value="">(無適用選項)</option>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.label;
+                select.appendChild(opt);
+            });
+
+            if (filtered.find(i => i.id === currentVal)) {
+                select.value = currentVal;
+            } else {
+                select.value = filtered[0].id;
+            }
+        }
+
+        function getItemById(dataArray, id) {
+            return dataArray.find(item => item.id === id) || { prompt_text: '' };
+        }
+
+        // 生成 Prompt
+        window.generatePrompt = function() {
+            const eyewear = document.getElementById('input-eyewear').value.trim();
+            const appId = document.getElementById('select-appearances').value;
+            const outId = document.getElementById('select-outfits').value;
+            const sceneId = document.getElementById('select-scenes').value;
+            const poseId = document.getElementById('select-poses').value;
+
+            const appPrompt = getItemById(DATA_MAP.APPEARANCES, appId).prompt_text;
+            const outPrompt = getItemById(DATA_MAP.OUTFITS, outId).prompt_text;
+            const scenePrompt = getItemById(DATA_MAP.SCENES, sceneId).prompt_text;
+            const posePrompt = getItemById(DATA_MAP.POSES, poseId).prompt_text;
+
+            const finalPrompt = `[EYEWEAR BLOCK]
+Using the provided eyewear product reference images, generate a
+photorealistic half-body portrait (from waist up, vertical 2:3
+aspect ratio) of a model wearing exactly these glasses/sunglasses.
+
+EYEWEAR — refer to reference images provided AND the following
+description extracted from the product:
+
+${eyewear}
+
+Reproduce all details exactly. Do not simplify or reinterpret.
+If any detail in the description conflicts with the reference
+image, prioritize the reference image.
+
+[APPEARANCE BLOCK]
+${appPrompt}
+
+[OUTFIT BLOCK]
+OUTFIT:
+${outPrompt}
+
+ACCESSORIES:
+Small gold hoop earrings. Keep accessories minimal.
+
+[SCENE BLOCK]
+SCENE & BACKGROUND:
+${scenePrompt}
+
+[POSE BLOCK]
+POSE & CAMERA ANGLE:
+${posePrompt}
+
+[FIXED OUTPUT TAIL]
+OUTPUT: Photorealistic, high resolution, 2:3 vertical.
+Priority: exact eyewear fidelity above all else.`;
+
+            document.getElementById('promptOutput').value = finalPrompt;
+        }
+
+        // 複製 Prompt
+        window.copyPrompt = function() {
+            const output = document.getElementById('promptOutput');
+            output.select();
+            document.execCommand('copy');
+            alert('Prompt 已複製到剪貼簿！');
+        }
+
+        // --- 管理功能 (CRUD) ---
+
+        window.openModal = function(categoryKey, title) {
+            currentManageCategory = categoryKey;
+            document.getElementById('modalTitle').innerText = `管理：${title}`;
+            document.getElementById('manageModal').style.display = 'flex';
+            window.resetForm();
+            renderModalList();
+        }
+
+        window.closeModal = function() {
+            document.getElementById('manageModal').style.display = 'none';
+        }
+
+        function renderModalList() {
+            const listContainer = document.getElementById('modalItemList');
+            listContainer.innerHTML = '';
+            const dataArray = DATA_MAP[currentManageCategory];
+
+            dataArray.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                const genderLabel = item.gender === 'both' ? '通用' : (item.gender === 'female' ? '女' : '男');
+
+                row.innerHTML = `
+                    <div class="item-info">
+                        <strong>${item.label}</strong>
+                        <span>[${genderLabel}]</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-secondary" onclick="editItem('${item.id}')">編輯</button>
+                        <button class="btn-danger" onclick="deleteItem('${item.id}')">刪除</button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        window.resetForm = function() {
+            document.getElementById('formTitle').innerText = '新增項目';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('edit-label').value = '';
+            document.getElementById('edit-gender').value = 'both';
+            document.getElementById('edit-prompt').value = '';
+        }
+
+        window.editItem = function(id) {
+            const dataArray = DATA_MAP[currentManageCategory];
+            const item = dataArray.find(i => i.id === id);
+            if(!item) return;
+
+            document.getElementById('formTitle').innerText = '編輯項目';
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('edit-label').value = item.label;
+            document.getElementById('edit-gender').value = item.gender;
+            document.getElementById('edit-prompt').value = item.prompt_text;
+        }
+
+        window.saveItem = async function() {
+            const idInput = document.getElementById('edit-id').value;
+            const label = document.getElementById('edit-label').value.trim();
+            const gender = document.getElementById('edit-gender').value;
+            const prompt_text = document.getElementById('edit-prompt').value.trim();
+
+            if(!label || !prompt_text) {
+                alert('請填寫顯示名稱與英文描述！');
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerText = '儲存中...';
+
+            try {
+                if (idInput) {
+                    // 更新
+                    const { error } = await supabase
+                        .from('wako_prompts')
+                        .update({ label, gender, prompt_text })
+                        .eq('id', idInput);
+                    if(error) throw error;
+                } else {
+                    // 新增
+                    const { error } = await supabase
+                        .from('wako_prompts')
+                        .insert([{ category: currentManageCategory, label, gender, prompt_text }]);
+                    if(error) throw error;
+                }
+                
+                await loadData(); // 重新拉取最新資料
+                window.resetForm();
+                renderModalList();
+            } catch (error) {
+                alert('儲存失敗：' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '儲存至雲端';
+            }
+        }
+
+        window.deleteItem = async function(id) {
+            if(!confirm('確定要從雲端刪除此項目嗎？此動作無法復原。')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('wako_prompts')
+                    .delete()
+                    .eq('id', id);
+                
+                if(error) throw error;
+                await loadData(); // 重新拉取最新資料
+                renderModalList();
+            } catch (error) {
+                alert('刪除失敗：' + error.message);
+            }
+        }
+
+        // 啟動時載入資料
+        window.onload = loadData;
+
+    </script>
+</body>
+</html>
