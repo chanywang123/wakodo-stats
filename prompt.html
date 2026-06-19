@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>和光堂眼鏡 AI Prompt 組合器 (雲端版)</title>
+    <title>AI Prompt 組合器</title>
     <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="15.6" fill="%23fff"/%3E%3Cg fill="none" stroke="%23111" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="16" cy="16" r="14.2" stroke-width="1.1"/%3E%3Ccircle cx="16" cy="16" r="11.9" stroke-width="0.8"/%3E%3Cg stroke-width="0.85"%3E%3Ccircle cx="16" cy="11.0" r="4.4"/%3E%3Ccircle cx="20.8" cy="13.6" r="4.4"/%3E%3Ccircle cx="19.6" cy="19.1" r="4.4"/%3E%3Ccircle cx="12.4" cy="19.1" r="4.4"/%3E%3Ccircle cx="11.2" cy="13.6" r="4.4"/%3E%3C/g%3E%3Ccircle cx="16" cy="15.2" r="2.2" stroke-width="0.7"/%3E%3C/g%3E%3C/svg%3E' />
     <style>
         /* CSS 變數定義 */
@@ -39,6 +39,10 @@
         .gender-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
         .gender-btn { flex: 1; padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; border-radius: 4px; text-align: center; font-weight: bold; }
         .gender-btn.active { background: var(--gold); color: var(--bg-color); border-color: var(--gold); }
+
+        /* 兩欄式表單群組 (用於比例與風格) */
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .grid-2-col .form-group { margin-bottom: 0; }
 
         button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: 0.2s; }
         .btn-primary { background-color: var(--gold); color: var(--bg-color); padding: 12px; font-size: 16px; width: 100%; margin-top: 10px; }
@@ -93,6 +97,26 @@
             <div class="form-group">
                 <label>眼鏡描述 (Eyewear Prompt)</label>
                 <textarea id="input-eyewear" placeholder="請貼入眼鏡產品的特徵描述 (英文)...">Black thick acetate square frame sunglasses with dark tinted lenses.</textarea>
+            </div>
+
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label>圖片比例 (Aspect Ratio)</label>
+                    <select id="select-ratio" onchange="generatePrompt()">
+                        <option value="2:3">直式 2:3 (預設)</option>
+                        <option value="9:16">直式 9:16 (限動/Reels)</option>
+                        <option value="1:1">等比 1:1 (方形)</option>
+                        <option value="3:2">橫式 3:2 (相機預設)</option>
+                        <option value="16:9">橫式 16:9 (寬螢幕)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="form-header">
+                        <label>攝影風格 (STYLES)</label>
+                        <button class="btn-secondary" onclick="openModal('STYLES', '攝影風格')">管理</button>
+                    </div>
+                    <select id="select-styles" onchange="generatePrompt()"></select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -179,7 +203,7 @@
         </div>
     </div>
 
-    <!-- 引入 Supabase JS SDK (使用 module 方式) -->
+    <!-- 引入 Supabase JS SDK -->
     <script type="module">
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
         
@@ -192,7 +216,7 @@
         // 全域變數
         let currentGender = 'female';
         let currentManageCategory = '';
-        let DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [] };
+        let DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [] };
 
         // 載入資料庫資料
         async function loadData() {
@@ -213,7 +237,7 @@
             }
 
             // 清空並重新分類資料
-            DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [] };
+            DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [] };
             data.forEach(item => {
                 if(DATA_MAP[item.category]) {
                     DATA_MAP[item.category].push(item);
@@ -242,6 +266,7 @@
             populateSelect('select-outfits', DATA_MAP.OUTFITS);
             populateSelect('select-scenes', DATA_MAP.SCENES);
             populateSelect('select-poses', DATA_MAP.POSES);
+            populateSelect('select-styles', DATA_MAP.STYLES);
         }
 
         function populateSelect(selectId, dataArray) {
@@ -277,20 +302,23 @@
         // 生成 Prompt
         window.generatePrompt = function() {
             const eyewear = document.getElementById('input-eyewear').value.trim();
+            const ratio = document.getElementById('select-ratio').value;
+            
             const appId = document.getElementById('select-appearances').value;
             const outId = document.getElementById('select-outfits').value;
             const sceneId = document.getElementById('select-scenes').value;
             const poseId = document.getElementById('select-poses').value;
+            const styleId = document.getElementById('select-styles').value;
 
             const appPrompt = getItemById(DATA_MAP.APPEARANCES, appId).prompt_text;
             const outPrompt = getItemById(DATA_MAP.OUTFITS, outId).prompt_text;
             const scenePrompt = getItemById(DATA_MAP.SCENES, sceneId).prompt_text;
             const posePrompt = getItemById(DATA_MAP.POSES, poseId).prompt_text;
+            const stylePrompt = getItemById(DATA_MAP.STYLES, styleId).prompt_text;
 
             const finalPrompt = `[EYEWEAR BLOCK]
 Using the provided eyewear product reference images, generate a
-photorealistic half-body portrait (from waist up, vertical 2:3
-aspect ratio) of a model wearing exactly these glasses/sunglasses.
+half-body portrait (from waist up, ${ratio} aspect ratio) of a model wearing exactly these glasses/sunglasses.
 
 EYEWEAR — refer to reference images provided AND the following
 description extracted from the product:
@@ -319,9 +347,12 @@ ${scenePrompt}
 POSE & CAMERA ANGLE:
 ${posePrompt}
 
-[FIXED OUTPUT TAIL]
-OUTPUT: Photorealistic, high resolution, 2:3 vertical.
-Priority: exact eyewear fidelity above all else.`;
+[STYLE & OUTPUT BLOCK]
+STYLE:
+${stylePrompt}
+
+OUTPUT: High resolution, exact eyewear fidelity above all else.
+Aspect ratio: ${ratio} --ar ${ratio}`;
 
             document.getElementById('promptOutput').value = finalPrompt;
         }
