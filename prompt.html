@@ -9,7 +9,8 @@
         :root {
             --bg-color: #0f0f0f; --panel-bg: #1a1a1a; --text-main: #ffffff;
             --text-muted: #888888; --gold: #c9a84c; --gold-hover: #e0bc55;
-            --border-color: #333333; --danger: #ff4d4d;
+            --border-color: #333333; --danger: #ff4d4d;圖片比例
+
             --font-en: 'Inter', system-ui, sans-serif; --font-zh: system-ui, sans-serif;
         }
 
@@ -111,6 +112,7 @@
                 <label>圖片比例 (Aspect Ratio)</label>
                 <select id="select-ratio" onchange="generatePrompt()">
                     <option value="2:3">直式 2:3 (人像預設)</option>
+                    <option value="3:4">直式 3:4 (IG 貼文)</option>
                     <option value="1:1">等比 1:1 (靜物預設/方形)</option>
                     <option value="9:16">直式 9:16 (限動/Reels)</option>
                     <option value="3:2">橫式 3:2 (相機預設)</option>
