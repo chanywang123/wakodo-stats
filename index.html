@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V14.0.0</title>
+  <title>和光堂戰情室 V14.3.0</title>
 
   <!-- ===== 外部套件（CDN）===== -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -40,7 +40,6 @@
       --green:         var(--google-green);
       --red:           var(--google-red);
 
-      /* 恢復高可讀性的白底設定 */
       --glass-bg:      rgba(255, 255, 255, 0.85); 
       --glass-border:  rgba(255, 255, 255, 0.9);
       --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.06);
@@ -122,10 +121,15 @@
     .btn-primary { background: var(--primary); color: #fff; border: none; box-shadow: 0 4px 12px rgba(66,133,244,0.3); }
     .btn-primary:hover { filter: brightness(1.1); background: var(--primary); }
     .btn-danger-ghost { background: rgba(234,67,53,0.1); color: var(--red); border: 1px solid rgba(234,67,53,.3); padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; }
-    .icon-btn { padding: 8px; border-radius: 50%; background: transparent; color: var(--text-hint); border: none; font-size: 18px; }
+    
+    .icon-btn { 
+      width: 40px; height: 40px; border-radius: 50%; 
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; color: var(--text-hint); border: none; font-size: 18px; transition: .2s;
+    }
     .icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
 
-    /* ===== iOS Segmented Control (高對比版) ===== */
+    /* ===== iOS Segmented Control ===== */
     .ios-seg-group {
       position: relative; display: inline-flex; background: rgba(0,0,0,0.04);
       border-radius: 12px; padding: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
@@ -168,14 +172,11 @@
     .filter-group { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 6px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
     .filter-group select, .filter-group input { background: transparent; border: none; outline: none; font-size: 14px; font-weight: 800; color: var(--text-primary); padding: 4px; }
     .seg-label { font-size: 12px; font-weight: 800; color: var(--text-secondary); letter-spacing: .5px; }
-    
-    /* 隱藏 Flatpickr 月份下拉箭頭 */
     .flatpickr-monthDropdown-months { appearance: none; -webkit-appearance: none; text-align: center; font-weight: 800; }
 
     /* 已選篩選標籤列 */
     #activeFilters { display: none; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 12px; }
     #activeFilters.show { display: flex; }
-    /* 修復標籤游標：加上 cursor: pointer */
     .chip { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 800; background: #fff; color: var(--primary); border: 1px solid rgba(66,133,244,.3); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     .chip-x { font-weight: 900; line-height: 1; padding: 0 2px; }
     .chip-x:hover { color: var(--red); }
@@ -195,11 +196,52 @@
       display:inline-flex; align-items:center; gap:8px; min-height:36px; padding:8px 14px;
       border-radius:999px; border:1px solid rgba(0,0,0,0.08); background:#fff;
       color:var(--text-primary); font-size:13px; font-weight:800; cursor:pointer; transition:.2s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02); user-select: none;
     }
     .source-tag:hover { transform:translateY(-2px); box-shadow:0 6px 12px rgba(0,0,0,0.06); }
     .source-tag.is-active { background:var(--primary-light); color:var(--primary); border-color:var(--primary); box-shadow: none; }
     .source-tag-dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+
+    /* ===== 關鍵字分析專屬樣式 (V14.3.0 升級) ===== */
+    .kw-wrap { display:flex; align-items:flex-start; gap:14px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.05); flex-wrap:wrap; }
+    .kw-title { flex:0 0 auto; min-width:84px; padding-top:6px; color:var(--google-yellow); font-size:13px; font-weight:900; letter-spacing:.4px; }
+    .kw-tags { flex:1 1 720px; display:flex; flex-wrap:wrap; gap:8px; }
+    
+    /* 長尾關鍵字：實體玻璃膠囊 */
+    .kw-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+      border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.6);
+      color: var(--text-primary); font-size: 13px; font-weight: 800; cursor: pointer; transition: .2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02); user-select: none;
+    }
+    .kw-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); background: #fff; }
+    .kw-pill.is-active { background: var(--google-yellow); color: #fff; border-color: var(--google-yellow); box-shadow: 0 4px 12px rgba(251,188,5,0.3); }
+    .kw-pill.is-active .kw-count { background: rgba(255,255,255,0.3); color: #fff; }
+    
+    /* 關鍵字文字防爆版截斷 */
+    .kw-text { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kw-count { background: rgba(251,188,5,0.2); color: #d97706; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 900; transition: .2s; }
+    
+    /* 常見組合：層級式卡片 */
+    .kw-combo-card {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px;
+      border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); background: rgba(0,0,0,0.02);
+      cursor: pointer; transition: .2s ease; user-select: none;
+    }
+    .kw-combo-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); background: rgba(0,0,0,0.04); }
+    .kw-combo-card.is-active { background: rgba(251,188,5,0.1); border-color: rgba(251,188,5,0.3); }
+    .kw-combo-part {
+      background: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 800;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);
+      max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .kw-combo-plus { color: var(--text-hint); font-weight: 900; font-size: 12px; }
+
+    /* 自訂捲軸 */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
     /* ===== 桑基圖容器 ===== */
     .sankey-wrap { width: 100%; min-height: 420px; }
@@ -227,7 +269,6 @@
     .data-table tbody tr:hover { background: #f8f9fa; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-2px); z-index: 2; position: relative; }
     .data-table tbody td { padding: 14px; }
     
-    /* 翻頁動畫 */
     .flight-row-enter { animation: flightFlipIn .5s cubic-bezier(.34, 1.56, .64, 1) both; }
     @keyframes flightFlipIn {
       0% { opacity: 0; transform: perspective(1000px) rotateX(-60deg) translateY(-20px); }
@@ -303,19 +344,11 @@
     .seg-bar-wrap { margin-bottom: 24px; }
     .seg-bar-title { font-size: 13px; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
     .seg-bar-track { width: 100%; height: 36px; border-radius: 12px; overflow: hidden; display: flex; background: rgba(0,0,0,0.04); box-shadow: inset 0 2px 6px rgba(0,0,0,.05); border: 1px solid rgba(0,0,0,0.05); }
-    .seg-bar-seg { height: 100%; width: 0; transition: width 0.6s cubic-bezier(.34, 1.56, .64, 1), filter .2s; position: relative; cursor: pointer; }
+    .seg-bar-seg { height: 100%; width: 0; transition: width 0.6s cubic-bezier(.34, 1.56, .64, 1), filter .2s; position: relative; cursor: pointer; overflow: hidden; }
     .seg-bar-seg:not(:last-child) { border-right: 2px solid #fff; }
     .seg-bar-seg:hover { filter: brightness(1.15); }
-    .seg-bar-seg::after {
-      content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%;
-      transform: translateX(-50%); background: rgba(0,0,0,.85); color: #fff;
-      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800;
-      white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 10;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .seg-bar-seg:hover::after { opacity: 1; }
     .seg-bar-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 12px; }
-    .seg-bar-li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--text-secondary); cursor: pointer; transition: 0.2s; }
+    .seg-bar-li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--text-secondary); cursor: pointer; transition: 0.2s; user-select: none; }
     .seg-bar-li:hover { color: var(--text-primary); transform: translateY(-1px); }
     .seg-bar-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .seg-bar-li b { color: var(--text-primary); font-weight: 900; margin-left: 4px; font-size: 15px; }
@@ -399,7 +432,7 @@
           <span class="glow-dot" style="width: 12px; height: 12px;"></span>
           <h1 class="h1" style="font-size: 32px;">和光堂戰情室</h1>
           <div class="title-meta">
-            <span class="ver-tag">V14.0.0</span>
+            <span class="ver-tag">V14.3.0</span>
             <span class="mono hint" id="lastDataDisp" style="font-weight: 800;">last data --/--/--</span>
             <a id="perfLink" href="performance.html" target="_blank" rel="noopener"
                style="font-size:12px;padding:4px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;background:#fff;color:var(--text-primary);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:0.2s;">觀看業績 ↗</a>
@@ -528,7 +561,7 @@
         </div>
       </div>
 
-      <!-- 區塊 2：顧客輪廓 (氣泡圖 + 歸因標籤 + 客群輪廓) 整合大卡片 -->
+      <!-- 區塊 2：顧客輪廓 (氣泡圖 + 歸因標籤 + 關鍵字 + 客群輪廓) 整合大卡片 -->
       <div class="card">
         <div class="section-head" onclick="toggleSection('secProfile')">
           <div>
@@ -556,6 +589,30 @@
           <div class="source-tag-wrap">
             <div class="source-tag-title" style="font-size: 14px;">歸因標籤</div>
             <div id="sharedSourceTags" class="source-tags"></div>
+          </div>
+
+          <!-- 2.5 Google 關鍵字分析區 (V14.3.0 升級版) -->
+          <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,0.05);">
+            <div class="chart-label" style="margin-bottom:20px;font-size:14px;color:var(--google-yellow);">🔍 Google 搜尋關鍵字分析</div>
+            
+            <!-- 高頻關鍵字 (>=4) -->
+            <div class="seg-bar-wrap">
+              <div class="seg-bar-title">🔥 熱門搜尋 (出現 10 次以上)</div>
+              <div id="segBarKeywordTrack" class="seg-bar-track"></div>
+              <div id="segBarKeywordLegend" class="seg-bar-legend"></div>
+            </div>
+
+            <!-- 長尾關鍵字 (<=3) -->
+            <div style="margin-bottom: 24px;">
+              <div class="seg-bar-title">🧩 長尾搜尋 (未滿10次的關鍵字，依次數與最新日期排序)</div>
+              <div id="longTailKeywords" style="max-height: 160px; overflow-y: auto; padding-right: 8px; display: flex; flex-wrap: wrap; gap: 8px;" class="custom-scrollbar"></div>
+            </div>
+
+            <!-- 常見組合 (層級式卡片) -->
+            <div>
+              <div class="seg-bar-title">🔗 常見搜尋組合</div>
+              <div id="comboKeywords" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            </div>
           </div>
 
           <!-- 3. 客群輪廓 (Seg-bars) -->
@@ -691,7 +748,7 @@
       </div>
     </div>
 
-    <!-- 次級管理員帳號管理 Modal (完美復活版) -->
+    <!-- 次級管理員帳號管理 Modal -->
     <div id="accountModal" class="modal" style="z-index:110;" onclick="if(event.target===this)closeAccountModal()">
       <div class="modal-box" style="max-width: 500px;">
         <button class="modal-close" onclick="closeAccountModal()">×</button>
@@ -729,11 +786,11 @@
 
   <script>
   /* =============================================================
-     和光堂戰情室 V14.0.0 (Liquid Glassmorphism + Plotly Only + Timestamps)
+     和光堂戰情室 V14.3.0 (Liquid Glassmorphism + Keyword Analysis + Tooltip Fix + Combo Cards)
      ============================================================= */
 
   const CFG = Object.freeze({
-    VERSION: "14.0.0",
+    VERSION: "14.3.0",
     GATE_PASSWORD: "wakodo100",
     GATE_KEY: "wakodo_gate_ok",
     WIPE_PASSWORD: "628599",
@@ -781,7 +838,7 @@
 
   const ST = {
     raw: [], filtered: [], limit: 20, store: "全部",
-    filter: { source:[], purpose:[], gender:null, age:null, cust:null, pay:null },
+    filter: { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, keyword:null },
     datePicker: null, exportPicker: null,
     isAdmin: false, adminRole: null,
     editingId: null, currentDetailId: null,
@@ -906,7 +963,7 @@
     applyFilter();
   }
 
-function maskName(name){
+  function maskName(name){
     name = s(name).trim();
     if (!name) return "未留資料";
     return name; // 直接回傳真實姓名，不做任何遮罩
@@ -964,6 +1021,27 @@ function maskName(name){
     applyFilter();
   };
 
+  /* ===== 關鍵字單選篩選 ===== */
+  window.setKeywordFilter = (kwStr) => {
+    if (ST.filter.keyword === kwStr) {
+      ST.filter.keyword = null; // 再次點擊取消篩選
+    } else {
+      ST.filter.keyword = kwStr;
+    }
+    applyFilter();
+    
+    // 自動平滑滾動到資料表
+    const secTable = $("secTable");
+    const iconTable = $("icon-secTable");
+    if (secTable) {
+      secTable.classList.remove("collapsed");
+      if (iconTable) iconTable.classList.remove("rotated");
+      setTimeout(() => {
+        secTable.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  };
+
   window.resetSeg = (dim) => {
     const grpId = dim === "cust" ? "segCust" : "segPay";
     if (dim === "cust") ST.filter.cust = null; else ST.filter.pay = null;
@@ -976,7 +1054,7 @@ function maskName(name){
   };
 
   window.clearFilter = () => {
-    ST.filter = { source:[], purpose:[], gender:null, age:null, cust:null, pay:null };
+    ST.filter = { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, keyword:null };
     ST.store = "全部";
     syncStoreUI();
 
@@ -1062,6 +1140,8 @@ function maskName(name){
     if (ST.filter.age)     chips.push(`<span class="chip" onclick="setAgeFilter('${ST.filter.age}')">年齡：${ST.filter.age} ✕</span>`);
     if (ST.filter.cust)    chips.push(`<span class="chip" onclick="resetSeg('cust')">${ST.filter.cust==='new'?'新客':'老客'} ✕</span>`);
     if (ST.filter.pay)     chips.push(`<span class="chip" onclick="resetSeg('pay')">${ST.filter.pay==='paid'?'有消費':'未消費'} ✕</span>`);
+    if (ST.filter.keyword) chips.push(`<span class="chip" style="border-color:var(--google-yellow);color:var(--google-yellow);" onclick="setKeywordFilter('${ST.filter.keyword.replace(/'/g,"\\'")}')">關鍵字：${ST.filter.keyword} ✕</span>`);
+    
     if (chips.length) {
       box.innerHTML = chips.join("") + `<span class="chip chip-clear" onclick="clearFilter()">清除全部 ✕</span>`;
       box.classList.add("show");
@@ -1081,6 +1161,17 @@ function maskName(name){
     if (f.cust === "old" && v.is_new_customer) return false;
     if (f.pay === "paid" && !(Number(v.amount) > 0)) return false;
     if (f.pay === "unpaid" && Number(v.amount) > 0) return false;
+    
+    // 關鍵字單選過濾邏輯
+    if (f.keyword) {
+      const rawStr = s(v.search_keywords).trim();
+      if (!rawStr) return false;
+      const parts = rawStr.split(/[+,,、，]+/).map(x => x.trim().toLowerCase()).filter(Boolean);
+      const targetKws = f.keyword.split(" + ").map(x => x.trim().toLowerCase());
+      // 必須包含組合中的「所有」關鍵字
+      if (!targetKws.every(tk => parts.includes(tk))) return false;
+    }
+
     const q = s($("qSearch") && $("qSearch").value).trim();
     if (q) {
       const hay = [
@@ -1152,6 +1243,128 @@ function maskName(name){
       if (!btn) return;
       toggleSource(btn.dataset.label);
     };
+  }
+
+  /* ===== 專屬 Tooltip 函式 ===== */
+  window.showTooltip = (e, title, desc) => {
+    const box = $("hoverPreview"); if (!box) return;
+    box.innerHTML = `<div class="hp-kw">${title}</div><div class="hp-detail">${desc}</div>`;
+    box.style.display = "block";
+    moveHoverPreview(e);
+  };
+  window.hideTooltip = () => { $("hoverPreview").style.display = "none"; };
+
+  /* ===== Google 關鍵字分析函式 (V14.3.0 升級版) ===== */
+  function updKeywordAnalysis() {
+    let totalKwCount = 0;
+    const kwMap = new Map();
+    const comboMap = new Map();
+
+    // 1. 資料清洗與統計
+    ST.filtered.forEach(v => {
+      const rawStr = s(v.search_keywords).trim();
+      if (!rawStr) return;
+
+      // 依據 + , ， 、 切割，保留空白
+      const parts = rawStr.split(/[+,,、，]+/).map(x => x.trim()).filter(Boolean);
+      if (!parts.length) return;
+
+      const date = s(v.form_date);
+      const uniqueParts = [];
+
+      parts.forEach(p => {
+        const lower = p.toLowerCase();
+        if (!uniqueParts.includes(lower)) uniqueParts.push(lower);
+
+        if (!kwMap.has(lower)) {
+          kwMap.set(lower, { original: p, count: 0, latestDate: date });
+        }
+        const obj = kwMap.get(lower);
+        obj.count++;
+        if (date > obj.latestDate) obj.latestDate = date;
+        totalKwCount++;
+      });
+
+      // 統計常見組合 (大於1個詞)
+      if (uniqueParts.length > 1) {
+        uniqueParts.sort(); // 確保 A,B 和 B,A 算同一組
+        const displayCombo = uniqueParts.map(l => kwMap.get(l).original).join(" + ");
+        comboMap.set(displayCombo, (comboMap.get(displayCombo) || 0) + 1);
+      }
+    });
+
+    // 2. 分類高頻與長尾
+    const highFreq = [];
+    const lowFreq = [];
+    for (const obj of kwMap.values()) {
+      if (obj.count >= 10) highFreq.push(obj);
+      else lowFreq.push(obj);
+    }
+
+    // 排序
+    highFreq.sort((a, b) => b.count - a.count);
+    lowFreq.sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return b.latestDate > a.latestDate ? 1 : -1; // 次數相同比日期
+    });
+
+    // 3. 渲染高頻 (Seg-bar)
+    const highFreqTotal = highFreq.reduce((sum, obj) => sum + obj.count, 0);
+    
+    const segRows = highFreq.map((obj, i) => ({
+      label: obj.original,
+      count: obj.count,
+      color: CFG.PURPOSE_COLORS[i % CFG.PURPOSE_COLORS.length],
+      active: ST.filter.keyword === obj.original
+    }));
+    renderSegBar('segBarKeywordTrack', 'segBarKeywordLegend', segRows, (label) => setKeywordFilter(label), highFreqTotal);
+
+    // 4. 渲染長尾 (Scrollable Box)
+    const ltContainer = $("longTailKeywords");
+    if (ltContainer) {
+      if (!lowFreq.length) {
+        ltContainer.innerHTML = `<div style="color:var(--text-hint); font-size:13px; font-weight:800; padding:6px 0;">無長尾關鍵字紀錄</div>`;
+      } else {
+        ltContainer.innerHTML = lowFreq.map(obj => {
+          const activeCls = ST.filter.keyword === obj.original ? 'is-active' : '';
+          const pct = ((obj.count / totalKwCount) * 100).toFixed(1);
+          const tip = `總數：${obj.count} 筆 (${pct}%)`;
+          return `
+            <div class="kw-pill ${activeCls}" onmouseenter="showTooltip(event, '${obj.original.replace(/'/g,"\\'")}', '${tip}')" onmouseleave="hideTooltip()" onmousemove="moveHoverPreview(event)" onclick="setKeywordFilter('${obj.original.replace(/'/g,"\\'")}')">
+              <span class="kw-text">${obj.original}</span>
+              <span class="kw-count">${obj.count}</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    // 5. 渲染常見組合 (層級式卡片)
+    const comboContainer = $("comboKeywords");
+    if (comboContainer) {
+      const sortedCombos = [...comboMap.entries()].sort((a, b) => b[1] - a[1]);
+      if (!sortedCombos.length) {
+        comboContainer.innerHTML = `<div style="color:var(--text-hint); font-size:13px; font-weight:800; padding:6px 0;">無組合紀錄</div>`;
+      } else {
+        comboContainer.innerHTML = sortedCombos.map(([comboStr, count], i) => {
+          const activeCls = ST.filter.keyword === comboStr ? 'is-active' : '';
+          const parts = comboStr.split(" + ");
+          
+          // 將組合內的每個詞變成獨立色塊
+          const partsHtml = parts.map((p, j) => {
+            const color = CFG.PURPOSE_COLORS[(i + j) % CFG.PURPOSE_COLORS.length];
+            return `<span class="kw-combo-part" style="color:${color};">${p}</span>`;
+          }).join(`<span class="kw-combo-plus">+</span>`);
+
+          return `
+            <div class="kw-combo-card ${activeCls}" onclick="setKeywordFilter('${comboStr.replace(/'/g,"\\'")}')">
+              ${partsHtml}
+              <span class="kw-count" style="margin-left: 4px;">${count}</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
   }
 
   function applyFilter(){
@@ -1321,7 +1534,7 @@ function maskName(name){
     Plotly.react(el, traces, { ...layout, transition:{ duration:220, easing:"cubic-in-out" } }, { displayModeBar:false, responsive:true });
   }
 
-  function renderSegBar(trackId, legendId, rows, onClick){
+  function renderSegBar(trackId, legendId, rows, onClick, customTotal = null){
     let track  = $(trackId); let legend = $(legendId);
     if (!track || !legend) return;
 
@@ -1329,7 +1542,7 @@ function maskName(name){
     track.replaceWith(freshTrack); legend.replaceWith(freshLegend);
     track  = freshTrack; legend = freshLegend;
 
-    const total = rows.reduce((s, r) => s + r.count, 0);
+    const total = customTotal !== null ? customTotal : rows.reduce((s, r) => s + r.count, 0);
     if (!total){
       track.innerHTML  = '<div style="display:flex;align-items:center;padding:0 12px;color:var(--text-hint);font-size:13px;">無資料</div>';
       legend.innerHTML = ''; return;
@@ -1339,19 +1552,22 @@ function maskName(name){
 
     track.innerHTML = rows.map((r, i) => {
       const pctStr = pcts[i].toFixed(1);
-      const tip = r.label + '\u3000' + r.count + ' 人 (' + pctStr + '%)';
+      const title = r.label.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+      const desc = `總數：${r.count} 筆 (${pctStr}%)`;
       const activeCls = r.active ? ' seg-active' : '';
-      return '<div class="seg-bar-seg' + activeCls + '" style="width:0;background:' + r.color + ';"' +
-        ' data-tip="' + tip.replace(/"/g, '&quot;') + '" data-label="' + r.label.replace(/"/g, '&quot;') + '"></div>';
+      
+      const innerText = pcts[i] > 6 ? `<span style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); color:#fff; font-size:12px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90%; text-shadow:0 1px 3px rgba(0,0,0,0.6); pointer-events:none;">${r.label}</span>` : '';
+
+      return `<div class="seg-bar-seg${activeCls}" style="width:0;background:${r.color};" data-label="${title}" onmouseenter="showTooltip(event, '${title}', '${desc}')" onmouseleave="hideTooltip()" onmousemove="moveHoverPreview(event)">${innerText}</div>`;
     }).join('');
 
     legend.innerHTML = rows.map((r, i) => {
       const pct = pcts[i].toFixed(1);
       const activeCls = r.active ? ' seg-bar-li--active' : '';
       const dotOutline = r.active ? 'outline:2px solid #fff;outline-offset:1px;box-shadow:0 0 0 3px ' + r.color + ';' : '';
-      return '<span class="seg-bar-li' + activeCls + '" data-label="' + r.label.replace(/"/g, '&quot;') + '">' +
-        '<span class="seg-bar-dot" style="background:' + r.color + ';' + dotOutline + '"></span>' +
-        r.label + '<b>' + r.count + '</b><span class="seg-bar-pct">(' + pct + '%)</span></span>';
+      return `<span class="seg-bar-li${activeCls}" data-label="${r.label.replace(/"/g, '&quot;')}">
+        <span class="seg-bar-dot" style="background:${r.color};${dotOutline}"></span>
+        ${r.label}<b>${r.count}</b><span class="seg-bar-pct">(${pct}%)</span></span>`;
     }).join('');
 
     requestAnimationFrame(() => {
@@ -1402,6 +1618,7 @@ function maskName(name){
     scheduleChart('profile', () => updSegProfile());
     scheduleChart('bubble', () => updBubble());
     scheduleChart('journey', () => buildSankeyAll());
+    updKeywordAnalysis();
   }
 
   const SANKEY_END = "🎯 來店";
@@ -1567,7 +1784,6 @@ function maskName(name){
     const box = $("hoverPreview"); if (!v || !box) return;
     const detail = s(v.detail_desc).trim(); const kw = s(v.search_keywords).trim();
     
-    // 格式化時間的輔助函式
     const fmtTime = (ts) => {
       if (!ts) return "";
       const d = new Date(ts);
@@ -1584,7 +1800,6 @@ function maskName(name){
     
     if (!detail && !kw && !cTime) { box.style.display = "none"; return; }
 
-    // 加入建檔與修改時間
     if (cTime || uTime) {
       html += `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 12px; color: var(--text-hint); font-weight: 700; display: flex; flex-direction: column; gap: 4px;">`;
       if (cTime) html += `<div>🕒 建檔：${cTime}</div>`;
