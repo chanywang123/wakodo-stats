@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>發文成效分析 | 和光堂</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23faf6ef'/%3E%3Cg%20fill='none'%20stroke='%23c9773f'%20stroke-width='3.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='20'%20cy='36'%20r='11'/%3E%3Ccircle%20cx='44'%20cy='36'%20r='11'/%3E%3Cpath%20d='M31%2034%20Q32%2029%2033%2034'/%3E%3Cpath%20d='M9%2033%20Q6%2030%209%2026'/%3E%3Cpath%20d='M55%2033%20Q58%2030%2055%2026'/%3E%3C/g%3E%3C/svg%3E" />
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  window.supabase = createClient(
+    "https://yxalpzculcyhzvnyvecb.supabase.co",
+    "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
+  );
+  window.dispatchEvent(new Event("supabase-ready"));
+</script>
+
+<style>
+  :root{
+    --bg:#faf6ef;
+    --card:#ffffff;
+    --ink:#2b241c;
+    --ink-soft:#6b6053;
+    --line:#e8dfd0;
+    --accent:#c9773f;
+    --accent-soft:#f1dcc6;
+    --ig:#d6336c;
+    --fb:#3b5998;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(60,45,20,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:32px 24px 80px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:13px;
+    margin:0 0 28px;
+  }
+
+  /* ==== 新增按鈕 ==== */
+  .toolbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+  }
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(201,119,63,0.35);
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+  }
+  .btn-danger{
+    background:#fdecea;
+    color:#c0392b;
+  }
+
+  /* ==== 卡片列表 ==== */
+  #groupList{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:14px;
+  }
+  .group-tile{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .group-tile:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(60,45,20,0.12);
+  }
+  .tile-cover{
+    position:relative;
+    aspect-ratio:1/1;
+    background:#f2ece0;
+    cursor:pointer;
+    overflow:hidden;
+  }
+  .tile-cover img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .tile-cover iframe,
+  .tile-cover .fb-post,
+  .tile-cover .fb-post iframe{
+    pointer-events:none; /* 縮圖僅供預覽，點擊一律交給外層開啟詳情視窗 */
+    width:100% !important;
+  }
+  .tile-embed-loading{
+    width:100%; height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .tile-cover-placeholder{
+    width:100%; height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:20px;
+    color:var(--ink-soft);
+  }
+  .tile-badge{
+    position:absolute;
+    bottom:8px; right:8px;
+    background:rgba(20,15,8,0.72);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .tile-info{
+    padding:10px 12px 6px;
+    cursor:pointer;
+    flex:1;
+  }
+  .tile-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-bottom:4px;
+  }
+  .tile-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+  }
+  .tile-actions{
+    padding:0 12px 10px;
+    text-align:right;
+  }
+  .tile-actions .icon-btn{ font-size:12px; }
+
+  .group-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 20px;
+  }
+  .group-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .tag-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-weight:700;
+    font-size:13px;
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .tag-pill.empty{
+    background:#f1f1ee;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .type-pill{
+    font-size:12px;
+    padding:3px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .group-note{
+    color:var(--ink-soft);
+    font-size:13px;
+    flex:1;
+    min-width:120px;
+  }
+  .group-actions{
+    display:flex;
+    gap:8px;
+  }
+  .icon-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:14px;
+    padding:4px 8px;
+    border-radius:6px;
+  }
+  .icon-btn:hover{ background:#f2ece0; color:var(--ink); }
+
+  .platform-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .platform-box{
+    flex:1;
+    min-width:280px;
+    max-width:360px;
+    margin:0 auto;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:12px;
+  }
+  .platform-label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .dot.ig{ background:var(--ig); }
+  .dot.fb{ background:var(--fb); }
+  .embed-holder{
+    max-width:100%;
+    overflow:hidden;
+  }
+  .embed-holder :is(iframe,blockquote){
+    max-width:100% !important;
+  }
+  .platform-empty{
+    color:var(--ink-soft);
+    font-size:12px;
+    text-align:center;
+    padding:20px 0;
+  }
+  .add-platform-btn{
+    margin-top:8px;
+    font-size:12px;
+  }
+
+  /* ==== 詢問記錄清單 ==== */
+  .inquiry-section{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .inquiry-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .inquiry-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    padding:6px 8px;
+    border-radius:8px;
+    background:#faf7f1;
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  .inquiry-row:hover{ background:var(--accent-soft); }
+  .inquiry-date{
+    font-weight:700;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .inquiry-type-badge{
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#eee6d8;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .inquiry-note-preview{
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    flex:1;
+  }
+  .inquiry-empty{
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:4px 2px;
+  }
+  .add-inquiry-btn{
+    width:100%;
+    font-size:12px;
+    padding:7px;
+  }
+  .inquiry-thumb-wrap{
+    position:relative;
+    flex-shrink:0;
+  }
+  .inquiry-thumb{
+    width:22px;
+    height:22px;
+    border-radius:5px;
+    object-fit:cover;
+    border:1px solid var(--line);
+    display:block;
+  }
+  .inquiry-thumb-hover{
+    display:none;
+    position:absolute;
+    bottom:28px;
+    left:0;
+    width:200px;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    border:1px solid var(--line);
+    z-index:20;
+  }
+  .inquiry-thumb-hover img{ width:100%; display:block; }
+  .inquiry-thumb-wrap:hover .inquiry-thumb-hover{ display:block; }
+
+  /* ==== 截圖上傳區（Modal 內） ==== */
+  .shot-zone{
+    border:2px dashed var(--line);
+    border-radius:10px;
+    min-height:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    background:#fdfbf8;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .shot-zone:hover, .shot-zone.dragover{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .shot-zone:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .shot-empty{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:20px;
+  }
+  .shot-preview{
+    max-width:100%;
+    max-height:280px;
+    display:block;
+    margin:0 auto;
+  }
+  .shot-actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+
+  /* ==== Lightbox ==== */
+  .lightbox-overlay{
+    position:fixed; inset:0;
+    background:rgba(10,8,4,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:300;
+    padding:30px;
+  }
+  .lightbox-overlay.open{ display:flex; }
+  .lightbox-overlay img{
+    max-width:100%;
+    max-height:100%;
+    border-radius:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox-close{
+    position:absolute;
+    top:24px; right:28px;
+    background:rgba(255,255,255,0.15);
+    color:#fff;
+    border:none;
+    width:36px; height:36px;
+    border-radius:50%;
+    font-size:16px;
+    cursor:pointer;
+  }
+  .lightbox-close:hover{ background:rgba(255,255,255,0.3); }
+
+  .empty-state{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:60px 0;
+    font-size:14px;
+  }
+
+  /* ==== 統計區 ==== */
+  .stats-wrap{
+    margin-bottom:22px;
+  }
+  .stat-cards{
+    display:flex;
+    gap:14px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .stat-card{
+    flex:1;
+    min-width:160px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-num{
+    font-size:22px;
+    font-weight:800;
+    color:var(--accent);
+    margin-bottom:2px;
+  }
+  .stat-label{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .rank-chart{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:6px 10px;
+    min-height:80px;
+  }
+
+  /* ==== 限時動態 ==== */
+  .section-divider{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:36px 0 16px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .section-title{
+    font-size:17px;
+    margin:0;
+  }
+  .story-block{
+    margin-bottom:26px;
+  }
+  .story-subtitle{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+  }
+  .story-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+    gap:12px;
+  }
+  .story-tile{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .story-tile:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(60,45,20,0.12);
+  }
+  .story-tile .tile-cover{ aspect-ratio:9/16; cursor:pointer; }
+  .story-tile-info{
+    padding:8px 10px;
+  }
+  .story-tile-brand{
+    font-size:12px;
+    font-weight:700;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .highlight-group{
+    margin-bottom:22px;
+  }
+  .highlight-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .highlight-name{
+    font-size:14px;
+    font-weight:700;
+    color:var(--accent);
+  }
+
+  /* ==== 篩選器 ==== */
+  .filter-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:20px;
+    padding:12px 14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .filter-bar select,
+  .filter-bar input[type=text]{
+    padding:7px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:13px;
+    background:#fdfbf8;
+    font-family:inherit;
+  }
+  .filter-bar input[type=text]{ min-width:160px; }
+  .filter-check{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+
+  /* ==== 收合展開 / 徽章 ==== */
+  .collapse-caret{
+    color:var(--ink-soft);
+    font-size:12px;
+    width:12px;
+    display:inline-block;
+  }
+  .inquiry-count-badge{
+    font-size:12px;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:2px 9px;
+    border-radius:999px;
+  }
+
+  /* ==== Modal ==== */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(30,24,15,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:#fff;
+    border-radius:16px;
+    width:100%;
+    max-width:520px;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal h2{
+    margin:0 0 18px;
+    font-size:17px;
+  }
+  .detail-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .detail-tag-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .detail-header-actions{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field input[type=text],
+  .field input[type=date],
+  .field textarea,
+  .field select{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fdfbf8;
+  }
+  .field textarea{ min-height:70px; resize:vertical; }
+  .combo{ position:relative; }
+  .combo-list{
+    position:absolute;
+    top:100%; left:0; right:0;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-top:4px;
+    max-height:160px;
+    overflow-y:auto;
+    box-shadow:var(--shadow);
+    z-index:5;
+    display:none;
+  }
+  .combo-list.open{ display:block; }
+  .combo-item{
+    padding:8px 12px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .combo-item:hover{ background:var(--accent-soft); }
+  .row2{ display:flex; gap:12px; }
+  .row2 > *{ flex:1; }
+
+  .modal-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .modal-footer .right{ display:flex; gap:8px; }
+
+  .platform-input-block{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+  }
+  .platform-input-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .platform-input-block input[type=url]{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fdfbf8;
+  }
+  .hint{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    transition:all .25s ease;
+    pointer-events:none;
+    z-index:200;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<h1>發文成效分析</h1>
+<p class="sub">和光堂 IG / FB 貼文成效與詢問記錄追蹤</p>
+
+<!-- ===== 統計區 ===== -->
+<div class="stats-wrap">
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-num" id="statThisMonth">0</div>
+      <div class="stat-label">本月新增詢問數</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statBestPost">—</div>
+      <div class="stat-label">詢問最多的內容項目</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statTotalTracked">0</div>
+      <div class="stat-label">目前追蹤中的貼文數</div>
+    </div>
+  </div>
+  <div id="rankChart" class="rank-chart"></div>
+</div>
+
+<!-- ===== 篩選器 ===== -->
+<div class="filter-bar">
+  <select id="filterTag">
+    <option value="">全部品牌型號</option>
+  </select>
+  <select id="filterType">
+    <option value="">全部類別</option>
+    <option value="圖文">圖文</option>
+    <option value="短影片">短影片</option>
+  </select>
+  <select id="filterPlatform">
+    <option value="">全部平台</option>
+    <option value="instagram">僅 Instagram</option>
+    <option value="facebook">僅 Facebook</option>
+  </select>
+  <label class="filter-check">
+    <input type="checkbox" id="filterHasInquiry" />
+    只看有詢問記錄
+  </label>
+  <input type="text" id="filterSearch" placeholder="搜尋備註內容..." />
+  <button class="btn btn-ghost" onclick="resetFilters()">清除篩選</button>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="openGroupModal()">+ 新增內容項目</button>
+</div>
+
+<div id="groupList"></div>
+<div id="emptyState" class="empty-state" style="display:none;">目前還沒有任何內容項目，點右上角新增一筆看看。</div>
+
+<!-- ===== 限時動態 ===== -->
+<div class="section-divider">
+  <h2 class="section-title">限時動態</h2>
+  <button class="btn btn-primary" onclick="openStoryModal()">+ 新增限時動態</button>
+</div>
+
+<div class="story-block">
+  <h3 class="story-subtitle">當日</h3>
+  <div id="storyDailyList" class="story-grid"></div>
+  <div id="storyDailyEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有「當日」限時動態記錄。</div>
+</div>
+
+<div class="story-block">
+  <h3 class="story-subtitle">精選</h3>
+  <div id="storyHighlightGroups"></div>
+  <div id="storyHighlightEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有「精選」限時動態記錄。</div>
+</div>
+
+<!-- ===== 內容項目 Modal（新增/編輯） ===== -->
+<div class="modal-overlay" id="groupModalOverlay">
+  <div class="modal">
+    <h2 id="groupModalTitle">新增內容項目</h2>
+
+    <div class="field">
+      <label>PO文類別</label>
+      <select id="postType">
+        <option value="">未指定</option>
+        <option value="圖文">圖文</option>
+        <option value="短影片">短影片</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>發文日期</label>
+      <input type="date" id="postDate" />
+      <div class="hint">預設帶入今天，可依實際發文日期手動修改，列表會依此排序</div>
+    </div>
+
+    <div class="field">
+      <label>品牌 + 型號標籤（可留空，之後再補）</label>
+      <div class="row2">
+        <div class="combo">
+          <input type="text" id="tagBrand" placeholder="品牌，例如 MYKITA" autocomplete="off" />
+          <div class="combo-list" id="brandList"></div>
+        </div>
+        <div class="combo">
+          <input type="text" id="tagModel" placeholder="型號" autocomplete="off" />
+          <div class="combo-list" id="modelList"></div>
+        </div>
+      </div>
+      <div class="hint">輸入過的品牌/型號會自動變成下拉建議，方便同款不同文章沿用</div>
+    </div>
+
+    <div class="field">
+      <label>內部備註 / 標題</label>
+      <textarea id="groupNote" placeholder="方便自己辨識這篇內容，例如：VioRou B'asic Yoji 系列"></textarea>
+    </div>
+
+    <div class="field">
+      <label>平台貼文網址</label>
+      <div id="platformInputs"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="addPlatformInput('instagram')">+ 加入 Instagram 網址</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="addPlatformInput('facebook')">+ 加入 Facebook 網址</button>
+      </div>
+      <div class="hint">直接貼上貼文的分享連結即可，例如 https://www.instagram.com/p/xxxx/ 或 https://www.facebook.com/xxx/posts/xxx</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteGroupBtn" style="display:none;" onclick="deleteGroup()">刪除整筆</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeGroupModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveGroup()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 內容項目詳情 Modal（點擊方塊後顯示完整貼文與詢問記錄） ===== -->
+<div class="modal-overlay" id="groupDetailOverlay">
+  <div class="modal" style="max-width:780px;">
+    <div class="detail-header">
+      <div id="detailTagRow" class="detail-tag-row"></div>
+      <div class="detail-header-actions">
+        <button class="icon-btn" onclick="editCurrentDetailGroup()">編輯項目</button>
+        <button class="icon-btn" onclick="closeGroupDetail()">✕ 關閉</button>
+      </div>
+    </div>
+    <div id="detailNote" class="group-note" style="margin-bottom:14px;"></div>
+    <div class="platform-row" id="detailPlatformRow"></div>
+  </div>
+</div>
+
+<!-- ===== 標籤編輯 Modal ===== -->
+<div class="modal-overlay" id="tagModalOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h2>編輯標籤</h2>
+    <div class="field">
+      <label>品牌</label>
+      <input type="text" id="editTagBrand" />
+    </div>
+    <div class="field">
+      <label>型號</label>
+      <input type="text" id="editTagModel" />
+    </div>
+    <div class="hint" style="margin-bottom:16px;">修改後，所有引用此標籤的內容項目會一併更新</div>
+    <div class="modal-footer">
+      <span></span>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeTagModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveTagEdit()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 限時動態 新增/編輯 Modal ===== -->
+<div class="modal-overlay" id="storyModalOverlay">
+  <div class="modal" style="max-width:440px;">
+    <h2 id="storyModalTitle">新增限時動態</h2>
+
+    <div class="field">
+      <label>分類</label>
+      <select id="storyCategory" onchange="onStoryCategoryChange()">
+        <option value="當日">當日</option>
+        <option value="精選">精選</option>
+      </select>
+    </div>
+
+    <div class="field" id="storyHighlightField" style="display:none;">
+      <label>精選名稱</label>
+      <div class="combo">
+        <input type="text" id="storyHighlightName" placeholder="例如：鏡框特輯" autocomplete="off" />
+        <div class="combo-list" id="storyHighlightList"></div>
+      </div>
+      <div class="hint">輸入過的精選名稱會變成下拉建議，方便同一輯持續加入新項目</div>
+    </div>
+
+    <div class="field">
+      <label>品牌＋型號</label>
+      <input type="text" id="storyBrandModel" placeholder="例如：MYKITA EERO" list="storyBrandModelSuggestions" />
+      <datalist id="storyBrandModelSuggestions"></datalist>
+    </div>
+
+    <div class="field">
+      <label>備註</label>
+      <textarea id="storyNote" placeholder="選填，方便自己標記細節"></textarea>
+    </div>
+
+    <div class="field">
+      <label>限時動態截圖</label>
+      <div class="shot-zone" id="storyShotZone" tabindex="0">
+        <div id="storyShotEmpty" class="shot-empty">點擊選擇檔案、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上</div>
+        <img id="storyShotPreview" class="shot-preview" style="display:none;" />
+        <input type="file" id="storyShotFileInput" accept="image/*" style="display:none;" />
+      </div>
+      <div class="shot-actions" id="storyShotActions" style="display:none;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="triggerStoryShotFileSelect()">🔄 更換截圖</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandStoryShot()">🔍 放大檢視</button>
+      </div>
+      <div class="hint" id="storyShotStatus"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteStoryBtn" style="display:none;" onclick="deleteStoryEntry()">刪除</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeStoryModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveStoryEntry()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 限時動態 詳情 Modal（圖 + 詢問記錄管理） ===== -->
+<div class="modal-overlay" id="storyDetailOverlay">
+  <div class="modal" style="max-width:640px;">
+    <div class="detail-header">
+      <div id="storyDetailBrand" style="font-weight:700; font-size:15px;"></div>
+      <div class="detail-header-actions">
+        <button class="icon-btn" onclick="editCurrentStoryEntry()">編輯</button>
+        <button class="icon-btn" onclick="closeStoryDetail()">✕ 關閉</button>
+      </div>
+    </div>
+    <div id="storyDetailNote" class="group-note" style="margin-bottom:12px;"></div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+      <img id="storyDetailImage" src="" style="max-width:220px; border-radius:10px; cursor:pointer; display:block;" onclick="openLightbox(document.getElementById('storyDetailImage').src)" />
+      <div style="flex:1; min-width:200px;">
+        <div class="inquiry-list" id="storyDetailInquiryList"></div>
+        <button class="btn btn-ghost add-inquiry-btn" id="storyDetailAddInquiryBtn">+ 新增詢問記錄</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 精選 名稱編輯 Modal ===== -->
+<div class="modal-overlay" id="highlightModalOverlay">
+  <div class="modal" style="max-width:360px;">
+    <h2>編輯精選名稱</h2>
+    <div class="field">
+      <label>名稱</label>
+      <input type="text" id="editHighlightName" />
+    </div>
+    <div class="hint" style="margin-bottom:16px;">修改後，所有屬於此精選的項目會一併更新</div>
+    <div class="modal-footer">
+      <span></span>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeHighlightModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveHighlightEdit()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 截圖 Lightbox ===== -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" onclick="event.stopPropagation()" />
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== 詢問記錄 Modal（新增/編輯共用） ===== -->
+<div class="modal-overlay" id="inquiryModalOverlay">
+  <div class="modal" style="max-width:420px;">
+    <h2 id="inquiryModalTitle">新增詢問記錄</h2>
+
+    <div class="field">
+      <label>詢問日期</label>
+      <input type="date" id="inquiryDate" />
+    </div>
+
+    <div class="field">
+      <label>詢問形式</label>
+      <select id="inquiryType">
+        <option value="留言">留言</option>
+        <option value="私訊">私訊</option>
+        <option value="到店">到店</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>備註</label>
+      <textarea id="inquiryNote" placeholder="例如：詢問價格、想知道有沒有現貨"></textarea>
+    </div>
+
+    <div class="field">
+      <label>截圖</label>
+      <div class="shot-zone" id="shotZone" tabindex="0">
+        <div id="shotEmpty" class="shot-empty">
+          點擊選擇檔案、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上
+        </div>
+        <img id="shotPreview" class="shot-preview" style="display:none;" />
+        <input type="file" id="shotFileInput" accept="image/*" style="display:none;" />
+      </div>
+      <div class="shot-actions" id="shotActions" style="display:none;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="triggerShotFileSelect()">🔄 更換截圖</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="downloadCurrentShot()">📥 下載</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandCurrentShot()">🔍 放大檢視</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="removeCurrentShot()">✕ 移除截圖</button>
+      </div>
+      <div class="hint" id="shotStatus"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteInquiryBtn" style="display:none;" onclick="deleteInquiry()">刪除記錄</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeInquiryModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveInquiry()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let sb = null;
+let allTags = [];      // [{id, brand, model}]
+let allGroups = [];     // full joined data
+let currentGroupId = null;
+let editingTagId = null;
+let platformInputCounter = 0;
+let currentInquiryId = null;
+let currentPlatformPostId = null;
+let currentInquiryParentType = 'platform'; // 'platform' | 'story'
+let currentShotBlob = null;
+let currentShotChanged = false;
+let currentShotRemoved = false;
+let existingShotUrl = null;
+
+window.addEventListener("supabase-ready", () => {
+  sb = window.supabase;
+  loadAll();
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+/* ================= 資料載入 ================= */
+async function loadAll(){
+  await loadTags();
+  await loadGroups();
+  await loadStories();
+  populateTagFilterOptions();
+}
+
+async function loadTags(){
+  const { data, error } = await sb.from('tags').select('*').order('brand');
+  if(error){ console.error(error); return; }
+  allTags = data || [];
+}
+
+async function loadGroups(){
+  const { data, error } = await sb
+    .from('posts_group')
+    .select(`
+      id, post_type, note, created_at, tag_id, post_date,
+      tags ( id, brand, model ),
+      platform_posts ( id, platform, post_url, inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url ) )
+    `);
+
+  if(error){ console.error(error); showToast('讀取失敗，請檢查主控台'); return; }
+  allGroups = (data || []).sort((a, b) => {
+    const dateA = new Date(a.post_date || a.created_at);
+    const dateB = new Date(b.post_date || b.created_at);
+    return dateB - dateA; // 新到舊；沒填發文日期時退回用建立時間排序
+  });
+  rebuildInquiryIndex();
+  renderGroups();
+}
+
+let allInquiriesById = {};
+function rebuildInquiryIndex(){
+  allInquiriesById = {};
+  allGroups.forEach(g => {
+    (g.platform_posts || []).forEach(pp => {
+      (pp.inquiries || []).forEach(iq => {
+        allInquiriesById[iq.id] = iq;
+      });
+    });
+  });
+}
+
+/* ================= 標籤下拉來源（僅顯示仍被使用的） ================= */
+function usedTagIds(){
+  return new Set(allGroups.map(g => g.tag_id).filter(Boolean));
+}
+
+function countInquiries(g){
+  return (g.platform_posts || []).reduce((sum,pp) => sum + (pp.inquiries ? pp.inquiries.length : 0), 0);
+}
+
+/* ================= 篩選 ================= */
+let filterState = { tagId:'', postType:'', platform:'', hasInquiry:false, search:'' };
+
+function filteredGroups(){
+  return allGroups.filter(g => {
+    if(filterState.tagId && g.tag_id !== filterState.tagId) return false;
+    if(filterState.postType && g.post_type !== filterState.postType) return false;
+    if(filterState.platform && !g.platform_posts.some(pp => pp.platform === filterState.platform)) return false;
+    if(filterState.hasInquiry && countInquiries(g) === 0) return false;
+    if(filterState.search){
+      const s = filterState.search.toLowerCase();
+      const noteMatch = (g.note||'').toLowerCase().includes(s);
+      const tagMatch = g.tags && (g.tags.brand+g.tags.model).toLowerCase().includes(s);
+      if(!noteMatch && !tagMatch) return false;
+    }
+    return true;
+  });
+}
+
+function resetFilters(){
+  filterState = { tagId:'', postType:'', platform:'', hasInquiry:false, search:'' };
+  document.getElementById('filterTag').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterPlatform').value = '';
+  document.getElementById('filterHasInquiry').checked = false;
+  document.getElementById('filterSearch').value = '';
+  renderGroups();
+}
+
+function populateTagFilterOptions(){
+  const sel = document.getElementById('filterTag');
+  const used = usedTagIds();
+  const currentVal = sel.value;
+  const options = allTags.filter(t => used.has(t.id));
+  sel.innerHTML = '<option value="">全部品牌型號</option>' +
+    options.map(t => `<option value="${t.id}">${escapeHtml(t.brand)} / ${escapeHtml(t.model)}</option>`).join('');
+  sel.value = currentVal;
+}
+
+function setupFilterBar(){
+  document.getElementById('filterTag').addEventListener('change', e => { filterState.tagId = e.target.value; renderGroups(); });
+  document.getElementById('filterType').addEventListener('change', e => { filterState.postType = e.target.value; renderGroups(); });
+  document.getElementById('filterPlatform').addEventListener('change', e => { filterState.platform = e.target.value; renderGroups(); });
+  document.getElementById('filterHasInquiry').addEventListener('change', e => { filterState.hasInquiry = e.target.checked; renderGroups(); });
+  document.getElementById('filterSearch').addEventListener('input', e => { filterState.search = e.target.value; renderGroups(); });
+}
+setupFilterBar();
+
+/* ================= 統計卡片 + 詢問度排行圖表 ================= */
+function renderStats(){
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7); // YYYY-MM
+
+  let monthCount = 0;
+  let totalTracked = 0;
+  const tagStats = {}; // key -> { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 }
+
+  allGroups.forEach(g => {
+    const label = g.tags ? `${g.tags.brand} / ${g.tags.model}` : (g.note ? g.note : '未分類標籤');
+    const typeKey = g.post_type === '圖文' ? '圖文' : g.post_type === '短影片' ? '短影片' : '未分類';
+
+    (g.platform_posts || []).forEach(pp => {
+      totalTracked++;
+      const inquiries = pp.inquiries || [];
+      inquiries.forEach(iq => {
+        if(iq.inquiry_date && iq.inquiry_date.slice(0,7) === ym) monthCount++;
+      });
+      if(inquiries.length > 0){
+        const key = g.tag_id || ('note:' + g.id);
+        if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
+        tagStats[key][typeKey] += inquiries.length;
+        tagStats[key].total += inquiries.length;
+      }
+    });
+  });
+
+  // 併入限時動態的詢問記錄
+  (allStoryEntries || []).forEach(se => {
+    totalTracked++;
+    const inquiries = se.inquiries || [];
+    inquiries.forEach(iq => {
+      if(iq.inquiry_date && iq.inquiry_date.slice(0,7) === ym) monthCount++;
+    });
+    if(inquiries.length > 0){
+      const key = 'story:' + (se.brand_model_text || se.id);
+      const label = se.brand_model_text || '未命名限動';
+      if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
+      tagStats[key]['限動'] += inquiries.length;
+      tagStats[key].total += inquiries.length;
+    }
+  });
+
+  document.getElementById('statThisMonth').textContent = monthCount;
+  document.getElementById('statTotalTracked').textContent = totalTracked;
+
+  const ranked = Object.values(tagStats).sort((a,b) => b.total - a.total);
+  const bestEl = document.getElementById('statBestPost');
+  bestEl.textContent = ranked.length > 0 ? `${ranked[0].label}（${ranked[0].total}次）` : '—';
+
+  renderRankChart(ranked.slice(0, 10));
+}
+
+function renderRankChart(ranked){
+  const el = document.getElementById('rankChart');
+  if(!ranked || ranked.length === 0){
+    el.innerHTML = '<div style="text-align:center; color:var(--ink-soft); font-size:13px; padding:24px 0;">目前還沒有詢問記錄可供統計</div>';
+    return;
+  }
+  const labels = ranked.map(r => r.label).reverse();
+  const series = ['圖文','短影片','限動','未分類'].map(type => ({
+    x: ranked.map(r => r[type] || 0).reverse(),
+    y: labels,
+    name: type,
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: type === '圖文' ? '#c9773f' : type === '短影片' ? '#3b5998' : type === '限動' ? '#a85fb0' : '#c9c2b0' }
+  }));
+
+  Plotly.newPlot(el, series, {
+    barmode: 'stack',
+    margin: { l: 140, r: 20, t: 10, b: 30 },
+    height: Math.max(160, labels.length * 34 + 60),
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { family: 'Noto Sans TC, PingFang TC, sans-serif', size: 12, color: '#2b241c' },
+    legend: { orientation: 'h', y: -0.15 },
+    xaxis: { title: '詢問次數', gridcolor: '#e8dfd0', zeroline:false },
+    yaxis: { automargin: true }
+  }, { displayModeBar:false, responsive:true });
+}
+
+function buildTagTypeHtml(g){
+  const tagHtml = g.tags
+    ? `<span class="tag-pill">${escapeHtml(g.tags.brand)} / ${escapeHtml(g.tags.model)}
+         <span class="icon-btn" style="padding:0 0 0 4px;" onclick="event.stopPropagation();openTagModal('${g.tags.id}')" title="編輯標籤">✎</span>
+       </span>`
+    : `<span class="tag-pill empty">未分類標籤</span>`;
+  const typeHtml = g.post_type ? `<span class="type-pill">${escapeHtml(g.post_type)}</span>` : '';
+  return `${tagHtml}${typeHtml}`;
+}
+
+function buildPlatformsHtml(g){
+  return ['instagram','facebook'].map(p => {
+    const post = g.platform_posts.find(pp => pp.platform === p);
+    const label = p === 'instagram' ? 'Instagram' : 'Facebook';
+    const dotClass = p === 'instagram' ? 'ig' : 'fb';
+    if(post){
+      const embedContent = buildCompactEmbed(p, post.post_url);
+      const inquiriesHtml = renderInquiryList(post.inquiries || [], 'platform', post.id);
+      return `
+        <div class="platform-box">
+          <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
+          <div class="embed-holder">${embedContent}</div>
+          <div class="inquiry-section">
+            <div class="inquiry-list">${inquiriesHtml}</div>
+            <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null, 'platform', '${post.id}')">+ 新增詢問記錄</button>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="platform-box">
+        <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
+        <div class="platform-empty">尚未加入此平台貼文</div>
+      </div>`;
+  }).join('');
+}
+
+let currentDetailGroupId = null;
+function openGroupDetail(id){
+  currentDetailGroupId = id;
+  const g = allGroups.find(x => x.id === id);
+  if(!g) return;
+  document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
+  document.getElementById('detailNote').textContent = g.note || '';
+  document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
+  document.getElementById('groupDetailOverlay').classList.add('open');
+  reInitEmbeds();
+}
+function closeGroupDetail(){
+  document.getElementById('groupDetailOverlay').classList.remove('open');
+  currentDetailGroupId = null;
+}
+function editCurrentDetailGroup(){
+  if(currentDetailGroupId){
+    const id = currentDetailGroupId;
+    closeGroupDetail();
+    openGroupModal(id);
+  }
+}
+
+/* 詢問記錄新增/編輯/刪除後，若「內容項目詳情」或「限動詳情」視窗還開著，
+   直接用最新資料重繪內容，不用使用者自己關掉重開才看得到更新 */
+function refreshOpenDetailModals(){
+  if(currentDetailGroupId){
+    const g = allGroups.find(x => x.id === currentDetailGroupId);
+    if(g){
+      document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
+      document.getElementById('detailNote').textContent = g.note || '';
+      document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
+      reInitEmbeds();
+    } else {
+      closeGroupDetail();
+    }
+  }
+  if(currentStoryDetailId){
+    const se = allStoryEntries.find(x => x.id === currentStoryDetailId);
+    if(se){
+      document.getElementById('storyDetailBrand').textContent = se.brand_model_text;
+      document.getElementById('storyDetailNote').textContent = se.note || '';
+      document.getElementById('storyDetailImage').src = se.image_url;
+      document.getElementById('storyDetailInquiryList').innerHTML = renderInquiryList(se.inquiries || [], 'story', se.id);
+      document.getElementById('storyDetailAddInquiryBtn').onclick = () => openInquiryModal(null, 'story', se.id);
+    } else {
+      closeStoryDetail();
+    }
+  }
+}
+
+/* ================= 渲染卡片列表（網格方塊） ================= */
+function renderGroups(){
+  const wrap = document.getElementById('groupList');
+  const empty = document.getElementById('emptyState');
+  wrap.innerHTML = '';
+
+  const groups = filteredGroups();
+
+  if(allGroups.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = '目前還沒有任何內容項目，點右上角新增一筆看看。';
+    renderStats();
+    return;
+  }
+  if(groups.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = '沒有符合篩選條件的內容項目。';
+    renderStats();
+    return;
+  }
+  empty.style.display = 'none';
+
+  groups.forEach(g => {
+    const tile = document.createElement('div');
+    tile.className = 'group-tile';
+
+    const inquiryCount = countInquiries(g);
+    const coverPost = ['instagram','facebook']
+      .map(p => g.platform_posts.find(pp => pp.platform === p))
+      .find(Boolean);
+
+    const coverHtml = coverPost
+      ? `<div class="tile-embed-loading">載入中…</div>`
+      : `<div class="tile-cover-placeholder">🏷️</div>`;
+
+    tile.innerHTML = `
+      <div class="tile-cover ${coverPost ? 'tile-cover-lazy' : ''}" data-group-id="${g.id}" onclick="openGroupDetail('${g.id}')">
+        ${coverHtml}
+        ${inquiryCount > 0 ? `<span class="tile-badge">💬 ${inquiryCount}</span>` : ''}
+      </div>
+      <div class="tile-info" onclick="openGroupDetail('${g.id}')">
+        <div class="tile-tags">${buildTagTypeHtml(g)}</div>
+        ${g.note ? `<div class="tile-note">${escapeHtml(g.note)}</div>` : ''}
+      </div>
+      <div class="tile-actions">
+        <button class="icon-btn" onclick="openGroupModal('${g.id}')">編輯</button>
+      </div>
+    `;
+    wrap.appendChild(tile);
+  });
+
+  renderStats();
+  setupTileObserver();
+}
+
+/* 縮圖區塊「捲到看得見才載入」，避免一次載入大量 IG/FB embed 拖垮效能 */
+let tileObserver = null;
+function setupTileObserver(){
+  if(tileObserver) tileObserver.disconnect();
+  tileObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        loadTileCover(entry.target);
+        tileObserver.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '250px' });
+  document.querySelectorAll('.tile-cover-lazy').forEach(el => tileObserver.observe(el));
+}
+
+function loadTileCover(el){
+  const g = allGroups.find(x => x.id === el.dataset.groupId);
+  if(!g) return;
+  const post = ['instagram','facebook']
+    .map(p => g.platform_posts.find(pp => pp.platform === p))
+    .find(Boolean);
+  if(!post){ el.innerHTML = `<div class="tile-cover-placeholder">🏷️</div>`; return; }
+  const badge = el.querySelector('.tile-badge');
+  el.innerHTML = buildTileEmbed(post.platform, post.post_url);
+  if(badge) el.appendChild(badge);
+  reInitEmbeds();
+}
+
+/* 直接用貼文網址組出輕量嵌入（無需再從嵌入碼裡解析網址） */
+function buildCompactEmbed(platform, postUrl){
+  if(platform === 'instagram'){
+    const permalink = normalizeIgUrl(postUrl);
+    return `<iframe src="${permalink}embed/captioned/" width="100%" height="580" style="border:none;max-width:340px;display:block;margin:0 auto;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
+  }
+  if(platform === 'facebook'){
+    return `<div class="fb-post" data-href="${postUrl}" data-width="340"></div>`;
+  }
+  return '';
+}
+
+/* 方塊縮圖用的精簡版嵌入：IG用無caption的/embed/、FB隱藏文字內容，只留圖片本身 */
+function buildTileEmbed(platform, postUrl){
+  if(platform === 'instagram'){
+    const permalink = normalizeIgUrl(postUrl);
+    return `<iframe src="${permalink}embed/" width="100%" height="100%" style="border:none;display:block;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
+  }
+  if(platform === 'facebook'){
+    return `<div class="fb-post" data-href="${postUrl}" data-width="280" data-show-text="false"></div>`;
+  }
+  return '';
+}
+
+function normalizeIgUrl(url){
+  let clean = url.split('?')[0];
+  if(!clean.endsWith('/')) clean += '/';
+  return clean;
+}
+
+function reInitEmbeds(){
+  // Facebook
+  if(!window.FB){
+    if(!document.getElementById('fb-root')){
+      const fbRoot = document.createElement('div');
+      fbRoot.id = 'fb-root';
+      document.body.appendChild(fbRoot);
+    }
+    const s = document.createElement('script');
+    s.src = 'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v19.0';
+    s.async = true;
+    document.body.appendChild(s);
+  } else {
+    window.FB.XFBML.parse();
+  }
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderInquiryList(inquiries, parentType, parentId){
+  if(!inquiries || inquiries.length === 0){
+    return `<div class="inquiry-empty">尚無詢問記錄</div>`;
+  }
+  const sorted = [...inquiries].sort((a,b) => (b.inquiry_date||'').localeCompare(a.inquiry_date||''));
+  return sorted.map(iq => {
+    const thumbHtml = iq.screenshot_url
+      ? `<span class="inquiry-thumb-wrap" onclick="event.stopPropagation(); openLightbox('${iq.screenshot_url}')">
+           <img class="inquiry-thumb" src="${iq.screenshot_url}" />
+           <span class="inquiry-thumb-hover"><img src="${iq.screenshot_url}" /></span>
+         </span>`
+      : '';
+    return `
+    <div class="inquiry-row" onclick="openInquiryModal('${iq.id}', '${parentType}', '${parentId}')">
+      ${thumbHtml}
+      <span class="inquiry-date">${iq.inquiry_date ? escapeHtml(iq.inquiry_date) : '未填日期'}</span>
+      <span class="inquiry-type-badge">${escapeHtml(iq.inquiry_type || '未分類')}</span>
+      <span class="inquiry-note-preview">${iq.note ? escapeHtml(iq.note) : ''}</span>
+    </div>
+  `;
+  }).join('');
+}
+
+/* ================= 內容項目 Modal ================= */
+function openGroupModal(id){
+  currentGroupId = id || null;
+  document.getElementById('groupModalTitle').textContent = id ? '編輯內容項目' : '新增內容項目';
+  document.getElementById('deleteGroupBtn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('platformInputs').innerHTML = '';
+  platformInputCounter = 0;
+
+  if(id){
+    const g = allGroups.find(x => x.id === id);
+    document.getElementById('postType').value = g.post_type || '';
+    document.getElementById('postDate').value = g.post_date || '';
+    document.getElementById('tagBrand').value = g.tags ? g.tags.brand : '';
+    document.getElementById('tagModel').value = g.tags ? g.tags.model : '';
+    document.getElementById('groupNote').value = g.note || '';
+    g.platform_posts.forEach(pp => addPlatformInput(pp.platform, pp.post_url, pp.id));
+  } else {
+    document.getElementById('postType').value = '圖文';
+    document.getElementById('postDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('tagBrand').value = '';
+    document.getElementById('tagModel').value = '';
+    document.getElementById('groupNote').value = '';
+  }
+  renderComboSuggestions();
+  document.getElementById('groupModalOverlay').classList.add('open');
+}
+
+function closeGroupModal(){
+  document.getElementById('groupModalOverlay').classList.remove('open');
+  currentGroupId = null;
+}
+
+function addPlatformInput(platform, value, existingId){
+  platformInputCounter++;
+  const uid = 'plat_' + platformInputCounter;
+  const wrap = document.getElementById('platformInputs');
+  const label = platform === 'instagram' ? 'Instagram' : 'Facebook';
+  const dotClass = platform === 'instagram' ? 'ig' : 'fb';
+  const block = document.createElement('div');
+  block.className = 'platform-input-block';
+  block.dataset.platform = platform;
+  block.dataset.existingId = existingId || '';
+  block.id = uid;
+  block.innerHTML = `
+    <div class="platform-input-head">
+      <span class="platform-label"><span class="dot ${dotClass}"></span>${label}</span>
+      <button class="icon-btn" onclick="document.getElementById('${uid}').remove()">移除</button>
+    </div>
+    <input type="url" placeholder="貼上 ${label} 貼文網址" value="${value ? escapeHtml(value) : ''}" />
+  `;
+  wrap.appendChild(block);
+}
+
+/* ---- 品牌/型號自動完成 ---- */
+function renderComboSuggestions(){
+  const brandInput = document.getElementById('tagBrand');
+  const modelInput = document.getElementById('tagModel');
+  const brandList = document.getElementById('brandList');
+  const modelList = document.getElementById('modelList');
+
+  const uniqueBrands = [...new Set(allTags.map(t => t.brand))];
+
+  function refreshBrandList(){
+    const val = brandInput.value.trim().toLowerCase();
+    const matches = uniqueBrands.filter(b => !val || b.toLowerCase().includes(val));
+    brandList.innerHTML = matches.map(b => `<div class="combo-item">${escapeHtml(b)}</div>`).join('');
+    brandList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { brandInput.value = matches[i]; brandList.classList.remove('open'); refreshModelList(); };
+    });
+  }
+  function refreshModelList(){
+    const brandVal = brandInput.value.trim().toLowerCase();
+    const val = modelInput.value.trim().toLowerCase();
+    const models = [...new Set(allTags.filter(t => t.brand.toLowerCase() === brandVal).map(t => t.model))];
+    const matches = models.filter(m => !val || m.toLowerCase().includes(val));
+    modelList.innerHTML = matches.map(m => `<div class="combo-item">${escapeHtml(m)}</div>`).join('');
+    modelList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { modelInput.value = matches[i]; modelList.classList.remove('open'); };
+    });
+  }
+
+  brandInput.oninput = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onfocus = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onblur = () => setTimeout(()=>brandList.classList.remove('open'), 150);
+
+  modelInput.oninput = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onfocus = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onblur = () => setTimeout(()=>modelList.classList.remove('open'), 150);
+}
+
+/* ---- 儲存內容項目（含標籤 upsert、平台貼文 sync）---- */
+async function saveGroup(){
+  const postType = document.getElementById('postType').value || null;
+  const postDate = document.getElementById('postDate').value || null;
+  const brand = document.getElementById('tagBrand').value.trim();
+  const model = document.getElementById('tagModel').value.trim();
+  const note = document.getElementById('groupNote').value.trim();
+
+  let tagId = null;
+  if(brand && model){
+    tagId = await upsertTag(brand, model);
+    if(!tagId) return;
+  }
+
+  let groupId = currentGroupId;
+  if(groupId){
+    const { error } = await sb.from('posts_group')
+      .update({ post_type: postType, tag_id: tagId, note, post_date: postDate })
+      .eq('id', groupId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  } else {
+    const { data, error } = await sb.from('posts_group')
+      .insert({ post_type: postType, tag_id: tagId, note, post_date: postDate })
+      .select().single();
+    if(error){ console.error(error); showToast('新增失敗'); return; }
+    groupId = data.id;
+  }
+
+  // 同步平台貼文
+  const blocks = document.querySelectorAll('#platformInputs .platform-input-block');
+  for(const block of blocks){
+    const platform = block.dataset.platform;
+    const existingId = block.dataset.existingId;
+    const url = block.querySelector('input').value.trim();
+    if(!url) continue;
+
+    if(existingId){
+      await sb.from('platform_posts').update({ post_url: url }).eq('id', existingId);
+    } else {
+      await sb.from('platform_posts').insert({ group_id: groupId, platform, post_url: url });
+    }
+  }
+
+  showToast('已儲存');
+  closeGroupModal();
+  await loadAll();
+}
+
+async function upsertTag(brand, model){
+  // 先查有沒有一樣的（避免重複建立）
+  const { data: existing } = await sb.from('tags')
+    .select('id').eq('brand', brand).eq('model', model).maybeSingle();
+  if(existing) return existing.id;
+
+  const { data, error } = await sb.from('tags').insert({ brand, model }).select().single();
+  if(error){ console.error(error); showToast('標籤建立失敗'); return null; }
+  await loadTags();
+  return data.id;
+}
+
+async function deleteGroup(){
+  if(!currentGroupId) return;
+  if(!confirm('確定刪除這筆內容項目？相關的平台貼文與詢問記錄都會一併刪除。')) return;
+  const { error } = await sb.from('posts_group').delete().eq('id', currentGroupId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+  showToast('已刪除');
+  closeGroupModal();
+  await loadAll();
+}
+
+/* ================= 標籤獨立編輯（改一筆，全部關聯貼文跟著變） ================= */
+function openTagModal(tagId){
+  editingTagId = tagId;
+  const t = allTags.find(x => x.id === tagId);
+  document.getElementById('editTagBrand').value = t.brand;
+  document.getElementById('editTagModel').value = t.model;
+  document.getElementById('tagModalOverlay').classList.add('open');
+}
+function closeTagModal(){
+  document.getElementById('tagModalOverlay').classList.remove('open');
+  editingTagId = null;
+}
+async function saveTagEdit(){
+  const brand = document.getElementById('editTagBrand').value.trim();
+  const model = document.getElementById('editTagModel').value.trim();
+  if(!brand || !model){ showToast('品牌和型號不可留空'); return; }
+
+  const { error } = await sb.from('tags').update({ brand, model }).eq('id', editingTagId);
+  if(error){ console.error(error); showToast('更新失敗（可能與既有標籤重複）'); return; }
+  showToast('標籤已更新，關聯內容同步更新');
+  closeTagModal();
+  await loadAll();
+  refreshOpenDetailModals();
+}
+
+/* ================= 詢問記錄 Modal（新增/編輯共用） ================= */
+function openInquiryModal(inquiryId, parentType, parentId){
+  currentInquiryId = inquiryId || null;
+  currentPlatformPostId = parentId;
+  currentInquiryParentType = parentType || 'platform';
+  document.getElementById('deleteInquiryBtn').style.display = inquiryId ? 'inline-block' : 'none';
+
+  // 重置截圖狀態
+  currentShotBlob = null;
+  currentShotChanged = false;
+  currentShotRemoved = false;
+  existingShotUrl = null;
+  document.getElementById('shotStatus').textContent = '';
+
+  if(inquiryId){
+    const iq = allInquiriesById[inquiryId];
+    document.getElementById('inquiryModalTitle').textContent = '編輯詢問記錄';
+    document.getElementById('inquiryDate').value = iq.inquiry_date || '';
+    document.getElementById('inquiryType').value = iq.inquiry_type || '留言';
+    document.getElementById('inquiryNote').value = iq.note || '';
+    if(iq.screenshot_url){
+      existingShotUrl = iq.screenshot_url;
+      showShotPreview(iq.screenshot_url);
+    } else {
+      clearShotPreview();
+    }
+  } else {
+    document.getElementById('inquiryModalTitle').textContent = '新增詢問記錄';
+    document.getElementById('inquiryDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('inquiryType').value = '留言';
+    document.getElementById('inquiryNote').value = '';
+    clearShotPreview();
+  }
+  document.getElementById('inquiryModalOverlay').classList.add('open');
+}
+
+function closeInquiryModal(){
+  document.getElementById('inquiryModalOverlay').classList.remove('open');
+  currentInquiryId = null;
+  currentPlatformPostId = null;
+}
+
+async function saveInquiry(){
+  const inquiry_date = document.getElementById('inquiryDate').value || null;
+  const inquiry_type = document.getElementById('inquiryType').value;
+  const note = document.getElementById('inquiryNote').value.trim();
+
+  let screenshot_url = existingShotUrl; // 預設維持原本截圖
+  if(currentShotRemoved){
+    screenshot_url = null;
+  } else if(currentShotChanged && currentShotBlob){
+    document.getElementById('shotStatus').textContent = '上傳中...';
+    const uploadedUrl = await uploadShotToStorage(currentShotBlob);
+    if(!uploadedUrl){ document.getElementById('shotStatus').textContent = ''; return; }
+    screenshot_url = uploadedUrl;
+  }
+
+  const payload = { inquiry_date, inquiry_type, note, screenshot_url };
+
+  if(currentInquiryId){
+    const { error } = await sb.from('inquiries').update(payload).eq('id', currentInquiryId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  } else {
+    const insertPayload = currentInquiryParentType === 'story'
+      ? { story_entry_id: currentPlatformPostId, ...payload }
+      : { platform_post_id: currentPlatformPostId, ...payload };
+    const { error } = await sb.from('inquiries').insert(insertPayload);
+    if(error){ console.error(error); showToast('新增失敗'); return; }
+  }
+
+  showToast('已儲存');
+  closeInquiryModal();
+  await loadAll();
+  refreshOpenDetailModals();
+}
+
+/* ================= 截圖：貼上 / 拖曳 / 上傳 / 轉WebP / 下載 / Lightbox ================= */
+function fileToWebpBlob(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          if(blob) resolve(blob); else reject(new Error('WebP 轉換失敗'));
+        }, 'image/webp', 0.85);
+      };
+      img.onerror = () => reject(new Error('圖片讀取失敗'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('檔案讀取失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadShotToStorage(blob, bucket){
+  bucket = bucket || 'post-screenshots';
+  const filename = `img_${Date.now()}_${Math.random().toString(36).slice(2,8)}.webp`;
+  const { error } = await sb.storage.from(bucket).upload(filename, blob, { contentType: 'image/webp' });
+  if(error){ console.error(error); showToast('圖片上傳失敗'); return null; }
+  const { data } = sb.storage.from(bucket).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+async function handleShotFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')){ showToast('請選擇圖片檔案'); return; }
+  document.getElementById('shotStatus').textContent = '轉換中...';
+  try{
+    const webpBlob = await fileToWebpBlob(file);
+    currentShotBlob = webpBlob;
+    currentShotChanged = true;
+    currentShotRemoved = false;
+    const previewUrl = URL.createObjectURL(webpBlob);
+    showShotPreview(previewUrl);
+    document.getElementById('shotStatus').textContent = `已轉換為 WebP（約 ${(webpBlob.size/1024).toFixed(0)} KB）`;
+  } catch(e){
+    console.error(e);
+    document.getElementById('shotStatus').textContent = '';
+    showToast('圖片處理失敗');
+  }
+}
+
+function showShotPreview(src){
+  document.getElementById('shotEmpty').style.display = 'none';
+  const img = document.getElementById('shotPreview');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('shotActions').style.display = 'flex';
+}
+
+function clearShotPreview(){
+  document.getElementById('shotEmpty').style.display = 'block';
+  const img = document.getElementById('shotPreview');
+  img.src = '';
+  img.style.display = 'none';
+  document.getElementById('shotActions').style.display = 'none';
+}
+
+function triggerShotFileSelect(){
+  document.getElementById('shotFileInput').click();
+}
+
+function removeCurrentShot(){
+  currentShotBlob = null;
+  currentShotChanged = false;
+  currentShotRemoved = true;
+  clearShotPreview();
+  document.getElementById('shotStatus').textContent = '';
+}
+
+async function downloadCurrentShot(){
+  const img = document.getElementById('shotPreview');
+  if(!img.src) return;
+  try{
+    const resp = await fetch(img.src);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `詢問截圖_${new Date().toISOString().slice(0,10)}.webp`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch(e){
+    console.error(e);
+    showToast('下載失敗');
+  }
+}
+
+function expandCurrentShot(){
+  const img = document.getElementById('shotPreview');
+  if(!img.src) return;
+  openLightbox(img.src);
+}
+
+function openLightbox(src){
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxOverlay').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightboxOverlay').classList.remove('open');
+  document.getElementById('lightboxImg').src = '';
+}
+
+function setupShotZone(){
+  const zone = document.getElementById('shotZone');
+  const fileInput = document.getElementById('shotFileInput');
+  const modalOverlay = document.getElementById('inquiryModalOverlay');
+
+  zone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    if(e.target.files[0]) handleShotFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file) handleShotFile(file);
+  });
+
+  // 在整個 Modal 範圍內按 Ctrl+V 都能貼上，不用先點擊貼上區
+  modalOverlay.addEventListener('paste', e => {
+    const items = e.clipboardData ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.startsWith('image/')){
+        handleShotFile(item.getAsFile());
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+setupShotZone();
+
+async function deleteInquiry(){
+  if(!currentInquiryId) return;
+  if(!confirm('確定刪除這筆詢問記錄？')) return;
+  const { error } = await sb.from('inquiries').delete().eq('id', currentInquiryId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+  showToast('已刪除');
+  closeInquiryModal();
+  await loadAll();
+  refreshOpenDetailModals();
+}
+
+/* ================= 限時動態 ================= */
+let allStoriesHighlights = [];
+let allStoryEntries = [];
+let currentStoryEntryId = null;
+let currentStoryDetailId = null;
+let editingHighlightId = null;
+let currentStoryImageBlob = null;
+let currentStoryImageChanged = false;
+let existingStoryImageUrl = null;
+
+async function loadStories(){
+  const { data: highlights, error: e1 } = await sb.from('stories_highlights').select('*').order('name');
+  if(e1){ console.error(e1); }
+  allStoriesHighlights = highlights || [];
+
+  const { data, error } = await sb
+    .from('story_entries')
+    .select(`
+      id, category, highlight_id, brand_model_text, image_url, note, created_at,
+      stories_highlights ( id, name ),
+      inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url )
+    `)
+    .order('created_at', { ascending: false });
+
+  if(error){ console.error(error); return; } // 資料表可能還沒建立，先安靜略過
+  allStoryEntries = data || [];
+  rebuildStoryInquiryIndex();
+  renderStories();
+}
+
+function rebuildStoryInquiryIndex(){
+  allStoryEntries.forEach(se => {
+    (se.inquiries || []).forEach(iq => { allInquiriesById[iq.id] = iq; });
+  });
+}
+
+function buildStoryTileHtml(se){
+  const count = (se.inquiries || []).length;
+  return `
+    <div class="story-tile" onclick="openStoryDetail('${se.id}')">
+      <div class="tile-cover">
+        <img src="${se.image_url}" />
+        ${count > 0 ? `<span class="tile-badge">💬 ${count}</span>` : ''}
+      </div>
+      <div class="story-tile-info">
+        <div class="story-tile-brand">${escapeHtml(se.brand_model_text)}</div>
+        ${se.note ? `<div class="tile-note">${escapeHtml(se.note)}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderStories(){
+  const dailyList = document.getElementById('storyDailyList');
+  const dailyEmpty = document.getElementById('storyDailyEmpty');
+  const highlightWrap = document.getElementById('storyHighlightGroups');
+  const highlightEmpty = document.getElementById('storyHighlightEmpty');
+  if(!dailyList) return; // HTML 還沒渲染完成時安全跳過
+
+  const daily = allStoryEntries.filter(se => se.category === '當日');
+  dailyList.innerHTML = daily.map(se => buildStoryTileHtml(se)).join('');
+  dailyEmpty.style.display = daily.length === 0 ? 'block' : 'none';
+
+  const highlightEntries = allStoryEntries.filter(se => se.category === '精選');
+  if(highlightEntries.length === 0){
+    highlightWrap.innerHTML = '';
+    highlightEmpty.style.display = 'block';
+  } else {
+    highlightEmpty.style.display = 'none';
+    const groups = {};
+    highlightEntries.forEach(se => {
+      const key = se.highlight_id || 'none';
+      if(!groups[key]){
+        groups[key] = { name: se.stories_highlights ? se.stories_highlights.name : '未命名精選', id: se.highlight_id, items: [] };
+      }
+      groups[key].items.push(se);
+    });
+    highlightWrap.innerHTML = Object.values(groups).map(grp => `
+      <div class="highlight-group">
+        <div class="highlight-header">
+          <span class="highlight-name">${escapeHtml(grp.name)}</span>
+          ${grp.id ? `<button class="icon-btn" onclick="openHighlightModal('${grp.id}')" title="編輯精選名稱">✎</button>` : ''}
+        </div>
+        <div class="story-grid">${grp.items.map(se => buildStoryTileHtml(se)).join('')}</div>
+      </div>
+    `).join('');
+  }
+
+  renderStats();
+}
+
+function populateBrandModelDatalist(){
+  const el = document.getElementById('storyBrandModelSuggestions');
+  if(!el) return;
+  el.innerHTML = allTags.map(t => `<option value="${escapeHtml(t.brand)} ${escapeHtml(t.model)}"></option>`).join('');
+}
+
+function renderHighlightSuggestions(){
+  const input = document.getElementById('storyHighlightName');
+  const list = document.getElementById('storyHighlightList');
+  function refresh(){
+    const val = input.value.trim().toLowerCase();
+    const matches = allStoriesHighlights.filter(h => !val || h.name.toLowerCase().includes(val));
+    list.innerHTML = matches.map(h => `<div class="combo-item">${escapeHtml(h.name)}</div>`).join('');
+    list.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { input.value = matches[i].name; list.classList.remove('open'); };
+    });
+  }
+  input.oninput = () => { refresh(); list.classList.add('open'); };
+  input.onfocus = () => { refresh(); list.classList.add('open'); };
+  input.onblur = () => setTimeout(()=>list.classList.remove('open'), 150);
+}
+
+function onStoryCategoryChange(){
+  const cat = document.getElementById('storyCategory').value;
+  document.getElementById('storyHighlightField').style.display = cat === '精選' ? 'block' : 'none';
+}
+
+function openStoryModal(id){
+  currentStoryEntryId = id || null;
+  document.getElementById('storyModalTitle').textContent = id ? '編輯限時動態' : '新增限時動態';
+  document.getElementById('deleteStoryBtn').style.display = id ? 'inline-block' : 'none';
+
+  populateBrandModelDatalist();
+  renderHighlightSuggestions();
+
+  currentStoryImageBlob = null;
+  currentStoryImageChanged = false;
+  existingStoryImageUrl = null;
+  document.getElementById('storyShotStatus').textContent = '';
+
+  if(id){
+    const se = allStoryEntries.find(x => x.id === id);
+    document.getElementById('storyCategory').value = se.category;
+    document.getElementById('storyHighlightName').value = se.stories_highlights ? se.stories_highlights.name : '';
+    document.getElementById('storyBrandModel').value = se.brand_model_text || '';
+    document.getElementById('storyNote').value = se.note || '';
+    existingStoryImageUrl = se.image_url;
+    showStoryImagePreview(se.image_url);
+  } else {
+    document.getElementById('storyCategory').value = '當日';
+    document.getElementById('storyHighlightName').value = '';
+    document.getElementById('storyBrandModel').value = '';
+    document.getElementById('storyNote').value = '';
+    clearStoryImagePreview();
+  }
+  onStoryCategoryChange();
+  document.getElementById('storyModalOverlay').classList.add('open');
+}
+
+function closeStoryModal(){
+  document.getElementById('storyModalOverlay').classList.remove('open');
+  currentStoryEntryId = null;
+}
+
+async function upsertHighlight(name){
+  const { data: existing } = await sb.from('stories_highlights').select('id').eq('name', name).maybeSingle();
+  if(existing) return existing.id;
+  const { data, error } = await sb.from('stories_highlights').insert({ name }).select().single();
+  if(error){ console.error(error); showToast('精選名稱建立失敗'); return null; }
+  return data.id;
+}
+
+async function saveStoryEntry(){
+  const category = document.getElementById('storyCategory').value;
+  const brand_model_text = document.getElementById('storyBrandModel').value.trim();
+  if(!brand_model_text){ showToast('請填寫品牌＋型號'); return; }
+
+  let highlight_id = null;
+  if(category === '精選'){
+    const name = document.getElementById('storyHighlightName').value.trim();
+    if(!name){ showToast('請填寫精選名稱'); return; }
+    highlight_id = await upsertHighlight(name);
+    if(!highlight_id) return;
+  }
+
+  let image_url = existingStoryImageUrl;
+  if(currentStoryImageChanged && currentStoryImageBlob){
+    document.getElementById('storyShotStatus').textContent = '上傳中...';
+    const uploaded = await uploadShotToStorage(currentStoryImageBlob, 'story-images');
+    if(!uploaded){ document.getElementById('storyShotStatus').textContent = ''; return; }
+    image_url = uploaded;
+  }
+  if(!image_url){ showToast('請上傳限時動態截圖'); return; }
+
+  const note = document.getElementById('storyNote').value.trim();
+  const payload = { category, highlight_id, brand_model_text, image_url, note };
+
+  if(currentStoryEntryId){
+    const { error } = await sb.from('story_entries').update(payload).eq('id', currentStoryEntryId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  } else {
+    const { error } = await sb.from('story_entries').insert(payload);
+    if(error){ console.error(error); showToast('新增失敗'); return; }
+  }
+
+  showToast('已儲存');
+  closeStoryModal();
+  await loadStories();
+}
+
+async function deleteStoryEntry(){
+  if(!currentStoryEntryId) return;
+  if(!confirm('確定刪除這筆限時動態記錄？相關的詢問記錄也會一併刪除。')) return;
+  const { error } = await sb.from('story_entries').delete().eq('id', currentStoryEntryId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+  showToast('已刪除');
+  closeStoryModal();
+  await loadStories();
+}
+
+/* ---- 限時動態截圖上傳（獨立於詢問記錄截圖，共用轉檔邏輯） ---- */
+function showStoryImagePreview(src){
+  document.getElementById('storyShotEmpty').style.display = 'none';
+  const img = document.getElementById('storyShotPreview');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('storyShotActions').style.display = 'flex';
+}
+function clearStoryImagePreview(){
+  document.getElementById('storyShotEmpty').style.display = 'block';
+  const img = document.getElementById('storyShotPreview');
+  img.src = '';
+  img.style.display = 'none';
+  document.getElementById('storyShotActions').style.display = 'none';
+}
+function triggerStoryShotFileSelect(){
+  document.getElementById('storyShotFileInput').click();
+}
+function expandStoryShot(){
+  const img = document.getElementById('storyShotPreview');
+  if(img.src) openLightbox(img.src);
+}
+async function handleStoryImageFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')){ showToast('請選擇圖片檔案'); return; }
+  document.getElementById('storyShotStatus').textContent = '轉換中...';
+  try{
+    const webpBlob = await fileToWebpBlob(file);
+    currentStoryImageBlob = webpBlob;
+    currentStoryImageChanged = true;
+    const previewUrl = URL.createObjectURL(webpBlob);
+    showStoryImagePreview(previewUrl);
+    document.getElementById('storyShotStatus').textContent = `已轉換為 WebP（約 ${(webpBlob.size/1024).toFixed(0)} KB）`;
+  } catch(e){
+    console.error(e);
+    document.getElementById('storyShotStatus').textContent = '';
+    showToast('圖片處理失敗');
+  }
+}
+function setupStoryShotZone(){
+  const zone = document.getElementById('storyShotZone');
+  const fileInput = document.getElementById('storyShotFileInput');
+  const modalOverlay = document.getElementById('storyModalOverlay');
+
+  zone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    if(e.target.files[0]) handleStoryImageFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file) handleStoryImageFile(file);
+  });
+  modalOverlay.addEventListener('paste', e => {
+    const items = e.clipboardData ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.startsWith('image/')){
+        handleStoryImageFile(item.getAsFile());
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+setupStoryShotZone();
+
+/* ---- 限時動態 詳情（圖 + 詢問記錄管理） ---- */
+function openStoryDetail(id){
+  currentStoryDetailId = id;
+  const se = allStoryEntries.find(x => x.id === id);
+  if(!se) return;
+  document.getElementById('storyDetailBrand').textContent = se.brand_model_text;
+  document.getElementById('storyDetailNote').textContent = se.note || '';
+  document.getElementById('storyDetailImage').src = se.image_url;
+  document.getElementById('storyDetailInquiryList').innerHTML = renderInquiryList(se.inquiries || [], 'story', se.id);
+  document.getElementById('storyDetailAddInquiryBtn').onclick = () => openInquiryModal(null, 'story', se.id);
+  document.getElementById('storyDetailOverlay').classList.add('open');
+}
+function closeStoryDetail(){
+  document.getElementById('storyDetailOverlay').classList.remove('open');
+  currentStoryDetailId = null;
+}
+function editCurrentStoryEntry(){
+  if(!currentStoryDetailId) return;
+  const id = currentStoryDetailId;
+  closeStoryDetail();
+  openStoryModal(id);
+}
+
+/* ---- 精選名稱編輯（改一筆，底下所有項目跟著變） ---- */
+function openHighlightModal(highlightId){
+  editingHighlightId = highlightId;
+  const h = allStoriesHighlights.find(x => x.id === highlightId);
+  document.getElementById('editHighlightName').value = h ? h.name : '';
+  document.getElementById('highlightModalOverlay').classList.add('open');
+}
+function closeHighlightModal(){
+  document.getElementById('highlightModalOverlay').classList.remove('open');
+  editingHighlightId = null;
+}
+async function saveHighlightEdit(){
+  const name = document.getElementById('editHighlightName').value.trim();
+  if(!name){ showToast('名稱不可留空'); return; }
+  const { error } = await sb.from('stories_highlights').update({ name }).eq('id', editingHighlightId);
+  if(error){ console.error(error); showToast('更新失敗（可能與既有精選名稱重複）'); return; }
+  showToast('精選名稱已更新');
+  closeHighlightModal();
+  await loadStories();
+}
+</script>
+</body>
+</html>
