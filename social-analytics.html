@@ -549,7 +549,8 @@
     border-radius:12px;
   }
   .filter-bar select,
-  .filter-bar input[type=text]{
+  .filter-bar input[type=text],
+  .filter-bar input[type=date]{
     padding:7px 10px;
     border:1px solid var(--line);
     border-radius:8px;
@@ -749,14 +750,21 @@
       <div class="stat-num" id="statTotalTracked">0</div>
       <div class="stat-label">目前追蹤中的貼文數</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statBestFormat" style="font-size:16px;">—</div>
+      <div class="stat-label">熱門形式</div>
+    </div>
   </div>
   <div id="rankChart" class="rank-chart"></div>
 </div>
 
 <!-- ===== 篩選器 ===== -->
 <div class="filter-bar">
-  <select id="filterTag">
-    <option value="">全部品牌型號</option>
+  <select id="filterBrand">
+    <option value="">全部品牌</option>
+  </select>
+  <select id="filterModel">
+    <option value="">全部型號</option>
   </select>
   <select id="filterType">
     <option value="">全部類別</option>
@@ -768,6 +776,13 @@
     <option value="instagram">僅 Instagram</option>
     <option value="facebook">僅 Facebook</option>
   </select>
+  <select id="filterDateTarget">
+    <option value="post">依發文日期</option>
+    <option value="inquiry">依詢問日期</option>
+  </select>
+  <input type="date" id="filterDateStart" title="起始日期" />
+  <span style="color:var(--ink-soft); font-size:13px;">～</span>
+  <input type="date" id="filterDateEnd" title="結束日期" />
   <label class="filter-check">
     <input type="checkbox" id="filterHasInquiry" />
     只看有詢問記錄
@@ -1092,9 +1107,13 @@ async function loadAll(){
 }
 
 async function loadTags(){
-  const { data, error } = await sb.from('tags').select('*').order('brand');
+  const { data, error } = await sb
+    .from('tags')
+    .select('id, model, brand_id, brands ( id, name )');
   if(error){ console.error(error); return; }
-  allTags = data || [];
+  allTags = (data || [])
+    .map(t => ({ id: t.id, model: t.model, brand_id: t.brand_id, brand: t.brands ? t.brands.name : '' }))
+    .sort((a,b) => (a.brand + a.model).localeCompare(b.brand + b.model));
 }
 
 async function loadGroups(){
@@ -1102,7 +1121,7 @@ async function loadGroups(){
     .from('posts_group')
     .select(`
       id, post_type, note, created_at, tag_id, post_date,
-      tags ( id, brand, model ),
+      tags ( id, model, brand_id, brands ( id, name ) ),
       platform_posts ( id, platform, post_url, inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url ) )
     `);
 
@@ -1111,6 +1130,12 @@ async function loadGroups(){
     const dateA = new Date(a.post_date || a.created_at);
     const dateB = new Date(b.post_date || b.created_at);
     return dateB - dateA; // 新到舊；沒填發文日期時退回用建立時間排序
+  });
+  // 把 join 出來的 brands.name 攤平成 tags.brand，讓其餘程式碼沿用原本寫法不用大改
+  allGroups.forEach(g => {
+    if(g.tags && g.tags.brands){
+      g.tags.brand = g.tags.brands.name;
+    }
   });
   rebuildInquiryIndex();
   renderGroups();
@@ -1138,11 +1163,12 @@ function countInquiries(g){
 }
 
 /* ================= 篩選 ================= */
-let filterState = { tagId:'', postType:'', platform:'', hasInquiry:false, search:'' };
+let filterState = { brand:'', model:'', postType:'', platform:'', hasInquiry:false, search:'', dateTarget:'post', dateStart:'', dateEnd:'' };
 
 function filteredGroups(){
   return allGroups.filter(g => {
-    if(filterState.tagId && g.tag_id !== filterState.tagId) return false;
+    if(filterState.brand && (!g.tags || g.tags.brand !== filterState.brand)) return false;
+    if(filterState.model && (!g.tags || g.tags.model !== filterState.model)) return false;
     if(filterState.postType && g.post_type !== filterState.postType) return false;
     if(filterState.platform && !g.platform_posts.some(pp => pp.platform === filterState.platform)) return false;
     if(filterState.hasInquiry && countInquiries(g) === 0) return false;
@@ -1152,36 +1178,81 @@ function filteredGroups(){
       const tagMatch = g.tags && (g.tags.brand+g.tags.model).toLowerCase().includes(s);
       if(!noteMatch && !tagMatch) return false;
     }
+    if(filterState.dateStart || filterState.dateEnd){
+      if(filterState.dateTarget === 'inquiry'){
+        const hasMatch = (g.platform_posts || []).some(pp => (pp.inquiries || []).some(iq => {
+          if(!iq.inquiry_date) return false;
+          if(filterState.dateStart && iq.inquiry_date < filterState.dateStart) return false;
+          if(filterState.dateEnd && iq.inquiry_date > filterState.dateEnd) return false;
+          return true;
+        }));
+        if(!hasMatch) return false;
+      } else {
+        const d = g.post_date || (g.created_at ? g.created_at.slice(0,10) : '');
+        if(!d) return false;
+        if(filterState.dateStart && d < filterState.dateStart) return false;
+        if(filterState.dateEnd && d > filterState.dateEnd) return false;
+      }
+    }
     return true;
   });
 }
 
 function resetFilters(){
-  filterState = { tagId:'', postType:'', platform:'', hasInquiry:false, search:'' };
-  document.getElementById('filterTag').value = '';
+  filterState = { brand:'', model:'', postType:'', platform:'', hasInquiry:false, search:'', dateTarget:'post', dateStart:'', dateEnd:'' };
+  document.getElementById('filterBrand').value = '';
+  populateModelFilterOptions();
   document.getElementById('filterType').value = '';
   document.getElementById('filterPlatform').value = '';
   document.getElementById('filterHasInquiry').checked = false;
   document.getElementById('filterSearch').value = '';
+  document.getElementById('filterDateTarget').value = 'post';
+  document.getElementById('filterDateStart').value = '';
+  document.getElementById('filterDateEnd').value = '';
   renderGroups();
 }
 
+/* 品牌下拉：列出目前仍被使用的品牌（去重） */
 function populateTagFilterOptions(){
-  const sel = document.getElementById('filterTag');
+  const sel = document.getElementById('filterBrand');
   const used = usedTagIds();
   const currentVal = sel.value;
-  const options = allTags.filter(t => used.has(t.id));
-  sel.innerHTML = '<option value="">全部品牌型號</option>' +
-    options.map(t => `<option value="${t.id}">${escapeHtml(t.brand)} / ${escapeHtml(t.model)}</option>`).join('');
-  sel.value = currentVal;
+  const usedBrands = [...new Set(allTags.filter(t => used.has(t.id)).map(t => t.brand))].sort();
+  sel.innerHTML = '<option value="">全部品牌</option>' +
+    usedBrands.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+  sel.value = usedBrands.includes(currentVal) ? currentVal : '';
+  populateModelFilterOptions();
+}
+
+/* 型號下拉：只列出目前選定品牌底下的型號；沒選品牌時列出全部型號 */
+function populateModelFilterOptions(){
+  const sel = document.getElementById('filterModel');
+  const used = usedTagIds();
+  const brand = document.getElementById('filterBrand').value;
+  const currentVal = sel.value;
+  const pool = allTags.filter(t => used.has(t.id) && (!brand || t.brand === brand));
+  const usedModels = [...new Set(pool.map(t => t.model))].sort();
+  sel.innerHTML = '<option value="">全部型號</option>' +
+    usedModels.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+  sel.value = usedModels.includes(currentVal) ? currentVal : '';
+  filterState.model = sel.value;
 }
 
 function setupFilterBar(){
-  document.getElementById('filterTag').addEventListener('change', e => { filterState.tagId = e.target.value; renderGroups(); });
+  document.getElementById('filterBrand').addEventListener('change', e => {
+    filterState.brand = e.target.value;
+    filterState.model = ''; // 換品牌時型號重置，避免留著上一個品牌底下的型號
+    populateModelFilterOptions();
+    renderGroups();
+  });
+  document.getElementById('filterModel').addEventListener('change', e => { filterState.model = e.target.value; renderGroups(); });
   document.getElementById('filterType').addEventListener('change', e => { filterState.postType = e.target.value; renderGroups(); });
   document.getElementById('filterPlatform').addEventListener('change', e => { filterState.platform = e.target.value; renderGroups(); });
   document.getElementById('filterHasInquiry').addEventListener('change', e => { filterState.hasInquiry = e.target.checked; renderGroups(); });
   document.getElementById('filterSearch').addEventListener('input', e => { filterState.search = e.target.value; renderGroups(); });
+  document.getElementById('filterDateTarget').addEventListener('change', e => { filterState.dateTarget = e.target.value; renderGroups(); });
+  document.getElementById('filterDateStart').addEventListener('change', e => { filterState.dateStart = e.target.value; renderGroups(); });
+  document.getElementById('filterDateEnd').addEventListener('change', e => { filterState.dateEnd = e.target.value; renderGroups(); });
 }
 setupFilterBar();
 
@@ -1193,6 +1264,7 @@ function renderStats(){
   let monthCount = 0;
   let totalTracked = 0;
   const tagStats = {}; // key -> { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 }
+  const formatTotals = { 圖文:0, 短影片:0, 限動:0, 未分類:0 };
 
   allGroups.forEach(g => {
     const label = g.tags ? `${g.tags.brand} / ${g.tags.model}` : (g.note ? g.note : '未分類標籤');
@@ -1209,6 +1281,7 @@ function renderStats(){
         if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
         tagStats[key][typeKey] += inquiries.length;
         tagStats[key].total += inquiries.length;
+        formatTotals[typeKey] += inquiries.length;
       }
     });
   });
@@ -1226,6 +1299,7 @@ function renderStats(){
       if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
       tagStats[key]['限動'] += inquiries.length;
       tagStats[key].total += inquiries.length;
+      formatTotals['限動'] += inquiries.length;
     }
   });
 
@@ -1236,35 +1310,111 @@ function renderStats(){
   const bestEl = document.getElementById('statBestPost');
   bestEl.textContent = ranked.length > 0 ? `${ranked[0].label}（${ranked[0].total}次）` : '—';
 
-  renderRankChart(ranked.slice(0, 10));
+  const bestFormatEl = document.getElementById('statBestFormat');
+  if(bestFormatEl){
+    const topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0];
+    bestFormatEl.textContent = topFormat && topFormat[1] > 0 ? `${topFormat[0]}（${topFormat[1]}次）` : '—';
+  }
+
+  renderRankChart();
 }
 
-function renderRankChart(ranked){
+/* 桑基圖：品牌 → 型號，依總詢問次數排序（由多到少），寬度代表詢問次數 */
+function renderRankChart(){
   const el = document.getElementById('rankChart');
-  if(!ranked || ranked.length === 0){
-    el.innerHTML = '<div style="text-align:center; color:var(--ink-soft); font-size:13px; padding:24px 0;">目前還沒有詢問記錄可供統計</div>';
+
+  const brandMap = {}; // brand -> { total, models: { model: count } }
+  function addCount(brand, model, count){
+    if(!brand || count <= 0) return;
+    if(!brandMap[brand]) brandMap[brand] = { total: 0, models: {} };
+    brandMap[brand].total += count;
+    brandMap[brand].models[model] = (brandMap[brand].models[model] || 0) + count;
+  }
+
+  allGroups.forEach(g => {
+    if(!g.tags) return;
+    const count = (g.platform_posts || []).reduce((s, pp) => s + (pp.inquiries || []).length, 0);
+    addCount(g.tags.brand, g.tags.model, count);
+  });
+
+  // 限動的品牌+型號是自由輸入的一整串文字，嘗試用第一個空白拆成品牌/型號
+  (allStoryEntries || []).forEach(se => {
+    const count = (se.inquiries || []).length;
+    if(count <= 0) return;
+    const text = (se.brand_model_text || '').trim();
+    const spaceIdx = text.indexOf(' ');
+    const brand = spaceIdx > 0 ? text.slice(0, spaceIdx) : text;
+    const model = spaceIdx > 0 ? text.slice(spaceIdx + 1) : '限動';
+    addCount(brand, model, count);
+  });
+
+  const brandEntries = Object.entries(brandMap).sort((a, b) => b[1].total - a[1].total);
+
+  if(brandEntries.length === 0){
+    el.innerHTML = '<div style="text-align:center; color:var(--ink-soft); font-size:13px; padding:30px 0;">目前還沒有詢問記錄可供統計</div>';
     return;
   }
-  const labels = ranked.map(r => r.label).reverse();
-  const series = ['圖文','短影片','限動','未分類'].map(type => ({
-    x: ranked.map(r => r[type] || 0).reverse(),
-    y: labels,
-    name: type,
-    type: 'bar',
-    orientation: 'h',
-    marker: { color: type === '圖文' ? '#c9773f' : type === '短影片' ? '#3b5998' : type === '限動' ? '#a85fb0' : '#c9c2b0' }
-  }));
 
-  Plotly.newPlot(el, series, {
-    barmode: 'stack',
-    margin: { l: 140, r: 20, t: 10, b: 30 },
-    height: Math.max(160, labels.length * 34 + 60),
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
+  const totalAll = brandEntries.reduce((s, [, v]) => s + v.total, 0);
+  const labels = [], nodeX = [], nodeY = [], nodeColor = [];
+  const brandIndex = {};
+  let cursor = 0;
+
+  brandEntries.forEach(([brand, info]) => {
+    brandIndex[brand] = labels.length;
+    labels.push(brand);
+    nodeX.push(0.01);
+    nodeY.push(Math.min(0.98, Math.max(0.02, (cursor + info.total / 2) / totalAll)));
+    nodeColor.push('#c9773f');
+    cursor += info.total;
+  });
+
+  const modelIndex = {};
+  const sourceArr = [], targetArr = [], valueArr = [];
+  let cursor2 = 0;
+
+  brandEntries.forEach(([brand, info]) => {
+    const models = Object.entries(info.models).sort((a, b) => b[1] - a[1]);
+    models.forEach(([model, count]) => {
+      const key = brand + '␟' + model;
+      if(!(key in modelIndex)){
+        modelIndex[key] = labels.length;
+        labels.push(model);
+        nodeX.push(0.99);
+        nodeY.push(Math.min(0.98, Math.max(0.02, (cursor2 + count / 2) / totalAll)));
+        nodeColor.push('#e8c39e');
+        cursor2 += count;
+      }
+      sourceArr.push(brandIndex[brand]);
+      targetArr.push(modelIndex[key]);
+      valueArr.push(count);
+    });
+  });
+
+  Plotly.newPlot(el, [{
+    type: 'sankey',
+    orientation: 'h',
+    arrangement: 'fixed',
+    node: {
+      pad: 10,
+      thickness: 14,
+      label: labels,
+      x: nodeX,
+      y: nodeY,
+      color: nodeColor,
+      line: { color: '#fff', width: 0.5 }
+    },
+    link: {
+      source: sourceArr,
+      target: targetArr,
+      value: valueArr,
+      color: 'rgba(201,119,63,0.25)'
+    }
+  }], {
+    margin: { l: 10, r: 10, t: 10, b: 10 },
+    height: Math.max(240, labels.length * 26),
     font: { family: 'Noto Sans TC, PingFang TC, sans-serif', size: 12, color: '#2b241c' },
-    legend: { orientation: 'h', y: -0.15 },
-    xaxis: { title: '詢問次數', gridcolor: '#e8dfd0', zeroline:false },
-    yaxis: { automargin: true }
+    paper_bgcolor: 'rgba(0,0,0,0)'
   }, { displayModeBar:false, responsive:true });
 }
 
@@ -1652,13 +1802,26 @@ async function saveGroup(){
   await loadAll();
 }
 
-async function upsertTag(brand, model){
-  // 先查有沒有一樣的（避免重複建立）
-  const { data: existing } = await sb.from('tags')
-    .select('id').eq('brand', brand).eq('model', model).maybeSingle();
+async function upsertBrand(name){
+  const { data: existing } = await sb.from('brands')
+    .select('id').ilike('name', name).maybeSingle();
   if(existing) return existing.id;
 
-  const { data, error } = await sb.from('tags').insert({ brand, model }).select().single();
+  const { data, error } = await sb.from('brands').insert({ name }).select().single();
+  if(error){ console.error(error); showToast('品牌建立失敗'); return null; }
+  return data.id;
+}
+
+async function upsertTag(brand, model){
+  const brandId = await upsertBrand(brand);
+  if(!brandId) return null;
+
+  // 同品牌底下找有沒有一樣的型號（忽略大小寫，避免重複建立）
+  const { data: existing } = await sb.from('tags')
+    .select('id').eq('brand_id', brandId).ilike('model', model).maybeSingle();
+  if(existing) return existing.id;
+
+  const { data, error } = await sb.from('tags').insert({ brand_id: brandId, model }).select().single();
   if(error){ console.error(error); showToast('標籤建立失敗'); return null; }
   await loadTags();
   return data.id;
@@ -1691,9 +1854,34 @@ async function saveTagEdit(){
   const model = document.getElementById('editTagModel').value.trim();
   if(!brand || !model){ showToast('品牌和型號不可留空'); return; }
 
-  const { error } = await sb.from('tags').update({ brand, model }).eq('id', editingTagId);
-  if(error){ console.error(error); showToast('更新失敗（可能與既有標籤重複）'); return; }
-  showToast('標籤已更新，關聯內容同步更新');
+  const t = allTags.find(x => x.id === editingTagId);
+  if(!t) return;
+
+  // 1. 品牌是全域的：直接改 brands 表本身，所有引用這個品牌的標籤自動一起變。
+  //    如果改完的名稱跟「另一個」已存在的品牌撞名（忽略大小寫），視為同一個品牌，自動合併。
+  let brandId = t.brand_id;
+  const { data: dupBrand } = await sb.from('brands')
+    .select('id').ilike('name', brand).neq('id', t.brand_id).maybeSingle();
+  if(dupBrand){
+    await sb.from('tags').update({ brand_id: dupBrand.id }).eq('brand_id', t.brand_id);
+    await sb.from('brands').delete().eq('id', t.brand_id);
+    brandId = dupBrand.id;
+  } else {
+    await sb.from('brands').update({ name: brand }).eq('id', t.brand_id);
+  }
+
+  // 2. 型號僅限該品牌底下：如果改完的型號跟同品牌下「另一個」型號撞名，合併並轉移關聯貼文
+  const { data: dupModel } = await sb.from('tags')
+    .select('id').eq('brand_id', brandId).ilike('model', model).neq('id', editingTagId).maybeSingle();
+  if(dupModel){
+    await sb.from('posts_group').update({ tag_id: dupModel.id }).eq('tag_id', editingTagId);
+    await sb.from('tags').delete().eq('id', editingTagId);
+  } else {
+    const { error } = await sb.from('tags').update({ model, brand_id: brandId }).eq('id', editingTagId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  }
+
+  showToast('已更新，所有相關內容同步更新');
   closeTagModal();
   await loadAll();
   refreshOpenDetailModals();
