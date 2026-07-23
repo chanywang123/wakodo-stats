@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="15.6" fill="%23fff"/%3E%3Cg fill="none" stroke="%23111" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="16" cy="16" r="14.2" stroke-width="1.1"/%3E%3Ccircle cx="16" cy="16" r="11.9" stroke-width="0.8"/%3E%3Cg stroke-width="0.85"%3E%3Ccircle cx="16" cy="11.0" r="4.4"/%3E%3Ccircle cx="20.8" cy="13.6" r="4.4"/%3E%3Ccircle cx="19.6" cy="19.1" r="4.4"/%3E%3Ccircle cx="12.4" cy="19.1" r="4.4"/%3E%3Ccircle cx="11.2" cy="13.6" r="4.4"/%3E%3C/g%3E%3Ccircle cx="16" cy="15.2" r="2.2" stroke-width="0.7"/%3E%3C/g%3E%3C/svg%3E' />
-  <title>📝 顧客登記 v4.5 (旅程視覺化版)</title>
+  <title>📝 顧客登記 v4.6 (Index 同步版)</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -12,7 +12,7 @@
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
     window.supabase = createClient(
       "https://yxalpzculcyhzvnyvecb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
+      "sb_publishable_NqpdQeAYGWTFBcdjkAQ4eQ_AT2GXf5k"
     );
   </script>
 
@@ -66,7 +66,7 @@
   <div class="max-w-xl wrap-wider mx-auto p-4">
     <div class="theme-primary-bg theme-contrast-text p-4 rounded-xl shadow-md mb-4 flex justify-between items-center sticky top-2 z-40 transition-colors">
       <div class="flex items-center gap-2">
-        <h1 class="font-bold text-lg">📝 顧客登記 v4.5</h1>
+        <h1 class="font-bold text-lg">📝 顧客登記 v4.6</h1>
         <input type="date" id="globalDate" class="text-sm bg-black/10 border-0 rounded px-2 py-1 text-inherit">
       </div>
       <div class="st-selector">
@@ -98,7 +98,7 @@
   </div>
 
   <script>
-    const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "Threads", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "網紅推薦", "廣告看板", "FB、IG 社團", "AI推薦"];
+    const SOURCES = ["Google 搜尋", "Google Map", "Facebook 廣告", "Instagram 廣告", "Threads", "FB、IG 一般文章", "TikTok & YouTube", "Dcard", "Mobile 01", "PTT", "親友介紹", "途經路過", "其他", "網紅推薦", "廣告看板", "FB 社團文", "AI推薦"];
     const PURPOSES = ["驗光配鏡", "單純配鏡不驗光", "眼鏡維修", "購買隱形眼鏡", "調整眼鏡", "單純買框", "問題諮詢", "單純看看", "購買其他商品", "住戶視力檢查"];
     const AGES = ["18歲以下", "18-24", "25-34", "35-44", "45-54", "55歲以上"];
     const DESC_P = "客人「眼鏡壞掉」或「度數不足」是「需求」\n但什麼「原因」讓他會選擇來和光堂\n是看了廣告？還是本來就是老客習慣來和光堂？或者覺得裝潢...等等 ";
@@ -229,13 +229,21 @@
 
         if(hasError) { alert("如果客人有消費，金額不應該是0元"); return; }
 
-        if(!iN) { if(a > 0) sc.unshift('老客回購'); else sc.unshift('老客-未購'); }
-        fD.push({ p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag, p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'), p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw, p_detail: det, p_is_new_customer: iN, p_amount: hasP ? a : 0, p_ad_source_detail: "" });
+        if(!iN) {
+          const oldCustomerFlag = a > 0 ? '老客回購' : '老客-未購';
+          const cleanSources = sc.filter(source => source !== '老客回購' && source !== '老客-未購');
+          cleanSources.push(oldCustomerFlag);
+          sc.splice(0, sc.length, ...cleanSources);
+        }
+        fD.push({ p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag, p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'), p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw, p_detail: det, p_is_new_customer: iN, p_amount: hasP ? a : 0, p_ad_source_detail: kw });
       }
       
       btn.disabled = true; btn.innerText = "傳送中...";
       try {
-        for(let d of fD) await supabase.rpc('submit_visit_v8', d);
+        for(let d of fD) {
+          const { error } = await supabase.rpc('submit_visit_v9', d);
+          if(error) throw error;
+        }
         document.getElementById('successModal').classList.remove('hidden');
         btn.disabled = false; btn.innerText = "確認並送出";
       } catch(e) { alert(e.message); btn.disabled = false; btn.innerText = "確認並送出"; }
