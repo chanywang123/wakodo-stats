@@ -1830,9 +1830,15 @@ async function upsertTag(brand, model){
 async function deleteGroup(){
   if(!currentGroupId) return;
   if(!confirm('確定刪除這筆內容項目？相關的平台貼文與詢問記錄都會一併刪除。')) return;
+  const group = allGroups.find(g => g.id === currentGroupId);
+  const screenshotUrls = (group?.platform_posts || [])
+    .flatMap(pp => pp.inquiries || [])
+    .map(iq => iq.screenshot_url)
+    .filter(Boolean);
   const { error } = await sb.from('posts_group').delete().eq('id', currentGroupId);
   if(error){ console.error(error); showToast('刪除失敗'); return; }
-  showToast('已刪除');
+  const storageCleaned = await removeStorageUrls(screenshotUrls, 'post-screenshots');
+  showToast(storageCleaned ? '已刪除' : '資料已刪除，但部分截圖清理失敗');
   closeGroupModal();
   await loadAll();
 }
@@ -1934,6 +1940,8 @@ async function saveInquiry(){
   const inquiry_type = document.getElementById('inquiryType').value;
   const note = document.getElementById('inquiryNote').value.trim();
 
+  const oldScreenshotUrl = existingShotUrl;
+  let uploadedNewUrl = null;
   let screenshot_url = existingShotUrl; // 預設維持原本截圖
   if(currentShotRemoved){
     screenshot_url = null;
@@ -1941,23 +1949,35 @@ async function saveInquiry(){
     document.getElementById('shotStatus').textContent = '上傳中...';
     const uploadedUrl = await uploadShotToStorage(currentShotBlob);
     if(!uploadedUrl){ document.getElementById('shotStatus').textContent = ''; return; }
+    uploadedNewUrl = uploadedUrl;
     screenshot_url = uploadedUrl;
   }
 
   const payload = { inquiry_date, inquiry_type, note, screenshot_url };
+  let saveError = null;
 
   if(currentInquiryId){
     const { error } = await sb.from('inquiries').update(payload).eq('id', currentInquiryId);
-    if(error){ console.error(error); showToast('更新失敗'); return; }
+    saveError = error;
   } else {
     const insertPayload = currentInquiryParentType === 'story'
       ? { story_entry_id: currentPlatformPostId, ...payload }
       : { platform_post_id: currentPlatformPostId, ...payload };
     const { error } = await sb.from('inquiries').insert(insertPayload);
-    if(error){ console.error(error); showToast('新增失敗'); return; }
+    saveError = error;
   }
 
-  showToast('已儲存');
+  if(saveError){
+    console.error(saveError);
+    if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'post-screenshots');
+    showToast(currentInquiryId ? '更新失敗' : '新增失敗');
+    return;
+  }
+
+  const oldFileCleaned = oldScreenshotUrl && oldScreenshotUrl !== screenshot_url
+    ? await removeStorageUrls([oldScreenshotUrl], 'post-screenshots')
+    : true;
+  showToast(oldFileCleaned ? '已儲存' : '資料已儲存，但舊截圖清理失敗');
   closeInquiryModal();
   await loadAll();
   refreshOpenDetailModals();
@@ -1994,6 +2014,33 @@ async function uploadShotToStorage(blob, bucket){
   if(error){ console.error(error); showToast('圖片上傳失敗'); return null; }
   const { data } = sb.storage.from(bucket).getPublicUrl(filename);
   return data.publicUrl;
+}
+
+function storagePathFromPublicUrl(url, bucket){
+  if(!url) return null;
+  try{
+    const pathname = new URL(url).pathname;
+    const marker = `/storage/v1/object/public/${bucket}/`;
+    const markerIndex = pathname.indexOf(marker);
+    if(markerIndex < 0) return null;
+    return decodeURIComponent(pathname.slice(markerIndex + marker.length));
+  } catch(error){
+    console.error('無法解析 Storage 網址', error);
+    return null;
+  }
+}
+
+async function removeStorageUrls(urls, bucket){
+  const paths = [...new Set((urls || [])
+    .map(url => storagePathFromPublicUrl(url, bucket))
+    .filter(Boolean))];
+  if(paths.length === 0) return true;
+  const { error } = await sb.storage.from(bucket).remove(paths);
+  if(error){
+    console.error(`清理 ${bucket} 舊檔失敗`, error);
+    return false;
+  }
+  return true;
 }
 
 async function handleShotFile(file){
@@ -2114,9 +2161,11 @@ setupShotZone();
 async function deleteInquiry(){
   if(!currentInquiryId) return;
   if(!confirm('確定刪除這筆詢問記錄？')) return;
+  const inquiry = allInquiriesById[currentInquiryId];
   const { error } = await sb.from('inquiries').delete().eq('id', currentInquiryId);
   if(error){ console.error(error); showToast('刪除失敗'); return; }
-  showToast('已刪除');
+  const storageCleaned = await removeStorageUrls([inquiry?.screenshot_url], 'post-screenshots');
+  showToast(storageCleaned ? '已刪除' : '資料已刪除，但截圖清理失敗');
   closeInquiryModal();
   await loadAll();
   refreshOpenDetailModals();
@@ -2298,27 +2347,41 @@ async function saveStoryEntry(){
     if(!highlight_id) return;
   }
 
+  const oldImageUrl = existingStoryImageUrl;
+  let uploadedNewUrl = null;
   let image_url = existingStoryImageUrl;
   if(currentStoryImageChanged && currentStoryImageBlob){
     document.getElementById('storyShotStatus').textContent = '上傳中...';
     const uploaded = await uploadShotToStorage(currentStoryImageBlob, 'story-images');
     if(!uploaded){ document.getElementById('storyShotStatus').textContent = ''; return; }
+    uploadedNewUrl = uploaded;
     image_url = uploaded;
   }
   if(!image_url){ showToast('請上傳限時動態截圖'); return; }
 
   const note = document.getElementById('storyNote').value.trim();
   const payload = { category, highlight_id, brand_model_text, image_url, note };
+  let saveError = null;
 
   if(currentStoryEntryId){
     const { error } = await sb.from('story_entries').update(payload).eq('id', currentStoryEntryId);
-    if(error){ console.error(error); showToast('更新失敗'); return; }
+    saveError = error;
   } else {
     const { error } = await sb.from('story_entries').insert(payload);
-    if(error){ console.error(error); showToast('新增失敗'); return; }
+    saveError = error;
   }
 
-  showToast('已儲存');
+  if(saveError){
+    console.error(saveError);
+    if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+    showToast(currentStoryEntryId ? '更新失敗' : '新增失敗');
+    return;
+  }
+
+  const oldFileCleaned = oldImageUrl && oldImageUrl !== image_url
+    ? await removeStorageUrls([oldImageUrl], 'story-images')
+    : true;
+  showToast(oldFileCleaned ? '已儲存' : '資料已儲存，但舊圖片清理失敗');
   closeStoryModal();
   await loadStories();
 }
@@ -2326,9 +2389,17 @@ async function saveStoryEntry(){
 async function deleteStoryEntry(){
   if(!currentStoryEntryId) return;
   if(!confirm('確定刪除這筆限時動態記錄？相關的詢問記錄也會一併刪除。')) return;
+  const storyEntry = allStoryEntries.find(se => se.id === currentStoryEntryId);
+  const inquiryScreenshotUrls = (storyEntry?.inquiries || [])
+    .map(iq => iq.screenshot_url)
+    .filter(Boolean);
   const { error } = await sb.from('story_entries').delete().eq('id', currentStoryEntryId);
   if(error){ console.error(error); showToast('刪除失敗'); return; }
-  showToast('已刪除');
+  const [storyImageCleaned, inquiryImagesCleaned] = await Promise.all([
+    removeStorageUrls([storyEntry?.image_url], 'story-images'),
+    removeStorageUrls(inquiryScreenshotUrls, 'post-screenshots')
+  ]);
+  showToast(storyImageCleaned && inquiryImagesCleaned ? '已刪除' : '資料已刪除，但部分圖片清理失敗');
   closeStoryModal();
   await loadStories();
 }
