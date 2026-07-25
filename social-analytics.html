@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>發文成效分析 | 和光堂</title>
+<title>發文成效分析 | 和光堂 Glass v3</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23faf6ef'/%3E%3Cg%20fill='none'%20stroke='%23c9773f'%20stroke-width='3.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='20'%20cy='36'%20r='11'/%3E%3Ccircle%20cx='44'%20cy='36'%20r='11'/%3E%3Cpath%20d='M31%2034%20Q32%2029%2033%2034'/%3E%3Cpath%20d='M9%2033%20Q6%2030%209%2026'/%3E%3Cpath%20d='M55%2033%20Q58%2030%2055%2026'/%3E%3C/g%3E%3C/svg%3E" />
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
@@ -728,34 +728,922 @@
     opacity:1;
     transform:translateX(-50%) translateY(0);
   }
+
+
+  /* =========================================================
+     2026 Glass Dashboard Redesign
+     ========================================================= */
+  :root{
+    --bg:#f1f3f5;
+    --card:rgba(255,255,255,0.68);
+    --glass:rgba(255,255,255,0.58);
+    --glass-strong:rgba(255,255,255,0.78);
+    --ink:#292724;
+    --ink-soft:#77716a;
+    --line:rgba(255,255,255,0.82);
+    --line-soft:rgba(103,91,78,0.10);
+    --accent:#a9784e;
+    --accent-deep:#765238;
+    --accent-soft:rgba(169,120,78,0.13);
+    --accent-glow:rgba(195,151,108,0.24);
+    --ig:#c45b7f;
+    --fb:#647fac;
+    --radius:22px;
+    --shadow:0 18px 50px rgba(65,57,49,0.09), inset 0 1px 0 rgba(255,255,255,0.82);
+  }
+  html{ background:#eef1f3; }
+  body{
+    position:relative;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,255,255,.96) 0, rgba(255,255,255,0) 32%),
+      radial-gradient(circle at 88% 8%, rgba(222,230,236,.78) 0, rgba(222,230,236,0) 30%),
+      radial-gradient(circle at 55% 45%, rgba(238,226,213,.46) 0, rgba(238,226,213,0) 38%),
+      linear-gradient(145deg,#f6f7f8 0%,#eef1f3 48%,#f5f2ee 100%);
+    color:var(--ink);
+    padding:34px 28px 90px;
+  }
+  body::before,
+  body::after{
+    content:"";
+    position:fixed;
+    border-radius:50%;
+    filter:blur(2px);
+    pointer-events:none;
+    z-index:-1;
+  }
+  body::before{
+    width:340px;height:340px;left:-120px;top:180px;
+    background:radial-gradient(circle,rgba(255,255,255,.84),rgba(255,255,255,0) 68%);
+  }
+  body::after{
+    width:420px;height:420px;right:-160px;bottom:60px;
+    background:radial-gradient(circle,rgba(206,190,173,.22),rgba(206,190,173,0) 68%);
+  }
+  h1{
+    font-size:27px;
+    letter-spacing:-.03em;
+    font-weight:760;
+    margin-bottom:5px;
+  }
+  .sub{ color:var(--ink-soft); margin-bottom:30px; }
+
+  .glass-panel,
+  .stat-card,
+  .filter-bar,
+  .group-tile,
+  .story-tile,
+  .modal{
+    background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.48));
+    border:1px solid rgba(255,255,255,.88);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(24px) saturate(135%);
+    -webkit-backdrop-filter:blur(24px) saturate(135%);
+  }
+
+  .stats-wrap{ margin-bottom:22px; }
+  .stats-heading{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:14px;
+  }
+  .section-kicker,.panel-kicker{
+    color:var(--accent);
+    font-size:10px;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+  .dashboard-title{
+    font-size:18px;
+    letter-spacing:-.02em;
+    margin:7px 0 0;
+  }
+  .scope-pill{
+    color:var(--ink-soft);
+    background:rgba(255,255,255,.46);
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:999px;
+    padding:8px 13px;
+    font-size:11px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 8px 24px rgba(54,48,42,.05);
+  }
+  .stat-cards{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .stat-card{
+    position:relative;
+    min-width:0;
+    overflow:hidden;
+    border-radius:20px;
+    padding:17px 18px 16px;
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  }
+  .stat-card::after{
+    content:"";
+    position:absolute;
+    width:110px;height:110px;
+    top:-64px;right:-46px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.85),rgba(255,255,255,0) 70%);
+  }
+  .stat-card:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,255,255,1);
+    box-shadow:0 23px 58px rgba(65,57,49,.12),inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  .stat-card-primary{
+    background:linear-gradient(145deg,rgba(255,253,250,.92),rgba(239,225,211,.54));
+  }
+  .stat-icon{
+    position:absolute;
+    right:16px;top:15px;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:11px;
+    color:var(--accent-deep);
+    background:rgba(255,255,255,.52);
+    border:1px solid rgba(255,255,255,.88);
+    font-size:15px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .stat-num{
+    color:var(--accent-deep);
+    font-size:30px;
+    line-height:1.08;
+    letter-spacing:-.04em;
+    margin:0 0 7px;
+    font-weight:780;
+  }
+  .stat-label{ font-size:12px; color:var(--ink); font-weight:700; }
+  .stat-caption{ font-size:10px; color:var(--ink-soft); margin-top:5px; }
+  .format-card .stat-label{ margin:2px 42px 13px 0; display:block; }
+  .format-breakdown{ display:flex; flex-direction:column; gap:7px; }
+  .format-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11px; color:var(--ink-soft); }
+  .format-row span{ display:flex;align-items:center;gap:7px; }
+  .format-row strong{ color:var(--ink);font-size:12px; }
+  .format-dot{ width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.42); }
+  .format-dot.graphic{ background:#a9784e; }
+  .format-dot.video{ background:#7f91a8; }
+  .format-dot.story{ background:#a8899b; }
+
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.72fr) minmax(310px,.78fr);
+    gap:14px;
+    align-items:stretch;
+  }
+  .glass-panel{ border-radius:22px; overflow:hidden; }
+  .sankey-panel{ padding:18px 18px 12px; min-height:430px; }
+  .insight-stack{ display:grid; grid-template-rows:1fr 1fr; gap:14px; min-width:0; }
+  .insight-panel{ padding:17px 17px 13px; min-height:0; }
+  .panel-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding:1px 2px 13px;
+    border-bottom:1px solid rgba(103,91,78,.08);
+  }
+  .panel-head.compact{ padding-bottom:11px; }
+  .panel-head h3{ font-size:14px; margin:6px 0 0; letter-spacing:-.01em; }
+  .panel-note{ color:var(--ink-soft); font-size:10px; white-space:nowrap; padding-top:4px; }
+  .rank-chart{
+    min-height:330px;
+    padding:4px 0 0;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .insight-list{ display:flex; flex-direction:column; gap:3px; padding-top:8px; }
+  .insight-item{
+    display:grid;
+    grid-template-columns:30px minmax(0,1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 8px;
+    border-radius:13px;
+    cursor:pointer;
+    transition:background .14s ease,transform .14s ease;
+  }
+  .insight-item:hover{ background:rgba(255,255,255,.52); transform:translateX(2px); }
+  .insight-rank{
+    width:27px;height:27px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(169,120,78,.10);
+    color:var(--accent-deep);
+    font-size:11px;font-weight:800;
+  }
+  .insight-main{ min-width:0; }
+  .insight-title{ font-size:11px; font-weight:750; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .insight-sub{ font-size:9.5px; color:var(--ink-soft); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .insight-value{ font-size:11px; font-weight:800; color:var(--accent-deep); white-space:nowrap; }
+  .insight-type{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:27px;height:27px;border-radius:10px;
+    background:rgba(127,145,168,.10);color:#657489;
+    font-size:9px;font-weight:800;
+  }
+  .insight-empty{ color:var(--ink-soft); font-size:11px; text-align:center; padding:28px 8px; }
+
+  .filter-bar{
+    position:relative;
+    gap:8px;
+    padding:11px 12px;
+    border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,255,255,.68),rgba(255,255,255,.42));
+    box-shadow:0 14px 42px rgba(65,57,49,.07),inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .filter-bar::before{
+    content:"";position:absolute;left:14px;right:14px;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.96),transparent);
+  }
+  .filter-bar select,
+  .filter-bar input[type=text],
+  .filter-bar input[type=date]{
+    appearance:none;
+    border:1px solid rgba(255,255,255,.88);
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.38));
+    color:var(--ink);
+    padding:9px 12px;
+    min-height:38px;
+    outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.84),0 7px 18px rgba(65,57,49,.04);
+    transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+  }
+  .filter-bar select{ padding-right:28px; background-image:linear-gradient(45deg,transparent 50%,#8b8178 50%),linear-gradient(135deg,#8b8178 50%,transparent 50%),linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.38)); background-position:calc(100% - 15px) 16px,calc(100% - 11px) 16px,0 0;background-size:4px 4px,4px 4px,100% 100%;background-repeat:no-repeat; }
+  .filter-bar select:focus,
+  .filter-bar input:focus{
+    border-color:rgba(169,120,78,.36);
+    box-shadow:0 0 0 4px rgba(169,120,78,.08),inset 0 1px 0 rgba(255,255,255,.94);
+    transform:translateY(-1px);
+  }
+  .filter-check{
+    padding:8px 10px;
+    min-height:38px;
+    border-radius:13px;
+    background:rgba(255,255,255,.36);
+    border:1px solid rgba(255,255,255,.72);
+  }
+  .filter-check input{ accent-color:var(--accent); }
+
+  .btn{
+    border-radius:13px;
+    transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(145deg,#b0835d,#8f6545);
+    color:#fff;
+    box-shadow:0 10px 22px rgba(122,82,56,.22),inset 0 1px 0 rgba(255,255,255,.28);
+  }
+  .btn-primary:hover{ filter:brightness(1.04); box-shadow:0 14px 28px rgba(122,82,56,.28),inset 0 1px 0 rgba(255,255,255,.3); }
+  .btn-ghost{
+    background:linear-gradient(145deg,rgba(255,255,255,.62),rgba(255,255,255,.30));
+    border:1px solid rgba(255,255,255,.82);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 7px 18px rgba(65,57,49,.04);
+  }
+
+  .group-tile,.story-tile{ border-radius:18px; border-color:rgba(255,255,255,.86); }
+  .group-tile:hover,.story-tile:hover{ box-shadow:0 19px 46px rgba(65,57,49,.13),inset 0 1px 0 rgba(255,255,255,.9); }
+  .tag-pill{ background:rgba(169,120,78,.10); color:var(--accent-deep); }
+  .type-pill{ border-color:rgba(103,91,78,.12); background:rgba(255,255,255,.3); }
+  .section-divider{ border-top-color:rgba(103,91,78,.10); }
+  .modal-overlay{ background:rgba(42,39,35,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .modal{ border-radius:24px; }
+
+  @media (max-width:1120px){
+    .stat-cards{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .dashboard-grid{ grid-template-columns:1fr; }
+    .insight-stack{ grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+  }
+  @media (max-width:720px){
+    body{ padding:24px 14px 72px; }
+    .stats-heading{ align-items:flex-start; flex-direction:column; gap:10px; }
+    .scope-pill{ align-self:flex-start; }
+    .stat-cards{ grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-card{ padding:16px 15px; }
+    .stat-num{ font-size:26px; }
+    .insight-stack{ grid-template-columns:1fr; }
+    .sankey-panel{ padding:15px 12px 8px; }
+    .filter-bar{ border-radius:18px; }
+    .filter-bar select,.filter-bar input[type=text],.filter-bar input[type=date]{ flex:1 1 145px; min-width:0; }
+  }
+  @media (max-width:430px){
+    .stat-cards{ grid-template-columns:1fr; }
+    .panel-note{ display:none; }
+  }
+
+
+/* ===== Atmospheric glass background + motion ===== */
+html{ background:#edf2f4 !important; }
+body{
+  position:relative;
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse at 82% 12%,rgba(199,219,231,.34) 0%,rgba(199,219,231,0) 36%),
+    radial-gradient(ellipse at 18% 82%,rgba(232,211,191,.32) 0%,rgba(232,211,191,0) 39%),
+    linear-gradient(180deg,rgba(255,255,255,.64),rgba(255,255,255,.08) 22%,rgba(255,255,255,0) 38%),
+    linear-gradient(145deg,#f8fbfc 0%,#edf3f5 40%,#f7eee7 75%,#f2f7f8 100%) !important;
+}
+.ambient-stage{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+.ambient-stage::before,
+.ambient-stage::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+}
+.ambient-stage::before{
+  width:74vw;
+  height:30vw;
+  min-height:260px;
+  left:16vw;
+  top:8vh;
+  border:1px solid rgba(255,255,255,.38);
+  border-radius:50%;
+  background:linear-gradient(155deg,rgba(255,255,255,.20),rgba(190,214,227,.12) 52%,rgba(239,220,202,.14));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.46),0 28px 80px rgba(97,111,119,.09);
+  filter:blur(9px);
+  opacity:.62;
+  transform:rotate(-12deg);
+  animation:refractiveArc 32s ease-in-out infinite alternate;
+}
+.ambient-stage::after{
+  width:52vw;
+  height:52vw;
+  min-width:520px;
+  min-height:520px;
+  right:-18vw;
+  top:34vh;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.30);
+  background:radial-gradient(circle at 34% 32%,rgba(255,255,255,.28),rgba(208,225,234,.10) 38%,rgba(235,216,200,.10) 58%,rgba(255,255,255,0) 73%);
+  filter:blur(8px);
+  opacity:.68;
+  animation:refractiveDisc 38s ease-in-out infinite alternate;
+}
+body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(script){
+  position:relative;
+  z-index:1;
+  width:min(100%,1540px);
+  margin-left:auto;
+  margin-right:auto;
+}
+.ambient-mineral,.ambient-pearl,.ambient-shadow,.ambient-ribbon,.ambient-orb,.ambient-grain{
+  position:absolute;
+  inset:0;
+}
+.ambient-mineral{
+  opacity:.68;
+  background:
+    radial-gradient(circle at 18% 22%,rgba(255,255,255,.86) 0 1px,transparent 1.45px) 0 0/18px 18px,
+    radial-gradient(circle at 72% 64%,rgba(190,210,220,.52) 0 1px,transparent 1.45px) 0 0/23px 23px,
+    radial-gradient(circle at 34% 78%,rgba(218,194,174,.43) 0 1px,transparent 1.55px) 0 0/27px 27px;
+  mix-blend-mode:multiply;
+  filter:blur(.25px);
+}
+.ambient-pearl{
+  inset:-12%;
+  background:
+    radial-gradient(ellipse at 17% 13%,rgba(255,255,255,.96) 0%,rgba(255,255,255,0) 34%),
+    radial-gradient(ellipse at 80% 12%,rgba(204,222,232,.58) 0%,rgba(204,222,232,0) 32%),
+    radial-gradient(ellipse at 65% 72%,rgba(235,220,207,.46) 0%,rgba(235,220,207,0) 36%),
+    radial-gradient(ellipse at 27% 84%,rgba(220,215,233,.27) 0%,rgba(220,215,233,0) 29%);
+  opacity:1;
+  filter:blur(13px);
+  animation:pearlShift 30s ease-in-out infinite alternate;
+}
+.ambient-shadow{
+  inset:-7% -3%;
+  background:
+    linear-gradient(112deg,rgba(91,112,127,.16) 9%,transparent 10%,transparent 15.8%,rgba(91,112,127,.095) 17%,transparent 18%,transparent 25%),
+    linear-gradient(112deg,rgba(106,126,140,.13) 28%,transparent 29.2%,transparent 35.7%,rgba(106,126,140,.075) 37%,transparent 38.2%,transparent 46%),
+    linear-gradient(112deg,rgba(97,117,132,.10) 53%,transparent 54%,transparent 60%,rgba(97,117,132,.060) 61.3%,transparent 62.5%,transparent 70%);
+  opacity:.72;
+  filter:blur(2px);
+  mix-blend-mode:multiply;
+  transform-origin:left center;
+  animation:shadowDrift 38s ease-in-out infinite alternate;
+}
+.ambient-ribbon{
+  inset:auto;
+  width:58vw;
+  height:58vw;
+  left:-12vw;
+  top:34vh;
+  border-radius:45% 55% 53% 47% / 47% 49% 51% 53%;
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 46%,rgba(211,226,235,.14) 70%,rgba(255,255,255,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 0 0 1px rgba(255,255,255,.08);
+  filter:blur(9px);
+  opacity:.62;
+  transform:rotate(-12deg);
+  animation:ribbonFloat 34s ease-in-out infinite alternate;
+}
+.ambient-orb{ border-radius:50%; filter:blur(2px); mix-blend-mode:normal; opacity:.76; }
+.ambient-orb.orb-a{
+  width:26vw;height:26vw;min-width:260px;min-height:260px;left:-7vw;top:15vh;
+  background:radial-gradient(circle,rgba(255,255,255,.96) 0%,rgba(199,220,231,.34) 31%,rgba(255,255,255,0) 70%);
+  animation:orbFloatA 24s ease-in-out infinite alternate;
+}
+.ambient-orb.orb-b{
+  width:28vw;height:28vw;min-width:280px;min-height:280px;right:-8vw;bottom:5vh;
+  background:radial-gradient(circle,rgba(237,218,199,.54) 0%,rgba(227,198,173,.22) 36%,rgba(236,222,208,0) 72%);
+  animation:orbFloatB 31s ease-in-out infinite alternate;
+}
+.ambient-grain{
+  opacity:.20;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  mix-blend-mode:multiply;
+}
+@keyframes pearlShift{0%{transform:translate3d(-1.5%,-1%,0) scale(1)}50%{transform:translate3d(2.4%,1.4%,0) scale(1.05)}100%{transform:translate3d(-.6%,3%,0) scale(1.02)}}
+@keyframes shadowDrift{0%{transform:translate3d(-1.5%,0,0) rotate(0);opacity:.40}100%{transform:translate3d(2%,1.2%,0) rotate(1.4deg);opacity:.54}}
+@keyframes ribbonFloat{0%{transform:translate3d(0,0,0) rotate(-12deg) scale(1)}100%{transform:translate3d(8vw,-4vh,0) rotate(-5deg) scale(1.06)}}
+@keyframes orbFloatA{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(4vw,-2vh,0) scale(1.08)}}
+@keyframes orbFloatB{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-3vw,1.5vh,0) scale(1.06)}}
+@keyframes refractiveArc{0%{transform:translate3d(-2vw,0,0) rotate(-12deg) scale(1)}100%{transform:translate3d(4vw,3vh,0) rotate(-7deg) scale(1.05)}}
+@keyframes refractiveDisc{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-4vw,-3vh,0) scale(1.08)}}
+
+/* Real translucent glass rather than opaque white cards */
+.glass-panel,.stat-card,.filter-bar,.group-tile,.story-tile,.modal{
+  background:linear-gradient(145deg,rgba(255,255,255,.54),rgba(255,255,255,.24)) !important;
+  border:1px solid rgba(255,255,255,.80) !important;
+  box-shadow:0 18px 48px rgba(65,57,49,.08),inset 0 1px 0 rgba(255,255,255,.84),inset 0 -8px 16px rgba(255,255,255,.07) !important;
+  backdrop-filter:blur(25px) saturate(158%) !important;
+  -webkit-backdrop-filter:blur(25px) saturate(158%) !important;
+}
+.stat-card-primary{ background:linear-gradient(145deg,rgba(255,252,248,.79),rgba(239,227,214,.43)) !important; }
+.filter-bar{ background:linear-gradient(135deg,rgba(255,255,255,.53),rgba(255,255,255,.27)) !important; overflow:visible !important; }
+
+/* ===== Animated modal / lightbox transitions ===== */
+.modal-overlay{
+  display:flex !important;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .20s ease,visibility 0s linear .24s;
+}
+.modal-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transition-delay:0s;
+}
+.modal-overlay .modal{
+  opacity:0;
+  transform:translateY(16px) scale(.965);
+  filter:blur(7px);
+  transition:opacity .20s ease,transform .27s cubic-bezier(.2,.8,.2,1),filter .20s ease;
+}
+.modal-overlay.open .modal{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  filter:blur(0);
+}
+.lightbox-overlay{
+  display:flex !important;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .20s ease,visibility 0s linear .24s;
+}
+.lightbox-overlay.open{ opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s; }
+.lightbox-overlay img{
+  opacity:0;
+  transform:scale(.94) translateY(10px);
+  transition:opacity .20s ease,transform .27s cubic-bezier(.2,.8,.2,1);
+}
+.lightbox-overlay.open img{ opacity:1;transform:scale(1) translateY(0); }
+
+/* ===== Fully custom liquid-glass select controls ===== */
+.glass-select-native{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  overflow:hidden !important;
+  clip-path:inset(50%) !important;
+}
+.glass-select-shell{
+  position:relative;
+  display:inline-flex;
+  min-width:116px;
+  max-width:240px;
+  vertical-align:middle;
+  flex:0 1 auto;
+}
+.glass-select-shell.glass-select-fluid{ width:100% !important;max-width:none;display:flex; }
+.glass-select-trigger{
+  width:100%;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:13px;
+  color:var(--ink);
+  font:inherit;
+  font-size:13px;
+  line-height:1.2;
+  text-align:left;
+  cursor:pointer;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.64),rgba(255,255,255,.28));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 9px 22px rgba(65,57,49,.05);
+  backdrop-filter:blur(22px) saturate(155%);
+  -webkit-backdrop-filter:blur(22px) saturate(155%);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.glass-select-trigger:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.98);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1),0 12px 28px rgba(65,57,49,.075);
+}
+.glass-select-trigger[aria-expanded="true"]{
+  border-color:rgba(186,145,104,.48);
+  background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(244,235,226,.40));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.98),0 0 0 4px rgba(192,150,107,.10),0 14px 34px rgba(65,57,49,.09);
+}
+.glass-select-label{ min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.glass-select-chevron{
+  width:8px;height:8px;flex:0 0 auto;
+  border-right:1.7px solid #857b72;
+  border-bottom:1.7px solid #857b72;
+  transform:rotate(45deg) translateY(-2px);
+  transition:transform .18s ease;
+}
+.glass-select-trigger[aria-expanded="true"] .glass-select-chevron{ transform:rotate(225deg) translate(-1px,-1px); }
+.glass-select-menu{
+  position:fixed;
+  z-index:10000;
+  max-height:min(360px,calc(100vh - 28px));
+  overflow:auto;
+  padding:7px;
+  border:1px solid rgba(255,255,255,.84);
+  border-radius:17px;
+  background:
+    linear-gradient(145deg,rgba(248,251,252,.78),rgba(244,239,234,.61));
+  box-shadow:0 24px 65px rgba(49,46,43,.18),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -12px 28px rgba(255,255,255,.12);
+  backdrop-filter:blur(30px) saturate(165%);
+  -webkit-backdrop-filter:blur(30px) saturate(165%);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s ease,transform .21s cubic-bezier(.2,.8,.2,1);
+}
+.glass-select-menu[data-side="bottom"]{
+  transform:translateY(-8px) scale(.975);
+  transform-origin:top center;
+}
+.glass-select-menu[data-side="top"]{
+  transform:translateY(8px) scale(.975);
+  transform-origin:bottom center;
+}
+.glass-select-menu.open{ opacity:1;transform:translateY(0) scale(1);pointer-events:auto; }
+.glass-select-option{
+  width:100%;
+  display:flex;
+  align-items:center;
+  min-height:38px;
+  padding:8px 11px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:var(--ink);
+  font:inherit;
+  font-size:13px;
+  text-align:left;
+  cursor:pointer;
+  transition:background .13s ease,transform .13s ease,color .13s ease;
+}
+.glass-select-option:hover,.glass-select-option:focus-visible{
+  outline:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(224,234,239,.36));
+  transform:translateX(2px);
+}
+.glass-select-option.is-selected{
+  color:var(--accent-deep);
+  font-weight:750;
+  background:linear-gradient(135deg,rgba(246,234,222,.76),rgba(255,255,255,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+}
+.glass-select-option:disabled{ opacity:.42;cursor:not-allowed; }
+.glass-select-menu::-webkit-scrollbar{ width:10px; }
+.glass-select-menu::-webkit-scrollbar-track{ background:transparent; }
+.glass-select-menu::-webkit-scrollbar-thumb{ background:rgba(113,112,110,.38);border:3px solid transparent;border-radius:999px;background-clip:padding-box; }
+
+@media (max-width:768px){
+  .glass-select-shell{ min-width:0;max-width:none;flex:1 1 145px; }
+  .glass-select-trigger{ min-height:42px; }
+}
+@media (prefers-reduced-motion:reduce){
+  .ambient-stage::before,.ambient-stage::after,.ambient-pearl,.ambient-shadow,.ambient-ribbon,.ambient-orb{ animation:none !important; }
+  .modal-overlay,.modal-overlay .modal,.lightbox-overlay,.lightbox-overlay img,.glass-select-menu,.glass-select-trigger{ transition:none !important; }
+}
+
+
+/* ===== V4：品牌配置容量條 + 限動詢問智慧預覽 ===== */
+.stat-cards{
+  grid-template-columns:minmax(170px,.72fr) minmax(420px,1.85fr) minmax(180px,.78fr) minmax(215px,1fr) !important;
+}
+.brand-mix-card{
+  padding-bottom:14px !important;
+}
+.brand-mix-card .stat-label{
+  margin-right:42px;
+}
+.brand-share-summary{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  color:var(--ink-soft);
+  font-size:10.5px;
+  white-space:nowrap;
+}
+.brand-share-summary strong{
+  color:var(--ink);
+  font-size:12px;
+}
+.brand-share-bar{
+  display:flex;
+  width:100%;
+  height:18px;
+  margin-top:13px;
+  overflow:hidden;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.88);
+  background:rgba(115,107,98,.08);
+  box-shadow:inset 0 2px 5px rgba(69,62,55,.12),0 1px 0 rgba(255,255,255,.88);
+}
+.brand-share-segment{
+  position:relative;
+  height:100%;
+  min-width:2px;
+  transition:filter .18s ease,transform .18s ease;
+  box-shadow:inset -1px 0 rgba(255,255,255,.5),inset 0 1px rgba(255,255,255,.28);
+}
+.brand-share-segment:hover{
+  filter:brightness(1.09) saturate(1.08);
+  transform:scaleY(1.08);
+  z-index:2;
+}
+.brand-share-empty-bar{
+  width:100%;
+  background:linear-gradient(90deg,rgba(135,145,152,.08),rgba(255,255,255,.36),rgba(135,145,152,.08));
+}
+.brand-share-legend{
+  display:flex;
+  gap:5px 10px;
+  margin-top:9px;
+  overflow-x:auto;
+  padding:1px 1px 4px;
+  scrollbar-width:thin;
+}
+.brand-share-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  flex:0 0 auto;
+  color:var(--ink-soft);
+  font-size:9.5px;
+  white-space:nowrap;
+}
+.brand-share-item i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  box-shadow:0 0 0 3px rgba(255,255,255,.38);
+}
+.brand-share-item strong{
+  color:var(--ink);
+  font-size:9.5px;
+}
+.brand-share-empty{
+  color:var(--ink-soft);
+  font-size:10px;
+}
+.brand-share-caption{
+  margin-top:3px;
+  opacity:.82;
+}
+
+.inquiry-thumb-hover{
+  display:none !important;
+}
+.inquiry-thumb-wrap{
+  outline:none;
+}
+.inquiry-thumb-wrap:focus .inquiry-thumb,
+.inquiry-thumb-wrap:hover .inquiry-thumb{
+  border-color:rgba(169,120,78,.52);
+  box-shadow:0 0 0 3px rgba(169,120,78,.10);
+}
+.inquiry-floating-preview{
+  position:fixed;
+  z-index:280;
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.92);
+  background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(239,243,245,.56));
+  box-shadow:0 22px 60px rgba(38,35,31,.28),inset 0 1px 0 rgba(255,255,255,.95);
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  transform:translateY(5px) scale(.97);
+  transition:opacity .15s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s linear .18s;
+}
+.inquiry-floating-preview.opens-above{
+  transform:translateY(-5px) scale(.97);
+}
+.inquiry-floating-preview.open{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0) scale(1);
+  transition-delay:0s;
+}
+.inquiry-floating-preview img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  background:rgba(255,255,255,.68);
+}
+.story-detail-modal{
+  width:min(760px,calc(100vw - 32px)) !important;
+  max-width:760px !important;
+}
+.story-detail-layout{
+  display:grid;
+  grid-template-columns:minmax(190px,245px) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+.story-detail-image-wrap{
+  position:sticky;
+  top:0;
+  min-width:0;
+}
+#storyDetailImage{
+  width:100%;
+  max-width:245px;
+  max-height:min(66vh,720px);
+  display:block;
+  object-fit:contain;
+  border-radius:14px;
+  cursor:pointer;
+  background:rgba(255,255,255,.44);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:0 12px 30px rgba(56,50,44,.08);
+}
+.story-detail-inquiries{
+  min-width:0;
+}
+
+@media(max-width:1180px){
+  .stat-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  .brand-mix-card{
+    grid-column:span 2;
+  }
+}
+@media(max-width:720px){
+  .stat-cards{
+    grid-template-columns:1fr !important;
+  }
+  .brand-mix-card{
+    grid-column:auto;
+  }
+  .story-detail-layout{
+    grid-template-columns:1fr;
+  }
+  .story-detail-image-wrap{
+    position:relative;
+  }
+  #storyDetailImage{
+    max-width:100%;
+    max-height:46vh;
+    margin:0 auto;
+  }
+}
+
 </style>
 </head>
 <body>
+<div class="ambient-stage" aria-hidden="true">
+  <div class="ambient-mineral"></div>
+  <div class="ambient-pearl"></div>
+  <div class="ambient-shadow"></div>
+  <div class="ambient-ribbon"></div>
+  <div class="ambient-orb orb-a"></div>
+  <div class="ambient-orb orb-b"></div>
+  <div class="ambient-grain"></div>
+</div>
 
 <h1>發文成效分析</h1>
 <p class="sub">和光堂 IG / FB 貼文成效與詢問記錄追蹤</p>
 
-<!-- ===== 統計區 ===== -->
+<!-- ===== 經營總覽 ===== -->
 <div class="stats-wrap">
+  <div class="stats-heading">
+    <div>
+      <div class="section-kicker">CONTENT INSIGHT</div>
+      <h2 class="dashboard-title">內容追蹤總覽</h2>
+    </div>
+    <div class="scope-pill" id="statScopeText">依目前篩選條件計算</div>
+  </div>
+
   <div class="stat-cards">
-    <div class="stat-card">
-      <div class="stat-num" id="statThisMonth">0</div>
-      <div class="stat-label">本月新增詢問數</div>
+    <div class="stat-card stat-card-primary">
+      <div class="stat-icon">↗</div>
+      <div class="stat-num" id="statTotalInquiries">0</div>
+      <div class="stat-label">詢問總數</div>
+      <div class="stat-caption" id="statTotalCaption">目前顯示範圍</div>
+    </div>
+    <div class="stat-card brand-mix-card">
+      <div class="stat-icon">◉</div>
+      <div class="stat-label">品牌追蹤佔比</div>
+      <div class="brand-share-summary">
+        <strong id="brandShareContentCount">0</strong> 個已標註內容
+        <span>·</span>
+        <span id="brandShareBrandCount">0 個品牌</span>
+      </div>
+      <div class="brand-share-bar" id="brandShareBar" aria-label="品牌追蹤佔比"></div>
+      <div class="brand-share-legend" id="brandShareLegend"></div>
+      <div class="stat-caption brand-share-caption">每篇正式內容計 1 次，IG／FB 不重複；限動暫不納入</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" id="statBestPost">—</div>
-      <div class="stat-label">詢問最多的內容項目</div>
+      <div class="stat-icon">≈</div>
+      <div class="stat-num" id="statAverage">0</div>
+      <div class="stat-label">平均每個有效內容</div>
+      <div class="stat-caption">詢問次數／內容</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statTotalTracked">0</div>
-      <div class="stat-label">目前追蹤中的貼文數</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statBestFormat" style="font-size:16px;">—</div>
-      <div class="stat-label">熱門形式</div>
+    <div class="stat-card format-card">
+      <div class="stat-icon">◫</div>
+      <div class="stat-label">詢問形式分布</div>
+      <div class="format-breakdown">
+        <div class="format-row"><span><i class="format-dot graphic"></i>圖文</span><strong id="statGraphicCount">0</strong></div>
+        <div class="format-row"><span><i class="format-dot video"></i>短影片</span><strong id="statVideoCount">0</strong></div>
+        <div class="format-row"><span><i class="format-dot story"></i>限動</span><strong id="statStoryCount">0</strong></div>
+      </div>
     </div>
   </div>
-  <div id="rankChart" class="rank-chart"></div>
+
+  <div class="dashboard-grid">
+    <section class="glass-panel sankey-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-kicker">FLOW MAP</div>
+          <h3>品牌 × 型號詢問流向</h3>
+        </div>
+        <span class="panel-note">線條寬度代表詢問次數</span>
+      </div>
+      <div id="rankChart" class="rank-chart"></div>
+    </section>
+
+    <aside class="insight-stack">
+      <section class="glass-panel insight-panel">
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-kicker">TOP CONTENT</div>
+            <h3>內容詢問排行</h3>
+          </div>
+          <span class="panel-note">單篇分開計算</span>
+        </div>
+        <div id="topContentList" class="insight-list"></div>
+      </section>
+
+      <section class="glass-panel insight-panel">
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-kicker">RECENT SIGNALS</div>
+            <h3>最近詢問動態</h3>
+          </div>
+          <span class="panel-note">最近 5 筆</span>
+        </div>
+        <div id="latestInquiryList" class="insight-list"></div>
+      </section>
+    </aside>
+  </div>
 </div>
 
 <!-- ===== 篩選器 ===== -->
@@ -973,7 +1861,7 @@
 
 <!-- ===== 限時動態 詳情 Modal（圖 + 詢問記錄管理） ===== -->
 <div class="modal-overlay" id="storyDetailOverlay">
-  <div class="modal" style="max-width:640px;">
+  <div class="modal story-detail-modal">
     <div class="detail-header">
       <div id="storyDetailBrand" style="font-weight:700; font-size:15px;"></div>
       <div class="detail-header-actions">
@@ -982,9 +1870,11 @@
       </div>
     </div>
     <div id="storyDetailNote" class="group-note" style="margin-bottom:12px;"></div>
-    <div style="display:flex; gap:16px; flex-wrap:wrap;">
-      <img id="storyDetailImage" src="" style="max-width:220px; border-radius:10px; cursor:pointer; display:block;" onclick="openLightbox(document.getElementById('storyDetailImage').src)" />
-      <div style="flex:1; min-width:200px;">
+    <div class="story-detail-layout">
+      <div class="story-detail-image-wrap">
+        <img id="storyDetailImage" src="" onclick="openLightbox(document.getElementById('storyDetailImage').src)" />
+      </div>
+      <div class="story-detail-inquiries">
         <div class="inquiry-list" id="storyDetailInquiryList"></div>
         <button class="btn btn-ghost add-inquiry-btn" id="storyDetailAddInquiryBtn">+ 新增詢問記錄</button>
       </div>
@@ -1009,6 +1899,12 @@
       </div>
     </div>
   </div>
+</div>
+
+
+<!-- ===== 詢問截圖智慧預覽（固定於視窗，不受 Modal 裁切） ===== -->
+<div class="inquiry-floating-preview" id="inquiryFloatingPreview" aria-hidden="true">
+  <img id="inquiryFloatingPreviewImg" alt="詢問截圖預覽" />
 </div>
 
 <!-- ===== 截圖 Lightbox ===== -->
@@ -1257,165 +2153,318 @@ function setupFilterBar(){
 setupFilterBar();
 
 /* ================= 統計卡片 + 詢問度排行圖表 ================= */
-function renderStats(){
-  const now = new Date();
-  const ym = now.toISOString().slice(0,7); // YYYY-MM
-
-  let monthCount = 0;
-  let totalTracked = 0;
-  const tagStats = {}; // key -> { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 }
-  const formatTotals = { 圖文:0, 短影片:0, 限動:0, 未分類:0 };
-
-  allGroups.forEach(g => {
-    const label = g.tags ? `${g.tags.brand} / ${g.tags.model}` : (g.note ? g.note : '未分類標籤');
-    const typeKey = g.post_type === '圖文' ? '圖文' : g.post_type === '短影片' ? '短影片' : '未分類';
-
-    (g.platform_posts || []).forEach(pp => {
-      totalTracked++;
-      const inquiries = pp.inquiries || [];
-      inquiries.forEach(iq => {
-        if(iq.inquiry_date && iq.inquiry_date.slice(0,7) === ym) monthCount++;
-      });
-      if(inquiries.length > 0){
-        const key = g.tag_id || ('note:' + g.id);
-        if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
-        tagStats[key][typeKey] += inquiries.length;
-        tagStats[key].total += inquiries.length;
-        formatTotals[typeKey] += inquiries.length;
-      }
-    });
-  });
-
-  // 併入限時動態的詢問記錄
-  (allStoryEntries || []).forEach(se => {
-    totalTracked++;
-    const inquiries = se.inquiries || [];
-    inquiries.forEach(iq => {
-      if(iq.inquiry_date && iq.inquiry_date.slice(0,7) === ym) monthCount++;
-    });
-    if(inquiries.length > 0){
-      const key = 'story:' + (se.brand_model_text || se.id);
-      const label = se.brand_model_text || '未命名限動';
-      if(!tagStats[key]) tagStats[key] = { label, 圖文:0, 短影片:0, 限動:0, 未分類:0, total:0 };
-      tagStats[key]['限動'] += inquiries.length;
-      tagStats[key].total += inquiries.length;
-      formatTotals['限動'] += inquiries.length;
-    }
-  });
-
-  document.getElementById('statThisMonth').textContent = monthCount;
-  document.getElementById('statTotalTracked').textContent = totalTracked;
-
-  const ranked = Object.values(tagStats).sort((a,b) => b.total - a.total);
-  const bestEl = document.getElementById('statBestPost');
-  bestEl.textContent = ranked.length > 0 ? `${ranked[0].label}（${ranked[0].total}次）` : '—';
-
-  const bestFormatEl = document.getElementById('statBestFormat');
-  if(bestFormatEl){
-    const topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0];
-    bestFormatEl.textContent = topFormat && topFormat[1] > 0 ? `${topFormat[0]}（${topFormat[1]}次）` : '—';
-  }
-
-  renderRankChart();
+function hasActiveStatsFilter(){
+  return Boolean(
+    filterState.brand || filterState.model || filterState.postType || filterState.platform ||
+    filterState.hasInquiry || filterState.search || filterState.dateStart || filterState.dateEnd
+  );
 }
 
-/* 桑基圖：品牌 → 型號，依總詢問次數排序（由多到少），寬度代表詢問次數 */
-function renderRankChart(){
-  const el = document.getElementById('rankChart');
+function inquiryMatchesDate(iq){
+  if(filterState.dateTarget !== 'inquiry') return true;
+  if(!filterState.dateStart && !filterState.dateEnd) return true;
+  if(!iq || !iq.inquiry_date) return false;
+  if(filterState.dateStart && iq.inquiry_date < filterState.dateStart) return false;
+  if(filterState.dateEnd && iq.inquiry_date > filterState.dateEnd) return false;
+  return true;
+}
 
-  const brandMap = {}; // brand -> { total, models: { model: count } }
-  function addCount(brand, model, count){
+function visibleGroupInquiries(g){
+  return (g.platform_posts || [])
+    .filter(pp => !filterState.platform || pp.platform === filterState.platform)
+    .flatMap(pp => (pp.inquiries || []).filter(inquiryMatchesDate));
+}
+
+function filteredStoriesForStats(){
+  return (allStoryEntries || []).filter(se => {
+    const text = `${se.brand_model_text || ''} ${se.note || ''}`.toLowerCase();
+    if(filterState.brand && !text.includes(filterState.brand.toLowerCase())) return false;
+    if(filterState.model && !text.includes(filterState.model.toLowerCase())) return false;
+    if(filterState.postType || filterState.platform) return false;
+    if(filterState.search && !text.includes(filterState.search.toLowerCase())) return false;
+    const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
+    if(filterState.hasInquiry && inquiries.length === 0) return false;
+    if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'post'){
+      const d = se.created_at ? se.created_at.slice(0,10) : '';
+      if(!d) return false;
+      if(filterState.dateStart && d < filterState.dateStart) return false;
+      if(filterState.dateEnd && d > filterState.dateEnd) return false;
+    }
+    if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'inquiry' && inquiries.length === 0) return false;
+    return true;
+  });
+}
+
+function latestInquiryDate(inquiries){
+  return (inquiries || []).reduce((latest, iq) => {
+    const d = iq.inquiry_date || '';
+    return d > latest ? d : latest;
+  }, '');
+}
+
+function buildContentStats(){
+  const entries = [];
+  const groups = filteredGroups();
+  const stories = filteredStoriesForStats();
+
+  groups.forEach(g => {
+    const inquiries = visibleGroupInquiries(g);
+    const label = g.tags ? `${g.tags.brand} / ${g.tags.model}` : (g.note || '未分類內容');
+    entries.push({
+      key:`group:${g.id}`,
+      kind:'group',
+      id:g.id,
+      label,
+      note:g.note || '',
+      format:g.post_type === '圖文' ? '圖文' : g.post_type === '短影片' ? '短影片' : '未分類',
+      inquiries,
+      total:inquiries.length,
+      latest:latestInquiryDate(inquiries),
+      sortDate:g.post_date || (g.created_at ? g.created_at.slice(0,10) : '')
+    });
+  });
+
+  stories.forEach(se => {
+    const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
+    entries.push({
+      key:`story:${se.id}`,
+      kind:'story',
+      id:se.id,
+      label:se.brand_model_text || '未命名限動',
+      note:se.note || '',
+      format:'限動',
+      inquiries,
+      total:inquiries.length,
+      latest:latestInquiryDate(inquiries),
+      sortDate:se.created_at ? se.created_at.slice(0,10) : ''
+    });
+  });
+
+  return entries;
+}
+
+function renderStats(){
+  const entries = buildContentStats();
+  const activeEntries = entries.filter(e => e.total > 0);
+  const totalInquiries = activeEntries.reduce((sum,e) => sum + e.total,0);
+  const average = activeEntries.length ? totalInquiries / activeEntries.length : 0;
+  const formatTotals = { 圖文:0, 短影片:0, 限動:0 };
+
+  activeEntries.forEach(e => {
+    if(e.format in formatTotals) formatTotals[e.format] += e.total;
+  });
+
+  document.getElementById('statTotalInquiries').textContent = totalInquiries;
+  document.getElementById('statAverage').textContent = average ? average.toFixed(average >= 10 ? 0 : 1) : '0';
+  document.getElementById('statGraphicCount').textContent = formatTotals['圖文'];
+  document.getElementById('statVideoCount').textContent = formatTotals['短影片'];
+  document.getElementById('statStoryCount').textContent = formatTotals['限動'];
+  document.getElementById('statTotalCaption').textContent = hasActiveStatsFilter() ? '依目前篩選結果' : '全部內容與限動';
+  document.getElementById('statScopeText').textContent = hasActiveStatsFilter() ? '已套用目前篩選' : '全部資料範圍';
+
+  renderBrandShare();
+  renderTopContent(activeEntries);
+  renderLatestInquiries(activeEntries);
+  renderRankChart(entries);
+}
+
+
+function brandColorForIndex(index){
+  const palette = [
+    '#8f6a4d','#b58c68','#71889a','#9d8292','#6f8c80','#c4a477',
+    '#7c7894','#879a66','#b47b73','#6f8793','#a68d68','#8a746d'
+  ];
+  return palette[index % palette.length];
+}
+
+function buildBrandShareData(){
+  const counts = new Map();
+  // 品牌配置只使用正式內容項目。每個 posts_group 計 1 次；IG/FB 不重複計算。
+  // 限時動態目前是自由文字，未連到 brands 表，因此不納入，避免同品牌被拆成多種拼法。
+  allGroups.forEach(group => {
+    const brand = group.tags && group.tags.brand ? group.tags.brand.trim() : '';
+    if(!brand) return;
+    counts.set(brand, (counts.get(brand) || 0) + 1);
+  });
+  const total = [...counts.values()].reduce((sum,count) => sum + count, 0);
+  const items = [...counts.entries()]
+    .map(([brand,count]) => ({ brand, count, percent: total ? count / total * 100 : 0 }))
+    .sort((a,b) => b.count - a.count || a.brand.localeCompare(b.brand, 'zh-Hant'));
+  return { total, items };
+}
+
+function renderBrandShare(){
+  const { total, items } = buildBrandShareData();
+  const bar = document.getElementById('brandShareBar');
+  const legend = document.getElementById('brandShareLegend');
+  const contentCount = document.getElementById('brandShareContentCount');
+  const brandCount = document.getElementById('brandShareBrandCount');
+  if(!bar || !legend || !contentCount || !brandCount) return;
+
+  contentCount.textContent = total;
+  brandCount.textContent = `${items.length} 個品牌`;
+
+  if(total === 0){
+    bar.innerHTML = '<span class="brand-share-empty-bar"></span>';
+    legend.innerHTML = '<span class="brand-share-empty">目前尚無已標註品牌的內容</span>';
+    return;
+  }
+
+  bar.innerHTML = items.map((item,index) => {
+    const color = brandColorForIndex(index);
+    const title = `${item.brand}：${item.count} 篇（${item.percent.toFixed(1)}%）`;
+    return `<span class="brand-share-segment" style="width:${item.percent}%;background:${color}" title="${escapeHtml(title)}"></span>`;
+  }).join('');
+
+  legend.innerHTML = items.map((item,index) => {
+    const color = brandColorForIndex(index);
+    const rounded = item.percent >= 10 ? item.percent.toFixed(0) : item.percent.toFixed(1);
+    return `<span class="brand-share-item" title="${escapeHtml(item.brand)}：${item.count} 篇">
+      <i style="background:${color}"></i>
+      <span>${escapeHtml(item.brand)}</span>
+      <strong>${rounded}%</strong>
+    </span>`;
+  }).join('');
+}
+
+function renderTopContent(activeEntries){
+  const el = document.getElementById('topContentList');
+  const ranked = [...activeEntries]
+    .sort((a,b) => b.total-a.total || (b.latest || b.sortDate).localeCompare(a.latest || a.sortDate))
+    .slice(0,5);
+
+  if(ranked.length === 0){
+    el.innerHTML = '<div class="insight-empty">目前範圍內還沒有詢問記錄</div>';
+    return;
+  }
+
+  el.innerHTML = ranked.map((item,index) => {
+    const sub = [item.format, item.note].filter(Boolean).join(' · ');
+    const click = item.kind === 'group' ? `openGroupDetail('${item.id}')` : `openStoryDetail('${item.id}')`;
+    return `<div class="insight-item" onclick="${click}">
+      <span class="insight-rank">${String(index+1).padStart(2,'0')}</span>
+      <div class="insight-main">
+        <div class="insight-title">${escapeHtml(item.label)}</div>
+        <div class="insight-sub">${escapeHtml(sub || '尚無備註')}</div>
+      </div>
+      <span class="insight-value">${item.total} 次</span>
+    </div>`;
+  }).join('');
+}
+
+function renderLatestInquiries(activeEntries){
+  const el = document.getElementById('latestInquiryList');
+  const items = activeEntries.flatMap(entry => (entry.inquiries || []).map(iq => ({
+    ...iq,
+    parentKind:entry.kind,
+    parentId:entry.id,
+    parentLabel:entry.label,
+    format:entry.format
+  }))).sort((a,b) => (b.inquiry_date || '').localeCompare(a.inquiry_date || '')).slice(0,5);
+
+  if(items.length === 0){
+    el.innerHTML = '<div class="insight-empty">目前範圍內還沒有詢問動態</div>';
+    return;
+  }
+
+  const formatShort = { 圖文:'圖', 短影片:'影', 限動:'限', 未分類:'文' };
+  el.innerHTML = items.map(item => {
+    const click = item.parentKind === 'group' ? `openGroupDetail('${item.parentId}')` : `openStoryDetail('${item.parentId}')`;
+    const date = item.inquiry_date ? item.inquiry_date.replaceAll('-','/') : '未填日期';
+    const sub = [date,item.inquiry_type || '詢問',item.note || '無備註'].join(' · ');
+    return `<div class="insight-item" onclick="${click}">
+      <span class="insight-type">${formatShort[item.format] || '文'}</span>
+      <div class="insight-main">
+        <div class="insight-title">${escapeHtml(item.parentLabel)}</div>
+        <div class="insight-sub">${escapeHtml(sub)}</div>
+      </div>
+      <span class="insight-value">›</span>
+    </div>`;
+  }).join('');
+}
+
+/* 桑基圖：品牌 → 型號；依目前篩選與詢問日期範圍同步更新 */
+function renderRankChart(contentEntries){
+  const el = document.getElementById('rankChart');
+  const brandMap = {};
+  function addCount(brand,model,count){
     if(!brand || count <= 0) return;
-    if(!brandMap[brand]) brandMap[brand] = { total: 0, models: {} };
+    if(!brandMap[brand]) brandMap[brand] = { total:0, models:{} };
     brandMap[brand].total += count;
     brandMap[brand].models[model] = (brandMap[brand].models[model] || 0) + count;
   }
 
-  allGroups.forEach(g => {
-    if(!g.tags) return;
-    const count = (g.platform_posts || []).reduce((s, pp) => s + (pp.inquiries || []).length, 0);
-    addCount(g.tags.brand, g.tags.model, count);
+  (contentEntries || []).forEach(entry => {
+    if(entry.total <= 0) return;
+    if(entry.kind === 'group'){
+      const g = allGroups.find(x => x.id === entry.id);
+      if(g && g.tags) addCount(g.tags.brand,g.tags.model,entry.total);
+    } else {
+      const text = (entry.label || '').trim();
+      const spaceIdx = text.indexOf(' ');
+      const brand = spaceIdx > 0 ? text.slice(0,spaceIdx) : text;
+      const model = spaceIdx > 0 ? text.slice(spaceIdx+1) : '限動';
+      addCount(brand,model,entry.total);
+    }
   });
 
-  // 限動的品牌+型號是自由輸入的一整串文字，嘗試用第一個空白拆成品牌/型號
-  (allStoryEntries || []).forEach(se => {
-    const count = (se.inquiries || []).length;
-    if(count <= 0) return;
-    const text = (se.brand_model_text || '').trim();
-    const spaceIdx = text.indexOf(' ');
-    const brand = spaceIdx > 0 ? text.slice(0, spaceIdx) : text;
-    const model = spaceIdx > 0 ? text.slice(spaceIdx + 1) : '限動';
-    addCount(brand, model, count);
-  });
-
-  const brandEntries = Object.entries(brandMap).sort((a, b) => b[1].total - a[1].total);
-
+  const brandEntries = Object.entries(brandMap).sort((a,b) => b[1].total-a[1].total);
   if(brandEntries.length === 0){
-    el.innerHTML = '<div style="text-align:center; color:var(--ink-soft); font-size:13px; padding:30px 0;">目前還沒有詢問記錄可供統計</div>';
+    if(window.Plotly) Plotly.purge(el);
+    el.innerHTML = '<div class="insight-empty" style="padding-top:120px;">目前範圍內還沒有詢問記錄可供統計</div>';
     return;
   }
 
-  const totalAll = brandEntries.reduce((s, [, v]) => s + v.total, 0);
-  const labels = [], nodeX = [], nodeY = [], nodeColor = [];
-  const brandIndex = {};
-  let cursor = 0;
-
-  brandEntries.forEach(([brand, info]) => {
-    brandIndex[brand] = labels.length;
-    labels.push(brand);
-    nodeX.push(0.01);
-    nodeY.push(Math.min(0.98, Math.max(0.02, (cursor + info.total / 2) / totalAll)));
-    nodeColor.push('#c9773f');
-    cursor += info.total;
+  const totalAll = brandEntries.reduce((s,[,v]) => s+v.total,0);
+  const labels=[],nodeX=[],nodeY=[],nodeColor=[];
+  const brandIndex={};
+  let cursor=0;
+  brandEntries.forEach(([brand,info]) => {
+    brandIndex[brand]=labels.length;
+    labels.push(brand);nodeX.push(.015);
+    nodeY.push(Math.min(.97,Math.max(.03,(cursor+info.total/2)/totalAll)));
+    nodeColor.push('rgba(142,101,70,.92)');cursor+=info.total;
   });
 
-  const modelIndex = {};
-  const sourceArr = [], targetArr = [], valueArr = [];
-  let cursor2 = 0;
-
-  brandEntries.forEach(([brand, info]) => {
-    const models = Object.entries(info.models).sort((a, b) => b[1] - a[1]);
-    models.forEach(([model, count]) => {
-      const key = brand + '␟' + model;
+  const modelIndex={};
+  const sourceArr=[],targetArr=[],valueArr=[];
+  let cursor2=0;
+  brandEntries.forEach(([brand,info]) => {
+    Object.entries(info.models).sort((a,b) => b[1]-a[1]).forEach(([model,count]) => {
+      const key=brand+'␟'+model;
       if(!(key in modelIndex)){
-        modelIndex[key] = labels.length;
-        labels.push(model);
-        nodeX.push(0.99);
-        nodeY.push(Math.min(0.98, Math.max(0.02, (cursor2 + count / 2) / totalAll)));
-        nodeColor.push('#e8c39e');
-        cursor2 += count;
+        modelIndex[key]=labels.length;
+        labels.push(model);nodeX.push(.985);
+        nodeY.push(Math.min(.97,Math.max(.03,(cursor2+count/2)/totalAll)));
+        nodeColor.push('rgba(198,171,145,.82)');cursor2+=count;
       }
-      sourceArr.push(brandIndex[brand]);
-      targetArr.push(modelIndex[key]);
-      valueArr.push(count);
+      sourceArr.push(brandIndex[brand]);targetArr.push(modelIndex[key]);valueArr.push(count);
     });
   });
 
-  Plotly.newPlot(el, [{
-    type: 'sankey',
-    orientation: 'h',
-    arrangement: 'fixed',
-    node: {
-      pad: 10,
-      thickness: 14,
-      label: labels,
-      x: nodeX,
-      y: nodeY,
-      color: nodeColor,
-      line: { color: '#fff', width: 0.5 }
+  if(!window.Plotly){
+    el.innerHTML = '<div class="insight-empty" style="padding-top:120px;">圖表元件載入中…</div>';
+    return;
+  }
+
+  Plotly.react(el,[{
+    type:'sankey',orientation:'h',arrangement:'fixed',
+    node:{
+      pad:12,thickness:13,label:labels,x:nodeX,y:nodeY,color:nodeColor,
+      line:{color:'rgba(255,255,255,.9)',width:.7},
+      hovertemplate:'%{label}<extra></extra>'
     },
-    link: {
-      source: sourceArr,
-      target: targetArr,
-      value: valueArr,
-      color: 'rgba(201,119,63,0.25)'
+    link:{
+      source:sourceArr,target:targetArr,value:valueArr,
+      color:'rgba(169,120,78,.20)',
+      hovertemplate:'%{source.label} → %{target.label}<br>%{value} 次詢問<extra></extra>'
     }
-  }], {
-    margin: { l: 10, r: 10, t: 10, b: 10 },
-    height: Math.max(240, labels.length * 26),
-    font: { family: 'Noto Sans TC, PingFang TC, sans-serif', size: 12, color: '#2b241c' },
-    paper_bgcolor: 'rgba(0,0,0,0)'
-  }, { displayModeBar:false, responsive:true });
+  }],{
+    margin:{l:8,r:8,t:8,b:8},
+    height:Math.max(330,labels.length*25),
+    font:{family:'Noto Sans TC, PingFang TC, sans-serif',size:11,color:'#403b36'},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'
+  },{displayModeBar:false,responsive:true});
 }
 
 function buildTagTypeHtml(g){
@@ -1641,6 +2690,85 @@ function escapeHtml(str){
   return d.innerHTML;
 }
 
+
+let activeInquiryPreviewTarget = null;
+
+function openInquiryPreviewLightbox(target){
+  hideInquiryPreview();
+  const encoded = target && target.dataset ? target.dataset.previewSrc : '';
+  if(encoded) openLightbox(decodeURIComponent(encoded));
+}
+
+function positionInquiryPreview(target){
+  const preview = document.getElementById('inquiryFloatingPreview');
+  const img = document.getElementById('inquiryFloatingPreviewImg');
+  if(!preview || !img || !target || !img.naturalWidth || !img.naturalHeight) return;
+
+  const margin = 14;
+  const gap = 10;
+  const maxWidth = Math.min(300, window.innerWidth - margin * 2);
+  const maxHeight = Math.min(430, window.innerHeight - margin * 2);
+  const ratio = img.naturalWidth / img.naturalHeight;
+  let width = Math.min(maxWidth, img.naturalWidth);
+  let height = width / ratio;
+  if(height > maxHeight){
+    height = maxHeight;
+    width = height * ratio;
+  }
+
+  const rect = target.getBoundingClientRect();
+  const roomBelow = window.innerHeight - rect.bottom - gap - margin;
+  const roomAbove = rect.top - gap - margin;
+  const openBelow = roomBelow >= height || roomBelow >= roomAbove;
+
+  let top = openBelow ? rect.bottom + gap : rect.top - gap - height;
+  top = Math.max(margin, Math.min(top, window.innerHeight - height - margin));
+
+  let left = rect.left + rect.width / 2 - width / 2;
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+
+  preview.style.width = `${width}px`;
+  preview.style.height = `${height}px`;
+  preview.style.left = `${left}px`;
+  preview.style.top = `${top}px`;
+  preview.classList.toggle('opens-below', openBelow);
+  preview.classList.toggle('opens-above', !openBelow);
+}
+
+function showInquiryPreview(target){
+  const preview = document.getElementById('inquiryFloatingPreview');
+  const img = document.getElementById('inquiryFloatingPreviewImg');
+  const encoded = target && target.dataset ? target.dataset.previewSrc : '';
+  if(!preview || !img || !encoded) return;
+
+  activeInquiryPreviewTarget = target;
+  const src = decodeURIComponent(encoded);
+  preview.classList.remove('open');
+  img.onload = () => {
+    if(activeInquiryPreviewTarget !== target) return;
+    positionInquiryPreview(target);
+    requestAnimationFrame(() => preview.classList.add('open'));
+  };
+  if(img.src === src && img.complete && img.naturalWidth){
+    positionInquiryPreview(target);
+    requestAnimationFrame(() => preview.classList.add('open'));
+  } else {
+    img.src = src;
+  }
+}
+
+function hideInquiryPreview(){
+  activeInquiryPreviewTarget = null;
+  const preview = document.getElementById('inquiryFloatingPreview');
+  if(preview) preview.classList.remove('open');
+}
+
+window.addEventListener('scroll', hideInquiryPreview, true);
+window.addEventListener('resize', () => {
+  if(activeInquiryPreviewTarget) positionInquiryPreview(activeInquiryPreviewTarget);
+});
+
+
 function renderInquiryList(inquiries, parentType, parentId){
   if(!inquiries || inquiries.length === 0){
     return `<div class="inquiry-empty">尚無詢問記錄</div>`;
@@ -1648,9 +2776,14 @@ function renderInquiryList(inquiries, parentType, parentId){
   const sorted = [...inquiries].sort((a,b) => (b.inquiry_date||'').localeCompare(a.inquiry_date||''));
   return sorted.map(iq => {
     const thumbHtml = iq.screenshot_url
-      ? `<span class="inquiry-thumb-wrap" onclick="event.stopPropagation(); openLightbox('${iq.screenshot_url}')">
+      ? `<span class="inquiry-thumb-wrap" tabindex="0"
+           data-preview-src="${encodeURIComponent(iq.screenshot_url)}"
+           onmouseenter="showInquiryPreview(this)"
+           onmouseleave="hideInquiryPreview()"
+           onfocus="showInquiryPreview(this)"
+           onblur="hideInquiryPreview()"
+           onclick="event.stopPropagation(); openInquiryPreviewLightbox(this)">
            <img class="inquiry-thumb" src="${iq.screenshot_url}" />
-           <span class="inquiry-thumb-hover"><img src="${iq.screenshot_url}" /></span>
          </span>`
       : '';
     return `
@@ -2516,6 +3649,252 @@ async function saveHighlightEdit(){
   closeHighlightModal();
   await loadStories();
 }
+</script>
+<script>
+(function(){
+  const states = new Map();
+  let activeState = null;
+
+  function selectedText(select){
+    const option = select.options[select.selectedIndex];
+    return option ? option.textContent.trim() : '';
+  }
+
+  function syncState(state){
+    state.label.textContent = selectedText(state.select) || '請選擇';
+    state.button.title = state.label.textContent;
+  }
+
+  function syncAll(){
+    states.forEach(syncState);
+  }
+
+  function closeMenu(returnFocus){
+    if(!activeState) return;
+    const state = activeState;
+    activeState = null;
+    state.button.setAttribute('aria-expanded','false');
+    state.menu.classList.remove('open');
+    setTimeout(() => {
+      if(state.menu.parentNode) state.menu.remove();
+    }, 220);
+    if(returnFocus) state.button.focus({preventScroll:true});
+  }
+
+  function placeMenu(state){
+    if(!state.menu || !state.menu.isConnected) return;
+
+    const rect = state.button.getBoundingClientRect();
+    const gap = 8;
+    const viewportGap = 12;
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = document.documentElement.clientHeight;
+    const minWidth = Math.max(rect.width, 180);
+
+    state.menu.style.width = 'auto';
+    state.menu.style.minWidth = minWidth + 'px';
+    state.menu.style.maxWidth = Math.max(180, Math.min(Math.max(minWidth, 300), viewportWidth - viewportGap * 2)) + 'px';
+    state.menu.style.maxHeight = 'none';
+
+    const naturalHeight = Math.min(state.menu.scrollHeight || 320, 380);
+    const roomBelow = Math.max(0, viewportHeight - rect.bottom - viewportGap - gap);
+    const roomAbove = Math.max(0, rect.top - viewportGap - gap);
+    const minimumComfortHeight = Math.min(190, naturalHeight);
+
+    let side = 'bottom';
+    if(roomBelow < minimumComfortHeight && roomAbove > roomBelow){
+      side = 'top';
+    } else if(roomAbove >= naturalHeight && roomBelow < naturalHeight){
+      side = 'top';
+    }
+
+    const availableHeight = side === 'top' ? roomAbove : roomBelow;
+    const menuMaxHeight = Math.max(86, Math.min(380, availableHeight));
+    state.menu.style.maxHeight = menuMaxHeight + 'px';
+    state.menu.dataset.side = side;
+
+    const menuWidth = state.menu.getBoundingClientRect().width;
+    const menuHeight = Math.min(state.menu.scrollHeight, menuMaxHeight);
+    const preferredLeft = rect.left;
+    const left = Math.min(
+      Math.max(viewportGap, preferredLeft),
+      Math.max(viewportGap, viewportWidth - menuWidth - viewportGap)
+    );
+    const top = side === 'top'
+      ? Math.max(viewportGap, rect.top - gap - menuHeight)
+      : Math.min(viewportHeight - viewportGap - menuHeight, rect.bottom + gap);
+
+    state.menu.style.left = Math.round(left) + 'px';
+    state.menu.style.top = Math.round(Math.max(viewportGap, top)) + 'px';
+  }
+
+  function buildMenu(state){
+    const menu = document.createElement('div');
+    menu.className = 'glass-select-menu';
+    menu.setAttribute('role','listbox');
+    menu.tabIndex = -1;
+
+    Array.from(state.select.options).forEach((option, index) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'glass-select-option';
+      item.textContent = option.textContent;
+      item.dataset.value = option.value;
+      item.dataset.index = String(index);
+      item.setAttribute('role','option');
+      item.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+      if(option.selected) item.classList.add('is-selected');
+      if(option.disabled) item.disabled = true;
+      item.addEventListener('click', () => {
+        if(item.disabled) return;
+        state.select.value = option.value;
+        state.select.dispatchEvent(new Event('change',{bubbles:true}));
+        syncState(state);
+        closeMenu(true);
+      });
+      menu.appendChild(item);
+    });
+
+    menu.addEventListener('keydown', (event) => {
+      const options = Array.from(menu.querySelectorAll('.glass-select-option:not(:disabled)'));
+      const current = document.activeElement;
+      let index = options.indexOf(current);
+      if(event.key === 'ArrowDown'){
+        event.preventDefault();
+        options[Math.min(index + 1, options.length - 1)]?.focus();
+      } else if(event.key === 'ArrowUp'){
+        event.preventDefault();
+        options[Math.max(index - 1, 0)]?.focus();
+      } else if(event.key === 'Home'){
+        event.preventDefault(); options[0]?.focus();
+      } else if(event.key === 'End'){
+        event.preventDefault(); options[options.length - 1]?.focus();
+      } else if(event.key === 'Escape'){
+        event.preventDefault(); closeMenu(true);
+      }
+    });
+    return menu;
+  }
+
+  function openMenu(state){
+    if(activeState === state){ closeMenu(true); return; }
+    closeMenu(false);
+    syncState(state);
+    state.menu = buildMenu(state);
+    document.body.appendChild(state.menu);
+    activeState = state;
+    state.button.setAttribute('aria-expanded','true');
+    placeMenu(state);
+    requestAnimationFrame(() => {
+      placeMenu(state);
+      state.menu.classList.add('open');
+      const selected = state.menu.querySelector('.is-selected');
+      (selected || state.menu.querySelector('.glass-select-option:not(:disabled)'))?.focus({preventScroll:true});
+      selected?.scrollIntoView({block:'nearest'});
+    });
+  }
+
+  function enhanceSelect(select){
+    if(select.dataset.glassEnhanced === '1') return;
+    select.dataset.glassEnhanced = '1';
+
+    const rect = select.getBoundingClientRect();
+    const shell = document.createElement('div');
+    shell.className = 'glass-select-shell';
+    if(select.closest('.field') || select.closest('.platform-input-block')){
+      shell.classList.add('glass-select-fluid');
+    } else if(rect.width){
+      shell.style.width = Math.max(116, Math.min(rect.width, 240)) + 'px';
+    }
+
+    select.parentNode.insertBefore(shell, select);
+    shell.appendChild(select);
+    select.classList.add('glass-select-native');
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'glass-select-trigger';
+    button.setAttribute('aria-haspopup','listbox');
+    button.setAttribute('aria-expanded','false');
+    const label = document.createElement('span');
+    label.className = 'glass-select-label';
+    const chevron = document.createElement('span');
+    chevron.className = 'glass-select-chevron';
+    chevron.setAttribute('aria-hidden','true');
+    button.append(label, chevron);
+    shell.appendChild(button);
+
+    const state = {select,shell,button,label,menu:null};
+    states.set(select,state);
+    syncState(state);
+
+    button.addEventListener('click', () => openMenu(state));
+    button.addEventListener('keydown', (event) => {
+      if(['Enter',' ','ArrowDown','ArrowUp'].includes(event.key)){
+        event.preventDefault(); openMenu(state);
+      }
+    });
+    select.addEventListener('change', () => syncState(state));
+    new MutationObserver(() => syncState(state)).observe(select,{childList:true,subtree:true,attributes:true});
+  }
+
+  function enhanceAll(root){
+    (root || document).querySelectorAll('select').forEach(enhanceSelect);
+  }
+
+  document.addEventListener('pointerdown', (event) => {
+    if(!activeState) return;
+    if(activeState.shell.contains(event.target) || activeState.menu?.contains(event.target)) return;
+    closeMenu(false);
+  }, true);
+  document.addEventListener('keydown', event => {
+    if(event.key === 'Escape' && activeState) closeMenu(true);
+  });
+  let viewportRaf = 0;
+  function scheduleMenuPlacement(){
+    if(!activeState || viewportRaf) return;
+    viewportRaf = requestAnimationFrame(() => {
+      viewportRaf = 0;
+      if(activeState) placeMenu(activeState);
+    });
+  }
+  window.addEventListener('resize', scheduleMenuPlacement);
+  window.addEventListener('scroll', event => {
+    if(!activeState) return;
+    if(activeState.menu && (event.target === activeState.menu || activeState.menu.contains(event.target))) return;
+    scheduleMenuPlacement();
+  }, true);
+
+  function wrapAfter(name){
+    const original = window[name];
+    if(typeof original !== 'function' || original.__glassWrapped) return;
+    const wrapped = function(...args){
+      const result = original.apply(this,args);
+      Promise.resolve(result).finally(() => requestAnimationFrame(syncAll));
+      return result;
+    };
+    wrapped.__glassWrapped = true;
+    window[name] = wrapped;
+  }
+
+  function init(){
+    enhanceAll(document);
+    ['resetFilters','populateTagFilterOptions','populateModelFilterOptions','openGroupModal','openInquiryModal','openStoryModal','openTagModal','openHighlightModal'].forEach(wrapAfter);
+    new MutationObserver(mutations => {
+      mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+        if(node.nodeType === 1){
+          if(node.matches?.('select')) enhanceSelect(node);
+          enhanceAll(node);
+        }
+      }));
+    }).observe(document.body,{childList:true,subtree:true});
+    window.syncGlassSelects = syncAll;
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
+
 </script>
 </body>
 </html>
