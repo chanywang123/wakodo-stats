@@ -235,7 +235,7 @@
           cleanSources.push(oldCustomerFlag);
           sc.splice(0, sc.length, ...cleanSources);
         }
-        fD.push({ p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag, p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'), p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw, p_detail: det, p_is_new_customer: iN, p_amount: hasP ? a : 0, p_ad_source_detail: kw });
+        fD.push({ p_date: dt, p_store: globalSt, p_name: n, p_gender: g, p_age: ag, p_is_local: !c.querySelector('.toggle-btn').classList.contains('unchecked'), p_sources: [...new Set(sc)], p_purposes: pu, p_keywords: kw, p_detail: det, p_is_new_customer: iN, p_amount: hasP ? a : 0, p_ad_source_detail: kw, p_has_purchased: hasP });
       }
       
       btn.disabled = true; btn.innerText = "傳送中...";
