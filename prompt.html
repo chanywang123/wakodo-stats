@@ -3,627 +3,964 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>和光堂眼鏡 AI Prompt 組合器 (雲端版)</title>
+    <title>和光堂眼鏡 AI Prompt 工作台 V2</title>
     <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="15.6" fill="%23fff"/%3E%3Cg fill="none" stroke="%23111" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="16" cy="16" r="14.2" stroke-width="1.1"/%3E%3Ccircle cx="16" cy="16" r="11.9" stroke-width="0.8"/%3E%3Cg stroke-width="0.85"%3E%3Ccircle cx="16" cy="11.0" r="4.4"/%3E%3Ccircle cx="20.8" cy="13.6" r="4.4"/%3E%3Ccircle cx="19.6" cy="19.1" r="4.4"/%3E%3Ccircle cx="12.4" cy="19.1" r="4.4"/%3E%3Ccircle cx="11.2" cy="13.6" r="4.4"/%3E%3C/g%3E%3Ccircle cx="16" cy="15.2" r="2.2" stroke-width="0.7"/%3E%3C/g%3E%3C/svg%3E' />
     <style>
         :root {
-            --bg-color: #0f0f0f; --panel-bg: #1a1a1a; --text-main: #ffffff;
-            --text-muted: #888888; --gold: #c9a84c; --gold-hover: #e0bc55;
-            --border-color: #333333; --danger: #ff4d4d;圖片比例
-
-            --font-en: 'Inter', system-ui, sans-serif; --font-zh: system-ui, sans-serif;
+            --bg: #0d0e0f;
+            --panel: #171819;
+            --panel-soft: #1d1f20;
+            --input: #111213;
+            --text: #f7f5ef;
+            --muted: #92928e;
+            --gold: #c9a84c;
+            --gold-hover: #dfbd60;
+            --border: #303234;
+            --danger: #ff5d5d;
+            --success: #27c47d;
+            --font-en: Inter, ui-sans-serif, system-ui, sans-serif;
+            --font-zh: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-zh); line-height: 1.6; padding: 20px; font-size: 14px; }
-        h1, h2, h3 { font-family: var(--font-en); }
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font: 14px/1.6 var(--font-zh);
+        }
+        button, select, input, textarea { font: inherit; }
+        button { cursor: pointer; }
 
-        header { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        header h1 { color: var(--gold); font-size: 24px; }
-        #status { color: var(--gold); font-size: 14px; font-weight: bold; }
+        .app-shell { max-width: 1540px; margin: 0 auto; padding: 18px; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 2px 2px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand h1 { color: var(--gold); font: 700 23px/1.2 var(--font-en); }
+        .brand p { color: var(--muted); margin-top: 3px; font-size: 12px; }
+        .status-wrap { display: flex; align-items: center; gap: 8px; }
+        #status { color: var(--gold); font-weight: 700; white-space: nowrap; }
 
-        .container { display: flex; gap: 20px; height: calc(100vh - 80px); min-height: 600px; }
-        .col-left, .col-right { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; }
-        .col-left { flex: 1; overflow-y: auto; }
-        .col-right { flex: 1; }
+        .toolbar {
+            display: grid;
+            grid-template-columns: minmax(260px, 1.25fr) minmax(210px, 1fr) minmax(190px, .85fr) auto;
+            gap: 12px;
+            align-items: stretch;
+            margin: 16px 0;
+        }
+        .toolbar-card {
+            min-width: 0;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 6px;
+        }
+        .segmented { display: flex; gap: 5px; height: 100%; }
+        .segment-btn {
+            flex: 1;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 12px;
+            color: var(--muted);
+            background: transparent;
+            font-weight: 700;
+            transition: .18s ease;
+        }
+        .segment-btn:hover { color: var(--text); background: rgba(255,255,255,.04); }
+        .segment-btn.active { color: #111; background: var(--gold); }
+        .ratio-wrap { display: flex; align-items: center; gap: 8px; padding: 0 5px; }
+        .ratio-wrap label { color: var(--muted); white-space: nowrap; font-weight: 700; }
 
-        .mode-toggle { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-color); padding: 5px; border-radius: 6px; border: 1px solid var(--border-color); }
-        .mode-btn { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 4px; font-weight: bold; color: var(--text-muted); transition: 0.3s; }
-        .mode-btn.active { background: var(--gold); color: var(--bg-color); }
+        select, input, textarea {
+            width: 100%;
+            color: var(--text);
+            background: var(--input);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 10px 11px;
+            outline: none;
+        }
+        select:focus, input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,.10); }
+        textarea { resize: vertical; min-height: 90px; }
 
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: var(--gold); font-weight: 500; }
-        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .form-header label { margin-bottom: 0; }
-        
-        select, input, textarea { width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; font-family: var(--font-zh); font-size: 14px; outline: none; }
-        select:focus, input:focus, textarea:focus { border-color: var(--gold); }
-        textarea { resize: vertical; min-height: 80px; }
+        .btn {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 13px;
+            color: var(--text);
+            background: var(--panel-soft);
+            font-weight: 700;
+            transition: .18s ease;
+        }
+        .btn:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-gold { color: #111; background: var(--gold); border-color: var(--gold); }
+        .btn-gold:hover { color: #111; background: var(--gold-hover); }
+        .btn-danger { color: var(--danger); background: transparent; border-color: var(--danger); }
+        .btn-danger:hover { color: white; background: var(--danger); }
+        .btn-small { font-size: 12px; padding: 6px 9px; }
+        .toolbar-actions { display: flex; gap: 8px; }
+        .toolbar-actions .btn { white-space: nowrap; }
 
-        .gender-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
-        .gender-btn { flex: 1; padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; border-radius: 4px; text-align: center; font-weight: bold; }
-        .gender-btn.active { background: var(--gold); color: var(--bg-color); border-color: var(--gold); }
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(360px, .92fr) minmax(460px, 1.35fr);
+            gap: 16px;
+            min-height: calc(100vh - 170px);
+        }
+        .panel {
+            min-width: 0;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .controls-panel { overflow-y: auto; }
+        .preview-panel { display: flex; flex-direction: column; min-height: 620px; }
 
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .grid-2-col .form-group { margin-bottom: 0; }
+        .reference-card {
+            border: 1px solid rgba(201,168,76,.34);
+            background: rgba(201,168,76,.07);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 18px;
+        }
+        .reference-card h2 { color: var(--gold); font-size: 14px; margin-bottom: 8px; }
+        .reference-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .reference-item { color: #d2d0ca; font-size: 13px; }
+        .reference-item strong { display: block; color: var(--text); margin-bottom: 2px; }
 
-        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: 0.2s; }
-        .btn-primary { background-color: var(--gold); color: var(--bg-color); padding: 12px; font-size: 16px; width: 100%; margin-top: 10px; }
-        .btn-primary:hover { background-color: var(--gold-hover); }
-        .btn-primary:disabled { background-color: var(--text-muted); cursor: not-allowed; }
-        .btn-secondary { background-color: transparent; color: var(--gold); border: 1px solid var(--gold); font-size: 12px; }
-        .btn-secondary:hover { background-color: var(--gold); color: var(--bg-color); }
-        .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
-        .btn-danger:hover { background-color: var(--danger); color: #fff; }
+        .form-group { margin-bottom: 17px; }
+        .form-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 7px; }
+        .form-label label { color: var(--gold); font-weight: 750; }
+        .form-label span { color: var(--muted); font-size: 11px; }
+        .option-summary {
+            margin-top: 7px;
+            padding: 8px 10px;
+            color: var(--muted);
+            background: rgba(255,255,255,.025);
+            border-left: 2px solid #555;
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        details.advanced {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--input);
+            margin-top: 6px;
+        }
+        details.advanced summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 11px 13px;
+            color: var(--gold);
+            font-weight: 750;
+        }
+        details.advanced summary::-webkit-details-marker { display: none; }
+        .advanced-content { padding: 0 13px 13px; }
+        .advanced-content p { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
 
-        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        #promptOutput { flex: 1; width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; font-family: var(--font-en); font-size: 13px; line-height: 1.5; resize: none; }
+        .panel-footer { display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; }
+
+        .preview-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .preview-header h2 { color: var(--gold); font: 700 18px/1.2 var(--font-en); }
+        .preview-header p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+        #previewSections { display: grid; gap: 10px; overflow-y: auto; padding-right: 3px; }
+        .preview-card {
+            border: 1px solid var(--border);
+            background: var(--input);
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .preview-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 11px;
+            border-bottom: 1px solid var(--border);
+        }
+        .preview-card-head h3 { color: var(--gold); font-size: 12px; letter-spacing: .03em; }
+        .preview-card pre {
+            color: #dddcd7;
+            font: 12px/1.55 var(--font-en);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            padding: 11px;
+        }
+        .full-prompt {
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .full-prompt summary { cursor: pointer; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+        #promptOutput { min-height: 300px; font: 12px/1.55 var(--font-en); }
+
+        .product-hint {
+            margin-top: 12px;
+            padding: 13px;
+            color: #d3d1ca;
+            background: rgba(201,168,76,.07);
+            border: 1px dashed rgba(201,168,76,.55);
+            border-radius: 8px;
+            font-size: 12px;
+        }
 
         /* Modal */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--panel-bg); border: 1px solid var(--gold); border-radius: 8px; width: 850px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; }
-        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-        .modal-header h2 { color: var(--gold); }
-        .close-btn { background: none; color: var(--text-muted); font-size: 24px; padding: 0; border: none; }
-        .close-btn:hover { color: var(--text-main); }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; display: flex; gap: 20px; }
-        
-        .item-list { flex: 1.2; border-right: 1px solid var(--border-color); padding-right: 20px; max-height: 60vh; overflow-y: auto;}
-        
-        /* 拖曳排序專用樣式 */
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); transition: background 0.2s; background: var(--panel-bg); }
-        .item-row:hover { background: rgba(255,255,255,0.05); }
-        .item-row.dragging { opacity: 0.4; background: rgba(201, 168, 76, 0.1); border: 1px dashed var(--gold); }
-        .item-row.drag-over { border-top: 2px solid var(--gold); background: rgba(201, 168, 76, 0.2); }
-        .drag-handle { cursor: grab; color: var(--text-muted); font-size: 18px; padding-right: 10px; user-select: none; }
-        .drag-handle:active { cursor: grabbing; }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(0,0,0,.82);
+        }
+        .modal-content {
+            width: min(1040px, 100%);
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { color: var(--gold); font-size: 18px; }
+        .close-btn { border: 0; color: var(--muted); background: transparent; font-size: 26px; }
+        .manager-tabs { display: flex; gap: 7px; padding: 11px 18px; overflow-x: auto; border-bottom: 1px solid var(--border); }
+        .manager-tab { white-space: nowrap; border: 1px solid var(--border); background: var(--input); color: var(--muted); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+        .manager-tab.active { color: #111; background: var(--gold); border-color: var(--gold); }
+        .modal-body { min-height: 0; display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; padding: 18px; overflow: hidden; }
+        .item-list { min-height: 360px; max-height: 60vh; overflow-y: auto; border-right: 1px solid var(--border); padding-right: 16px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 7px; border-bottom: 1px solid var(--border); }
+        .item-row:hover { background: rgba(255,255,255,.025); }
+        .item-row.dragging { opacity: .42; }
+        .item-row.drag-over { border-top: 2px solid var(--gold); }
+        .item-main { min-width: 0; display: flex; align-items: center; gap: 9px; }
+        .drag-handle { color: var(--muted); cursor: grab; font-size: 17px; }
+        .item-info { min-width: 0; }
+        .item-info strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item-info span { color: var(--muted); font-size: 11px; }
+        .item-actions { display: flex; gap: 5px; }
+        .item-form { min-width: 0; overflow-y: auto; }
+        .item-form h3 { color: var(--gold); margin-bottom: 13px; }
 
-        .item-info strong { display: block; margin-bottom: 4px; }
-        .item-info span { font-size: 12px; color: var(--text-muted); }
-        
-        .item-form { flex: 1; }
-        .item-form h3 { margin-bottom: 15px; color: var(--gold); }
-
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 20px); background-color: #1a1a1a; color: var(--gold); border: 1px solid var(--gold); padding: 12px 24px; border-radius: 4px; font-size: 14px; font-weight: 600; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            z-index: 2000;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, 16px);
+            padding: 11px 18px;
+            color: var(--gold);
+            background: #171819;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            font-weight: 700;
+            transition: .22s ease;
+        }
         .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #343638; border-radius: 8px; }
+
+        @media (max-width: 1040px) {
+            .toolbar { grid-template-columns: 1fr 1fr; }
+            .workspace { grid-template-columns: 1fr; }
+            .preview-panel { min-height: 520px; }
+        }
+        @media (max-width: 680px) {
+            .app-shell { padding: 10px; }
+            header { align-items: flex-start; }
+            .brand p { display: none; }
+            .toolbar { grid-template-columns: 1fr; }
+            .toolbar-actions { display: grid; grid-template-columns: 1fr 1fr; }
+            .reference-grid { grid-template-columns: 1fr; }
+            .modal-body { grid-template-columns: 1fr; overflow-y: auto; }
+            .item-list { max-height: 34vh; border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 12px; }
+        }
     </style>
 </head>
 <body>
-
+<div class="app-shell">
     <header>
-        <h1>Wako Eyewear AI Prompt Builder</h1>
-        <div id="status">🔄 連線中...</div>
+        <div class="brand">
+            <h1>Wako Eyewear AI Prompt Workspace</h1>
+            <p>Gemini 人像與眼鏡產品 Prompt 工作台 · 中文正式版</p>
+        </div>
+        <div class="status-wrap">
+            <span id="status">連線中…</span>
+            <button class="btn btn-small" type="button" onclick="reloadData()">重新載入</button>
+        </div>
     </header>
 
-    <div class="container">
-        <!-- 左欄：參數設定 -->
-        <div class="col-left">
-            <div class="mode-toggle">
-                <div class="mode-btn active" onclick="setMode('model')" id="mode-model">👩 人像模特模式</div>
-                <div class="mode-btn" onclick="setMode('product')" id="mode-product">👓 產品靜物模式</div>
-            </div>
+    <section class="toolbar" aria-label="工作台工具列">
+        <div class="toolbar-card segmented">
+            <button class="segment-btn active" type="button" onclick="setMode('model')" id="mode-model">人像模特</button>
+            <button class="segment-btn" type="button" onclick="setMode('product')" id="mode-product">產品靜物</button>
+        </div>
 
-            <div class="form-group">
-                <label>圖片比例 (Aspect Ratio)</label>
-                <select id="select-ratio" onchange="generatePrompt()">
-                   <option value="4:5">直式 4:5 (IG 貼文)</option>
-                    <option value="2:3">直式 2:3 (人像預設)</option>
-                    <option value="1:1">等比 1:1 (靜物預設/方形)</option>
-                    <option value="9:16">直式 9:16 (限動/Reels)</option>
-                    <option value="3:2">橫式 3:2 (相機預設)</option>
-                    <option value="16:9">橫式 16:9 (寬螢幕)</option>
-                </select>
-            </div>
+        <div class="toolbar-card segmented" id="gender-toolbar">
+            <button class="segment-btn active" type="button" onclick="setGender('female')" id="btn-female">女模</button>
+            <button class="segment-btn" type="button" onclick="setGender('male')" id="btn-male">男模</button>
+        </div>
 
+        <div class="toolbar-card ratio-wrap">
+            <label for="select-ratio">圖片比例</label>
+            <select id="select-ratio" onchange="generatePrompt()">
+                <option value="4:5">4:5 · IG 貼文</option>
+                <option value="2:3">2:3 · 直式人像</option>
+                <option value="1:1">1:1 · 方形</option>
+                <option value="9:16">9:16 · 限動／Reels</option>
+                <option value="3:2">3:2 · 橫式相片</option>
+                <option value="16:9">16:9 · 寬螢幕</option>
+            </select>
+        </div>
+
+        <div class="toolbar-actions">
+            <button class="btn" type="button" onclick="openManager()">管理 Prompt</button>
+            <button class="btn btn-gold" type="button" onclick="copyPrompt()">複製完整 Prompt</button>
+        </div>
+    </section>
+
+    <main class="workspace">
+        <section class="panel controls-panel" aria-label="Prompt 設定">
             <div id="section-model">
-                <div class="gender-toggle">
-                    <div class="gender-btn active" onclick="setGender('female')" id="btn-female">👩 女模 (Female)</div>
-                    <div class="gender-btn" onclick="setGender('male')" id="btn-male">👨 男模 (Male)</div>
-                </div>
-
-                <div class="form-group">
-                    <label>眼鏡細節輔助 (可留空給 Gemini 判斷)</label>
-                    <textarea id="input-eyewear" placeholder="(選填) 若有圖片抓不到的細節可寫於此..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>攝影風格 (STYLES)</label>
-                        <button class="btn-secondary" onclick="openModal('STYLES', '攝影風格')">管理</button>
-                    </div>
-                    <select id="select-styles" onchange="generatePrompt()"></select>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>外貌與臉部特徵 (APPEARANCES)</label>
-                        <button class="btn-secondary" onclick="openModal('APPEARANCES', '外貌與臉部特徵')">管理</button>
-                    </div>
-                    <select id="select-appearances" onchange="generatePrompt()"></select>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>服裝風格 (OUTFITS)</label>
-                        <button class="btn-secondary" onclick="openModal('OUTFITS', '服裝風格')">管理</button>
-                    </div>
-                    <select id="select-outfits" onchange="generatePrompt()"></select>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>場景與背景 (SCENES)</label>
-                        <button class="btn-secondary" onclick="openModal('SCENES', '場景與背景')">管理</button>
-                    </div>
-                    <select id="select-scenes" onchange="generatePrompt()"></select>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>姿勢與鏡頭 (POSES)</label>
-                        <button class="btn-secondary" onclick="openModal('POSES', '姿勢與鏡頭')">管理</button>
-                    </div>
-                    <select id="select-poses" onchange="generatePrompt()"></select>
-                </div>
-            </div>
-
-            <div id="section-product" style="display: none;">
-                <div class="form-group">
-                    <div class="form-header">
-                        <label>靜物佈局與材質 (PRODUCT STILL LIFE)</label>
-                        <button class="btn-secondary" onclick="openModal('PRODUCT_LAYOUTS', '靜物佈局')">管理</button>
-                    </div>
-                    <select id="select-product-layouts" onchange="generatePrompt()"></select>
-                </div>
-                <div style="padding: 15px; background: rgba(201, 168, 76, 0.1); border: 1px dashed var(--gold); border-radius: 6px; color: #ccc; font-size: 13px;">
-                    💡 <strong>靜物模式提示：</strong><br>
-                    此模式專為產生「純產品圖」設計。請將生成的 Prompt 貼給 Gemini，並附上您的眼鏡去背圖或產品實拍圖，AI 將會以此佈局為您產出高質感的商業靜物照。
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="generatePrompt()">生成 Prompt</button>
-        </div>
-
-        <div class="col-right">
-            <div class="preview-header">
-                <h2 style="color: var(--gold);">Prompt 預覽</h2>
-                <button class="btn-secondary" onclick="copyPrompt()">📋 一鍵複製</button>
-            </div>
-            <textarea id="promptOutput" readonly placeholder="等待資料載入中..."></textarea>
-        </div>
-    </div>
-
-    <!-- 管理 Modal -->
-    <div class="modal-overlay" id="manageModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">管理資料</h2>
-                <button class="close-btn" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="item-list" id="modalItemList">
-                    <!-- 列表動態生成 -->
-                </div>
-                <div class="item-form">
-                    <h3 id="formTitle">新增項目</h3>
-                    <input type="hidden" id="edit-id">
-                    <div class="form-group">
-                        <label>顯示名稱 (中文 Label)</label>
-                        <input type="text" id="edit-label" placeholder="例如：韓系玻璃肌模特兒">
-                    </div>
-                    <div class="form-group">
-                        <label>適用性別 (Gender)</label>
-                        <select id="edit-gender">
-                            <option value="both">通用 (Both)</option>
-                            <option value="female">限女性 (Female)</option>
-                            <option value="male">限男性 (Male)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>英文描述 (Prompt)</label>
-                        <textarea id="edit-prompt" style="height: 150px;" placeholder="輸入完整英文 Prompt 片段..."></textarea>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" id="saveBtn" onclick="saveItem()">儲存至雲端</button>
-                        <button class="btn-secondary" onclick="resetForm()" style="padding: 12px; font-size: 16px;">取消 / 清空</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast" class="toast">📋 Prompt 已複製到剪貼簿！</div>
-
-    <!-- 使用 type="module" 確保與 Supabase SDK 完美相容 -->
-    <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-        
-        const supabase = createClient(
-            "https://yxalpzculcyhzvnyvecb.supabase.co",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
-        );
-
-        let currentMode = 'model'; 
-        let currentGender = 'female';
-        let currentManageCategory = '';
-        let DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [], PRODUCT_LAYOUTS: [] };
-        let draggedIndex = null;
-
-        // ==========================================
-        // 必須將所有 HTML onclick 呼叫的函數綁定到 window 上
-        // ==========================================
-        
-        window.showToast = function(message) {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 2000);
-        }
-
-        window.setMode = function(mode) {
-            currentMode = mode;
-            document.getElementById('mode-model').classList.toggle('active', mode === 'model');
-            document.getElementById('mode-product').classList.toggle('active', mode === 'product');
-            
-            document.getElementById('section-model').style.display = mode === 'model' ? 'block' : 'none';
-            document.getElementById('section-product').style.display = mode === 'product' ? 'block' : 'none';
-
-            const ratioSelect = document.getElementById('select-ratio');
-            if(mode === 'product' && ratioSelect.value === '2:3') ratioSelect.value = '1:1';
-            if(mode === 'model' && ratioSelect.value === '1:1') ratioSelect.value = '2:3';
-
-            window.generatePrompt();
-        }
-
-        window.setGender = function(gender) {
-            currentGender = gender;
-            document.getElementById('btn-female').classList.toggle('active', gender === 'female');
-            document.getElementById('btn-male').classList.toggle('active', gender === 'male');
-            refreshAllSelects();
-            window.generatePrompt();
-        }
-
-        window.generatePrompt = function() {
-            const ratio = document.getElementById('select-ratio').value;
-            let finalPrompt = "";
-
-            if (currentMode === 'model') {
-                const eyewear = document.getElementById('input-eyewear').value.trim();
-                const appId = document.getElementById('select-appearances').value;
-                const outId = document.getElementById('select-outfits').value;
-                const sceneId = document.getElementById('select-scenes').value;
-                const poseId = document.getElementById('select-poses').value;
-                const styleId = document.getElementById('select-styles').value;
-
-                const appP = getItemById(DATA_MAP.APPEARANCES, appId).prompt_text;
-                const outP = getItemById(DATA_MAP.OUTFITS, outId).prompt_text;
-                const sceneP = getItemById(DATA_MAP.SCENES, sceneId).prompt_text;
-                const poseP = getItemById(DATA_MAP.POSES, poseId).prompt_text;
-                const styleP = getItemById(DATA_MAP.STYLES, styleId).prompt_text;
-
-                const eyewearBlock = eyewear ? `\nEYEWEAR DETAILS:\n${eyewear}\n` : "";
-
-                finalPrompt = `[EYEWEAR & COMPOSITION]
-Using the provided eyewear product reference images, generate a half-body portrait (from waist up, ${ratio} aspect ratio) of a model wearing exactly these glasses.
-${eyewearBlock}
-The glasses must be low-profile, discreet, and perfectly proportioned to the model's face, matching the exact scale of the reference images. Reproduce all details exactly. Do not simplify, enlarge, or reinterpret.
-
-[APPEARANCE BLOCK]
-${appP}
-
-[OUTFIT BLOCK]
-OUTFIT:
-${outP}
-
-[SCENE BLOCK]
-SCENE & BACKGROUND:
-${sceneP}
-
-[POSE BLOCK]
-POSE & CAMERA ANGLE:
-${poseP}
-
-[STYLE & OUTPUT BLOCK]
-STYLE:
-${styleP}
-
-OUTPUT: High resolution, exact eyewear fidelity above all else. Aspect ratio: ${ratio} --ar ${ratio}`;
-
-            } else {
-                const layoutId = document.getElementById('select-product-layouts').value;
-                const layoutP = getItemById(DATA_MAP.PRODUCT_LAYOUTS, layoutId).prompt_text;
-                
-                finalPrompt = `[PRODUCT STILL LIFE MODE]
-${layoutP}
-
-OUTPUT: 
-Aspect Ratio: ${ratio} --ar ${ratio}`;
-            }
-
-            document.getElementById('promptOutput').value = finalPrompt;
-        }
-
-        window.copyPrompt = function() {
-            const output = document.getElementById('promptOutput');
-            output.select();
-            document.execCommand('copy');
-            window.showToast("📋 Prompt 已複製到剪貼簿！");
-        }
-
-        window.openModal = function(categoryKey, title) {
-            currentManageCategory = categoryKey;
-            document.getElementById('modalTitle').innerText = `管理：${title}`;
-            document.getElementById('manageModal').style.display = 'flex';
-            window.resetForm();
-            renderModalList();
-        }
-
-        window.closeModal = function() {
-            document.getElementById('manageModal').style.display = 'none';
-        }
-
-        window.resetForm = function() {
-            document.getElementById('formTitle').innerText = '新增項目';
-            document.getElementById('edit-id').value = '';
-            document.getElementById('edit-label').value = '';
-            document.getElementById('edit-gender').value = 'both';
-            document.getElementById('edit-prompt').value = '';
-        }
-
-        window.editItem = function(id) {
-            const dataArray = DATA_MAP[currentManageCategory];
-            const item = dataArray.find(i => i.id === id);
-            if(!item) return;
-
-            document.getElementById('formTitle').innerText = '編輯項目';
-            document.getElementById('edit-id').value = item.id;
-            document.getElementById('edit-label').value = item.label;
-            document.getElementById('edit-gender').value = item.gender;
-            document.getElementById('edit-prompt').value = item.prompt_text;
-        }
-
-        window.saveItem = async function() {
-            const idInput = document.getElementById('edit-id').value;
-            const label = document.getElementById('edit-label').value.trim();
-            const gender = document.getElementById('edit-gender').value;
-            const prompt_text = document.getElementById('edit-prompt').value.trim();
-
-            if(!label || !prompt_text) {
-                alert('請填寫顯示名稱與英文描述！');
-                return;
-            }
-
-            const btn = document.getElementById('saveBtn');
-            btn.disabled = true;
-            btn.innerText = '儲存中...';
-
-            try {
-                if (idInput) {
-                    const { error } = await supabase.from('wako_prompts').update({ label, gender, prompt_text }).eq('id', idInput);
-                    if(error) throw error;
-                    window.showToast("✨ 雲端修改成功！");
-                } else {
-                    const currentArr = DATA_MAP[currentManageCategory] || [];
-                    const maxSort = currentArr.length > 0 ? Math.max(...currentArr.map(i => i.sort_order || 0)) : 0;
-                    
-                    const { error } = await supabase.from('wako_prompts').insert([{ 
-                        category: currentManageCategory, 
-                        label, 
-                        gender, 
-                        prompt_text,
-                        sort_order: maxSort + 1 
-                    }]);
-                    if(error) throw error;
-                    window.showToast("✨ 雲端新增成功！");
-                }
-                
-                await loadData();
-                window.resetForm();
-                renderModalList();
-            } catch (error) {
-                alert('儲存失敗：' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = '儲存至雲端';
-            }
-        }
-
-        window.deleteItem = async function(id) {
-            if(!confirm('確定要從雲端刪除此項目嗎？此動作無法復原。')) return;
-            
-            try {
-                const { error } = await supabase.from('wako_prompts').delete().eq('id', id);
-                if(error) throw error;
-                window.showToast("🗑️ 項目已成功刪除");
-                await loadData();
-                renderModalList();
-            } catch (error) {
-                alert('刪除失敗：' + error.message);
-            }
-        }
-
-        // ==========================================
-        // 內部邏輯函數 (不需綁定到 window)
-        // ==========================================
-
-        async function loadData() {
-            document.getElementById('status').innerText = '🔄 載入資料中...';
-            document.getElementById('status').style.color = 'var(--text-muted)';
-            
-            // 安全抓取資料，並在前端進行排序，防止資料庫缺少 sort_order 欄位時崩潰
-            const { data, error } = await supabase.from('wako_prompts').select('*');
-
-            if (error) {
-                console.error("讀取失敗:", error);
-                document.getElementById('status').innerText = '❌ 連線失敗';
-                document.getElementById('status').style.color = 'var(--danger)';
-                window.showToast("❌ 連線資料庫失敗");
-                return;
-            }
-
-            // 前端安全排序邏輯
-            data.sort((a, b) => {
-                const orderA = a.sort_order != null ? a.sort_order : 9999;
-                const orderB = b.sort_order != null ? b.sort_order : 9999;
-                if (orderA !== orderB) return orderA - orderB;
-                return new Date(a.created_at) - new Date(b.created_at);
-            });
-
-            DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [], PRODUCT_LAYOUTS: [] };
-            data.forEach(item => {
-                if(DATA_MAP[item.category]) {
-                    DATA_MAP[item.category].push(item);
-                }
-            });
-
-            document.getElementById('status').innerText = '🟢 雲端同步完成';
-            document.getElementById('status').style.color = '#10b981';
-            
-            refreshAllSelects();
-            window.generatePrompt();
-        }
-
-        function refreshAllSelects() {
-            populateSelect('select-appearances', DATA_MAP.APPEARANCES, true);
-            populateSelect('select-outfits', DATA_MAP.OUTFITS, true);
-            populateSelect('select-scenes', DATA_MAP.SCENES, false);
-            populateSelect('select-poses', DATA_MAP.POSES, false);
-            populateSelect('select-styles', DATA_MAP.STYLES, false);
-            populateSelect('select-product-layouts', DATA_MAP.PRODUCT_LAYOUTS, false);
-        }
-
-        function populateSelect(selectId, dataArray, filterGender) {
-            const select = document.getElementById(selectId);
-            if (!select) return;
-            dataArray = dataArray || [];
-            
-            const currentVal = select.value;
-            select.innerHTML = '';
-            
-            const filtered = filterGender ? dataArray.filter(item => item.gender === 'both' || item.gender === currentGender) : dataArray;
-            
-            if(filtered.length === 0) {
-                select.innerHTML = '<option value="">(無適用選項)</option>';
-                return;
-            }
-
-            filtered.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.id;
-                opt.textContent = item.label;
-                select.appendChild(opt);
-            });
-
-            if (filtered.find(i => i.id === currentVal)) select.value = currentVal;
-            else select.value = filtered[0].id;
-        }
-
-        function getItemById(dataArray, id) {
-            dataArray = dataArray || [];
-            return dataArray.find(item => item.id === id) || { prompt_text: '' };
-        }
-
-        function renderModalList() {
-            const listContainer = document.getElementById('modalItemList');
-            listContainer.innerHTML = '';
-            const dataArray = DATA_MAP[currentManageCategory] || [];
-
-            dataArray.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.className = 'item-row';
-                row.draggable = true;
-                row.dataset.index = index;
-                
-                const genderLabel = item.gender === 'both' ? '通用' : (item.gender === 'female' ? '女' : '男');
-
-                row.addEventListener('dragstart', handleDragStart);
-                row.addEventListener('dragover', handleDragOver);
-                row.addEventListener('dragleave', handleDragLeave);
-                row.addEventListener('drop', handleDrop);
-                row.addEventListener('dragend', handleDragEnd);
-
-                row.innerHTML = `
-                    <div style="display:flex; align-items:center;">
-                        <div class="drag-handle" title="按住拖曳排序">☰</div>
-                        <div class="item-info">
-                            <strong>${item.label}</strong>
-                            <span>[${genderLabel}]</span>
+                <div class="reference-card">
+                    <h2>參考圖分工</h2>
+                    <div class="reference-grid">
+                        <div class="reference-item">
+                            <strong>人物參考圖</strong>
+                            只用來鎖定人物身份、臉部與髮型
+                        </div>
+                        <div class="reference-item">
+                            <strong>眼鏡產品圖</strong>
+                            用來鎖定鏡框結構、比例、材質與顏色
                         </div>
                     </div>
-                    <div style="display: flex; gap: 5px; align-items: center;">
-                        <button class="btn-secondary" onclick="editItem('${item.id}')">編輯</button>
-                        <button class="btn-danger" onclick="deleteItem('${item.id}')">刪除</button>
+                </div>
+
+                <!-- 外貌依目前性別自動套用，保留隱藏選單維持資料結構相容 -->
+                <select id="select-appearances" hidden></select>
+
+                <div class="form-group">
+                    <div class="form-label"><label for="select-outfits">1. 服裝</label><span>OUTFIT</span></div>
+                    <select id="select-outfits" onchange="generatePrompt()"></select>
+                    <div class="option-summary" id="summary-outfits"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label"><label for="select-scenes">2. 場景</label><span>SCENE</span></div>
+                    <select id="select-scenes" onchange="generatePrompt()"></select>
+                    <div class="option-summary" id="summary-scenes"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label"><label for="select-poses">3. 姿勢與取景</label><span>POSE & FRAMING</span></div>
+                    <select id="select-poses" onchange="generatePrompt()"></select>
+                    <div class="option-summary" id="summary-poses"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label"><label for="select-styles">4. 攝影風格</label><span>STYLE</span></div>
+                    <select id="select-styles" onchange="generatePrompt()"></select>
+                    <div class="option-summary" id="summary-styles"></div>
+                </div>
+
+                <details class="advanced">
+                    <summary>＋ 進階：補充眼鏡細節</summary>
+                    <div class="advanced-content">
+                        <p>只有參考圖難以辨識的型號文字、色號或特殊結構才需要填寫。</p>
+                        <textarea id="input-eyewear" oninput="generatePrompt()" placeholder="例如：鏡腳內側文字、色號、特殊鉸鏈結構……"></textarea>
                     </div>
-                `;
-                listContainer.appendChild(row);
+                </details>
+            </div>
+
+            <div id="section-product" hidden>
+                <div class="form-group">
+                    <div class="form-label"><label for="select-product-layouts">產品佈局與材質</label><span>PRODUCT STILL LIFE</span></div>
+                    <select id="select-product-layouts" onchange="generatePrompt()"></select>
+                    <div class="option-summary" id="summary-product-layouts"></div>
+                </div>
+                <div class="product-hint">
+                    請在 Gemini 一併附上眼鏡產品實拍圖。此模式會依選定佈局建立純產品商業靜物照。
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <button class="btn" type="button" onclick="resetWorkspace()">重設目前選項</button>
+                <button class="btn btn-gold" type="button" onclick="copyPrompt()">複製完整 Prompt</button>
+            </div>
+        </section>
+
+        <section class="panel preview-panel" aria-label="Prompt 預覽">
+            <div class="preview-header">
+                <div>
+                    <h2>Prompt 分區預覽</h2>
+                    <p>每個模組獨立顯示，方便快速檢查組合內容</p>
+                </div>
+                <button class="btn btn-gold" type="button" onclick="copyPrompt()">複製全部</button>
+            </div>
+
+            <div id="previewSections"></div>
+
+            <details class="full-prompt">
+                <summary>查看完整純文字 Prompt</summary>
+                <textarea id="promptOutput" readonly placeholder="等待資料載入中……"></textarea>
+            </details>
+        </section>
+    </main>
+</div>
+
+<div class="modal-overlay" id="manageModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">管理 Prompt 資料</h2>
+            <button class="close-btn" type="button" onclick="closeModal()" aria-label="關閉">×</button>
+        </div>
+        <div class="manager-tabs" id="managerTabs"></div>
+        <div class="modal-body">
+            <div class="item-list" id="modalItemList"></div>
+            <div class="item-form">
+                <h3 id="formTitle">新增項目</h3>
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <div class="form-label"><label for="edit-label">顯示名稱</label></div>
+                    <input type="text" id="edit-label" placeholder="輸入中文 Label">
+                </div>
+                <div class="form-group">
+                    <div class="form-label"><label for="edit-gender">適用性別</label></div>
+                    <select id="edit-gender">
+                        <option value="both">通用</option>
+                        <option value="female">限女性</option>
+                        <option value="male">限男性</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="form-label"><label for="edit-prompt">英文 Prompt 內容</label></div>
+                    <textarea id="edit-prompt" style="min-height:190px" placeholder="輸入完整英文 Prompt 片段"></textarea>
+                </div>
+                <div style="display:flex; gap:8px">
+                    <button class="btn btn-gold" id="saveBtn" type="button" onclick="saveItem()">儲存至雲端</button>
+                    <button class="btn" type="button" onclick="resetForm()">取消／清空</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">Prompt 已複製</div>
+
+<script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+        "https://yxalpzculcyhzvnyvecb.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWxwemN1bGN5aHp2bnl2ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMjk5OTIsImV4cCI6MjA4MzYwNTk5Mn0.rxdujTa6x37QpDtm1uTrYIZ_6MTNVcqLMEuJYvfFKPI"
+    );
+
+    const CATEGORY_META = {
+        APPEARANCES: "人物參考",
+        OUTFITS: "服裝",
+        SCENES: "場景",
+        POSES: "姿勢",
+        STYLES: "攝影風格",
+        PRODUCT_LAYOUTS: "產品佈局"
+    };
+
+    let currentMode = "model";
+    let currentGender = "female";
+    let currentManageCategory = "OUTFITS";
+    let DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [], PRODUCT_LAYOUTS: [] };
+    let draggedIndex = null;
+    let fullPromptText = "";
+    let currentPreviewSections = [];
+
+    window.showToast = function(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1900);
+    };
+
+    window.setMode = function(mode) {
+        currentMode = mode;
+        document.getElementById("mode-model").classList.toggle("active", mode === "model");
+        document.getElementById("mode-product").classList.toggle("active", mode === "product");
+        document.getElementById("section-model").hidden = mode !== "model";
+        document.getElementById("section-product").hidden = mode !== "product";
+        document.getElementById("gender-toolbar").style.visibility = mode === "model" ? "visible" : "hidden";
+        window.generatePrompt();
+    };
+
+    window.setGender = function(gender) {
+        currentGender = gender;
+        document.getElementById("btn-female").classList.toggle("active", gender === "female");
+        document.getElementById("btn-male").classList.toggle("active", gender === "male");
+        refreshAllSelects();
+        window.generatePrompt();
+    };
+
+    window.resetWorkspace = function() {
+        document.getElementById("select-ratio").value = "4:5";
+        document.getElementById("input-eyewear").value = "";
+        if (currentMode === "model") {
+            currentGender = "female";
+            document.getElementById("btn-female").classList.add("active");
+            document.getElementById("btn-male").classList.remove("active");
+            refreshAllSelects(false);
+            ["select-outfits", "select-scenes", "select-poses", "select-styles"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el.options.length) el.selectedIndex = 0;
             });
+        } else {
+            const el = document.getElementById("select-product-layouts");
+            if (el.options.length) el.selectedIndex = 0;
+        }
+        window.generatePrompt();
+    };
+
+    window.generatePrompt = function() {
+        const ratio = document.getElementById("select-ratio").value;
+        let sections = [];
+
+        if (currentMode === "model") {
+            const appearance = getAppearanceForGender();
+            const outfit = getSelectedItem("OUTFITS", "select-outfits");
+            const scene = getSelectedItem("SCENES", "select-scenes");
+            const pose = getSelectedItem("POSES", "select-poses");
+            const style = getSelectedItem("STYLES", "select-styles");
+            const eyewear = document.getElementById("input-eyewear").value.trim();
+
+            const referenceRules = `【人物參考圖】
+將指定的人物參考圖作為人物身分、臉部、五官比例、骨架、髮型、年齡感、族裔特徵與自然皮膚狀態的唯一依據。先綜合分析提供的三視圖及不同角度表情，最終呈現同一人物。人物參考圖只負責人物身分，不帶入原圖中的服裝、背景、光線或姿勢，除非下方另外選定。
+
+【眼鏡參考圖】
+將提供的眼鏡參考圖視為不可修改的固定圖像資產及唯一產品依據，而不是設計靈感。綜合多張參考圖分析同一副眼鏡，讓人物實際佩戴這副產品。完整保留原始鏡框輪廓、比例、尺寸感、鼻橋、框線、鉸鏈、鏡腳、鼻墊、材質、透明度、光澤、顏色、Logo、印刷與所有可見細節。眼鏡依照人物臉部形成真實佩戴位置，產品本身維持原貌。
+
+某個細節在單張圖中不清楚時，只使用其他眼鏡參考圖交叉判斷；仍無法確認時，保守維持已看得見的產品特徵。
+
+【眼鏡上臉尺度】
+眼鏡在臉上的比例自然、適中、低調並符合正常驗配。眼鏡清楚可見，鏡片不過度支配臉部，框面外緣接近人物自然臉寬，下框落點自然。提供實際尺寸時，尺寸視為決定上臉比例的硬條件。`;
+
+            const composition = `生成一張 ${ratio} 比例的寫實人像照片。
+
+【核心構圖】
+最終畫面始終聚焦在人物上腹部以上，主要呈現臉部、眼鏡、肩膀、手臂與上半身姿態。臀部、大腿、膝蓋及完整下半身保持在畫面外。人物臉部與眼鏡在畫面中要足夠大，能清楚檢視眼鏡。
+
+人物置於中央 1:1 安全裁切區。原始 4:5 圖片之後裁切成 1:1 時，頭部、臉部、眼鏡、肩膀、手臂與姿勢重點仍完整保留。頭髮最高點到圖片頂部之間，保留約人物頭部高度三分之一的乾淨留白。
+
+所選姿勢只控制上半身動作、肩線、頭部角度、視線與表情；姿勢描述中的坐姿、走動或全身動作只用來建立姿態，不改變上腹部以上的鏡頭範圍。
+
+【場景理解】
+所選場景是一個空間與氣氛方向。建築線條、空間布局、家具種類、背景細節與次要擺件可在每次生成時自然變化，同時維持該場景的地點、色調與視覺身分。背景作為人物與眼鏡的陪襯，保持自然層次與清楚空間感。`;
+
+            const realism = `人物保留參考圖中的真實皮膚材質，包括自然毛孔、細微膚色差異、局部紋理、細紋與合理的不完美。皮膚具有真實厚度、立體感與符合光線方向的反應。
+
+所選攝影風格可以改變色調、對比、顆粒、曝光與高光表現，但人物原有的五官、骨架、年齡感、皮膚紋理與真實特徵維持一致。眼鏡與場景物件保持真實材質、正確結構、合理比例與符合環境的反射。`;
+
+            sections = [
+                { title: "參考圖使用規則", text: referenceRules },
+                { title: "構圖與場景規則", text: composition },
+                { title: "人物與產品真實度", text: realism },
+                { title: "人物身分", text: appearance?.prompt_text || "" },
+                { title: "服裝", text: outfit?.prompt_text || "" },
+                { title: "場景與背景", text: scene?.prompt_text || "" },
+                { title: "姿勢與鏡頭角度", text: pose?.prompt_text || "" },
+                { title: "攝影風格", text: style?.prompt_text || "" }
+            ];
+
+            if (eyewear) sections.splice(3, 0, { title: "補充眼鏡細節", text: eyewear });
+            sections.push({
+                title: "輸出要求",
+                text: `輸出系統能生成的最高畫質寫實成品。優先順序為：眼鏡細節與能見度 > 人物身分與姿勢 > 場景。完整呈現指定人物、眼鏡產品、上腹部以上構圖、頭頂三分之一頭高留白及中央 1:1 安全裁切。人物皮膚、身體結構、眼鏡佩戴位置、材質反射與場景光線保持真實可信。輸出比例：${ratio}。`
+            });
+        } else {
+            const layout = getSelectedItem("PRODUCT_LAYOUTS", "select-product-layouts");
+            sections = [
+                { title: "靜物背景模式", text: layout?.prompt_text || "" },
+                { title: "輸出要求", text: `輸出系統能生成的最高畫質專業商業靜物攝影成品。輸出比例：${ratio}。` }
+            ];
         }
 
-        function handleDragStart(e) {
-            draggedIndex = parseInt(this.dataset.index);
-            e.dataTransfer.effectAllowed = 'move';
-            this.classList.add('dragging');
+        currentPreviewSections = sections;
+        fullPromptText = sections.map(section => `[${section.title}]\n${section.text}`).join("\n\n");
+        document.getElementById("promptOutput").value = fullPromptText;
+        renderPreviewSections();
+        updateSelectionSummaries();
+    };
+
+    function renderPreviewSections() {
+        const container = document.getElementById("previewSections");
+        container.replaceChildren();
+
+        currentPreviewSections.forEach((section, index) => {
+            const card = document.createElement("article");
+            card.className = "preview-card";
+
+            const head = document.createElement("div");
+            head.className = "preview-card-head";
+            const title = document.createElement("h3");
+            title.textContent = section.title;
+            const copyButton = document.createElement("button");
+            copyButton.type = "button";
+            copyButton.className = "btn btn-small";
+            copyButton.textContent = "複製此區";
+            copyButton.addEventListener("click", () => copyText(`[${section.title}]\n${section.text}`, "此區段已複製"));
+            head.append(title, copyButton);
+
+            const pre = document.createElement("pre");
+            pre.textContent = section.text;
+            card.append(head, pre);
+            container.appendChild(card);
+        });
+    }
+
+    async function copyText(text, successMessage) {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch {
+            const helper = document.createElement("textarea");
+            helper.value = text;
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
+            document.execCommand("copy");
+            helper.remove();
         }
+        window.showToast(successMessage);
+    }
 
-        function handleDragOver(e) {
-            e.preventDefault(); 
-            e.dataTransfer.dropEffect = 'move';
-            this.classList.add('drag-over');
-        }
+    window.copyPrompt = function() {
+        if (!fullPromptText) return;
+        copyText(fullPromptText, "完整 Prompt 已複製");
+    };
 
-        function handleDragLeave(e) {
-            this.classList.remove('drag-over');
-        }
+    window.openManager = function() {
+        const preferred = currentMode === "product" ? "PRODUCT_LAYOUTS" : "OUTFITS";
+        document.getElementById("manageModal").style.display = "flex";
+        switchManageCategory(preferred);
+    };
 
-        async function handleDrop(e) {
-            e.stopPropagation();
-            this.classList.remove('drag-over');
-            
-            const targetIndex = parseInt(this.dataset.index);
-            if (draggedIndex === null || draggedIndex === targetIndex) return;
+    window.openModal = function(categoryKey) {
+        document.getElementById("manageModal").style.display = "flex";
+        switchManageCategory(categoryKey);
+    };
 
-            const arr = DATA_MAP[currentManageCategory];
-            const [movedItem] = arr.splice(draggedIndex, 1);
-            arr.splice(targetIndex, 0, movedItem);
+    window.closeModal = function() {
+        document.getElementById("manageModal").style.display = "none";
+    };
 
-            arr.forEach((item, idx) => item.sort_order = idx);
+    function renderManagerTabs() {
+        const tabs = document.getElementById("managerTabs");
+        tabs.replaceChildren();
+        Object.entries(CATEGORY_META).forEach(([key, label]) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "manager-tab";
+            button.dataset.category = key;
+            button.textContent = label;
+            button.addEventListener("click", () => switchManageCategory(key));
+            tabs.appendChild(button);
+        });
+    }
 
-            renderModalList();
-            refreshAllSelects();
-            window.generatePrompt();
+    function switchManageCategory(categoryKey) {
+        currentManageCategory = categoryKey;
+        document.getElementById("modalTitle").textContent = `管理 Prompt：${CATEGORY_META[categoryKey]}`;
+        document.querySelectorAll(".manager-tab").forEach(tab => {
+            tab.classList.toggle("active", tab.dataset.category === categoryKey);
+        });
+        window.resetForm();
+        renderModalList();
+    }
 
-            const updates = arr.map(item => ({
-                id: item.id,
-                category: item.category,
-                label: item.label,
-                gender: item.gender,
-                prompt_text: item.prompt_text,
-                sort_order: item.sort_order
-            }));
+    window.resetForm = function() {
+        document.getElementById("formTitle").textContent = "新增項目";
+        document.getElementById("edit-id").value = "";
+        document.getElementById("edit-label").value = "";
+        document.getElementById("edit-gender").value = "both";
+        document.getElementById("edit-prompt").value = "";
+    };
 
-            const { error } = await supabase.from('wako_prompts').upsert(updates);
-            if (error) {
-                alert('排序儲存失敗，請確認您已在資料庫執行新增 sort_order 欄位的 SQL 指令。');
-                loadData(); 
+    window.editItem = function(id) {
+        const item = (DATA_MAP[currentManageCategory] || []).find(row => row.id === id);
+        if (!item) return;
+        document.getElementById("formTitle").textContent = "編輯項目";
+        document.getElementById("edit-id").value = item.id;
+        document.getElementById("edit-label").value = item.label;
+        document.getElementById("edit-gender").value = item.gender;
+        document.getElementById("edit-prompt").value = item.prompt_text;
+    };
+
+    window.saveItem = async function() {
+        const id = document.getElementById("edit-id").value;
+        const label = document.getElementById("edit-label").value.trim();
+        const gender = document.getElementById("edit-gender").value;
+        const prompt_text = document.getElementById("edit-prompt").value.trim();
+        if (!label || !prompt_text) return alert("請填寫顯示名稱與 Prompt 內容");
+
+        const button = document.getElementById("saveBtn");
+        button.disabled = true;
+        button.textContent = "儲存中…";
+        try {
+            if (id) {
+                const { error } = await supabase.from("wako_prompts").update({ label, gender, prompt_text }).eq("id", id);
+                if (error) throw error;
+                window.showToast("雲端修改成功");
             } else {
-                window.showToast("✨ 排序已自動儲存");
+                const current = DATA_MAP[currentManageCategory] || [];
+                const maxSort = current.length ? Math.max(...current.map(item => item.sort_order ?? 0)) : -1;
+                const { error } = await supabase.from("wako_prompts").insert([{
+                    category: currentManageCategory,
+                    label,
+                    gender,
+                    prompt_text,
+                    sort_order: maxSort + 1
+                }]);
+                if (error) throw error;
+                window.showToast("雲端新增成功");
             }
+            await loadData();
+            window.resetForm();
+            renderModalList();
+        } catch (error) {
+            alert(`儲存失敗：${error.message}`);
+        } finally {
+            button.disabled = false;
+            button.textContent = "儲存至雲端";
+        }
+    };
+
+    window.deleteItem = async function(id) {
+        if (!confirm("確定要刪除此項目嗎？")) return;
+        try {
+            const { error } = await supabase.from("wako_prompts").delete().eq("id", id);
+            if (error) throw error;
+            window.showToast("項目已刪除");
+            await loadData();
+            renderModalList();
+        } catch (error) {
+            alert(`刪除失敗：${error.message}`);
+        }
+    };
+
+    window.reloadData = function() { loadData(); };
+
+    async function loadData() {
+        setStatus("載入資料中…", "var(--muted)");
+        const { data, error } = await supabase.from("wako_prompts").select("*");
+        if (error) {
+            console.error(error);
+            setStatus("連線失敗", "var(--danger)");
+            window.showToast("Supabase 連線失敗");
+            return;
         }
 
-        function handleDragEnd(e) {
-            this.classList.remove('dragging');
-            document.querySelectorAll('.item-row').forEach(row => row.classList.remove('drag-over'));
-            draggedIndex = null;
+        data.sort((a, b) => {
+            const orderA = a.sort_order ?? 9999;
+            const orderB = b.sort_order ?? 9999;
+            if (orderA !== orderB) return orderA - orderB;
+            return new Date(a.created_at) - new Date(b.created_at);
+        });
+
+        DATA_MAP = { APPEARANCES: [], OUTFITS: [], SCENES: [], POSES: [], STYLES: [], PRODUCT_LAYOUTS: [] };
+        data.forEach(item => {
+            if (DATA_MAP[item.category]) DATA_MAP[item.category].push(item);
+        });
+
+        setStatus("雲端同步完成", "var(--success)");
+        refreshAllSelects();
+        window.generatePrompt();
+    }
+
+    function setStatus(text, color) {
+        const status = document.getElementById("status");
+        status.textContent = text;
+        status.style.color = color;
+    }
+
+    function refreshAllSelects(preserveSelection = true) {
+        populateSelect("select-appearances", DATA_MAP.APPEARANCES, true, preserveSelection);
+        populateSelect("select-outfits", DATA_MAP.OUTFITS, true, preserveSelection);
+        populateSelect("select-scenes", DATA_MAP.SCENES, false, preserveSelection);
+        populateSelect("select-poses", DATA_MAP.POSES, false, preserveSelection);
+        populateSelect("select-styles", DATA_MAP.STYLES, false, preserveSelection);
+        populateSelect("select-product-layouts", DATA_MAP.PRODUCT_LAYOUTS, false, preserveSelection);
+    }
+
+    function populateSelect(selectId, dataArray, filterGender, preserveSelection) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const previous = preserveSelection ? select.value : "";
+        const filtered = filterGender
+            ? (dataArray || []).filter(item => item.gender === "both" || item.gender === currentGender)
+            : (dataArray || []);
+
+        select.replaceChildren();
+        if (!filtered.length) {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "（無適用選項）";
+            select.appendChild(option);
+            return;
         }
 
-        // 啟動程式
-        loadData();
+        filtered.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.label;
+            select.appendChild(option);
+        });
+        select.value = filtered.some(item => item.id === previous) ? previous : filtered[0].id;
+    }
 
-    </script>
+    function getAppearanceForGender() {
+        return DATA_MAP.APPEARANCES.find(item => item.gender === currentGender)
+            || DATA_MAP.APPEARANCES.find(item => item.gender === "both")
+            || null;
+    }
+
+    function getSelectedItem(category, selectId) {
+        const id = document.getElementById(selectId)?.value;
+        return (DATA_MAP[category] || []).find(item => item.id === id) || null;
+    }
+
+    function updateSelectionSummaries() {
+        const map = [
+            ["OUTFITS", "select-outfits", "summary-outfits"],
+            ["SCENES", "select-scenes", "summary-scenes"],
+            ["POSES", "select-poses", "summary-poses"],
+            ["STYLES", "select-styles", "summary-styles"],
+            ["PRODUCT_LAYOUTS", "select-product-layouts", "summary-product-layouts"]
+        ];
+        map.forEach(([category, selectId, summaryId]) => {
+            const summary = document.getElementById(summaryId);
+            if (!summary) return;
+            const item = getSelectedItem(category, selectId);
+            summary.textContent = item?.prompt_text || "尚無內容";
+            summary.title = item?.prompt_text || "";
+        });
+    }
+
+    function renderModalList() {
+        const container = document.getElementById("modalItemList");
+        container.replaceChildren();
+        const rows = DATA_MAP[currentManageCategory] || [];
+
+        rows.forEach((item, index) => {
+            const row = document.createElement("div");
+            row.className = "item-row";
+            row.draggable = true;
+            row.dataset.index = String(index);
+            row.addEventListener("dragstart", handleDragStart);
+            row.addEventListener("dragover", handleDragOver);
+            row.addEventListener("dragleave", handleDragLeave);
+            row.addEventListener("drop", handleDrop);
+            row.addEventListener("dragend", handleDragEnd);
+
+            const main = document.createElement("div");
+            main.className = "item-main";
+            const handle = document.createElement("span");
+            handle.className = "drag-handle";
+            handle.textContent = "☰";
+            const info = document.createElement("div");
+            info.className = "item-info";
+            const strong = document.createElement("strong");
+            strong.textContent = item.label;
+            const meta = document.createElement("span");
+            meta.textContent = item.gender === "both" ? "通用" : item.gender === "female" ? "女性" : "男性";
+            info.append(strong, meta);
+            main.append(handle, info);
+
+            const actions = document.createElement("div");
+            actions.className = "item-actions";
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.className = "btn btn-small";
+            edit.textContent = "編輯";
+            edit.addEventListener("click", () => window.editItem(item.id));
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "btn btn-small btn-danger";
+            remove.textContent = "刪除";
+            remove.addEventListener("click", () => window.deleteItem(item.id));
+            actions.append(edit, remove);
+            row.append(main, actions);
+            container.appendChild(row);
+        });
+    }
+
+    function handleDragStart(event) {
+        draggedIndex = Number(this.dataset.index);
+        event.dataTransfer.effectAllowed = "move";
+        this.classList.add("dragging");
+    }
+    function handleDragOver(event) {
+        event.preventDefault();
+        this.classList.add("drag-over");
+    }
+    function handleDragLeave() { this.classList.remove("drag-over"); }
+    async function handleDrop(event) {
+        event.preventDefault();
+        this.classList.remove("drag-over");
+        const targetIndex = Number(this.dataset.index);
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        const rows = DATA_MAP[currentManageCategory];
+        const [moved] = rows.splice(draggedIndex, 1);
+        rows.splice(targetIndex, 0, moved);
+        rows.forEach((item, index) => item.sort_order = index);
+        renderModalList();
+        refreshAllSelects();
+        window.generatePrompt();
+
+        const updates = rows.map(item => ({
+            id: item.id,
+            category: item.category,
+            label: item.label,
+            gender: item.gender,
+            prompt_text: item.prompt_text,
+            sort_order: item.sort_order
+        }));
+        const { error } = await supabase.from("wako_prompts").upsert(updates, { onConflict: "id" });
+        if (error) {
+            alert(`排序儲存失敗：${error.message}`);
+            await loadData();
+        } else {
+            window.showToast("排序已儲存");
+        }
+    }
+    function handleDragEnd() {
+        this.classList.remove("dragging");
+        document.querySelectorAll(".item-row").forEach(row => row.classList.remove("drag-over"));
+        draggedIndex = null;
+    }
+
+    document.getElementById("manageModal").addEventListener("click", event => {
+        if (event.target.id === "manageModal") window.closeModal();
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") window.closeModal();
+    });
+
+    renderManagerTabs();
+    loadData();
+</script>
 </body>
 </html>
