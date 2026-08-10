@@ -2864,17 +2864,6 @@ window.addEventListener('resize', () => {
   if(activeInquiryPreviewTarget) positionInquiryPreview(activeInquiryPreviewTarget);
 });
 
-/* 保留原版詢問截圖 hover 智慧預覽；事件委派確保動態產生的限動圖片詢問也能正常觸發 */
-document.addEventListener('pointerover', (event) => {
-  const target = event.target.closest?.('.inquiry-thumb-wrap');
-  if(!target || target.contains(event.relatedTarget)) return;
-  showInquiryPreview(target);
-});
-document.addEventListener('pointerout', (event) => {
-  const target = event.target.closest?.('.inquiry-thumb-wrap');
-  if(!target || target.contains(event.relatedTarget)) return;
-  hideInquiryPreview();
-});
 
 function renderInquiryList(inquiries, parentType, parentId){
   if(!inquiries || inquiries.length === 0){
