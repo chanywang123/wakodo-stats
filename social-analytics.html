@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>發文成效分析 | 和光堂 Glass v5</title>
+<title>發文成效分析 | 和光堂 Glass v3</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23faf6ef'/%3E%3Cg%20fill='none'%20stroke='%23c9773f'%20stroke-width='3.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='20'%20cy='36'%20r='11'/%3E%3Ccircle%20cx='44'%20cy='36'%20r='11'/%3E%3Cpath%20d='M31%2034%20Q32%2029%2033%2034'/%3E%3Cpath%20d='M9%2033%20Q6%2030%209%2026'/%3E%3Cpath%20d='M55%2033%20Q58%2030%2055%2026'/%3E%3C/g%3E%3C/svg%3E" />
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
   window.supabase = createClient(
@@ -13,712 +15,4071 @@
   );
   window.dispatchEvent(new Event("supabase-ready"));
 </script>
+
 <style>
-:root{
-  --bg:#f5f1ea; --card:rgba(255,255,255,.78); --card-solid:#fff; --ink:#2b241c;
-  --soft:#766b60; --line:rgba(109,88,64,.14); --accent:#bd7447; --accent2:#e9d5c2;
-  --danger:#b94b42; --shadow:0 14px 44px rgba(65,49,32,.08); --radius:18px;
-}
-*{box-sizing:border-box}
+  :root{
+    --bg:#faf6ef;
+    --card:#ffffff;
+    --ink:#2b241c;
+    --ink-soft:#6b6053;
+    --line:#e8dfd0;
+    --accent:#c9773f;
+    --accent-soft:#f1dcc6;
+    --ig:#d6336c;
+    --fb:#3b5998;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(60,45,20,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:32px 24px 80px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:13px;
+    margin:0 0 28px;
+  }
+
+  /* ==== 新增按鈕 ==== */
+  .toolbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+  }
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(201,119,63,0.35);
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+  }
+  .btn-danger{
+    background:#fdecea;
+    color:#c0392b;
+  }
+
+  /* ==== 卡片列表 ==== */
+  #groupList{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:14px;
+  }
+  .group-tile{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .group-tile:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(60,45,20,0.12);
+  }
+  .tile-cover{
+    position:relative;
+    aspect-ratio:1/1;
+    background:#f2ece0;
+    cursor:pointer;
+    overflow:hidden;
+  }
+  .tile-cover img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .tile-cover iframe,
+  .tile-cover .fb-post,
+  .tile-cover .fb-post iframe{
+    pointer-events:none; /* 縮圖僅供預覽，點擊一律交給外層開啟詳情視窗 */
+    width:100% !important;
+  }
+  .tile-embed-loading{
+    width:100%; height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .tile-cover-placeholder{
+    width:100%; height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:20px;
+    color:var(--ink-soft);
+  }
+  .tile-badge{
+    position:absolute;
+    bottom:8px; right:8px;
+    background:rgba(20,15,8,0.72);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .tile-info{
+    padding:10px 12px 6px;
+    cursor:pointer;
+    flex:1;
+  }
+  .tile-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-bottom:4px;
+  }
+  .tile-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+  }
+  .tile-actions{
+    padding:0 12px 10px;
+    text-align:right;
+  }
+  .tile-actions .icon-btn{ font-size:12px; }
+
+  .group-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 20px;
+  }
+  .group-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .tag-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-weight:700;
+    font-size:13px;
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .tag-pill.empty{
+    background:#f1f1ee;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .type-pill{
+    font-size:12px;
+    padding:3px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .group-note{
+    color:var(--ink-soft);
+    font-size:13px;
+    flex:1;
+    min-width:120px;
+  }
+  .group-actions{
+    display:flex;
+    gap:8px;
+  }
+  .icon-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:14px;
+    padding:4px 8px;
+    border-radius:6px;
+  }
+  .icon-btn:hover{ background:#f2ece0; color:var(--ink); }
+
+  .platform-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .platform-box{
+    flex:1;
+    min-width:280px;
+    max-width:360px;
+    margin:0 auto;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:12px;
+  }
+  .platform-label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .dot.ig{ background:var(--ig); }
+  .dot.fb{ background:var(--fb); }
+  .embed-holder{
+    max-width:100%;
+    overflow:hidden;
+  }
+  .embed-holder :is(iframe,blockquote){
+    max-width:100% !important;
+  }
+  .platform-empty{
+    color:var(--ink-soft);
+    font-size:12px;
+    text-align:center;
+    padding:20px 0;
+  }
+  .add-platform-btn{
+    margin-top:8px;
+    font-size:12px;
+  }
+
+  /* ==== 詢問記錄清單 ==== */
+  .inquiry-section{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .inquiry-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .inquiry-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    padding:6px 8px;
+    border-radius:8px;
+    background:#faf7f1;
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  .inquiry-row:hover{ background:var(--accent-soft); }
+  .inquiry-date{
+    font-weight:700;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .inquiry-type-badge{
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#eee6d8;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .inquiry-note-preview{
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    flex:1;
+  }
+  .inquiry-empty{
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:4px 2px;
+  }
+  .add-inquiry-btn{
+    width:100%;
+    font-size:12px;
+    padding:7px;
+  }
+  .inquiry-thumb-wrap{
+    position:relative;
+    flex-shrink:0;
+  }
+  .inquiry-thumb{
+    width:22px;
+    height:22px;
+    border-radius:5px;
+    object-fit:cover;
+    border:1px solid var(--line);
+    display:block;
+  }
+  .inquiry-thumb-hover{
+    display:none;
+    position:absolute;
+    bottom:28px;
+    left:0;
+    width:200px;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    border:1px solid var(--line);
+    z-index:20;
+  }
+  .inquiry-thumb-hover img{ width:100%; display:block; }
+  .inquiry-thumb-wrap:hover .inquiry-thumb-hover{ display:block; }
+
+  /* ==== 截圖上傳區（Modal 內） ==== */
+  .shot-zone{
+    border:2px dashed var(--line);
+    border-radius:10px;
+    min-height:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    background:#fdfbf8;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .shot-zone:hover, .shot-zone.dragover{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .shot-zone:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .shot-empty{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:20px;
+  }
+  .shot-preview{
+    max-width:100%;
+    max-height:280px;
+    display:block;
+    margin:0 auto;
+  }
+  .shot-actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+
+  /* ==== Lightbox ==== */
+  .lightbox-overlay{
+    position:fixed; inset:0;
+    background:rgba(10,8,4,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:300;
+    padding:30px;
+  }
+  .lightbox-overlay.open{ display:flex; }
+  .lightbox-overlay img{
+    max-width:100%;
+    max-height:100%;
+    border-radius:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox-close{
+    position:absolute;
+    top:24px; right:28px;
+    background:rgba(255,255,255,0.15);
+    color:#fff;
+    border:none;
+    width:36px; height:36px;
+    border-radius:50%;
+    font-size:16px;
+    cursor:pointer;
+  }
+  .lightbox-close:hover{ background:rgba(255,255,255,0.3); }
+
+  .empty-state{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:60px 0;
+    font-size:14px;
+  }
+
+  /* ==== 統計區 ==== */
+  .stats-wrap{
+    margin-bottom:22px;
+  }
+  .stat-cards{
+    display:flex;
+    gap:14px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .stat-card{
+    flex:1;
+    min-width:160px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-num{
+    font-size:22px;
+    font-weight:800;
+    color:var(--accent);
+    margin-bottom:2px;
+  }
+  .stat-label{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .rank-chart{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:6px 10px;
+    min-height:80px;
+  }
+
+  /* ==== 限時動態 ==== */
+  .section-divider{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:36px 0 16px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .section-title{
+    font-size:17px;
+    margin:0;
+  }
+  .story-block{
+    margin-bottom:26px;
+  }
+  .story-subtitle{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+  }
+  .story-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+    gap:12px;
+  }
+  .story-tile{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .story-tile:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(60,45,20,0.12);
+  }
+  .story-tile .tile-cover{ aspect-ratio:9/16; cursor:pointer; }
+  .story-tile-info{
+    padding:8px 10px;
+  }
+  .story-tile-brand{
+    font-size:12px;
+    font-weight:700;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .highlight-group{
+    margin-bottom:22px;
+  }
+  .highlight-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .highlight-name{
+    font-size:14px;
+    font-weight:700;
+    color:var(--accent);
+  }
+
+  /* ==== 篩選器 ==== */
+  .filter-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:20px;
+    padding:12px 14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .filter-bar select,
+  .filter-bar input[type=text],
+  .filter-bar input[type=date]{
+    padding:7px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:13px;
+    background:#fdfbf8;
+    font-family:inherit;
+  }
+  .filter-bar input[type=text]{ min-width:160px; }
+  .filter-check{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+
+  /* ==== 收合展開 / 徽章 ==== */
+  .collapse-caret{
+    color:var(--ink-soft);
+    font-size:12px;
+    width:12px;
+    display:inline-block;
+  }
+  .inquiry-count-badge{
+    font-size:12px;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:2px 9px;
+    border-radius:999px;
+  }
+
+  /* ==== Modal ==== */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(30,24,15,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:#fff;
+    border-radius:16px;
+    width:100%;
+    max-width:520px;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal h2{
+    margin:0 0 18px;
+    font-size:17px;
+  }
+  .detail-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .detail-tag-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .detail-header-actions{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field input[type=text],
+  .field input[type=date],
+  .field textarea,
+  .field select{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fdfbf8;
+  }
+  .field textarea{ min-height:70px; resize:vertical; }
+  .combo{ position:relative; }
+  .combo-list{
+    position:absolute;
+    top:100%; left:0; right:0;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-top:4px;
+    max-height:160px;
+    overflow-y:auto;
+    box-shadow:var(--shadow);
+    z-index:5;
+    display:none;
+  }
+  .combo-list.open{ display:block; }
+  .combo-item{
+    padding:8px 12px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .combo-item:hover{ background:var(--accent-soft); }
+  .row2{ display:flex; gap:12px; }
+  .row2 > *{ flex:1; }
+
+  .modal-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .modal-footer .right{ display:flex; gap:8px; }
+
+  .platform-input-block{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+  }
+  .platform-input-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .platform-input-block input[type=url]{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fdfbf8;
+  }
+  .hint{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    transition:all .25s ease;
+    pointer-events:none;
+    z-index:200;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+
+  /* =========================================================
+     2026 Glass Dashboard Redesign
+     ========================================================= */
+  :root{
+    --bg:#f1f3f5;
+    --card:rgba(255,255,255,0.68);
+    --glass:rgba(255,255,255,0.58);
+    --glass-strong:rgba(255,255,255,0.78);
+    --ink:#292724;
+    --ink-soft:#77716a;
+    --line:rgba(255,255,255,0.82);
+    --line-soft:rgba(103,91,78,0.10);
+    --accent:#a9784e;
+    --accent-deep:#765238;
+    --accent-soft:rgba(169,120,78,0.13);
+    --accent-glow:rgba(195,151,108,0.24);
+    --ig:#c45b7f;
+    --fb:#647fac;
+    --radius:22px;
+    --shadow:0 18px 50px rgba(65,57,49,0.09), inset 0 1px 0 rgba(255,255,255,0.82);
+  }
+  html{ background:#eef1f3; }
+  body{
+    position:relative;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,255,255,.96) 0, rgba(255,255,255,0) 32%),
+      radial-gradient(circle at 88% 8%, rgba(222,230,236,.78) 0, rgba(222,230,236,0) 30%),
+      radial-gradient(circle at 55% 45%, rgba(238,226,213,.46) 0, rgba(238,226,213,0) 38%),
+      linear-gradient(145deg,#f6f7f8 0%,#eef1f3 48%,#f5f2ee 100%);
+    color:var(--ink);
+    padding:34px 28px 90px;
+  }
+  body::before,
+  body::after{
+    content:"";
+    position:fixed;
+    border-radius:50%;
+    filter:blur(2px);
+    pointer-events:none;
+    z-index:-1;
+  }
+  body::before{
+    width:340px;height:340px;left:-120px;top:180px;
+    background:radial-gradient(circle,rgba(255,255,255,.84),rgba(255,255,255,0) 68%);
+  }
+  body::after{
+    width:420px;height:420px;right:-160px;bottom:60px;
+    background:radial-gradient(circle,rgba(206,190,173,.22),rgba(206,190,173,0) 68%);
+  }
+  h1{
+    font-size:27px;
+    letter-spacing:-.03em;
+    font-weight:760;
+    margin-bottom:5px;
+  }
+  .sub{ color:var(--ink-soft); margin-bottom:30px; }
+
+  .glass-panel,
+  .stat-card,
+  .filter-bar,
+  .group-tile,
+  .story-tile,
+  .modal{
+    background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.48));
+    border:1px solid rgba(255,255,255,.88);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(24px) saturate(135%);
+    -webkit-backdrop-filter:blur(24px) saturate(135%);
+  }
+
+  .stats-wrap{ margin-bottom:22px; }
+  .stats-heading{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:14px;
+  }
+  .section-kicker,.panel-kicker{
+    color:var(--accent);
+    font-size:10px;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+  .dashboard-title{
+    font-size:18px;
+    letter-spacing:-.02em;
+    margin:7px 0 0;
+  }
+  .scope-pill{
+    color:var(--ink-soft);
+    background:rgba(255,255,255,.46);
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:999px;
+    padding:8px 13px;
+    font-size:11px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 8px 24px rgba(54,48,42,.05);
+  }
+  .stat-cards{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .stat-card{
+    position:relative;
+    min-width:0;
+    overflow:hidden;
+    border-radius:20px;
+    padding:17px 18px 16px;
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  }
+  .stat-card::after{
+    content:"";
+    position:absolute;
+    width:110px;height:110px;
+    top:-64px;right:-46px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.85),rgba(255,255,255,0) 70%);
+  }
+  .stat-card:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,255,255,1);
+    box-shadow:0 23px 58px rgba(65,57,49,.12),inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  .stat-card-primary{
+    background:linear-gradient(145deg,rgba(255,253,250,.92),rgba(239,225,211,.54));
+  }
+  .stat-icon{
+    position:absolute;
+    right:16px;top:15px;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:11px;
+    color:var(--accent-deep);
+    background:rgba(255,255,255,.52);
+    border:1px solid rgba(255,255,255,.88);
+    font-size:15px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .stat-num{
+    color:var(--accent-deep);
+    font-size:30px;
+    line-height:1.08;
+    letter-spacing:-.04em;
+    margin:0 0 7px;
+    font-weight:780;
+  }
+  .stat-label{ font-size:12px; color:var(--ink); font-weight:700; }
+  .stat-caption{ font-size:10px; color:var(--ink-soft); margin-top:5px; }
+  .format-card .stat-label{ margin:2px 42px 13px 0; display:block; }
+  .format-breakdown{ display:flex; flex-direction:column; gap:7px; }
+  .format-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11px; color:var(--ink-soft); }
+  .format-row span{ display:flex;align-items:center;gap:7px; }
+  .format-row strong{ color:var(--ink);font-size:12px; }
+  .format-dot{ width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.42); }
+  .format-dot.graphic{ background:#a9784e; }
+  .format-dot.video{ background:#7f91a8; }
+  .format-dot.story{ background:#a8899b; }
+
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.72fr) minmax(310px,.78fr);
+    gap:14px;
+    align-items:stretch;
+  }
+  .glass-panel{ border-radius:22px; overflow:hidden; }
+  .sankey-panel{ padding:18px 18px 12px; min-height:430px; }
+  .insight-stack{ display:grid; grid-template-rows:1fr 1fr; gap:14px; min-width:0; }
+  .insight-panel{ padding:17px 17px 13px; min-height:0; }
+  .panel-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding:1px 2px 13px;
+    border-bottom:1px solid rgba(103,91,78,.08);
+  }
+  .panel-head.compact{ padding-bottom:11px; }
+  .panel-head h3{ font-size:14px; margin:6px 0 0; letter-spacing:-.01em; }
+  .panel-note{ color:var(--ink-soft); font-size:10px; white-space:nowrap; padding-top:4px; }
+  .rank-chart{
+    min-height:330px;
+    padding:4px 0 0;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .insight-list{ display:flex; flex-direction:column; gap:3px; padding-top:8px; }
+  .insight-item{
+    display:grid;
+    grid-template-columns:30px minmax(0,1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 8px;
+    border-radius:13px;
+    cursor:pointer;
+    transition:background .14s ease,transform .14s ease;
+  }
+  .insight-item:hover{ background:rgba(255,255,255,.52); transform:translateX(2px); }
+  .insight-rank{
+    width:27px;height:27px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(169,120,78,.10);
+    color:var(--accent-deep);
+    font-size:11px;font-weight:800;
+  }
+  .insight-main{ min-width:0; }
+  .insight-title{ font-size:11px; font-weight:750; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .insight-sub{ font-size:9.5px; color:var(--ink-soft); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .insight-value{ font-size:11px; font-weight:800; color:var(--accent-deep); white-space:nowrap; }
+  .insight-type{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:27px;height:27px;border-radius:10px;
+    background:rgba(127,145,168,.10);color:#657489;
+    font-size:9px;font-weight:800;
+  }
+  .insight-empty{ color:var(--ink-soft); font-size:11px; text-align:center; padding:28px 8px; }
+
+  .filter-bar{
+    position:relative;
+    gap:8px;
+    padding:11px 12px;
+    border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,255,255,.68),rgba(255,255,255,.42));
+    box-shadow:0 14px 42px rgba(65,57,49,.07),inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .filter-bar::before{
+    content:"";position:absolute;left:14px;right:14px;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.96),transparent);
+  }
+  .filter-bar select,
+  .filter-bar input[type=text],
+  .filter-bar input[type=date]{
+    appearance:none;
+    border:1px solid rgba(255,255,255,.88);
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.38));
+    color:var(--ink);
+    padding:9px 12px;
+    min-height:38px;
+    outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.84),0 7px 18px rgba(65,57,49,.04);
+    transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+  }
+  .filter-bar select{ padding-right:28px; background-image:linear-gradient(45deg,transparent 50%,#8b8178 50%),linear-gradient(135deg,#8b8178 50%,transparent 50%),linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.38)); background-position:calc(100% - 15px) 16px,calc(100% - 11px) 16px,0 0;background-size:4px 4px,4px 4px,100% 100%;background-repeat:no-repeat; }
+  .filter-bar select:focus,
+  .filter-bar input:focus{
+    border-color:rgba(169,120,78,.36);
+    box-shadow:0 0 0 4px rgba(169,120,78,.08),inset 0 1px 0 rgba(255,255,255,.94);
+    transform:translateY(-1px);
+  }
+  .filter-check{
+    padding:8px 10px;
+    min-height:38px;
+    border-radius:13px;
+    background:rgba(255,255,255,.36);
+    border:1px solid rgba(255,255,255,.72);
+  }
+  .filter-check input{ accent-color:var(--accent); }
+
+  .btn{
+    border-radius:13px;
+    transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(145deg,#b0835d,#8f6545);
+    color:#fff;
+    box-shadow:0 10px 22px rgba(122,82,56,.22),inset 0 1px 0 rgba(255,255,255,.28);
+  }
+  .btn-primary:hover{ filter:brightness(1.04); box-shadow:0 14px 28px rgba(122,82,56,.28),inset 0 1px 0 rgba(255,255,255,.3); }
+  .btn-ghost{
+    background:linear-gradient(145deg,rgba(255,255,255,.62),rgba(255,255,255,.30));
+    border:1px solid rgba(255,255,255,.82);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 7px 18px rgba(65,57,49,.04);
+  }
+
+  .group-tile,.story-tile{ border-radius:18px; border-color:rgba(255,255,255,.86); }
+  .group-tile:hover,.story-tile:hover{ box-shadow:0 19px 46px rgba(65,57,49,.13),inset 0 1px 0 rgba(255,255,255,.9); }
+  .tag-pill{ background:rgba(169,120,78,.10); color:var(--accent-deep); }
+  .type-pill{ border-color:rgba(103,91,78,.12); background:rgba(255,255,255,.3); }
+  .section-divider{ border-top-color:rgba(103,91,78,.10); }
+  .modal-overlay{ background:rgba(42,39,35,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .modal{ border-radius:24px; }
+
+  @media (max-width:1120px){
+    .stat-cards{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .dashboard-grid{ grid-template-columns:1fr; }
+    .insight-stack{ grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+  }
+  @media (max-width:720px){
+    body{ padding:24px 14px 72px; }
+    .stats-heading{ align-items:flex-start; flex-direction:column; gap:10px; }
+    .scope-pill{ align-self:flex-start; }
+    .stat-cards{ grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-card{ padding:16px 15px; }
+    .stat-num{ font-size:26px; }
+    .insight-stack{ grid-template-columns:1fr; }
+    .sankey-panel{ padding:15px 12px 8px; }
+    .filter-bar{ border-radius:18px; }
+    .filter-bar select,.filter-bar input[type=text],.filter-bar input[type=date]{ flex:1 1 145px; min-width:0; }
+  }
+  @media (max-width:430px){
+    .stat-cards{ grid-template-columns:1fr; }
+    .panel-note{ display:none; }
+  }
+
+
+/* ===== Atmospheric glass background + motion ===== */
+html{ background:#edf2f4 !important; }
 body{
-  margin:0; padding:34px 24px 90px; color:var(--ink);
-  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-  background:
-    radial-gradient(circle at 10% 4%,rgba(255,255,255,.95),transparent 32%),
-    radial-gradient(circle at 88% 16%,rgba(217,226,229,.55),transparent 28%),
-    linear-gradient(145deg,#f6f2ec,#f2eee8 48%,#eef2f2);
+  position:relative;
   min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse at 82% 12%,rgba(199,219,231,.34) 0%,rgba(199,219,231,0) 36%),
+    radial-gradient(ellipse at 18% 82%,rgba(232,211,191,.32) 0%,rgba(232,211,191,0) 39%),
+    linear-gradient(180deg,rgba(255,255,255,.64),rgba(255,255,255,.08) 22%,rgba(255,255,255,0) 38%),
+    linear-gradient(145deg,#f8fbfc 0%,#edf3f5 40%,#f7eee7 75%,#f2f7f8 100%) !important;
 }
-body:before{
-  content:""; position:fixed; inset:0; pointer-events:none; opacity:.2;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.11'/%3E%3C/svg%3E");
+.ambient-stage{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
 }
-main{max-width:1380px;margin:auto;position:relative;z-index:1}
-h1{font-size:24px;margin:0 0 4px}.sub{color:var(--soft);margin:0 0 28px;font-size:13px}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin:34px 0 14px}
-.section-head h2{margin:0;font-size:18px}.section-head p{margin:4px 0 0;color:var(--soft);font-size:12px}
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{
-  border:0;border-radius:12px;padding:10px 15px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;
-  transition:.15s ease;background:rgba(255,255,255,.64);color:var(--ink);
-  box-shadow:inset 0 1px rgba(255,255,255,.9),0 8px 22px rgba(55,43,31,.05);
+.ambient-stage::before,
+.ambient-stage::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
 }
-.btn:hover{transform:translateY(-1px)}
-.btn-primary{background:linear-gradient(135deg,#c98254,#ad663f);color:#fff}
-.btn-danger{background:#f6e2df;color:var(--danger)}
-.btn-ghost{border:1px solid rgba(255,255,255,.74);background:rgba(255,255,255,.46)}
-.icon-btn{border:0;background:transparent;color:var(--soft);cursor:pointer;padding:5px 7px;border-radius:8px}
-.icon-btn:hover{background:rgba(255,255,255,.65);color:var(--ink)}
-.glass{
-  background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.47));
-  border:1px solid rgba(255,255,255,.78); border-radius:var(--radius); box-shadow:var(--shadow);
-  backdrop-filter:blur(22px) saturate(145%); -webkit-backdrop-filter:blur(22px) saturate(145%);
+.ambient-stage::before{
+  width:74vw;
+  height:30vw;
+  min-height:260px;
+  left:16vw;
+  top:8vh;
+  border:1px solid rgba(255,255,255,.38);
+  border-radius:50%;
+  background:linear-gradient(155deg,rgba(255,255,255,.20),rgba(190,214,227,.12) 52%,rgba(239,220,202,.14));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.46),0 28px 80px rgba(97,111,119,.09);
+  filter:blur(9px);
+  opacity:.62;
+  transform:rotate(-12deg);
+  animation:refractiveArc 32s ease-in-out infinite alternate;
 }
-.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;margin-bottom:14px}
-.stat{padding:17px 18px;min-height:105px}.stat .num{font-size:26px;font-weight:800;color:var(--accent)}
-.stat .label{font-size:12px;color:var(--soft);margin-top:4px}.stat .mini{font-size:11px;color:#9a8e83;margin-top:7px}
-.insight-grid{display:grid;grid-template-columns:1.45fr .8fr;gap:12px;margin-bottom:22px}
-.panel{padding:18px}.panel h3{margin:0 0 12px;font-size:14px}
-.bar-list,.top-list{display:flex;flex-direction:column;gap:9px}.bar-row{display:grid;grid-template-columns:160px 1fr 40px;gap:10px;align-items:center;font-size:12px}
-.bar-track{height:9px;border-radius:999px;background:rgba(94,78,61,.08);overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,#d6a178,#ad6a43);border-radius:999px}
-.top-item{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;background:rgba(255,255,255,.42);border-radius:11px;cursor:pointer}
-.top-item small{color:var(--soft)}.top-count{font-weight:800;color:var(--accent)}
-.filter-bar{padding:13px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:15px}
-input,select,textarea{
-  width:100%;border:1px solid rgba(105,84,62,.16);border-radius:11px;padding:10px 11px;
-  background:rgba(255,255,255,.72);color:var(--ink);font:inherit;font-size:13px;outline:none;
+.ambient-stage::after{
+  width:52vw;
+  height:52vw;
+  min-width:520px;
+  min-height:520px;
+  right:-18vw;
+  top:34vh;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.30);
+  background:radial-gradient(circle at 34% 32%,rgba(255,255,255,.28),rgba(208,225,234,.10) 38%,rgba(235,216,200,.10) 58%,rgba(255,255,255,0) 73%);
+  filter:blur(8px);
+  opacity:.68;
+  animation:refractiveDisc 38s ease-in-out infinite alternate;
 }
-input:focus,select:focus,textarea:focus{border-color:rgba(189,116,71,.55);box-shadow:0 0 0 4px rgba(189,116,71,.08)}
-.filter-bar select,.filter-bar input[type=date]{width:auto;min-width:135px}.filter-bar input[type=text]{width:210px}
-.filter-check{font-size:12px;color:var(--soft);display:flex;align-items:center;gap:6px}.filter-check input{width:auto}
-.content-grid,.story-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
-.tile{overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.tile-cover{position:relative;aspect-ratio:1/1;background:#e9e3da;overflow:hidden;cursor:pointer}
-.tile-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.tile-cover .placeholder{height:100%;display:flex;align-items:center;justify-content:center;color:var(--soft);font-size:13px;padding:16px;text-align:center}
-.badge{position:absolute;right:9px;bottom:9px;background:rgba(35,29,23,.78);color:#fff;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800}
-.badge.top-left{left:9px;right:auto;top:9px;bottom:auto}
-.tile-body{padding:12px 13px 13px;cursor:pointer}.tag-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.tag{background:#f1dfcf;color:#a9633e;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800}
-.type{border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:11px;color:var(--soft)}
-.note{font-size:12px;color:var(--soft);margin-top:7px;line-height:1.5;min-height:18px}
-.tile-foot{display:flex;justify-content:space-between;align-items:center;padding:0 11px 11px;color:var(--soft);font-size:11px}
-.story-stack{position:relative;width:100%;height:100%}.story-stack img{position:absolute;inset:0}
-.story-stack .stack2,.story-stack .stack3{position:absolute;inset:0;border:1px solid rgba(255,255,255,.95);border-radius:6px;background:#eee}
-.story-stack .stack2{transform:translate(5px,-5px);z-index:1}.story-stack .stack3{transform:translate(9px,-9px);z-index:0}
-.story-stack img{z-index:2}
-.empty{padding:30px;text-align:center;color:var(--soft);font-size:13px}
+body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(script){
+  position:relative;
+  z-index:1;
+  width:min(100%,1540px);
+  margin-left:auto;
+  margin-right:auto;
+}
+.ambient-mineral,.ambient-pearl,.ambient-shadow,.ambient-ribbon,.ambient-orb,.ambient-grain{
+  position:absolute;
+  inset:0;
+}
+.ambient-mineral{
+  opacity:.68;
+  background:
+    radial-gradient(circle at 18% 22%,rgba(255,255,255,.86) 0 1px,transparent 1.45px) 0 0/18px 18px,
+    radial-gradient(circle at 72% 64%,rgba(190,210,220,.52) 0 1px,transparent 1.45px) 0 0/23px 23px,
+    radial-gradient(circle at 34% 78%,rgba(218,194,174,.43) 0 1px,transparent 1.55px) 0 0/27px 27px;
+  mix-blend-mode:multiply;
+  filter:blur(.25px);
+}
+.ambient-pearl{
+  inset:-12%;
+  background:
+    radial-gradient(ellipse at 17% 13%,rgba(255,255,255,.96) 0%,rgba(255,255,255,0) 34%),
+    radial-gradient(ellipse at 80% 12%,rgba(204,222,232,.58) 0%,rgba(204,222,232,0) 32%),
+    radial-gradient(ellipse at 65% 72%,rgba(235,220,207,.46) 0%,rgba(235,220,207,0) 36%),
+    radial-gradient(ellipse at 27% 84%,rgba(220,215,233,.27) 0%,rgba(220,215,233,0) 29%);
+  opacity:1;
+  filter:blur(13px);
+  animation:pearlShift 30s ease-in-out infinite alternate;
+}
+.ambient-shadow{
+  inset:-7% -3%;
+  background:
+    linear-gradient(112deg,rgba(91,112,127,.16) 9%,transparent 10%,transparent 15.8%,rgba(91,112,127,.095) 17%,transparent 18%,transparent 25%),
+    linear-gradient(112deg,rgba(106,126,140,.13) 28%,transparent 29.2%,transparent 35.7%,rgba(106,126,140,.075) 37%,transparent 38.2%,transparent 46%),
+    linear-gradient(112deg,rgba(97,117,132,.10) 53%,transparent 54%,transparent 60%,rgba(97,117,132,.060) 61.3%,transparent 62.5%,transparent 70%);
+  opacity:.72;
+  filter:blur(2px);
+  mix-blend-mode:multiply;
+  transform-origin:left center;
+  animation:shadowDrift 38s ease-in-out infinite alternate;
+}
+.ambient-ribbon{
+  inset:auto;
+  width:58vw;
+  height:58vw;
+  left:-12vw;
+  top:34vh;
+  border-radius:45% 55% 53% 47% / 47% 49% 51% 53%;
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 46%,rgba(211,226,235,.14) 70%,rgba(255,255,255,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 0 0 1px rgba(255,255,255,.08);
+  filter:blur(9px);
+  opacity:.62;
+  transform:rotate(-12deg);
+  animation:ribbonFloat 34s ease-in-out infinite alternate;
+}
+.ambient-orb{ border-radius:50%; filter:blur(2px); mix-blend-mode:normal; opacity:.76; }
+.ambient-orb.orb-a{
+  width:26vw;height:26vw;min-width:260px;min-height:260px;left:-7vw;top:15vh;
+  background:radial-gradient(circle,rgba(255,255,255,.96) 0%,rgba(199,220,231,.34) 31%,rgba(255,255,255,0) 70%);
+  animation:orbFloatA 24s ease-in-out infinite alternate;
+}
+.ambient-orb.orb-b{
+  width:28vw;height:28vw;min-width:280px;min-height:280px;right:-8vw;bottom:5vh;
+  background:radial-gradient(circle,rgba(237,218,199,.54) 0%,rgba(227,198,173,.22) 36%,rgba(236,222,208,0) 72%);
+  animation:orbFloatB 31s ease-in-out infinite alternate;
+}
+.ambient-grain{
+  opacity:.20;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  mix-blend-mode:multiply;
+}
+@keyframes pearlShift{0%{transform:translate3d(-1.5%,-1%,0) scale(1)}50%{transform:translate3d(2.4%,1.4%,0) scale(1.05)}100%{transform:translate3d(-.6%,3%,0) scale(1.02)}}
+@keyframes shadowDrift{0%{transform:translate3d(-1.5%,0,0) rotate(0);opacity:.40}100%{transform:translate3d(2%,1.2%,0) rotate(1.4deg);opacity:.54}}
+@keyframes ribbonFloat{0%{transform:translate3d(0,0,0) rotate(-12deg) scale(1)}100%{transform:translate3d(8vw,-4vh,0) rotate(-5deg) scale(1.06)}}
+@keyframes orbFloatA{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(4vw,-2vh,0) scale(1.08)}}
+@keyframes orbFloatB{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-3vw,1.5vh,0) scale(1.06)}}
+@keyframes refractiveArc{0%{transform:translate3d(-2vw,0,0) rotate(-12deg) scale(1)}100%{transform:translate3d(4vw,3vh,0) rotate(-7deg) scale(1.05)}}
+@keyframes refractiveDisc{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-4vw,-3vh,0) scale(1.08)}}
+
+/* Real translucent glass rather than opaque white cards */
+.glass-panel,.stat-card,.filter-bar,.group-tile,.story-tile,.modal{
+  background:linear-gradient(145deg,rgba(255,255,255,.54),rgba(255,255,255,.24)) !important;
+  border:1px solid rgba(255,255,255,.80) !important;
+  box-shadow:0 18px 48px rgba(65,57,49,.08),inset 0 1px 0 rgba(255,255,255,.84),inset 0 -8px 16px rgba(255,255,255,.07) !important;
+  backdrop-filter:blur(25px) saturate(158%) !important;
+  -webkit-backdrop-filter:blur(25px) saturate(158%) !important;
+}
+.stat-card-primary{ background:linear-gradient(145deg,rgba(255,252,248,.79),rgba(239,227,214,.43)) !important; }
+.filter-bar{ background:linear-gradient(135deg,rgba(255,255,255,.53),rgba(255,255,255,.27)) !important; overflow:visible !important; }
+
+/* ===== Animated modal / lightbox transitions ===== */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(36,30,25,.36);display:flex;align-items:center;justify-content:center;
-  padding:20px;z-index:1000;opacity:0;visibility:hidden;pointer-events:none;transition:.18s ease;
+  display:flex !important;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .20s ease,visibility 0s linear .24s;
 }
-.modal-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
-.modal{width:min(620px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:20px;background:rgba(250,249,247,.94);border-radius:20px;border:1px solid rgba(255,255,255,.9);box-shadow:0 28px 80px rgba(31,27,23,.25);backdrop-filter:blur(25px)}
-.modal.wide{width:min(980px,100%)}.modal h2{margin:0 0 17px;font-size:18px}
-.field{margin-bottom:13px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}.hint{font-size:11px;color:var(--soft);margin-top:5px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.modal-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:18px}.modal-footer .right{display:flex;gap:8px}
-.platform-edit-row{display:grid;grid-template-columns:110px 1fr auto;gap:8px;margin-bottom:8px}
-.detail-platforms{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:11px}.platform-card{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.45)}
-.platform-card-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.platform-card-head b{font-size:12px}
-.platform-link{display:block;padding:12px;border-radius:11px;background:rgba(255,255,255,.56);color:var(--accent);text-decoration:none;font-size:12px;word-break:break-all}
-.inquiry-list{display:flex;flex-direction:column;gap:6px}.inq-row{display:flex;gap:8px;align-items:center;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.55);font-size:11px;cursor:pointer}
-.inq-row:hover{background:#f4e8dd}.inq-source{padding:2px 7px;border-radius:999px;background:#ede2d6;color:#7b695b;white-space:nowrap}.inq-note{color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.shot-zone{border:2px dashed rgba(115,91,65,.2);border-radius:13px;min-height:115px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:rgba(255,255,255,.44);cursor:pointer}
-.shot-zone img{max-width:100%;max-height:280px;display:block}.shot-empty{padding:20px;color:var(--soft);font-size:12px;text-align:center}.shot-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
-.multi-upload{border:2px dashed rgba(115,91,65,.2);border-radius:14px;padding:18px;text-align:center;background:rgba(255,255,255,.44);cursor:pointer}
-.story-editor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:9px;margin-top:10px}
-.story-editor-item{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#ddd;border:1px solid var(--line)}
-.story-editor-item img{width:100%;height:100%;object-fit:cover}.story-editor-item .x{position:absolute;right:6px;top:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(35,29,23,.78);color:#fff;font-weight:900;cursor:pointer}
-.story-editor-item .state{position:absolute;left:6px;bottom:6px;background:rgba(255,255,255,.88);padding:2px 6px;border-radius:999px;font-size:9px}
-.story-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:13px}.story-image-card{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.5);overflow:hidden}
-.story-image-wrap{aspect-ratio:9/16;background:#ddd;position:relative;cursor:pointer}.story-image-wrap img{width:100%;height:100%;object-fit:cover}.image-index{position:absolute;left:8px;top:8px;background:rgba(35,29,23,.72);color:#fff;padding:3px 8px;border-radius:999px;font-size:10px}.image-count{position:absolute;right:8px;top:8px;background:#fff;color:var(--accent);padding:3px 8px;border-radius:999px;font-size:10px;font-weight:900}
-.story-image-body{padding:10px}.story-image-actions{display:flex;gap:7px;margin-top:8px}
-.lightbox{position:fixed;inset:0;background:rgba(10,9,8,.88);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;visibility:hidden;pointer-events:none;transition:.15s}
-.lightbox.open{opacity:1;visibility:visible;pointer-events:auto}.lightbox img{max-width:94vw;max-height:92vh;border-radius:10px}
-.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,12px);background:rgba(35,29,23,.9);color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.18s;z-index:3000}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.combo{position:relative}.combo-list{position:absolute;left:0;right:0;top:calc(100% + 5px);background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);max-height:190px;overflow:auto;z-index:1100;display:none}.combo-list.open{display:block}.combo-option{padding:9px 10px;font-size:12px;cursor:pointer}.combo-option:hover{background:#f7eee7}
-@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.insight-grid{grid-template-columns:1fr}.bar-row{grid-template-columns:110px 1fr 35px}}
-@media(max-width:640px){body{padding:20px 12px 60px}.stats-grid{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}.filter-bar select,.filter-bar input[type=date],.filter-bar input[type=text]{width:100%}.platform-edit-row{grid-template-columns:1fr}.story-detail-grid{grid-template-columns:1fr}.modal{padding:16px}}
+.modal-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transition-delay:0s;
+}
+.modal-overlay .modal{
+  opacity:0;
+  transform:translateY(16px) scale(.965);
+  filter:blur(7px);
+  transition:opacity .20s ease,transform .27s cubic-bezier(.2,.8,.2,1),filter .20s ease;
+}
+.modal-overlay.open .modal{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  filter:blur(0);
+}
+.lightbox-overlay{
+  display:flex !important;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .20s ease,visibility 0s linear .24s;
+}
+.lightbox-overlay.open{ opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s; }
+.lightbox-overlay img{
+  opacity:0;
+  transform:scale(.94) translateY(10px);
+  transition:opacity .20s ease,transform .27s cubic-bezier(.2,.8,.2,1);
+}
+.lightbox-overlay.open img{ opacity:1;transform:scale(1) translateY(0); }
+
+/* ===== Fully custom liquid-glass select controls ===== */
+.glass-select-native{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  overflow:hidden !important;
+  clip-path:inset(50%) !important;
+}
+.glass-select-shell{
+  position:relative;
+  display:inline-flex;
+  min-width:116px;
+  max-width:240px;
+  vertical-align:middle;
+  flex:0 1 auto;
+}
+.glass-select-shell.glass-select-fluid{ width:100% !important;max-width:none;display:flex; }
+.glass-select-trigger{
+  width:100%;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:13px;
+  color:var(--ink);
+  font:inherit;
+  font-size:13px;
+  line-height:1.2;
+  text-align:left;
+  cursor:pointer;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.64),rgba(255,255,255,.28));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 9px 22px rgba(65,57,49,.05);
+  backdrop-filter:blur(22px) saturate(155%);
+  -webkit-backdrop-filter:blur(22px) saturate(155%);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.glass-select-trigger:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.98);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1),0 12px 28px rgba(65,57,49,.075);
+}
+.glass-select-trigger[aria-expanded="true"]{
+  border-color:rgba(186,145,104,.48);
+  background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(244,235,226,.40));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.98),0 0 0 4px rgba(192,150,107,.10),0 14px 34px rgba(65,57,49,.09);
+}
+.glass-select-label{ min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.glass-select-chevron{
+  width:8px;height:8px;flex:0 0 auto;
+  border-right:1.7px solid #857b72;
+  border-bottom:1.7px solid #857b72;
+  transform:rotate(45deg) translateY(-2px);
+  transition:transform .18s ease;
+}
+.glass-select-trigger[aria-expanded="true"] .glass-select-chevron{ transform:rotate(225deg) translate(-1px,-1px); }
+.glass-select-menu{
+  position:fixed;
+  z-index:10000;
+  max-height:min(360px,calc(100vh - 28px));
+  overflow:auto;
+  padding:7px;
+  border:1px solid rgba(255,255,255,.84);
+  border-radius:17px;
+  background:
+    linear-gradient(145deg,rgba(248,251,252,.78),rgba(244,239,234,.61));
+  box-shadow:0 24px 65px rgba(49,46,43,.18),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -12px 28px rgba(255,255,255,.12);
+  backdrop-filter:blur(30px) saturate(165%);
+  -webkit-backdrop-filter:blur(30px) saturate(165%);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s ease,transform .21s cubic-bezier(.2,.8,.2,1);
+}
+.glass-select-menu[data-side="bottom"]{
+  transform:translateY(-8px) scale(.975);
+  transform-origin:top center;
+}
+.glass-select-menu[data-side="top"]{
+  transform:translateY(8px) scale(.975);
+  transform-origin:bottom center;
+}
+.glass-select-menu.open{ opacity:1;transform:translateY(0) scale(1);pointer-events:auto; }
+.glass-select-option{
+  width:100%;
+  display:flex;
+  align-items:center;
+  min-height:38px;
+  padding:8px 11px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:var(--ink);
+  font:inherit;
+  font-size:13px;
+  text-align:left;
+  cursor:pointer;
+  transition:background .13s ease,transform .13s ease,color .13s ease;
+}
+.glass-select-option:hover,.glass-select-option:focus-visible{
+  outline:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(224,234,239,.36));
+  transform:translateX(2px);
+}
+.glass-select-option.is-selected{
+  color:var(--accent-deep);
+  font-weight:750;
+  background:linear-gradient(135deg,rgba(246,234,222,.76),rgba(255,255,255,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+}
+.glass-select-option:disabled{ opacity:.42;cursor:not-allowed; }
+.glass-select-menu::-webkit-scrollbar{ width:10px; }
+.glass-select-menu::-webkit-scrollbar-track{ background:transparent; }
+.glass-select-menu::-webkit-scrollbar-thumb{ background:rgba(113,112,110,.38);border:3px solid transparent;border-radius:999px;background-clip:padding-box; }
+
+@media (max-width:768px){
+  .glass-select-shell{ min-width:0;max-width:none;flex:1 1 145px; }
+  .glass-select-trigger{ min-height:42px; }
+}
+@media (prefers-reduced-motion:reduce){
+  .ambient-stage::before,.ambient-stage::after,.ambient-pearl,.ambient-shadow,.ambient-ribbon,.ambient-orb{ animation:none !important; }
+  .modal-overlay,.modal-overlay .modal,.lightbox-overlay,.lightbox-overlay img,.glass-select-menu,.glass-select-trigger{ transition:none !important; }
+}
+
+
+/* ===== V4：品牌配置容量條 + 限動詢問智慧預覽 ===== */
+.stat-cards{
+  grid-template-columns:minmax(170px,.72fr) minmax(420px,1.85fr) minmax(180px,.78fr) minmax(215px,1fr) !important;
+}
+.brand-mix-card{
+  padding-bottom:14px !important;
+}
+.brand-mix-card .stat-label{
+  margin-right:42px;
+}
+.brand-share-summary{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  color:var(--ink-soft);
+  font-size:10.5px;
+  white-space:nowrap;
+}
+.brand-share-summary strong{
+  color:var(--ink);
+  font-size:12px;
+}
+.brand-share-bar{
+  display:flex;
+  width:100%;
+  height:18px;
+  margin-top:13px;
+  overflow:hidden;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.88);
+  background:rgba(115,107,98,.08);
+  box-shadow:inset 0 2px 5px rgba(69,62,55,.12),0 1px 0 rgba(255,255,255,.88);
+}
+.brand-share-segment{
+  position:relative;
+  height:100%;
+  min-width:2px;
+  transition:filter .18s ease,transform .18s ease;
+  box-shadow:inset -1px 0 rgba(255,255,255,.5),inset 0 1px rgba(255,255,255,.28);
+}
+.brand-share-segment:hover{
+  filter:brightness(1.09) saturate(1.08);
+  transform:scaleY(1.08);
+  z-index:2;
+}
+.brand-share-empty-bar{
+  width:100%;
+  background:linear-gradient(90deg,rgba(135,145,152,.08),rgba(255,255,255,.36),rgba(135,145,152,.08));
+}
+.brand-share-legend{
+  display:flex;
+  gap:5px 10px;
+  margin-top:9px;
+  overflow-x:auto;
+  padding:1px 1px 4px;
+  scrollbar-width:thin;
+}
+.brand-share-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  flex:0 0 auto;
+  color:var(--ink-soft);
+  font-size:9.5px;
+  white-space:nowrap;
+}
+.brand-share-item i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  box-shadow:0 0 0 3px rgba(255,255,255,.38);
+}
+.brand-share-item strong{
+  color:var(--ink);
+  font-size:9.5px;
+}
+.brand-share-empty{
+  color:var(--ink-soft);
+  font-size:10px;
+}
+.brand-share-caption{
+  margin-top:3px;
+  opacity:.82;
+}
+
+.inquiry-thumb-hover{
+  display:none !important;
+}
+.inquiry-thumb-wrap{
+  outline:none;
+}
+.inquiry-thumb-wrap:focus .inquiry-thumb,
+.inquiry-thumb-wrap:hover .inquiry-thumb{
+  border-color:rgba(169,120,78,.52);
+  box-shadow:0 0 0 3px rgba(169,120,78,.10);
+}
+.inquiry-floating-preview{
+  position:fixed;
+  z-index:280;
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.92);
+  background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(239,243,245,.56));
+  box-shadow:0 22px 60px rgba(38,35,31,.28),inset 0 1px 0 rgba(255,255,255,.95);
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  transform:translateY(5px) scale(.97);
+  transition:opacity .15s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s linear .18s;
+}
+.inquiry-floating-preview.opens-above{
+  transform:translateY(-5px) scale(.97);
+}
+.inquiry-floating-preview.open{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0) scale(1);
+  transition-delay:0s;
+}
+.inquiry-floating-preview img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  background:rgba(255,255,255,.68);
+}
+.story-detail-modal{
+  width:min(760px,calc(100vw - 32px)) !important;
+  max-width:760px !important;
+}
+.story-detail-layout{
+  display:grid;
+  grid-template-columns:minmax(190px,245px) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+.story-detail-image-wrap{
+  position:sticky;
+  top:0;
+  min-width:0;
+}
+#storyDetailImage{
+  width:100%;
+  max-width:245px;
+  max-height:min(66vh,720px);
+  display:block;
+  object-fit:contain;
+  border-radius:14px;
+  cursor:pointer;
+  background:rgba(255,255,255,.44);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:0 12px 30px rgba(56,50,44,.08);
+}
+.story-detail-inquiries{
+  min-width:0;
+}
+
+@media(max-width:1180px){
+  .stat-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  .brand-mix-card{
+    grid-column:span 2;
+  }
+}
+@media(max-width:720px){
+  .stat-cards{
+    grid-template-columns:1fr !important;
+  }
+  .brand-mix-card{
+    grid-column:auto;
+  }
+  .story-detail-layout{
+    grid-template-columns:1fr;
+  }
+  .story-detail-image-wrap{
+    position:relative;
+  }
+  #storyDetailImage{
+    max-width:100%;
+    max-height:46vh;
+    margin:0 auto;
+  }
+}
+
+
+/* ===== V5：限動群組（僅調整限動區；上方 Dashboard / 桑基圖維持原樣） ===== */
+.story-group-meta{
+  margin-top:5px;
+  color:var(--ink-soft);
+  font-size:10px;
+}
+.story-editor-existing,
+.story-editor-pending,
+.story-detail-images{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:12px;
+}
+.story-editor-thumb,
+.story-detail-card{
+  min-width:0;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.82);
+  background:linear-gradient(145deg,rgba(255,255,255,.56),rgba(255,255,255,.28));
+  box-shadow:0 10px 28px rgba(65,57,49,.07),inset 0 1px 0 rgba(255,255,255,.84);
+  overflow:hidden;
+}
+.story-editor-thumb{
+  position:relative;
+  aspect-ratio:9/16;
+}
+.story-editor-thumb img,
+.story-detail-image-wrap-v5 img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.story-editor-remove{
+  position:absolute;
+  top:7px;
+  right:7px;
+  width:28px;
+  height:28px;
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:50%;
+  background:rgba(42,39,35,.72);
+  color:#fff;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.story-editor-section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:10px 0 8px;
+  color:var(--ink-soft);
+  font-size:11px;
+  font-weight:700;
+}
+.story-detail-modal{
+  width:min(1080px,calc(100vw - 32px)) !important;
+  max-width:1080px !important;
+}
+.story-detail-images{
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+}
+.story-detail-card{
+  display:flex;
+  flex-direction:column;
+}
+.story-detail-image-wrap-v5{
+  position:relative;
+  aspect-ratio:9/16;
+  cursor:pointer;
+  background:rgba(255,255,255,.38);
+}
+.story-detail-image-index,
+.story-detail-image-count{
+  position:absolute;
+  bottom:8px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:rgba(20,15,8,.70);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.story-detail-image-index{ left:8px; }
+.story-detail-image-count{ right:8px; }
+.story-detail-card-body{
+  padding:10px;
+}
+.story-detail-card-body .inquiry-list{
+  margin-bottom:8px;
+}
+.story-source-badge{
+  font-size:11px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:rgba(169,120,78,.12);
+  color:var(--accent-deep);
+  white-space:nowrap;
+}
+@media(max-width:720px){
+  .story-editor-existing,
+  .story-editor-pending{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .story-detail-images{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
-<main>
-  <h1>發文成效分析</h1>
-  <p class="sub">和光堂 IG / FB 貼文與限時動態詢問追蹤 · Glass v5</p>
+<div class="ambient-stage" aria-hidden="true">
+  <div class="ambient-mineral"></div>
+  <div class="ambient-pearl"></div>
+  <div class="ambient-shadow"></div>
+  <div class="ambient-ribbon"></div>
+  <div class="ambient-orb orb-a"></div>
+  <div class="ambient-orb orb-b"></div>
+  <div class="ambient-grain"></div>
+</div>
 
-  <section>
-    <div class="stats-grid">
-      <div class="stat glass"><div class="num" id="statTotal">0</div><div class="label">詢問總數</div><div class="mini">依目前篩選條件</div></div>
-      <div class="stat glass"><div class="num" id="statContent">0</div><div class="label">有效內容數</div><div class="mini">一般貼文＋限動組</div></div>
-      <div class="stat glass"><div class="num" id="statAvg">0</div><div class="label">平均每個內容</div><div class="mini">詢問次數／內容</div></div>
-      <div class="stat glass"><div class="num" id="statPost">0</div><div class="label">一般貼文詢問</div><div class="mini">圖文＋短影片</div></div>
-      <div class="stat glass"><div class="num" id="statStory">0</div><div class="label">限動詢問</div><div class="mini">整組加總</div></div>
+<h1>發文成效分析</h1>
+<p class="sub">和光堂 IG / FB 貼文成效與詢問記錄追蹤</p>
+
+<!-- ===== 經營總覽 ===== -->
+<div class="stats-wrap">
+  <div class="stats-heading">
+    <div>
+      <div class="section-kicker">CONTENT INSIGHT</div>
+      <h2 class="dashboard-title">內容追蹤總覽</h2>
     </div>
-    <div class="insight-grid">
-      <div class="panel glass"><h3>品牌詢問分布</h3><div id="brandBars" class="bar-list"></div></div>
-      <div class="panel glass"><h3>內容詢問排行</h3><div id="topContent" class="top-list"></div></div>
+    <div class="scope-pill" id="statScopeText">依目前篩選條件計算</div>
+  </div>
+
+  <div class="stat-cards">
+    <div class="stat-card stat-card-primary">
+      <div class="stat-icon">↗</div>
+      <div class="stat-num" id="statTotalInquiries">0</div>
+      <div class="stat-label">詢問總數</div>
+      <div class="stat-caption" id="statTotalCaption">目前顯示範圍</div>
     </div>
-  </section>
-
-  <div class="filter-bar glass">
-    <select id="filterBrand"><option value="">全部品牌</option></select>
-    <select id="filterModel"><option value="">全部型號</option></select>
-    <select id="filterType"><option value="">全部類別</option><option value="圖文">圖文</option><option value="短影片">短影片</option><option value="限動">限動</option></select>
-    <select id="filterPlatform"><option value="">全部平台</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option></select>
-    <select id="filterDateTarget"><option value="post">依內容日期</option><option value="inquiry">依詢問日期</option></select>
-    <input id="filterStart" type="date" title="起始日期">
-    <input id="filterEnd" type="date" title="結束日期">
-    <label class="filter-check"><input id="filterHasInquiry" type="checkbox">只看有詢問</label>
-    <input id="filterSearch" type="text" placeholder="搜尋備註 / 型號">
-    <button class="btn btn-ghost" onclick="resetFilters()">清除</button>
+    <div class="stat-card brand-mix-card">
+      <div class="stat-icon">◉</div>
+      <div class="stat-label">品牌追蹤佔比</div>
+      <div class="brand-share-summary">
+        <strong id="brandShareContentCount">0</strong> 個已標註內容
+        <span>·</span>
+        <span id="brandShareBrandCount">0 個品牌</span>
+      </div>
+      <div class="brand-share-bar" id="brandShareBar" aria-label="品牌追蹤佔比"></div>
+      <div class="brand-share-legend" id="brandShareLegend"></div>
+      <div class="stat-caption brand-share-caption">每篇正式內容計 1 次，IG／FB 不重複；限動暫不納入</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">≈</div>
+      <div class="stat-num" id="statAverage">0</div>
+      <div class="stat-label">平均每個有效內容</div>
+      <div class="stat-caption">詢問次數／內容</div>
+    </div>
+    <div class="stat-card format-card">
+      <div class="stat-icon">◫</div>
+      <div class="stat-label">詢問形式分布</div>
+      <div class="format-breakdown">
+        <div class="format-row"><span><i class="format-dot graphic"></i>圖文</span><strong id="statGraphicCount">0</strong></div>
+        <div class="format-row"><span><i class="format-dot video"></i>短影片</span><strong id="statVideoCount">0</strong></div>
+        <div class="format-row"><span><i class="format-dot story"></i>限動</span><strong id="statStoryCount">0</strong></div>
+      </div>
+    </div>
   </div>
 
-  <div class="section-head">
-    <div><h2>一般 PO 文</h2><p>同一內容可掛 Instagram / Facebook，再分別記錄詢問</p></div>
-    <div class="toolbar"><button class="btn btn-primary" onclick="openGroupModal()">＋ 新增內容項目</button></div>
-  </div>
-  <div id="groupList" class="content-grid"></div>
-  <div id="groupEmpty" class="empty glass" style="display:none">目前沒有符合條件的一般 PO 文</div>
+  <div class="dashboard-grid">
+    <section class="glass-panel sankey-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-kicker">FLOW MAP</div>
+          <h3>品牌 × 型號詢問流向</h3>
+        </div>
+        <span class="panel-note">線條寬度代表詢問次數</span>
+      </div>
+      <div id="rankChart" class="rank-chart"></div>
+    </section>
 
-  <div class="section-head">
-    <div><h2>限時動態</h2><p>一整組限動＝一個內容；每張圖個別追蹤詢問，外層統計整組加總</p></div>
-    <div class="toolbar"><button class="btn btn-primary" onclick="openStoryGroupModal()">＋ 新增限動組</button></div>
-  </div>
-  <div id="storyList" class="story-grid"></div>
-  <div id="storyEmpty" class="empty glass" style="display:none">目前沒有符合條件的限動組</div>
-</main>
+    <aside class="insight-stack">
+      <section class="glass-panel insight-panel">
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-kicker">TOP CONTENT</div>
+            <h3>內容詢問排行</h3>
+          </div>
+          <span class="panel-note">單篇分開計算</span>
+        </div>
+        <div id="topContentList" class="insight-list"></div>
+      </section>
 
-<!-- 一般內容 新增/編輯 -->
-<div class="modal-overlay" id="groupModal">
+      <section class="glass-panel insight-panel">
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-kicker">RECENT SIGNALS</div>
+            <h3>最近詢問動態</h3>
+          </div>
+          <span class="panel-note">最近 5 筆</span>
+        </div>
+        <div id="latestInquiryList" class="insight-list"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<!-- ===== 篩選器 ===== -->
+<div class="filter-bar">
+  <select id="filterBrand">
+    <option value="">全部品牌</option>
+  </select>
+  <select id="filterModel">
+    <option value="">全部型號</option>
+  </select>
+  <select id="filterType">
+    <option value="">全部類別</option>
+    <option value="圖文">圖文</option>
+    <option value="短影片">短影片</option>
+  </select>
+  <select id="filterPlatform">
+    <option value="">全部平台</option>
+    <option value="instagram">僅 Instagram</option>
+    <option value="facebook">僅 Facebook</option>
+  </select>
+  <select id="filterDateTarget">
+    <option value="post">依發文日期</option>
+    <option value="inquiry">依詢問日期</option>
+  </select>
+  <input type="date" id="filterDateStart" title="起始日期" />
+  <span style="color:var(--ink-soft); font-size:13px;">～</span>
+  <input type="date" id="filterDateEnd" title="結束日期" />
+  <label class="filter-check">
+    <input type="checkbox" id="filterHasInquiry" />
+    只看有詢問記錄
+  </label>
+  <input type="text" id="filterSearch" placeholder="搜尋備註內容..." />
+  <button class="btn btn-ghost" onclick="resetFilters()">清除篩選</button>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="openGroupModal()">+ 新增內容項目</button>
+</div>
+
+<div id="groupList"></div>
+<div id="emptyState" class="empty-state" style="display:none;">目前還沒有任何內容項目，點右上角新增一筆看看。</div>
+
+<!-- ===== 限時動態 ===== -->
+<div class="section-divider">
+  <h2 class="section-title">限時動態</h2>
+  <button class="btn btn-primary" onclick="openStoryModal()">+ 新增限時動態</button>
+</div>
+
+<div class="story-block">
+  <h3 class="story-subtitle">限動組</h3>
+  <div id="storyDailyList" class="story-grid"></div>
+  <div id="storyDailyEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有任何限時動態記錄。</div>
+</div>
+
+<!-- ===== 內容項目 Modal（新增/編輯） ===== -->
+<div class="modal-overlay" id="groupModalOverlay">
   <div class="modal">
     <h2 id="groupModalTitle">新增內容項目</h2>
-    <div class="field"><label>PO文類別</label><select id="postType"><option value="">未指定</option><option value="圖文">圖文</option><option value="短影片">短影片</option></select></div>
-    <div class="field"><label>發文日期</label><input type="date" id="postDate"></div>
-    <div class="field"><label>品牌＋型號</label><div class="row2">
-      <div class="combo"><input id="tagBrand" placeholder="品牌，例如 MYKITA" autocomplete="off"><div class="combo-list" id="brandList"></div></div>
-      <div class="combo"><input id="tagModel" placeholder="型號" autocomplete="off"><div class="combo-list" id="modelList"></div></div>
-    </div><div class="hint">與限動共用同一套品牌 / 型號標籤</div></div>
-    <div class="field"><label>內部備註 / 標題</label><textarea id="groupNote" rows="3"></textarea></div>
-    <div class="field"><label>平台貼文網址</label><div id="platformInputs"></div><div class="toolbar">
-      <button class="btn btn-ghost" onclick="addPlatformInput('instagram')">＋ Instagram</button>
-      <button class="btn btn-ghost" onclick="addPlatformInput('facebook')">＋ Facebook</button>
-    </div></div>
-    <div class="modal-footer"><button class="btn btn-danger" id="deleteGroupBtn" onclick="deleteGroup()" style="display:none">刪除整筆</button><div class="right"><button class="btn btn-ghost" onclick="closeModal('groupModal')">取消</button><button class="btn btn-primary" onclick="saveGroup()">儲存</button></div></div>
-  </div>
-</div>
 
-<!-- 一般內容詳情 -->
-<div class="modal-overlay" id="groupDetailModal">
-  <div class="modal wide">
-    <div class="modal-footer" style="margin-top:0"><div><h2 id="groupDetailTitle" style="margin:0"></h2><div id="groupDetailNote" class="note"></div></div><div class="right"><button class="btn btn-ghost" onclick="editCurrentGroup()">編輯</button><button class="btn btn-ghost" onclick="closeModal('groupDetailModal')">關閉</button></div></div>
-    <div id="groupDetailPlatforms" class="detail-platforms" style="margin-top:16px"></div>
-  </div>
-</div>
-
-<!-- 標籤編輯 -->
-<div class="modal-overlay" id="tagModal">
-  <div class="modal" style="max-width:420px">
-    <h2>編輯品牌 / 型號</h2>
-    <div class="field"><label>品牌</label><input id="editTagBrand"></div>
-    <div class="field"><label>型號</label><input id="editTagModel"></div>
-    <div class="hint">修改後，一般 PO 文與限動組會一起更新</div>
-    <div class="modal-footer"><span></span><div class="right"><button class="btn btn-ghost" onclick="closeModal('tagModal')">取消</button><button class="btn btn-primary" onclick="saveTagEdit()">儲存</button></div></div>
-  </div>
-</div>
-
-<!-- 限動組 新增/編輯 -->
-<div class="modal-overlay" id="storyGroupModal">
-  <div class="modal wide">
-    <h2 id="storyGroupModalTitle">新增限動組</h2>
-    <div class="row2">
-      <div class="field"><label>品牌</label><div class="combo"><input id="storyBrand" placeholder="品牌，例如 LINDBERG" autocomplete="off"><div class="combo-list" id="storyBrandList"></div></div></div>
-      <div class="field"><label>型號</label><div class="combo"><input id="storyModel" placeholder="型號" autocomplete="off"><div class="combo-list" id="storyModelList"></div></div></div>
-    </div>
-    <div class="field"><label>限動日期</label><input id="storyDate" type="date"><div class="hint">這是限動內容本身的發布日期，不是「當日 / 精選」來源</div></div>
-    <div class="field"><label>備註</label><textarea id="storyNote" rows="3" placeholder="例如：同款第二組穿搭版本"></textarea></div>
     <div class="field">
-      <label>限動圖片（可多張）</label>
-      <div class="multi-upload" id="storyUploadZone">點擊選擇多張圖片、拖曳圖片，或直接 Ctrl+V 貼上</div>
-      <input id="storyFiles" type="file" accept="image/*" multiple hidden>
-      <div class="hint">已存在圖片按 X 會立即從資料庫刪除；若該張已有詢問，詢問資料與對話截圖也會一併刪除</div>
-      <div id="storyEditorGrid" class="story-editor-grid"></div>
+      <label>PO文類別</label>
+      <select id="postType">
+        <option value="">未指定</option>
+        <option value="圖文">圖文</option>
+        <option value="短影片">短影片</option>
+      </select>
     </div>
-    <div class="modal-footer"><button class="btn btn-danger" id="deleteStoryGroupBtn" onclick="deleteStoryGroup()" style="display:none">刪除整組</button><div class="right"><button class="btn btn-ghost" onclick="closeStoryGroupModal()">取消</button><button class="btn btn-primary" onclick="saveStoryGroup()">儲存</button></div></div>
-  </div>
-</div>
 
-<!-- 限動組詳情 -->
-<div class="modal-overlay" id="storyDetailModal">
-  <div class="modal wide">
-    <div class="modal-footer" style="margin-top:0"><div><h2 id="storyDetailTitle" style="margin:0"></h2><div id="storyDetailMeta" class="note"></div></div><div class="right"><button class="btn btn-ghost" onclick="editCurrentStoryGroup()">編輯整組</button><button class="btn btn-ghost" onclick="closeModal('storyDetailModal')">關閉</button></div></div>
-    <div id="storyDetailGrid" class="story-detail-grid" style="margin-top:16px"></div>
-  </div>
-</div>
-
-<!-- 詢問 -->
-<div class="modal-overlay" id="inquiryModal">
-  <div class="modal" style="max-width:460px">
-    <h2 id="inquiryModalTitle">新增詢問</h2>
-    <div class="field"><label>詢問日期</label><input id="inquiryDate" type="date"></div>
-    <div class="field"><label>詢問形式</label><select id="inquiryType"><option value="留言">留言</option><option value="私訊">私訊</option><option value="到店">到店</option></select></div>
-    <div class="field" id="storySourceField" style="display:none"><label>限動詢問來源</label><select id="storySource"><option value="當日">當日限動</option><option value="精選">從精選來的</option></select><div class="hint">來源屬於這一筆詢問，不屬於限動圖片本身</div></div>
-    <div class="field"><label>備註</label><textarea id="inquiryNote" rows="3" placeholder="例如：詢問價格、想知道有沒有現貨"></textarea></div>
-    <div class="field"><label>對話截圖（單張）</label>
-      <div class="shot-zone" id="shotZone"><div id="shotEmpty" class="shot-empty">點擊選擇、拖曳，或 Ctrl+V 貼上</div><img id="shotPreview" style="display:none"></div>
-      <input id="shotFile" type="file" accept="image/*" hidden>
-      <div class="shot-actions" id="shotActions" style="display:none"><button class="btn btn-ghost" onclick="document.getElementById('shotFile').click()">更換</button><button class="btn btn-ghost" onclick="expandShot()">放大</button><button class="btn btn-ghost" onclick="removeShot()">移除</button></div>
-      <div class="hint">更換並儲存後，舊截圖會從 Storage 永久移除</div>
+    <div class="field">
+      <label>發文日期</label>
+      <input type="date" id="postDate" />
+      <div class="hint">預設帶入今天，可依實際發文日期手動修改，列表會依此排序</div>
     </div>
-    <div class="modal-footer"><button class="btn btn-danger" id="deleteInquiryBtn" onclick="deleteInquiry()" style="display:none">刪除詢問</button><div class="right"><button class="btn btn-ghost" onclick="closeInquiryModal()">取消</button><button class="btn btn-primary" onclick="saveInquiry()">儲存</button></div></div>
+
+    <div class="field">
+      <label>品牌 + 型號標籤（可留空，之後再補）</label>
+      <div class="row2">
+        <div class="combo">
+          <input type="text" id="tagBrand" placeholder="品牌，例如 MYKITA" autocomplete="off" />
+          <div class="combo-list" id="brandList"></div>
+        </div>
+        <div class="combo">
+          <input type="text" id="tagModel" placeholder="型號" autocomplete="off" />
+          <div class="combo-list" id="modelList"></div>
+        </div>
+      </div>
+      <div class="hint">輸入過的品牌/型號會自動變成下拉建議，方便同款不同文章沿用</div>
+    </div>
+
+    <div class="field">
+      <label>內部備註 / 標題</label>
+      <textarea id="groupNote" placeholder="方便自己辨識這篇內容，例如：VioRou B'asic Yoji 系列"></textarea>
+    </div>
+
+    <div class="field">
+      <label>平台貼文網址</label>
+      <div id="platformInputs"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="addPlatformInput('instagram')">+ 加入 Instagram 網址</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="addPlatformInput('facebook')">+ 加入 Facebook 網址</button>
+      </div>
+      <div class="hint">直接貼上貼文的分享連結即可，例如 https://www.instagram.com/p/xxxx/ 或 https://www.facebook.com/xxx/posts/xxx</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteGroupBtn" style="display:none;" onclick="deleteGroup()">刪除整筆</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeGroupModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveGroup()">儲存</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>
+<!-- ===== 內容項目詳情 Modal（點擊方塊後顯示完整貼文與詢問記錄） ===== -->
+<div class="modal-overlay" id="groupDetailOverlay">
+  <div class="modal" style="max-width:780px;">
+    <div class="detail-header">
+      <div id="detailTagRow" class="detail-tag-row"></div>
+      <div class="detail-header-actions">
+        <button class="icon-btn" onclick="editCurrentDetailGroup()">編輯項目</button>
+        <button class="icon-btn" onclick="closeGroupDetail()">✕ 關閉</button>
+      </div>
+    </div>
+    <div id="detailNote" class="group-note" style="margin-bottom:14px;"></div>
+    <div class="platform-row" id="detailPlatformRow"></div>
+  </div>
+</div>
+
+<!-- ===== 標籤編輯 Modal ===== -->
+<div class="modal-overlay" id="tagModalOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h2>編輯標籤</h2>
+    <div class="field">
+      <label>品牌</label>
+      <input type="text" id="editTagBrand" />
+    </div>
+    <div class="field">
+      <label>型號</label>
+      <input type="text" id="editTagModel" />
+    </div>
+    <div class="hint" style="margin-bottom:16px;">修改後，所有引用此標籤的內容項目會一併更新</div>
+    <div class="modal-footer">
+      <span></span>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeTagModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveTagEdit()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 限時動態 新增/編輯 Modal ===== -->
+<div class="modal-overlay" id="storyModalOverlay">
+  <div class="modal" style="max-width:720px;">
+    <h2 id="storyModalTitle">新增限時動態</h2>
+
+    <div class="field">
+      <label>限動日期</label>
+      <input type="date" id="storyDate" />
+    </div>
+
+    <div class="field">
+      <label>品牌 + 型號標籤</label>
+      <div class="row2">
+        <div class="combo">
+          <input type="text" id="storyTagBrand" placeholder="品牌，例如 MYKITA" autocomplete="off" />
+          <div class="combo-list" id="storyBrandList"></div>
+        </div>
+        <div class="combo">
+          <input type="text" id="storyTagModel" placeholder="型號" autocomplete="off" />
+          <div class="combo-list" id="storyModelList"></div>
+        </div>
+      </div>
+      <div class="hint">與一般 PO 文共用同一套品牌／型號標籤；同型號仍可建立多組不同版本限動</div>
+    </div>
+
+    <div class="field">
+      <label>備註</label>
+      <textarea id="storyNote" placeholder="選填，方便自己標記這一組限動"></textarea>
+    </div>
+
+    <div class="field">
+      <label>限時動態圖片</label>
+      <div class="story-editor-section-title">
+        <span>已儲存圖片</span>
+        <span>每張圖右上角 × 會永久刪除資料庫與 Storage 檔案</span>
+      </div>
+      <div id="storyExistingImages" class="story-editor-existing"></div>
+
+      <div class="story-editor-section-title" id="storyPendingTitle" style="display:none;">
+        <span>待新增圖片</span>
+        <span>尚未寫入資料庫</span>
+      </div>
+      <div id="storyPendingImages" class="story-editor-pending"></div>
+
+      <div class="shot-zone" id="storyShotZone" tabindex="0" style="margin-top:10px;">
+        <div class="shot-empty">點擊選擇多張圖片、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上</div>
+        <input type="file" id="storyShotFileInput" accept="image/*" multiple style="display:none;" />
+      </div>
+      <div class="hint" id="storyShotStatus"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteStoryBtn" style="display:none;" onclick="deleteStoryEntry()">刪除整組</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeStoryModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveStoryEntry()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 限時動態 詳情 Modal（同組多圖 + 各圖詢問記錄） ===== -->
+<div class="modal-overlay" id="storyDetailOverlay">
+  <div class="modal story-detail-modal">
+    <div class="detail-header">
+      <div>
+        <div id="storyDetailBrand" style="font-weight:700; font-size:15px;"></div>
+        <div id="storyDetailDate" class="hint" style="margin-top:4px;"></div>
+      </div>
+      <div class="detail-header-actions">
+        <button class="icon-btn" onclick="editCurrentStoryEntry()">編輯</button>
+        <button class="icon-btn" onclick="closeStoryDetail()">✕ 關閉</button>
+      </div>
+    </div>
+    <div id="storyDetailNote" class="group-note" style="margin-bottom:12px;"></div>
+    <div id="storyDetailImages" class="story-detail-images"></div>
+  </div>
+</div>
+
+<!-- ===== 詢問截圖智慧預覽（固定於視窗，不受 Modal 裁切） ===== -->
+<div class="inquiry-floating-preview" id="inquiryFloatingPreview" aria-hidden="true">
+  <img id="inquiryFloatingPreviewImg" alt="詢問截圖預覽" />
+</div>
+
+<!-- ===== 截圖 Lightbox ===== -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" onclick="event.stopPropagation()" />
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script>
-const SCHEMA_VERSION = 5;
-let sb = null;
-let allTags = [], allGroups = [], allStoryGroups = [];
-let currentGroupId = null, currentStoryGroupId = null, currentGroupDetailId = null, currentStoryDetailId = null;
-let editingTagId = null;
-let currentInquiryId = null, currentInquiryParentType = 'platform', currentInquiryParentId = null;
-let inquiryIndex = {};
-let pendingStoryFiles = [];
-let shotBlob = null, shotChanged = false, shotRemoved = false, existingShotUrl = null;
-const filterState = {brand:'',model:'',type:'',platform:'',dateTarget:'post',start:'',end:'',hasInquiry:false,search:''};
+<!-- ===== 詢問記錄 Modal（新增/編輯共用） ===== -->
+<div class="modal-overlay" id="inquiryModalOverlay">
+  <div class="modal" style="max-width:420px;">
+    <h2 id="inquiryModalTitle">新增詢問記錄</h2>
 
-window.addEventListener('supabase-ready', async ()=>{
+    <div class="field">
+      <label>詢問日期</label>
+      <input type="date" id="inquiryDate" />
+    </div>
+
+    <div class="field">
+      <label>詢問形式</label>
+      <select id="inquiryType">
+        <option value="留言">留言</option>
+        <option value="私訊">私訊</option>
+        <option value="到店">到店</option>
+      </select>
+    </div>
+
+    <div class="field" id="storySourceField" style="display:none;">
+      <label>限動詢問來源</label>
+      <select id="storySource">
+        <option value="當日">當日限動</option>
+        <option value="精選">從精選來的</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>備註</label>
+      <textarea id="inquiryNote" placeholder="例如：詢問價格、想知道有沒有現貨"></textarea>
+    </div>
+
+    <div class="field">
+      <label>截圖</label>
+      <div class="shot-zone" id="shotZone" tabindex="0">
+        <div id="shotEmpty" class="shot-empty">
+          點擊選擇檔案、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上
+        </div>
+        <img id="shotPreview" class="shot-preview" style="display:none;" />
+        <input type="file" id="shotFileInput" accept="image/*" style="display:none;" />
+      </div>
+      <div class="shot-actions" id="shotActions" style="display:none;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="triggerShotFileSelect()">🔄 更換截圖</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="downloadCurrentShot()">📥 下載</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandCurrentShot()">🔍 放大檢視</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="removeCurrentShot()">✕ 移除截圖</button>
+      </div>
+      <div class="hint" id="shotStatus"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteInquiryBtn" style="display:none;" onclick="deleteInquiry()">刪除記錄</button>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeInquiryModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveInquiry()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let sb = null;
+let allTags = [];      // [{id, brand, model}]
+let allGroups = [];     // full joined data
+let currentGroupId = null;
+let editingTagId = null;
+let platformInputCounter = 0;
+let currentInquiryId = null;
+let currentPlatformPostId = null;
+let currentInquiryParentType = 'platform'; // 'platform' | 'story-image'
+let currentShotBlob = null;
+let currentShotChanged = false;
+let currentShotRemoved = false;
+let existingShotUrl = null;
+
+window.addEventListener("supabase-ready", () => {
   sb = window.supabase;
-  await loadAll();
-  setupUI();
+  loadAll();
 });
 
-function esc(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function today(){return new Date().toLocaleDateString('en-CA')}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-function tagLabel(tag){return tag ? `${tag.brand} ${tag.model}`.trim() : '未分類'}
-function normalizeTag(t){if(!t)return null; return {...t,brand:t.brands?.name||t.brand||''}}
-function inquiryDateMatch(iq){
-  if(filterState.dateTarget!=='inquiry' || (!filterState.start&&!filterState.end)) return true;
-  const d=iq?.inquiry_date||''; if(!d)return false;
-  if(filterState.start&&d<filterState.start)return false; if(filterState.end&&d>filterState.end)return false; return true;
-}
-function contentDateMatch(d){
-  if(filterState.dateTarget!=='post'||(!filterState.start&&!filterState.end))return true;
-  if(!d)return false; if(filterState.start&&d<filterState.start)return false;if(filterState.end&&d>filterState.end)return false;return true;
-}
-function storagePath(url,bucket){
-  if(!url)return null;
-  const marker=`/storage/v1/object/public/${bucket}/`; const i=url.indexOf(marker);
-  return i<0?null:decodeURIComponent(url.slice(i+marker.length));
-}
-async function removeStorageUrls(urls,bucket){
-  const paths=[...new Set((urls||[]).map(u=>storagePath(u,bucket)).filter(Boolean))];
-  if(!paths.length)return true;
-  const {error}=await sb.storage.from(bucket).remove(paths);
-  if(error){console.error(error);return false} return true;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
+/* ================= 資料載入 ================= */
 async function loadAll(){
-  try{
-    await loadTags();
-    await Promise.all([loadGroups(),loadStoryGroups()]);
-    rebuildInquiryIndex();
-    populateFilters();
-    renderAll();
-  }catch(err){
-    console.error(err);
-    showToast('讀取失敗；若剛覆蓋新版，請先執行 v5 migration SQL');
+  await loadTags();
+  await loadGroups();
+  await loadStories();
+  populateTagFilterOptions();
+}
+
+async function loadTags(){
+  const { data, error } = await sb
+    .from('tags')
+    .select('id, model, brand_id, brands ( id, name )');
+  if(error){ console.error(error); return; }
+  allTags = (data || [])
+    .map(t => ({ id: t.id, model: t.model, brand_id: t.brand_id, brand: t.brands ? t.brands.name : '' }))
+    .sort((a,b) => (a.brand + a.model).localeCompare(b.brand + b.model));
+}
+
+async function loadGroups(){
+  const { data, error } = await sb
+    .from('posts_group')
+    .select(`
+      id, post_type, note, created_at, tag_id, post_date,
+      tags ( id, model, brand_id, brands ( id, name ) ),
+      platform_posts ( id, platform, post_url, inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url ) )
+    `);
+
+  if(error){ console.error(error); showToast('讀取失敗，請檢查主控台'); return; }
+  allGroups = (data || []).sort((a, b) => {
+    const dateA = new Date(a.post_date || a.created_at);
+    const dateB = new Date(b.post_date || b.created_at);
+    return dateB - dateA; // 新到舊；沒填發文日期時退回用建立時間排序
+  });
+  // 把 join 出來的 brands.name 攤平成 tags.brand，讓其餘程式碼沿用原本寫法不用大改
+  allGroups.forEach(g => {
+    if(g.tags && g.tags.brands){
+      g.tags.brand = g.tags.brands.name;
+    }
+  });
+  rebuildInquiryIndex();
+  renderGroups();
+}
+
+let allInquiriesById = {};
+function rebuildInquiryIndex(){
+  allInquiriesById = {};
+  allGroups.forEach(g => {
+    (g.platform_posts || []).forEach(pp => {
+      (pp.inquiries || []).forEach(iq => {
+        allInquiriesById[iq.id] = iq;
+      });
+    });
+  });
+}
+
+/* ================= 標籤下拉來源（僅顯示仍被使用的） ================= */
+function usedTagIds(){
+  return new Set([
+    ...allGroups.map(g => g.tag_id),
+    ...(allStoryEntries || []).map(se => se.tag_id)
+  ].filter(Boolean));
+}
+
+function countInquiries(g){
+  return (g.platform_posts || []).reduce((sum,pp) => sum + (pp.inquiries ? pp.inquiries.length : 0), 0);
+}
+
+/* ================= 篩選 ================= */
+let filterState = { brand:'', model:'', postType:'', platform:'', hasInquiry:false, search:'', dateTarget:'post', dateStart:'', dateEnd:'' };
+
+function filteredGroups(){
+  return allGroups.filter(g => {
+    if(filterState.brand && (!g.tags || g.tags.brand !== filterState.brand)) return false;
+    if(filterState.model && (!g.tags || g.tags.model !== filterState.model)) return false;
+    if(filterState.postType && g.post_type !== filterState.postType) return false;
+    if(filterState.platform && !g.platform_posts.some(pp => pp.platform === filterState.platform)) return false;
+    if(filterState.hasInquiry && countInquiries(g) === 0) return false;
+    if(filterState.search){
+      const s = filterState.search.toLowerCase();
+      const noteMatch = (g.note||'').toLowerCase().includes(s);
+      const tagMatch = g.tags && (g.tags.brand+g.tags.model).toLowerCase().includes(s);
+      if(!noteMatch && !tagMatch) return false;
+    }
+    if(filterState.dateStart || filterState.dateEnd){
+      if(filterState.dateTarget === 'inquiry'){
+        const hasMatch = (g.platform_posts || []).some(pp => (pp.inquiries || []).some(iq => {
+          if(!iq.inquiry_date) return false;
+          if(filterState.dateStart && iq.inquiry_date < filterState.dateStart) return false;
+          if(filterState.dateEnd && iq.inquiry_date > filterState.dateEnd) return false;
+          return true;
+        }));
+        if(!hasMatch) return false;
+      } else {
+        const d = g.post_date || (g.created_at ? g.created_at.slice(0,10) : '');
+        if(!d) return false;
+        if(filterState.dateStart && d < filterState.dateStart) return false;
+        if(filterState.dateEnd && d > filterState.dateEnd) return false;
+      }
+    }
+    return true;
+  });
+}
+
+function resetFilters(){
+  filterState = { brand:'', model:'', postType:'', platform:'', hasInquiry:false, search:'', dateTarget:'post', dateStart:'', dateEnd:'' };
+  document.getElementById('filterBrand').value = '';
+  populateModelFilterOptions();
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterPlatform').value = '';
+  document.getElementById('filterHasInquiry').checked = false;
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterDateTarget').value = 'post';
+  document.getElementById('filterDateStart').value = '';
+  document.getElementById('filterDateEnd').value = '';
+  renderGroups();
+}
+
+/* 品牌下拉：列出目前仍被使用的品牌（去重） */
+function populateTagFilterOptions(){
+  const sel = document.getElementById('filterBrand');
+  const used = usedTagIds();
+  const currentVal = sel.value;
+  const usedBrands = [...new Set(allTags.filter(t => used.has(t.id)).map(t => t.brand))].sort();
+  sel.innerHTML = '<option value="">全部品牌</option>' +
+    usedBrands.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+  sel.value = usedBrands.includes(currentVal) ? currentVal : '';
+  populateModelFilterOptions();
+}
+
+/* 型號下拉：只列出目前選定品牌底下的型號；沒選品牌時列出全部型號 */
+function populateModelFilterOptions(){
+  const sel = document.getElementById('filterModel');
+  const used = usedTagIds();
+  const brand = document.getElementById('filterBrand').value;
+  const currentVal = sel.value;
+  const pool = allTags.filter(t => used.has(t.id) && (!brand || t.brand === brand));
+  const usedModels = [...new Set(pool.map(t => t.model))].sort();
+  sel.innerHTML = '<option value="">全部型號</option>' +
+    usedModels.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+  sel.value = usedModels.includes(currentVal) ? currentVal : '';
+  filterState.model = sel.value;
+}
+
+function setupFilterBar(){
+  document.getElementById('filterBrand').addEventListener('change', e => {
+    filterState.brand = e.target.value;
+    filterState.model = ''; // 換品牌時型號重置，避免留著上一個品牌底下的型號
+    populateModelFilterOptions();
+    renderGroups();
+  });
+  document.getElementById('filterModel').addEventListener('change', e => { filterState.model = e.target.value; renderGroups(); });
+  document.getElementById('filterType').addEventListener('change', e => { filterState.postType = e.target.value; renderGroups(); });
+  document.getElementById('filterPlatform').addEventListener('change', e => { filterState.platform = e.target.value; renderGroups(); });
+  document.getElementById('filterHasInquiry').addEventListener('change', e => { filterState.hasInquiry = e.target.checked; renderGroups(); });
+  document.getElementById('filterSearch').addEventListener('input', e => { filterState.search = e.target.value; renderGroups(); });
+  document.getElementById('filterDateTarget').addEventListener('change', e => { filterState.dateTarget = e.target.value; renderGroups(); });
+  document.getElementById('filterDateStart').addEventListener('change', e => { filterState.dateStart = e.target.value; renderGroups(); });
+  document.getElementById('filterDateEnd').addEventListener('change', e => { filterState.dateEnd = e.target.value; renderGroups(); });
+}
+setupFilterBar();
+
+/* ================= 統計卡片 + 詢問度排行圖表 ================= */
+function hasActiveStatsFilter(){
+  return Boolean(
+    filterState.brand || filterState.model || filterState.postType || filterState.platform ||
+    filterState.hasInquiry || filterState.search || filterState.dateStart || filterState.dateEnd
+  );
+}
+
+function inquiryMatchesDate(iq){
+  if(filterState.dateTarget !== 'inquiry') return true;
+  if(!filterState.dateStart && !filterState.dateEnd) return true;
+  if(!iq || !iq.inquiry_date) return false;
+  if(filterState.dateStart && iq.inquiry_date < filterState.dateStart) return false;
+  if(filterState.dateEnd && iq.inquiry_date > filterState.dateEnd) return false;
+  return true;
+}
+
+function visibleGroupInquiries(g){
+  return (g.platform_posts || [])
+    .filter(pp => !filterState.platform || pp.platform === filterState.platform)
+    .flatMap(pp => (pp.inquiries || []).filter(inquiryMatchesDate));
+}
+
+function filteredStoriesForStats(){
+  return (allStoryEntries || []).filter(se => {
+    const text = `${se.brand_model_text || ''} ${se.note || ''}`.toLowerCase();
+    if(filterState.brand && !text.includes(filterState.brand.toLowerCase())) return false;
+    if(filterState.model && !text.includes(filterState.model.toLowerCase())) return false;
+    if(filterState.postType || filterState.platform) return false;
+    if(filterState.search && !text.includes(filterState.search.toLowerCase())) return false;
+    const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
+    if(filterState.hasInquiry && inquiries.length === 0) return false;
+    if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'post'){
+      const d = se.story_date || (se.created_at ? se.created_at.slice(0,10) : '');
+      if(!d) return false;
+      if(filterState.dateStart && d < filterState.dateStart) return false;
+      if(filterState.dateEnd && d > filterState.dateEnd) return false;
+    }
+    if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'inquiry' && inquiries.length === 0) return false;
+    return true;
+  });
+}
+
+function latestInquiryDate(inquiries){
+  return (inquiries || []).reduce((latest, iq) => {
+    const d = iq.inquiry_date || '';
+    return d > latest ? d : latest;
+  }, '');
+}
+
+function buildContentStats(){
+  const entries = [];
+  const groups = filteredGroups();
+  const stories = filteredStoriesForStats();
+
+  groups.forEach(g => {
+    const inquiries = visibleGroupInquiries(g);
+    const label = g.tags ? `${g.tags.brand} / ${g.tags.model}` : (g.note || '未分類內容');
+    entries.push({
+      key:`group:${g.id}`,
+      kind:'group',
+      id:g.id,
+      label,
+      note:g.note || '',
+      format:g.post_type === '圖文' ? '圖文' : g.post_type === '短影片' ? '短影片' : '未分類',
+      inquiries,
+      total:inquiries.length,
+      latest:latestInquiryDate(inquiries),
+      sortDate:g.post_date || (g.created_at ? g.created_at.slice(0,10) : '')
+    });
+  });
+
+  stories.forEach(se => {
+    const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
+    entries.push({
+      key:`story:${se.id}`,
+      kind:'story',
+      id:se.id,
+      label:se.brand_model_text || '未命名限動',
+      note:se.note || '',
+      format:'限動',
+      inquiries,
+      total:inquiries.length,
+      latest:latestInquiryDate(inquiries),
+      sortDate:se.story_date || (se.created_at ? se.created_at.slice(0,10) : '')
+    });
+  });
+
+  return entries;
+}
+
+function renderStats(){
+  const entries = buildContentStats();
+  const activeEntries = entries.filter(e => e.total > 0);
+  const totalInquiries = activeEntries.reduce((sum,e) => sum + e.total,0);
+  const average = activeEntries.length ? totalInquiries / activeEntries.length : 0;
+  const formatTotals = { 圖文:0, 短影片:0, 限動:0 };
+
+  activeEntries.forEach(e => {
+    if(e.format in formatTotals) formatTotals[e.format] += e.total;
+  });
+
+  document.getElementById('statTotalInquiries').textContent = totalInquiries;
+  document.getElementById('statAverage').textContent = average ? average.toFixed(average >= 10 ? 0 : 1) : '0';
+  document.getElementById('statGraphicCount').textContent = formatTotals['圖文'];
+  document.getElementById('statVideoCount').textContent = formatTotals['短影片'];
+  document.getElementById('statStoryCount').textContent = formatTotals['限動'];
+  document.getElementById('statTotalCaption').textContent = hasActiveStatsFilter() ? '依目前篩選結果' : '全部內容與限動';
+  document.getElementById('statScopeText').textContent = hasActiveStatsFilter() ? '已套用目前篩選' : '全部資料範圍';
+
+  renderBrandShare();
+  renderTopContent(activeEntries);
+  renderLatestInquiries(activeEntries);
+  renderRankChart(entries);
+}
+
+
+function brandColorForIndex(index){
+  const palette = [
+    '#8f6a4d','#b58c68','#71889a','#9d8292','#6f8c80','#c4a477',
+    '#7c7894','#879a66','#b47b73','#6f8793','#a68d68','#8a746d'
+  ];
+  return palette[index % palette.length];
+}
+
+function buildBrandShareData(){
+  const counts = new Map();
+  // 品牌配置只使用正式內容項目。每個 posts_group 計 1 次；IG/FB 不重複計算。
+  // 限時動態目前是自由文字，未連到 brands 表，因此不納入，避免同品牌被拆成多種拼法。
+  allGroups.forEach(group => {
+    const brand = group.tags && group.tags.brand ? group.tags.brand.trim() : '';
+    if(!brand) return;
+    counts.set(brand, (counts.get(brand) || 0) + 1);
+  });
+  const total = [...counts.values()].reduce((sum,count) => sum + count, 0);
+  const items = [...counts.entries()]
+    .map(([brand,count]) => ({ brand, count, percent: total ? count / total * 100 : 0 }))
+    .sort((a,b) => b.count - a.count || a.brand.localeCompare(b.brand, 'zh-Hant'));
+  return { total, items };
+}
+
+function renderBrandShare(){
+  const { total, items } = buildBrandShareData();
+  const bar = document.getElementById('brandShareBar');
+  const legend = document.getElementById('brandShareLegend');
+  const contentCount = document.getElementById('brandShareContentCount');
+  const brandCount = document.getElementById('brandShareBrandCount');
+  if(!bar || !legend || !contentCount || !brandCount) return;
+
+  contentCount.textContent = total;
+  brandCount.textContent = `${items.length} 個品牌`;
+
+  if(total === 0){
+    bar.innerHTML = '<span class="brand-share-empty-bar"></span>';
+    legend.innerHTML = '<span class="brand-share-empty">目前尚無已標註品牌的內容</span>';
+    return;
+  }
+
+  bar.innerHTML = items.map((item,index) => {
+    const color = brandColorForIndex(index);
+    const title = `${item.brand}：${item.count} 篇（${item.percent.toFixed(1)}%）`;
+    return `<span class="brand-share-segment" style="width:${item.percent}%;background:${color}" title="${escapeHtml(title)}"></span>`;
+  }).join('');
+
+  legend.innerHTML = items.map((item,index) => {
+    const color = brandColorForIndex(index);
+    const rounded = item.percent >= 10 ? item.percent.toFixed(0) : item.percent.toFixed(1);
+    return `<span class="brand-share-item" title="${escapeHtml(item.brand)}：${item.count} 篇">
+      <i style="background:${color}"></i>
+      <span>${escapeHtml(item.brand)}</span>
+      <strong>${rounded}%</strong>
+    </span>`;
+  }).join('');
+}
+
+function renderTopContent(activeEntries){
+  const el = document.getElementById('topContentList');
+  const ranked = [...activeEntries]
+    .sort((a,b) => b.total-a.total || (b.latest || b.sortDate).localeCompare(a.latest || a.sortDate))
+    .slice(0,5);
+
+  if(ranked.length === 0){
+    el.innerHTML = '<div class="insight-empty">目前範圍內還沒有詢問記錄</div>';
+    return;
+  }
+
+  el.innerHTML = ranked.map((item,index) => {
+    const sub = [item.format, item.note].filter(Boolean).join(' · ');
+    const click = item.kind === 'group' ? `openGroupDetail('${item.id}')` : `openStoryDetail('${item.id}')`;
+    return `<div class="insight-item" onclick="${click}">
+      <span class="insight-rank">${String(index+1).padStart(2,'0')}</span>
+      <div class="insight-main">
+        <div class="insight-title">${escapeHtml(item.label)}</div>
+        <div class="insight-sub">${escapeHtml(sub || '尚無備註')}</div>
+      </div>
+      <span class="insight-value">${item.total} 次</span>
+    </div>`;
+  }).join('');
+}
+
+function renderLatestInquiries(activeEntries){
+  const el = document.getElementById('latestInquiryList');
+  const items = activeEntries.flatMap(entry => (entry.inquiries || []).map(iq => ({
+    ...iq,
+    parentKind:entry.kind,
+    parentId:entry.id,
+    parentLabel:entry.label,
+    format:entry.format
+  }))).sort((a,b) => (b.inquiry_date || '').localeCompare(a.inquiry_date || '')).slice(0,5);
+
+  if(items.length === 0){
+    el.innerHTML = '<div class="insight-empty">目前範圍內還沒有詢問動態</div>';
+    return;
+  }
+
+  const formatShort = { 圖文:'圖', 短影片:'影', 限動:'限', 未分類:'文' };
+  el.innerHTML = items.map(item => {
+    const click = item.parentKind === 'group' ? `openGroupDetail('${item.parentId}')` : `openStoryDetail('${item.parentId}')`;
+    const date = item.inquiry_date ? item.inquiry_date.replaceAll('-','/') : '未填日期';
+    const sub = [date,item.inquiry_type || '詢問',item.note || '無備註'].join(' · ');
+    return `<div class="insight-item" onclick="${click}">
+      <span class="insight-type">${formatShort[item.format] || '文'}</span>
+      <div class="insight-main">
+        <div class="insight-title">${escapeHtml(item.parentLabel)}</div>
+        <div class="insight-sub">${escapeHtml(sub)}</div>
+      </div>
+      <span class="insight-value">›</span>
+    </div>`;
+  }).join('');
+}
+
+/* 桑基圖：品牌 → 型號；依目前篩選與詢問日期範圍同步更新 */
+function renderRankChart(contentEntries){
+  const el = document.getElementById('rankChart');
+  const brandMap = {};
+  function addCount(brand,model,count){
+    if(!brand || count <= 0) return;
+    if(!brandMap[brand]) brandMap[brand] = { total:0, models:{} };
+    brandMap[brand].total += count;
+    brandMap[brand].models[model] = (brandMap[brand].models[model] || 0) + count;
+  }
+
+  (contentEntries || []).forEach(entry => {
+    if(entry.total <= 0) return;
+    if(entry.kind === 'group'){
+      const g = allGroups.find(x => x.id === entry.id);
+      if(g && g.tags) addCount(g.tags.brand,g.tags.model,entry.total);
+    } else {
+      const text = (entry.label || '').trim();
+      const spaceIdx = text.indexOf(' ');
+      const brand = spaceIdx > 0 ? text.slice(0,spaceIdx) : text;
+      const model = spaceIdx > 0 ? text.slice(spaceIdx+1) : '限動';
+      addCount(brand,model,entry.total);
+    }
+  });
+
+  const brandEntries = Object.entries(brandMap).sort((a,b) => b[1].total-a[1].total);
+  if(brandEntries.length === 0){
+    if(window.Plotly) Plotly.purge(el);
+    el.innerHTML = '<div class="insight-empty" style="padding-top:120px;">目前範圍內還沒有詢問記錄可供統計</div>';
+    return;
+  }
+
+  const totalAll = brandEntries.reduce((s,[,v]) => s+v.total,0);
+  const labels=[],nodeX=[],nodeY=[],nodeColor=[];
+  const brandIndex={};
+  let cursor=0;
+  brandEntries.forEach(([brand,info]) => {
+    brandIndex[brand]=labels.length;
+    labels.push(brand);nodeX.push(.015);
+    nodeY.push(Math.min(.97,Math.max(.03,(cursor+info.total/2)/totalAll)));
+    nodeColor.push('rgba(142,101,70,.92)');cursor+=info.total;
+  });
+
+  const modelIndex={};
+  const sourceArr=[],targetArr=[],valueArr=[];
+  let cursor2=0;
+  brandEntries.forEach(([brand,info]) => {
+    Object.entries(info.models).sort((a,b) => b[1]-a[1]).forEach(([model,count]) => {
+      const key=brand+'␟'+model;
+      if(!(key in modelIndex)){
+        modelIndex[key]=labels.length;
+        labels.push(model);nodeX.push(.985);
+        nodeY.push(Math.min(.97,Math.max(.03,(cursor2+count/2)/totalAll)));
+        nodeColor.push('rgba(198,171,145,.82)');cursor2+=count;
+      }
+      sourceArr.push(brandIndex[brand]);targetArr.push(modelIndex[key]);valueArr.push(count);
+    });
+  });
+
+  if(!window.Plotly){
+    el.innerHTML = '<div class="insight-empty" style="padding-top:120px;">圖表元件載入中…</div>';
+    return;
+  }
+
+  Plotly.react(el,[{
+    type:'sankey',orientation:'h',arrangement:'fixed',
+    node:{
+      pad:12,thickness:13,label:labels,x:nodeX,y:nodeY,color:nodeColor,
+      line:{color:'rgba(255,255,255,.9)',width:.7},
+      hovertemplate:'%{label}<extra></extra>'
+    },
+    link:{
+      source:sourceArr,target:targetArr,value:valueArr,
+      color:'rgba(169,120,78,.20)',
+      hovertemplate:'%{source.label} → %{target.label}<br>%{value} 次詢問<extra></extra>'
+    }
+  }],{
+    margin:{l:8,r:8,t:8,b:8},
+    height:Math.max(330,labels.length*25),
+    font:{family:'Noto Sans TC, PingFang TC, sans-serif',size:11,color:'#403b36'},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'
+  },{displayModeBar:false,responsive:true});
+}
+
+function buildTagTypeHtml(g){
+  const tagHtml = g.tags
+    ? `<span class="tag-pill">${escapeHtml(g.tags.brand)} / ${escapeHtml(g.tags.model)}
+         <span class="icon-btn" style="padding:0 0 0 4px;" onclick="event.stopPropagation();openTagModal('${g.tags.id}')" title="編輯標籤">✎</span>
+       </span>`
+    : `<span class="tag-pill empty">未分類標籤</span>`;
+  const typeHtml = g.post_type ? `<span class="type-pill">${escapeHtml(g.post_type)}</span>` : '';
+  return `${tagHtml}${typeHtml}`;
+}
+
+function buildPlatformsHtml(g){
+  return ['instagram','facebook'].map(p => {
+    const post = g.platform_posts.find(pp => pp.platform === p);
+    const label = p === 'instagram' ? 'Instagram' : 'Facebook';
+    const dotClass = p === 'instagram' ? 'ig' : 'fb';
+    if(post){
+      const embedContent = buildCompactEmbed(p, post.post_url);
+      const inquiriesHtml = renderInquiryList(post.inquiries || [], 'platform', post.id);
+      return `
+        <div class="platform-box">
+          <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
+          <div class="embed-holder">${embedContent}</div>
+          <div class="inquiry-section">
+            <div class="inquiry-list">${inquiriesHtml}</div>
+            <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null, 'platform', '${post.id}')">+ 新增詢問記錄</button>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="platform-box">
+        <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
+        <div class="platform-empty">尚未加入此平台貼文</div>
+      </div>`;
+  }).join('');
+}
+
+let currentDetailGroupId = null;
+function openGroupDetail(id){
+  currentDetailGroupId = id;
+  const g = allGroups.find(x => x.id === id);
+  if(!g) return;
+  document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
+  document.getElementById('detailNote').textContent = g.note || '';
+  document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
+  document.getElementById('groupDetailOverlay').classList.add('open');
+  reInitEmbeds();
+}
+function closeGroupDetail(){
+  document.getElementById('groupDetailOverlay').classList.remove('open');
+  currentDetailGroupId = null;
+}
+function editCurrentDetailGroup(){
+  if(currentDetailGroupId){
+    const id = currentDetailGroupId;
+    closeGroupDetail();
+    openGroupModal(id);
   }
 }
-async function loadTags(){
-  const {data,error}=await sb.from('tags').select('id,model,brand_id,brands(id,name)');
-  if(error)throw error;
-  allTags=(data||[]).map(t=>({id:t.id,model:t.model,brand_id:t.brand_id,brand:t.brands?.name||''}))
-    .sort((a,b)=>(a.brand+a.model).localeCompare(b.brand+b.model));
-}
-async function loadGroups(){
-  const {data,error}=await sb.from('posts_group').select(`
-    id,post_type,note,created_at,tag_id,post_date,
-    tags(id,model,brand_id,brands(id,name)),
-    platform_posts(id,platform,post_url,inquiries(id,inquiry_date,inquiry_type,note,screenshot_url,story_source))
-  `);
-  if(error)throw error;
-  allGroups=(data||[]).map(g=>({...g,tags:normalizeTag(g.tags)}))
-    .sort((a,b)=>new Date(b.post_date||b.created_at)-new Date(a.post_date||a.created_at));
-}
-async function loadStoryGroups(){
-  const {data,error}=await sb.from('story_groups').select(`
-    id,tag_id,note,story_date,created_at,
-    tags(id,model,brand_id,brands(id,name)),
-    story_images(id,image_url,sort_order,created_at,
-      inquiries(id,inquiry_date,inquiry_type,note,screenshot_url,story_source)
-    )
-  `);
-  if(error)throw error;
-  allStoryGroups=(data||[]).map(g=>{
-    const images=(g.story_images||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0));
-    return {...g,tags:normalizeTag(g.tags),story_images:images};
-  }).sort((a,b)=>new Date(b.story_date||b.created_at)-new Date(a.story_date||a.created_at));
-}
-function rebuildInquiryIndex(){
-  inquiryIndex={};
-  allGroups.forEach(g=>(g.platform_posts||[]).forEach(pp=>(pp.inquiries||[]).forEach(iq=>{
-    inquiryIndex[iq.id]={...iq,parentType:'platform',parentId:pp.id,contentId:g.id};
-  })));
-  allStoryGroups.forEach(g=>(g.story_images||[]).forEach(img=>(img.inquiries||[]).forEach(iq=>{
-    inquiryIndex[iq.id]={...iq,parentType:'story-image',parentId:img.id,contentId:g.id};
-  })));
-}
-function groupInquiries(g){return (g.platform_posts||[]).flatMap(p=>p.inquiries||[]).filter(inquiryDateMatch)}
-function storyInquiries(g){return (g.story_images||[]).flatMap(i=>i.inquiries||[]).filter(inquiryDateMatch)}
-function filteredGroups(){
-  return allGroups.filter(g=>{
-    if(filterState.type==='限動')return false;
-    if(filterState.brand&&g.tags?.brand!==filterState.brand)return false;
-    if(filterState.model&&g.tags?.model!==filterState.model)return false;
-    if(filterState.type&&g.post_type!==filterState.type)return false;
-    if(filterState.platform&&!g.platform_posts?.some(p=>p.platform===filterState.platform))return false;
-    if(!contentDateMatch(g.post_date||String(g.created_at||'').slice(0,10)))return false;
-    const iq=groupInquiries(g);
-    if(filterState.dateTarget==='inquiry'&&(filterState.start||filterState.end)&&!iq.length)return false;
-    if(filterState.hasInquiry&&!iq.length)return false;
-    if(filterState.search){
-      const s=filterState.search.toLowerCase(), hay=`${tagLabel(g.tags)} ${g.note||''}`.toLowerCase();
-      if(!hay.includes(s))return false;
+
+/* 詢問記錄新增/編輯/刪除後，若「內容項目詳情」或「限動詳情」視窗還開著，
+   直接用最新資料重繪內容，不用使用者自己關掉重開才看得到更新 */
+function refreshOpenDetailModals(){
+  if(currentDetailGroupId){
+    const g = allGroups.find(x => x.id === currentDetailGroupId);
+    if(g){
+      document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
+      document.getElementById('detailNote').textContent = g.note || '';
+      document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
+      reInitEmbeds();
+    } else {
+      closeGroupDetail();
     }
-    return true;
-  });
-}
-function filteredStories(){
-  return allStoryGroups.filter(g=>{
-    if(filterState.type&&filterState.type!=='限動')return false;
-    if(filterState.platform)return false;
-    if(filterState.brand&&g.tags?.brand!==filterState.brand)return false;
-    if(filterState.model&&g.tags?.model!==filterState.model)return false;
-    if(!contentDateMatch(g.story_date||String(g.created_at||'').slice(0,10)))return false;
-    const iq=storyInquiries(g);
-    if(filterState.dateTarget==='inquiry'&&(filterState.start||filterState.end)&&!iq.length)return false;
-    if(filterState.hasInquiry&&!iq.length)return false;
-    if(filterState.search){
-      const s=filterState.search.toLowerCase(),hay=`${tagLabel(g.tags)} ${g.note||''}`.toLowerCase();
-      if(!hay.includes(s))return false;
+  }
+  if(currentStoryDetailId){
+    const se = allStoryEntries.find(x => x.id === currentStoryDetailId);
+    if(se){
+      renderStoryDetailContent(se);
+    } else {
+      closeStoryDetail();
     }
-    return true;
-  });
+  }
 }
-function renderAll(){renderGroups();renderStories();renderStats()}
+
+/* ================= 渲染卡片列表（網格方塊） ================= */
 function renderGroups(){
-  const wrap=document.getElementById('groupList'), rows=filteredGroups(); wrap.innerHTML='';
-  document.getElementById('groupEmpty').style.display=rows.length?'none':'block';
-  rows.forEach(g=>{
-    const count=groupInquiries(g).length;
-    const platforms=(g.platform_posts||[]).map(p=>p.platform==='instagram'?'IG':'FB').join(' + ');
-    const tile=document.createElement('article'); tile.className='tile glass';
-    tile.innerHTML=`<div class="tile-cover" onclick="openGroupDetail('${g.id}')">
-      <div class="placeholder">${platforms?`<b>${esc(platforms)}</b><br>點開查看貼文連結與詢問`:'尚未加入平台連結'}</div>
-      <span class="badge">${count} 詢問</span>
-    </div>
-    <div class="tile-body" onclick="openGroupDetail('${g.id}')"><div class="tag-row"><span class="tag">${esc(tagLabel(g.tags))}</span><span class="type">${esc(g.post_type||'未分類')}</span></div><div class="note">${esc(g.note||'')}</div></div>
-    <div class="tile-foot"><span>${esc(g.post_date||'')}</span><button class="icon-btn" onclick="event.stopPropagation();openGroupModal('${g.id}')">編輯</button></div>`;
+  const wrap = document.getElementById('groupList');
+  const empty = document.getElementById('emptyState');
+  wrap.innerHTML = '';
+
+  const groups = filteredGroups();
+
+  if(allGroups.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = '目前還沒有任何內容項目，點右上角新增一筆看看。';
+    renderStats();
+    return;
+  }
+  if(groups.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = '沒有符合篩選條件的內容項目。';
+    renderStats();
+    return;
+  }
+  empty.style.display = 'none';
+
+  groups.forEach(g => {
+    const tile = document.createElement('div');
+    tile.className = 'group-tile';
+
+    const inquiryCount = countInquiries(g);
+    const coverPost = ['instagram','facebook']
+      .map(p => g.platform_posts.find(pp => pp.platform === p))
+      .find(Boolean);
+
+    const coverHtml = coverPost
+      ? `<div class="tile-embed-loading">載入中…</div>`
+      : `<div class="tile-cover-placeholder">🏷️</div>`;
+
+    tile.innerHTML = `
+      <div class="tile-cover ${coverPost ? 'tile-cover-lazy' : ''}" data-group-id="${g.id}" onclick="openGroupDetail('${g.id}')">
+        ${coverHtml}
+        ${inquiryCount > 0 ? `<span class="tile-badge">💬 ${inquiryCount}</span>` : ''}
+      </div>
+      <div class="tile-info" onclick="openGroupDetail('${g.id}')">
+        <div class="tile-tags">${buildTagTypeHtml(g)}</div>
+        ${g.note ? `<div class="tile-note">${escapeHtml(g.note)}</div>` : ''}
+      </div>
+      <div class="tile-actions">
+        <button class="icon-btn" onclick="openGroupModal('${g.id}')">編輯</button>
+      </div>
+    `;
     wrap.appendChild(tile);
   });
-}
-function renderStories(){
-  const wrap=document.getElementById('storyList'), rows=filteredStories(); wrap.innerHTML='';
-  document.getElementById('storyEmpty').style.display=rows.length?'none':'block';
-  rows.forEach(g=>{
-    const imgs=g.story_images||[], count=storyInquiries(g).length, cover=imgs[0]?.image_url;
-    const tile=document.createElement('article'); tile.className='tile glass';
-    tile.innerHTML=`<div class="tile-cover" onclick="openStoryDetail('${g.id}')">
-      ${cover?`<div class="story-stack">${imgs.length>2?'<div class="stack3"></div>':''}${imgs.length>1?'<div class="stack2"></div>':''}<img src="${esc(cover)}" alt=""></div>`:`<div class="placeholder">尚無限動圖片</div>`}
-      <span class="badge top-left">${imgs.length} 張</span><span class="badge">${count} 詢問</span>
-    </div>
-    <div class="tile-body" onclick="openStoryDetail('${g.id}')"><div class="tag-row"><span class="tag">${esc(tagLabel(g.tags))}</span><span class="type">限動組</span></div><div class="note">${esc(g.note||'')}</div></div>
-    <div class="tile-foot"><span>${esc(g.story_date||'')}</span><button class="icon-btn" onclick="event.stopPropagation();openStoryGroupModal('${g.id}')">編輯</button></div>`;
-    wrap.appendChild(tile);
-  });
-}
-function renderStats(){
-  const gs=filteredGroups(), ss=filteredStories();
-  const entries=[
-    ...gs.map(g=>({kind:'post',id:g.id,label:tagLabel(g.tags),brand:g.tags?.brand||'未分類',count:groupInquiries(g).length})),
-    ...ss.map(g=>({kind:'story',id:g.id,label:`${tagLabel(g.tags)}｜限動`,brand:g.tags?.brand||'未分類',count:storyInquiries(g).length}))
-  ];
-  const total=entries.reduce((s,e)=>s+e.count,0), active=entries.filter(e=>e.count>0);
-  const post=entries.filter(e=>e.kind==='post').reduce((s,e)=>s+e.count,0), story=total-post;
-  document.getElementById('statTotal').textContent=total;
-  document.getElementById('statContent').textContent=active.length;
-  document.getElementById('statAvg').textContent=active.length?(total/active.length).toFixed(1):'0';
-  document.getElementById('statPost').textContent=post; document.getElementById('statStory').textContent=story;
-  const brands={};entries.forEach(e=>brands[e.brand]=(brands[e.brand]||0)+e.count);
-  const max=Math.max(1,...Object.values(brands));
-  document.getElementById('brandBars').innerHTML=Object.entries(brands).sort((a,b)=>b[1]-a[1]).map(([b,c])=>`<div class="bar-row"><span>${esc(b)}</span><div class="bar-track"><div class="bar-fill" style="width:${c/max*100}%"></div></div><b>${c}</b></div>`).join('')||'<div class="note">目前沒有詢問資料</div>';
-  document.getElementById('topContent').innerHTML=entries.filter(e=>e.count>0).sort((a,b)=>b.count-a.count).slice(0,6).map(e=>`<div class="top-item" onclick="${e.kind==='post'?`openGroupDetail('${e.id}')`:`openStoryDetail('${e.id}')`}"><div><b>${esc(e.label)}</b><br><small>${e.kind==='post'?'一般 PO 文':'限動組'}</small></div><span class="top-count">${e.count}</span></div>`).join('')||'<div class="note">目前沒有詢問資料</div>';
-}
-function populateFilters(){
-  const brand=document.getElementById('filterBrand'), model=document.getElementById('filterModel');
-  const brands=[...new Set(allTags.map(t=>t.brand).filter(Boolean))].sort();
-  brand.innerHTML='<option value="">全部品牌</option>'+brands.map(v=>`<option>${esc(v)}</option>`).join('');
-  populateModelFilter();
-  brand.value=filterState.brand;
-  model.value=filterState.model;
-}
-function populateModelFilter(){
-  const model=document.getElementById('filterModel');
-  const models=[...new Set(allTags.filter(t=>!filterState.brand||t.brand===filterState.brand).map(t=>t.model).filter(Boolean))].sort();
-  model.innerHTML='<option value="">全部型號</option>'+models.map(v=>`<option>${esc(v)}</option>`).join('');
-}
-function resetFilters(){
-  Object.assign(filterState,{brand:'',model:'',type:'',platform:'',dateTarget:'post',start:'',end:'',hasInquiry:false,search:''});
-  ['filterBrand','filterModel','filterType','filterPlatform'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('filterDateTarget').value='post';document.getElementById('filterStart').value='';document.getElementById('filterEnd').value='';document.getElementById('filterHasInquiry').checked=false;document.getElementById('filterSearch').value='';
-  populateModelFilter();renderAll();
-}
-function setupUI(){
-  const map={filterBrand:'brand',filterModel:'model',filterType:'type',filterPlatform:'platform',filterDateTarget:'dateTarget',filterStart:'start',filterEnd:'end'};
-  Object.entries(map).forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filterState[key]=e.target.value;if(id==='filterBrand'){filterState.model='';populateModelFilter()}renderAll()}));
-  document.getElementById('filterHasInquiry').addEventListener('change',e=>{filterState.hasInquiry=e.target.checked;renderAll()});
-  document.getElementById('filterSearch').addEventListener('input',e=>{filterState.search=e.target.value;renderAll()});
-  setupCombo('tagBrand','brandList',()=>[...new Set(allTags.map(t=>t.brand))],v=>{document.getElementById('tagBrand').value=v;refreshModelCombo('tagModel','modelList',v)});
-  setupCombo('storyBrand','storyBrandList',()=>[...new Set(allTags.map(t=>t.brand))],v=>{document.getElementById('storyBrand').value=v;refreshModelCombo('storyModel','storyModelList',v)});
-  refreshModelCombo('tagModel','modelList','');refreshModelCombo('storyModel','storyModelList','');
-  setupStoryUpload(); setupShotUpload();
-  document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
-}
-function setupCombo(inputId,listId,source,onChoose){
-  const input=document.getElementById(inputId), list=document.getElementById(listId);
-  const render=()=>{
-    const q=input.value.trim().toLowerCase(), vals=source().filter(Boolean).filter(v=>!q||v.toLowerCase().includes(q)).slice(0,30);
-    list.innerHTML=vals.map(v=>`<div class="combo-option" data-v="${esc(v)}">${esc(v)}</div>`).join('');list.classList.toggle('open',!!vals.length);
-    list.querySelectorAll('.combo-option').forEach(o=>o.onclick=()=>{onChoose(o.dataset.v);list.classList.remove('open')});
-  };
-  input.addEventListener('focus',render); input.addEventListener('input',render); input.addEventListener('blur',()=>setTimeout(()=>list.classList.remove('open'),120));
-}
-function refreshModelCombo(inputId,listId,brand){
-  const input=document.getElementById(inputId), list=document.getElementById(listId);
-  input.onfocus=input.oninput=()=>{
-    const q=input.value.trim().toLowerCase(), vals=[...new Set(allTags.filter(t=>!brand||t.brand===brand).map(t=>t.model))].filter(Boolean).filter(v=>!q||v.toLowerCase().includes(q)).slice(0,30);
-    list.innerHTML=vals.map(v=>`<div class="combo-option" data-v="${esc(v)}">${esc(v)}</div>`).join('');list.classList.toggle('open',!!vals.length);
-    list.querySelectorAll('.combo-option').forEach(o=>o.onclick=()=>{input.value=o.dataset.v;list.classList.remove('open')});
-  };
-  input.onblur=()=>setTimeout(()=>list.classList.remove('open'),120);
+
+  renderStats();
+  setupTileObserver();
 }
 
-let platformDraft=[];
-function openGroupModal(id=null){
-  currentGroupId=id; const g=allGroups.find(x=>x.id===id);
-  document.getElementById('groupModalTitle').textContent=id?'編輯內容項目':'新增內容項目';
-  document.getElementById('deleteGroupBtn').style.display=id?'block':'none';
-  document.getElementById('postType').value=g?.post_type||'';
-  document.getElementById('postDate').value=g?.post_date||today();
-  document.getElementById('tagBrand').value=g?.tags?.brand||'';document.getElementById('tagModel').value=g?.tags?.model||'';
-  document.getElementById('groupNote').value=g?.note||'';
-  platformDraft=(g?.platform_posts||[]).map(p=>({id:p.id,platform:p.platform,url:p.post_url}));
-  renderPlatformInputs();openModal('groupModal');
+/* 縮圖區塊「捲到看得見才載入」，避免一次載入大量 IG/FB embed 拖垮效能 */
+let tileObserver = null;
+function setupTileObserver(){
+  if(tileObserver) tileObserver.disconnect();
+  tileObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        loadTileCover(entry.target);
+        tileObserver.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '250px' });
+  document.querySelectorAll('.tile-cover-lazy').forEach(el => tileObserver.observe(el));
 }
-function renderPlatformInputs(){
-  const wrap=document.getElementById('platformInputs');
-  wrap.innerHTML=platformDraft.map((p,i)=>`<div class="platform-edit-row"><select onchange="platformDraft[${i}].platform=this.value"><option value="instagram" ${p.platform==='instagram'?'selected':''}>Instagram</option><option value="facebook" ${p.platform==='facebook'?'selected':''}>Facebook</option></select><input value="${esc(p.url||'')}" oninput="platformDraft[${i}].url=this.value" placeholder="貼文網址"><button class="icon-btn" onclick="platformDraft.splice(${i},1);renderPlatformInputs()">✕</button></div>`).join('');
+
+function loadTileCover(el){
+  const g = allGroups.find(x => x.id === el.dataset.groupId);
+  if(!g) return;
+  const post = ['instagram','facebook']
+    .map(p => g.platform_posts.find(pp => pp.platform === p))
+    .find(Boolean);
+  if(!post){ el.innerHTML = `<div class="tile-cover-placeholder">🏷️</div>`; return; }
+  const badge = el.querySelector('.tile-badge');
+  el.innerHTML = buildTileEmbed(post.platform, post.post_url);
+  if(badge) el.appendChild(badge);
+  reInitEmbeds();
 }
-function addPlatformInput(platform){platformDraft.push({id:null,platform,url:''});renderPlatformInputs()}
-async function upsertTag(brand,model){
-  brand=brand.trim();model=model.trim(); if(!brand||!model)return null;
-  let {data:b}=await sb.from('brands').select('id').ilike('name',brand).maybeSingle();
-  if(!b){const r=await sb.from('brands').insert({name:brand}).select('id').single();if(r.error)throw r.error;b=r.data}
-  let {data:t}=await sb.from('tags').select('id').eq('brand_id',b.id).ilike('model',model).maybeSingle();
-  if(!t){const r=await sb.from('tags').insert({brand_id:b.id,model}).select('id').single();if(r.error)throw r.error;t=r.data}
-  return t.id;
+
+/* 直接用貼文網址組出輕量嵌入（無需再從嵌入碼裡解析網址） */
+function buildCompactEmbed(platform, postUrl){
+  if(platform === 'instagram'){
+    const permalink = normalizeIgUrl(postUrl);
+    return `<iframe src="${permalink}embed/captioned/" width="100%" height="580" style="border:none;max-width:340px;display:block;margin:0 auto;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
+  }
+  if(platform === 'facebook'){
+    return `<div class="fb-post" data-href="${postUrl}" data-width="340"></div>`;
+  }
+  return '';
 }
+
+/* 方塊縮圖用的精簡版嵌入：IG用無caption的/embed/、FB隱藏文字內容，只留圖片本身 */
+function buildTileEmbed(platform, postUrl){
+  if(platform === 'instagram'){
+    const permalink = normalizeIgUrl(postUrl);
+    return `<iframe src="${permalink}embed/" width="100%" height="100%" style="border:none;display:block;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
+  }
+  if(platform === 'facebook'){
+    return `<div class="fb-post" data-href="${postUrl}" data-width="280" data-show-text="false"></div>`;
+  }
+  return '';
+}
+
+function normalizeIgUrl(url){
+  let clean = url.split('?')[0];
+  if(!clean.endsWith('/')) clean += '/';
+  return clean;
+}
+
+function reInitEmbeds(){
+  // Facebook
+  if(!window.FB){
+    if(!document.getElementById('fb-root')){
+      const fbRoot = document.createElement('div');
+      fbRoot.id = 'fb-root';
+      document.body.appendChild(fbRoot);
+    }
+    const s = document.createElement('script');
+    s.src = 'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v19.0';
+    s.async = true;
+    document.body.appendChild(s);
+  } else {
+    window.FB.XFBML.parse();
+  }
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+
+let activeInquiryPreviewTarget = null;
+
+function openInquiryPreviewLightbox(target){
+  hideInquiryPreview();
+  const encoded = target && target.dataset ? target.dataset.previewSrc : '';
+  if(encoded) openLightbox(decodeURIComponent(encoded));
+}
+
+function positionInquiryPreview(target){
+  const preview = document.getElementById('inquiryFloatingPreview');
+  const img = document.getElementById('inquiryFloatingPreviewImg');
+  if(!preview || !img || !target || !img.naturalWidth || !img.naturalHeight) return;
+
+  const margin = 14;
+  const gap = 10;
+  const maxWidth = Math.min(300, window.innerWidth - margin * 2);
+  const maxHeight = Math.min(430, window.innerHeight - margin * 2);
+  const ratio = img.naturalWidth / img.naturalHeight;
+  let width = Math.min(maxWidth, img.naturalWidth);
+  let height = width / ratio;
+  if(height > maxHeight){
+    height = maxHeight;
+    width = height * ratio;
+  }
+
+  const rect = target.getBoundingClientRect();
+  const roomBelow = window.innerHeight - rect.bottom - gap - margin;
+  const roomAbove = rect.top - gap - margin;
+  const openBelow = roomBelow >= height || roomBelow >= roomAbove;
+
+  let top = openBelow ? rect.bottom + gap : rect.top - gap - height;
+  top = Math.max(margin, Math.min(top, window.innerHeight - height - margin));
+
+  let left = rect.left + rect.width / 2 - width / 2;
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+
+  preview.style.width = `${width}px`;
+  preview.style.height = `${height}px`;
+  preview.style.left = `${left}px`;
+  preview.style.top = `${top}px`;
+  preview.classList.toggle('opens-below', openBelow);
+  preview.classList.toggle('opens-above', !openBelow);
+}
+
+function showInquiryPreview(target){
+  const preview = document.getElementById('inquiryFloatingPreview');
+  const img = document.getElementById('inquiryFloatingPreviewImg');
+  const encoded = target && target.dataset ? target.dataset.previewSrc : '';
+  if(!preview || !img || !encoded) return;
+
+  activeInquiryPreviewTarget = target;
+  const src = decodeURIComponent(encoded);
+  preview.classList.remove('open');
+  img.onload = () => {
+    if(activeInquiryPreviewTarget !== target) return;
+    positionInquiryPreview(target);
+    requestAnimationFrame(() => preview.classList.add('open'));
+  };
+  if(img.src === src && img.complete && img.naturalWidth){
+    positionInquiryPreview(target);
+    requestAnimationFrame(() => preview.classList.add('open'));
+  } else {
+    img.src = src;
+  }
+}
+
+function hideInquiryPreview(){
+  activeInquiryPreviewTarget = null;
+  const preview = document.getElementById('inquiryFloatingPreview');
+  if(preview) preview.classList.remove('open');
+}
+
+window.addEventListener('scroll', hideInquiryPreview, true);
+window.addEventListener('resize', () => {
+  if(activeInquiryPreviewTarget) positionInquiryPreview(activeInquiryPreviewTarget);
+});
+
+
+function renderInquiryList(inquiries, parentType, parentId){
+  if(!inquiries || inquiries.length === 0){
+    return `<div class="inquiry-empty">尚無詢問記錄</div>`;
+  }
+  const sorted = [...inquiries].sort((a,b) => (b.inquiry_date||'').localeCompare(a.inquiry_date||''));
+  return sorted.map(iq => {
+    const thumbHtml = iq.screenshot_url
+      ? `<span class="inquiry-thumb-wrap" tabindex="0"
+           data-preview-src="${encodeURIComponent(iq.screenshot_url)}"
+           onmouseenter="showInquiryPreview(this)"
+           onmouseleave="hideInquiryPreview()"
+           onfocus="showInquiryPreview(this)"
+           onblur="hideInquiryPreview()"
+           onclick="event.stopPropagation(); openInquiryPreviewLightbox(this)">
+           <img class="inquiry-thumb" src="${iq.screenshot_url}" />
+         </span>`
+      : '';
+    const sourceHtml = parentType === 'story-image'
+      ? `<span class="story-source-badge">${escapeHtml(iq.story_source === '精選' ? '精選' : '當日')}</span>`
+      : '';
+    return `
+    <div class="inquiry-row" onclick="openInquiryModal('${iq.id}', '${parentType}', '${parentId}')">
+      ${thumbHtml}
+      <span class="inquiry-date">${iq.inquiry_date ? escapeHtml(iq.inquiry_date) : '未填日期'}</span>
+      ${sourceHtml}
+      <span class="inquiry-type-badge">${escapeHtml(iq.inquiry_type || '未分類')}</span>
+      <span class="inquiry-note-preview">${iq.note ? escapeHtml(iq.note) : ''}</span>
+    </div>
+  `;
+  }).join('');
+}
+
+/* ================= 內容項目 Modal ================= */
+function openGroupModal(id){
+  currentGroupId = id || null;
+  document.getElementById('groupModalTitle').textContent = id ? '編輯內容項目' : '新增內容項目';
+  document.getElementById('deleteGroupBtn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('platformInputs').innerHTML = '';
+  platformInputCounter = 0;
+
+  if(id){
+    const g = allGroups.find(x => x.id === id);
+    document.getElementById('postType').value = g.post_type || '';
+    document.getElementById('postDate').value = g.post_date || '';
+    document.getElementById('tagBrand').value = g.tags ? g.tags.brand : '';
+    document.getElementById('tagModel').value = g.tags ? g.tags.model : '';
+    document.getElementById('groupNote').value = g.note || '';
+    g.platform_posts.forEach(pp => addPlatformInput(pp.platform, pp.post_url, pp.id));
+  } else {
+    document.getElementById('postType').value = '圖文';
+    document.getElementById('postDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('tagBrand').value = '';
+    document.getElementById('tagModel').value = '';
+    document.getElementById('groupNote').value = '';
+  }
+  renderComboSuggestions();
+  document.getElementById('groupModalOverlay').classList.add('open');
+}
+
+function closeGroupModal(){
+  document.getElementById('groupModalOverlay').classList.remove('open');
+  currentGroupId = null;
+}
+
+function addPlatformInput(platform, value, existingId){
+  platformInputCounter++;
+  const uid = 'plat_' + platformInputCounter;
+  const wrap = document.getElementById('platformInputs');
+  const label = platform === 'instagram' ? 'Instagram' : 'Facebook';
+  const dotClass = platform === 'instagram' ? 'ig' : 'fb';
+  const block = document.createElement('div');
+  block.className = 'platform-input-block';
+  block.dataset.platform = platform;
+  block.dataset.existingId = existingId || '';
+  block.id = uid;
+  block.innerHTML = `
+    <div class="platform-input-head">
+      <span class="platform-label"><span class="dot ${dotClass}"></span>${label}</span>
+      <button class="icon-btn" onclick="document.getElementById('${uid}').remove()">移除</button>
+    </div>
+    <input type="url" placeholder="貼上 ${label} 貼文網址" value="${value ? escapeHtml(value) : ''}" />
+  `;
+  wrap.appendChild(block);
+}
+
+/* ---- 品牌/型號自動完成 ---- */
+function renderComboSuggestions(){
+  const brandInput = document.getElementById('tagBrand');
+  const modelInput = document.getElementById('tagModel');
+  const brandList = document.getElementById('brandList');
+  const modelList = document.getElementById('modelList');
+
+  const uniqueBrands = [...new Set(allTags.map(t => t.brand))];
+
+  function refreshBrandList(){
+    const val = brandInput.value.trim().toLowerCase();
+    const matches = uniqueBrands.filter(b => !val || b.toLowerCase().includes(val));
+    brandList.innerHTML = matches.map(b => `<div class="combo-item">${escapeHtml(b)}</div>`).join('');
+    brandList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { brandInput.value = matches[i]; brandList.classList.remove('open'); refreshModelList(); };
+    });
+  }
+  function refreshModelList(){
+    const brandVal = brandInput.value.trim().toLowerCase();
+    const val = modelInput.value.trim().toLowerCase();
+    const models = [...new Set(allTags.filter(t => t.brand.toLowerCase() === brandVal).map(t => t.model))];
+    const matches = models.filter(m => !val || m.toLowerCase().includes(val));
+    modelList.innerHTML = matches.map(m => `<div class="combo-item">${escapeHtml(m)}</div>`).join('');
+    modelList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { modelInput.value = matches[i]; modelList.classList.remove('open'); };
+    });
+  }
+
+  brandInput.oninput = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onfocus = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onblur = () => setTimeout(()=>brandList.classList.remove('open'), 150);
+
+  modelInput.oninput = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onfocus = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onblur = () => setTimeout(()=>modelList.classList.remove('open'), 150);
+}
+
+/* ---- 儲存內容項目（含標籤 upsert、平台貼文 sync）---- */
 async function saveGroup(){
-  try{
-    const brand=document.getElementById('tagBrand').value,model=document.getElementById('tagModel').value;
-    const tag_id=brand.trim()&&model.trim()?await upsertTag(brand,model):null;
-    const payload={post_type:document.getElementById('postType').value||null,post_date:document.getElementById('postDate').value||null,tag_id,note:document.getElementById('groupNote').value.trim()};
-    let id=currentGroupId;
-    if(id){const {error}=await sb.from('posts_group').update(payload).eq('id',id);if(error)throw error}
-    else{const {data,error}=await sb.from('posts_group').insert(payload).select('id').single();if(error)throw error;id=data.id}
-    const existing=allGroups.find(g=>g.id===id)?.platform_posts||[];
-    const keepIds=platformDraft.filter(p=>p.id&&p.url.trim()).map(p=>p.id);
-    const removed=existing.filter(p=>!keepIds.includes(p.id));
-    for(const p of removed){
-      const shots=(p.inquiries||[]).map(i=>i.screenshot_url).filter(Boolean);
-      const {error}=await sb.from('platform_posts').delete().eq('id',p.id);if(error)throw error;
-      await removeStorageUrls(shots,'post-screenshots');
-    }
-    for(const p of platformDraft.filter(p=>p.url.trim())){
-      if(p.id){const {error}=await sb.from('platform_posts').update({platform:p.platform,post_url:p.url.trim()}).eq('id',p.id);if(error)throw error}
-      else{const {error}=await sb.from('platform_posts').insert({group_id:id,platform:p.platform,post_url:p.url.trim()});if(error)throw error}
-    }
-    closeModal('groupModal');showToast('已儲存');await loadAll();
-  }catch(e){console.error(e);showToast('儲存失敗')}
-}
-async function deleteGroup(){
-  const g=allGroups.find(x=>x.id===currentGroupId);if(!g||!confirm('確定刪除整筆 PO 文與相關詢問？'))return;
-  const shots=(g.platform_posts||[]).flatMap(p=>p.inquiries||[]).map(i=>i.screenshot_url).filter(Boolean);
-  const {error}=await sb.from('posts_group').delete().eq('id',g.id);if(error){console.error(error);showToast('刪除失敗');return}
-  await removeStorageUrls(shots,'post-screenshots');closeModal('groupModal');showToast('已刪除');await loadAll();
-}
-function openGroupDetail(id){
-  currentGroupDetailId=id;const g=allGroups.find(x=>x.id===id);if(!g)return;
-  document.getElementById('groupDetailTitle').innerHTML=`${esc(tagLabel(g.tags))} <button class="icon-btn" onclick="openTagModal('${g.tag_id||''}')">編輯標籤</button>`;
-  document.getElementById('groupDetailNote').textContent=g.note||'';
-  document.getElementById('groupDetailPlatforms').innerHTML=(g.platform_posts||[]).map(p=>`<section class="platform-card"><div class="platform-card-head"><b>${p.platform==='instagram'?'Instagram':'Facebook'}</b><button class="btn btn-ghost" onclick="openInquiryModal(null,'platform','${p.id}')">＋ 新增詢問</button></div><a class="platform-link" href="${esc(p.post_url)}" target="_blank" rel="noopener">${esc(p.post_url)}</a><div class="inquiry-list" style="margin-top:9px">${buildInquiryRows(p.inquiries||[],'platform',p.id)}</div></section>`).join('')||'<div class="note">尚未加入平台連結</div>';
-  openModal('groupDetailModal');
-}
-function editCurrentGroup(){closeModal('groupDetailModal');openGroupModal(currentGroupDetailId)}
+  const postType = document.getElementById('postType').value || null;
+  const postDate = document.getElementById('postDate').value || null;
+  const brand = document.getElementById('tagBrand').value.trim();
+  const model = document.getElementById('tagModel').value.trim();
+  const note = document.getElementById('groupNote').value.trim();
 
+  let tagId = null;
+  if(brand && model){
+    tagId = await upsertTag(brand, model);
+    if(!tagId) return;
+  }
+
+  let groupId = currentGroupId;
+  if(groupId){
+    const { error } = await sb.from('posts_group')
+      .update({ post_type: postType, tag_id: tagId, note, post_date: postDate })
+      .eq('id', groupId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  } else {
+    const { data, error } = await sb.from('posts_group')
+      .insert({ post_type: postType, tag_id: tagId, note, post_date: postDate })
+      .select().single();
+    if(error){ console.error(error); showToast('新增失敗'); return; }
+    groupId = data.id;
+  }
+
+  // 同步平台貼文
+  const blocks = document.querySelectorAll('#platformInputs .platform-input-block');
+  for(const block of blocks){
+    const platform = block.dataset.platform;
+    const existingId = block.dataset.existingId;
+    const url = block.querySelector('input').value.trim();
+    if(!url) continue;
+
+    if(existingId){
+      await sb.from('platform_posts').update({ post_url: url }).eq('id', existingId);
+    } else {
+      await sb.from('platform_posts').insert({ group_id: groupId, platform, post_url: url });
+    }
+  }
+
+  showToast('已儲存');
+  closeGroupModal();
+  await loadAll();
+}
+
+async function upsertBrand(name){
+  const { data: existing } = await sb.from('brands')
+    .select('id').ilike('name', name).maybeSingle();
+  if(existing) return existing.id;
+
+  const { data, error } = await sb.from('brands').insert({ name }).select().single();
+  if(error){ console.error(error); showToast('品牌建立失敗'); return null; }
+  return data.id;
+}
+
+async function upsertTag(brand, model){
+  const brandId = await upsertBrand(brand);
+  if(!brandId) return null;
+
+  // 同品牌底下找有沒有一樣的型號（忽略大小寫，避免重複建立）
+  const { data: existing } = await sb.from('tags')
+    .select('id').eq('brand_id', brandId).ilike('model', model).maybeSingle();
+  if(existing) return existing.id;
+
+  const { data, error } = await sb.from('tags').insert({ brand_id: brandId, model }).select().single();
+  if(error){ console.error(error); showToast('標籤建立失敗'); return null; }
+  await loadTags();
+  return data.id;
+}
+
+async function deleteGroup(){
+  if(!currentGroupId) return;
+  if(!confirm('確定刪除這筆內容項目？相關的平台貼文與詢問記錄都會一併刪除。')) return;
+  const group = allGroups.find(g => g.id === currentGroupId);
+  const screenshotUrls = (group?.platform_posts || [])
+    .flatMap(pp => pp.inquiries || [])
+    .map(iq => iq.screenshot_url)
+    .filter(Boolean);
+  const { error } = await sb.from('posts_group').delete().eq('id', currentGroupId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+  const storageCleaned = await removeStorageUrls(screenshotUrls, 'post-screenshots');
+  showToast(storageCleaned ? '已刪除' : '資料已刪除，但部分截圖清理失敗');
+  closeGroupModal();
+  await loadAll();
+}
+
+/* ================= 標籤獨立編輯（改一筆，全部關聯貼文跟著變） ================= */
 function openTagModal(tagId){
-  if(!tagId)return; editingTagId=tagId;const t=allTags.find(x=>x.id===tagId);if(!t)return;
-  document.getElementById('editTagBrand').value=t.brand;document.getElementById('editTagModel').value=t.model;openModal('tagModal');
+  editingTagId = tagId;
+  const t = allTags.find(x => x.id === tagId);
+  document.getElementById('editTagBrand').value = t.brand;
+  document.getElementById('editTagModel').value = t.model;
+  document.getElementById('tagModalOverlay').classList.add('open');
+}
+function closeTagModal(){
+  document.getElementById('tagModalOverlay').classList.remove('open');
+  editingTagId = null;
 }
 async function saveTagEdit(){
-  try{
-    const t=allTags.find(x=>x.id===editingTagId);if(!t)return;
-    const brand=document.getElementById('editTagBrand').value.trim(),model=document.getElementById('editTagModel').value.trim();if(!brand||!model)return showToast('品牌與型號不可留空');
-    let {data:targetBrand}=await sb.from('brands').select('id').ilike('name',brand).maybeSingle();
-    if(!targetBrand){const r=await sb.from('brands').insert({name:brand}).select('id').single();if(r.error)throw r.error;targetBrand=r.data}
-    let {data:dup}=await sb.from('tags').select('id').eq('brand_id',targetBrand.id).ilike('model',model).neq('id',editingTagId).maybeSingle();
-    if(dup){
-      await sb.from('posts_group').update({tag_id:dup.id}).eq('tag_id',editingTagId);
-      await sb.from('story_groups').update({tag_id:dup.id}).eq('tag_id',editingTagId);
-      const {error}=await sb.from('tags').delete().eq('id',editingTagId);if(error)throw error;
-    }else{
-      const {error}=await sb.from('tags').update({brand_id:targetBrand.id,model}).eq('id',editingTagId);if(error)throw error;
+  const brand = document.getElementById('editTagBrand').value.trim();
+  const model = document.getElementById('editTagModel').value.trim();
+  if(!brand || !model){ showToast('品牌和型號不可留空'); return; }
+
+  const t = allTags.find(x => x.id === editingTagId);
+  if(!t) return;
+
+  // 1. 品牌是全域的：直接改 brands 表本身，所有引用這個品牌的標籤自動一起變。
+  //    如果改完的名稱跟「另一個」已存在的品牌撞名（忽略大小寫），視為同一個品牌，自動合併。
+  let brandId = t.brand_id;
+  const { data: dupBrand } = await sb.from('brands')
+    .select('id').ilike('name', brand).neq('id', t.brand_id).maybeSingle();
+  if(dupBrand){
+    await sb.from('tags').update({ brand_id: dupBrand.id }).eq('brand_id', t.brand_id);
+    await sb.from('brands').delete().eq('id', t.brand_id);
+    brandId = dupBrand.id;
+  } else {
+    await sb.from('brands').update({ name: brand }).eq('id', t.brand_id);
+  }
+
+  // 2. 型號僅限該品牌底下：如果改完的型號跟同品牌下「另一個」型號撞名，合併並轉移關聯貼文
+  const { data: dupModel } = await sb.from('tags')
+    .select('id').eq('brand_id', brandId).ilike('model', model).neq('id', editingTagId).maybeSingle();
+  if(dupModel){
+    await sb.from('posts_group').update({ tag_id: dupModel.id }).eq('tag_id', editingTagId);
+    await sb.from('story_groups').update({ tag_id: dupModel.id }).eq('tag_id', editingTagId);
+    await sb.from('tags').delete().eq('id', editingTagId);
+  } else {
+    const { error } = await sb.from('tags').update({ model, brand_id: brandId }).eq('id', editingTagId);
+    if(error){ console.error(error); showToast('更新失敗'); return; }
+  }
+
+  showToast('已更新，所有相關內容同步更新');
+  closeTagModal();
+  await loadAll();
+  refreshOpenDetailModals();
+}
+
+/* ================= 詢問記錄 Modal（新增/編輯共用） ================= */
+function openInquiryModal(inquiryId, parentType, parentId){
+  currentInquiryId = inquiryId || null;
+  currentPlatformPostId = parentId; // 一般 PO 文為 platform_post_id；限動則為 story_image_id
+  currentInquiryParentType = parentType || 'platform';
+  document.getElementById('deleteInquiryBtn').style.display = inquiryId ? 'inline-block' : 'none';
+
+  const isStoryImage = currentInquiryParentType === 'story-image';
+  document.getElementById('storySourceField').style.display = isStoryImage ? 'block' : 'none';
+
+  // 重置截圖狀態
+  currentShotBlob = null;
+  currentShotChanged = false;
+  currentShotRemoved = false;
+  existingShotUrl = null;
+  document.getElementById('shotStatus').textContent = '';
+
+  if(inquiryId){
+    const iq = allInquiriesById[inquiryId];
+    document.getElementById('inquiryModalTitle').textContent = '編輯詢問記錄';
+    document.getElementById('inquiryDate').value = iq.inquiry_date || '';
+    document.getElementById('inquiryType').value = iq.inquiry_type || '留言';
+    document.getElementById('storySource').value = iq.story_source || '當日';
+    document.getElementById('inquiryNote').value = iq.note || '';
+    if(iq.screenshot_url){
+      existingShotUrl = iq.screenshot_url;
+      showShotPreview(iq.screenshot_url);
+    } else {
+      clearShotPreview();
     }
-    closeModal('tagModal');showToast('品牌 / 型號已同步更新');await loadAll();
-  }catch(e){console.error(e);showToast('標籤更新失敗')}
+  } else {
+    document.getElementById('inquiryModalTitle').textContent = '新增詢問記錄';
+    document.getElementById('inquiryDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('inquiryType').value = '留言';
+    document.getElementById('storySource').value = '當日';
+    document.getElementById('inquiryNote').value = '';
+    clearShotPreview();
+  }
+  document.getElementById('inquiryModalOverlay').classList.add('open');
 }
 
-function openStoryGroupModal(id=null){
-  currentStoryGroupId=id;pendingStoryFiles=[];const g=allStoryGroups.find(x=>x.id===id);
-  document.getElementById('storyGroupModalTitle').textContent=id?'編輯限動組':'新增限動組';
-  document.getElementById('deleteStoryGroupBtn').style.display=id?'block':'none';
-  document.getElementById('storyBrand').value=g?.tags?.brand||'';document.getElementById('storyModel').value=g?.tags?.model||'';
-  document.getElementById('storyDate').value=g?.story_date||today();document.getElementById('storyNote').value=g?.note||'';
-  renderStoryEditor();openModal('storyGroupModal');
-}
-function closeStoryGroupModal(){pendingStoryFiles.forEach(f=>URL.revokeObjectURL(f.preview));pendingStoryFiles=[];closeModal('storyGroupModal')}
-function setupStoryUpload(){
-  const zone=document.getElementById('storyUploadZone'),input=document.getElementById('storyFiles');
-  zone.onclick=()=>input.click();input.onchange=e=>addPendingStoryFiles([...e.target.files]);
-  zone.ondragover=e=>{e.preventDefault()};zone.ondrop=e=>{e.preventDefault();addPendingStoryFiles([...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')))};
-  document.addEventListener('paste',e=>{if(!document.getElementById('storyGroupModal').classList.contains('open'))return;const files=[...e.clipboardData.files].filter(f=>f.type.startsWith('image/'));if(files.length)addPendingStoryFiles(files)});
-}
-function addPendingStoryFiles(files){
-  files.filter(f=>f.type.startsWith('image/')).forEach(file=>pendingStoryFiles.push({file,preview:URL.createObjectURL(file)}));renderStoryEditor();document.getElementById('storyFiles').value='';
-}
-function renderStoryEditor(){
-  const g=allStoryGroups.find(x=>x.id===currentStoryGroupId), existing=g?.story_images||[];
-  document.getElementById('storyEditorGrid').innerHTML=[
-    ...existing.map((img,i)=>`<div class="story-editor-item"><img src="${esc(img.image_url)}"><button class="x" title="立即永久刪除" onclick="deleteStoryImageFully('${img.id}')">×</button><span class="state">已儲存 · ${i+1}</span></div>`),
-    ...pendingStoryFiles.map((p,i)=>`<div class="story-editor-item"><img src="${esc(p.preview)}"><button class="x" title="移除尚未儲存圖片" onclick="removePendingStoryFile(${i})">×</button><span class="state">待上傳</span></div>`)
-  ].join('');
-}
-function removePendingStoryFile(i){URL.revokeObjectURL(pendingStoryFiles[i].preview);pendingStoryFiles.splice(i,1);renderStoryEditor()}
-async function imageToWebp(file,max=1600,quality=.88){
-  const bmp=await createImageBitmap(file),scale=Math.min(1,max/Math.max(bmp.width,bmp.height));
-  const c=document.createElement('canvas');c.width=Math.round(bmp.width*scale);c.height=Math.round(bmp.height*scale);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
-  return await new Promise(res=>c.toBlob(res,'image/webp',quality));
-}
-async function uploadImage(blob,bucket,prefix){
-  const name=`${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}.webp`;
-  const {error}=await sb.storage.from(bucket).upload(name,blob,{contentType:'image/webp'});if(error)throw error;
-  return sb.storage.from(bucket).getPublicUrl(name).data.publicUrl;
-}
-async function saveStoryGroup(){
-  try{
-    const brand=document.getElementById('storyBrand').value.trim(),model=document.getElementById('storyModel').value.trim();if(!brand||!model)return showToast('請填品牌與型號');
-    const tag_id=await upsertTag(brand,model),payload={tag_id,story_date:document.getElementById('storyDate').value||null,note:document.getElementById('storyNote').value.trim()};
-    let id=currentStoryGroupId;
-    if(id){const {error}=await sb.from('story_groups').update(payload).eq('id',id);if(error)throw error}
-    else{const {data,error}=await sb.from('story_groups').insert(payload).select('id').single();if(error)throw error;id=data.id}
-    const existingCount=(allStoryGroups.find(g=>g.id===id)?.story_images||[]).length;
-    const uploaded=[];
-    try{
-      for(let i=0;i<pendingStoryFiles.length;i++){
-        const blob=await imageToWebp(pendingStoryFiles[i].file),url=await uploadImage(blob,'story-images','story');
-        uploaded.push(url);
-        const {error}=await sb.from('story_images').insert({story_group_id:id,image_url:url,sort_order:existingCount+i});if(error)throw error;
-      }
-    }catch(e){await removeStorageUrls(uploaded,'story-images');throw e}
-    closeStoryGroupModal();showToast('限動組已儲存');await loadAll();
-  }catch(e){console.error(e);showToast('限動組儲存失敗')}
-}
-async function deleteStoryImageFully(imageId){
-  const group=allStoryGroups.find(g=>(g.story_images||[]).some(i=>i.id===imageId)), img=group?.story_images.find(i=>i.id===imageId);if(!img)return;
-  const n=(img.inquiries||[]).length;
-  if(!confirm(n?`這張限動有 ${n} 筆詢問。刪除圖片會永久刪除圖片、詢問資料與對話截圖，確定嗎？`:'確定永久刪除這張限動圖片？'))return;
-  const shots=(img.inquiries||[]).map(i=>i.screenshot_url).filter(Boolean);
-  const {error}=await sb.from('story_images').delete().eq('id',imageId);if(error){console.error(error);showToast('圖片刪除失敗');return}
-  const [a,b]=await Promise.all([removeStorageUrls([img.image_url],'story-images'),removeStorageUrls(shots,'post-screenshots')]);
-  showToast(a&&b?'圖片與資料已永久刪除':'資料已刪除，但部分 Storage 檔案清理失敗');
-  await loadAll(); currentStoryGroupId=group.id;renderStoryEditor();if(currentStoryDetailId===group.id)openStoryDetail(group.id);
-}
-async function deleteStoryGroup(){
-  const g=allStoryGroups.find(x=>x.id===currentStoryGroupId);if(!g||!confirm('確定永久刪除整組限動？所有圖片、詢問與對話截圖都會刪除。'))return;
-  const imageUrls=(g.story_images||[]).map(i=>i.image_url),shots=(g.story_images||[]).flatMap(i=>i.inquiries||[]).map(i=>i.screenshot_url).filter(Boolean);
-  const {error}=await sb.from('story_groups').delete().eq('id',g.id);if(error){console.error(error);showToast('整組刪除失敗');return}
-  await Promise.all([removeStorageUrls(imageUrls,'story-images'),removeStorageUrls(shots,'post-screenshots')]);
-  closeStoryGroupModal();showToast('整組已刪除');await loadAll();
-}
-function openStoryDetail(id){
-  currentStoryDetailId=id;const g=allStoryGroups.find(x=>x.id===id);if(!g)return;
-  const total=storyInquiries(g).length;
-  document.getElementById('storyDetailTitle').innerHTML=`${esc(tagLabel(g.tags))} <button class="icon-btn" onclick="openTagModal('${g.tag_id||''}')">編輯標籤</button>`;
-  document.getElementById('storyDetailMeta').textContent=`${g.story_date||''}${g.note?' · '+g.note:''} · 全組 ${total} 筆詢問`;
-  document.getElementById('storyDetailGrid').innerHTML=(g.story_images||[]).map((img,i)=>{
-    const iq=(img.inquiries||[]).filter(inquiryDateMatch);
-    return `<article class="story-image-card"><div class="story-image-wrap" onclick="openLightbox('${esc(img.image_url)}')"><img src="${esc(img.image_url)}"><span class="image-index">第 ${i+1} 張</span><span class="image-count">${iq.length} 詢問</span></div><div class="story-image-body"><div class="inquiry-list">${buildInquiryRows(iq,'story-image',img.id)}</div><div class="story-image-actions"><button class="btn btn-primary" onclick="openInquiryModal(null,'story-image','${img.id}')">＋ 新增詢問</button></div></div></article>`;
-  }).join('')||'<div class="note">這組目前沒有圖片</div>';
-  openModal('storyDetailModal');
-}
-function editCurrentStoryGroup(){closeModal('storyDetailModal');openStoryGroupModal(currentStoryDetailId)}
-function buildInquiryRows(items,parentType,parentId){
-  return items.slice().sort((a,b)=>(b.inquiry_date||'').localeCompare(a.inquiry_date||'')).map(i=>`<div class="inq-row" onclick="openInquiryModal('${i.id}','${parentType}','${parentId}')"><span>${esc(i.inquiry_date||'未填日期')}</span>${parentType==='story-image'?`<span class="inq-source">${esc(i.story_source==='精選'?'精選':'當日')}</span>`:''}<span class="inq-source">${esc(i.inquiry_type||'詢問')}</span><span class="inq-note">${esc(i.note||'')}</span>${i.screenshot_url?'<span>▣</span>':''}</div>`).join('')||'<div class="note">尚無詢問</div>';
+function closeInquiryModal(){
+  document.getElementById('inquiryModalOverlay').classList.remove('open');
+  currentInquiryId = null;
+  currentPlatformPostId = null;
 }
 
-function openInquiryModal(id=null,parentType='platform',parentId=null){
-  currentInquiryId=id;currentInquiryParentType=parentType;currentInquiryParentId=parentId;
-  const iq=id?inquiryIndex[id]:null;
-  document.getElementById('inquiryModalTitle').textContent=id?'編輯詢問':'新增詢問';
-  document.getElementById('deleteInquiryBtn').style.display=id?'block':'none';
-  document.getElementById('inquiryDate').value=iq?.inquiry_date||today();document.getElementById('inquiryType').value=iq?.inquiry_type||'私訊';document.getElementById('inquiryNote').value=iq?.note||'';
-  const isStory=parentType==='story-image';document.getElementById('storySourceField').style.display=isStory?'block':'none';document.getElementById('storySource').value=iq?.story_source||'當日';
-  shotBlob=null;shotChanged=false;shotRemoved=false;existingShotUrl=iq?.screenshot_url||null;renderShot();openModal('inquiryModal');
-}
-function closeInquiryModal(){closeModal('inquiryModal');shotBlob=null}
-function renderShot(){
-  const img=document.getElementById('shotPreview'),empty=document.getElementById('shotEmpty'),actions=document.getElementById('shotActions');
-  let src=null;if(shotBlob)src=URL.createObjectURL(shotBlob);else if(!shotRemoved)src=existingShotUrl;
-  if(src){img.src=src;img.style.display='block';empty.style.display='none';actions.style.display='flex'}else{img.removeAttribute('src');img.style.display='none';empty.style.display='block';actions.style.display='none'}
-}
-function setupShotUpload(){
-  const zone=document.getElementById('shotZone'),input=document.getElementById('shotFile');
-  zone.onclick=()=>input.click();input.onchange=e=>setShotFile(e.target.files[0]);
-  zone.ondragover=e=>e.preventDefault();zone.ondrop=e=>{e.preventDefault();setShotFile(e.dataTransfer.files[0])};
-  document.addEventListener('paste',e=>{if(!document.getElementById('inquiryModal').classList.contains('open'))return;const f=[...e.clipboardData.files].find(x=>x.type.startsWith('image/'));if(f)setShotFile(f)});
-}
-function setShotFile(file){if(!file||!file.type.startsWith('image/'))return;shotBlob=file;shotChanged=true;shotRemoved=false;document.getElementById('shotFile').value='';renderShot()}
-function removeShot(){shotBlob=null;shotChanged=true;shotRemoved=true;renderShot()}
-function expandShot(){const src=document.getElementById('shotPreview').src;if(src)openLightbox(src)}
 async function saveInquiry(){
+  const inquiry_date = document.getElementById('inquiryDate').value || null;
+  const inquiry_type = document.getElementById('inquiryType').value;
+  const note = document.getElementById('inquiryNote').value.trim();
+  const story_source = currentInquiryParentType === 'story-image'
+    ? document.getElementById('storySource').value
+    : null;
+
+  const oldScreenshotUrl = existingShotUrl;
+  let uploadedNewUrl = null;
+  let screenshot_url = existingShotUrl; // 預設維持原本截圖
+  if(currentShotRemoved){
+    screenshot_url = null;
+  } else if(currentShotChanged && currentShotBlob){
+    document.getElementById('shotStatus').textContent = '上傳中...';
+    const uploadedUrl = await uploadShotToStorage(currentShotBlob);
+    if(!uploadedUrl){ document.getElementById('shotStatus').textContent = ''; return; }
+    uploadedNewUrl = uploadedUrl;
+    screenshot_url = uploadedUrl;
+  }
+
+  const payload = { inquiry_date, inquiry_type, note, screenshot_url, story_source };
+  let saveError = null;
+
+  if(currentInquiryId){
+    const { error } = await sb.from('inquiries').update(payload).eq('id', currentInquiryId);
+    saveError = error;
+  } else {
+    const insertPayload = currentInquiryParentType === 'story-image'
+      ? { story_image_id: currentPlatformPostId, platform_post_id: null, ...payload }
+      : { platform_post_id: currentPlatformPostId, story_image_id: null, ...payload };
+    const { error } = await sb.from('inquiries').insert(insertPayload);
+    saveError = error;
+  }
+
+  if(saveError){
+    console.error(saveError);
+    if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'post-screenshots');
+    showToast(currentInquiryId ? '更新失敗' : '新增失敗');
+    return;
+  }
+
+  // 截圖維持單張：成功換新圖後，把舊 Storage 檔案永久移除
+  const oldFileCleaned = oldScreenshotUrl && oldScreenshotUrl !== screenshot_url
+    ? await removeStorageUrls([oldScreenshotUrl], 'post-screenshots')
+    : true;
+  showToast(oldFileCleaned ? '已儲存' : '資料已儲存，但舊截圖清理失敗');
+  closeInquiryModal();
+  await loadAll();
+  refreshOpenDetailModals();
+}
+
+/* ================= 截圖：貼上 / 拖曳 / 上傳 / 轉WebP / 下載 / Lightbox ================= */
+function fileToWebpBlob(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          if(blob) resolve(blob); else reject(new Error('WebP 轉換失敗'));
+        }, 'image/webp', 0.85);
+      };
+      img.onerror = () => reject(new Error('圖片讀取失敗'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('檔案讀取失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadShotToStorage(blob, bucket){
+  bucket = bucket || 'post-screenshots';
+  const filename = `img_${Date.now()}_${Math.random().toString(36).slice(2,8)}.webp`;
+  const { error } = await sb.storage.from(bucket).upload(filename, blob, { contentType: 'image/webp' });
+  if(error){ console.error(error); showToast('圖片上傳失敗'); return null; }
+  const { data } = sb.storage.from(bucket).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+function storagePathFromPublicUrl(url, bucket){
+  if(!url) return null;
   try{
-    let screenshot_url=shotRemoved?null:existingShotUrl,uploaded=null;
-    if(shotBlob){const blob=await imageToWebp(shotBlob,1600,.9);uploaded=await uploadImage(blob,'post-screenshots','inq');screenshot_url=uploaded}
-    const payload={inquiry_date:document.getElementById('inquiryDate').value||null,inquiry_type:document.getElementById('inquiryType').value,note:document.getElementById('inquiryNote').value.trim(),screenshot_url,story_source:currentInquiryParentType==='story-image'?document.getElementById('storySource').value:null};
-    let error=null;
-    if(currentInquiryId){({error}=await sb.from('inquiries').update(payload).eq('id',currentInquiryId))}
-    else if(currentInquiryParentType==='story-image'){({error}=await sb.from('inquiries').insert({...payload,story_image_id:currentInquiryParentId,platform_post_id:null}))}
-    else{({error}=await sb.from('inquiries').insert({...payload,platform_post_id:currentInquiryParentId,story_image_id:null}))}
-    if(error){if(uploaded)await removeStorageUrls([uploaded],'post-screenshots');throw error}
-    if(existingShotUrl&&existingShotUrl!==screenshot_url)await removeStorageUrls([existingShotUrl],'post-screenshots');
-    closeInquiryModal();showToast('詢問已儲存');await loadAll();
-    if(currentInquiryParentType==='story-image'&&currentStoryDetailId)openStoryDetail(currentStoryDetailId);
-    if(currentInquiryParentType==='platform'&&currentGroupDetailId)openGroupDetail(currentGroupDetailId);
-  }catch(e){console.error(e);showToast('詢問儲存失敗')}
+    const pathname = new URL(url).pathname;
+    const marker = `/storage/v1/object/public/${bucket}/`;
+    const markerIndex = pathname.indexOf(marker);
+    if(markerIndex < 0) return null;
+    return decodeURIComponent(pathname.slice(markerIndex + marker.length));
+  } catch(error){
+    console.error('無法解析 Storage 網址', error);
+    return null;
+  }
 }
+
+async function removeStorageUrls(urls, bucket){
+  const paths = [...new Set((urls || [])
+    .map(url => storagePathFromPublicUrl(url, bucket))
+    .filter(Boolean))];
+  if(paths.length === 0) return true;
+  const { error } = await sb.storage.from(bucket).remove(paths);
+  if(error){
+    console.error(`清理 ${bucket} 舊檔失敗`, error);
+    return false;
+  }
+  return true;
+}
+
+async function handleShotFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')){ showToast('請選擇圖片檔案'); return; }
+  document.getElementById('shotStatus').textContent = '轉換中...';
+  try{
+    const webpBlob = await fileToWebpBlob(file);
+    currentShotBlob = webpBlob;
+    currentShotChanged = true;
+    currentShotRemoved = false;
+    const previewUrl = URL.createObjectURL(webpBlob);
+    showShotPreview(previewUrl);
+    document.getElementById('shotStatus').textContent = `已轉換為 WebP（約 ${(webpBlob.size/1024).toFixed(0)} KB）`;
+  } catch(e){
+    console.error(e);
+    document.getElementById('shotStatus').textContent = '';
+    showToast('圖片處理失敗');
+  }
+}
+
+function showShotPreview(src){
+  document.getElementById('shotEmpty').style.display = 'none';
+  const img = document.getElementById('shotPreview');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('shotActions').style.display = 'flex';
+}
+
+function clearShotPreview(){
+  document.getElementById('shotEmpty').style.display = 'block';
+  const img = document.getElementById('shotPreview');
+  img.src = '';
+  img.style.display = 'none';
+  document.getElementById('shotActions').style.display = 'none';
+}
+
+function triggerShotFileSelect(){
+  document.getElementById('shotFileInput').click();
+}
+
+function removeCurrentShot(){
+  currentShotBlob = null;
+  currentShotChanged = false;
+  currentShotRemoved = true;
+  clearShotPreview();
+  document.getElementById('shotStatus').textContent = '';
+}
+
+async function downloadCurrentShot(){
+  const img = document.getElementById('shotPreview');
+  if(!img.src) return;
+  try{
+    const resp = await fetch(img.src);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `詢問截圖_${new Date().toISOString().slice(0,10)}.webp`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch(e){
+    console.error(e);
+    showToast('下載失敗');
+  }
+}
+
+function expandCurrentShot(){
+  const img = document.getElementById('shotPreview');
+  if(!img.src) return;
+  openLightbox(img.src);
+}
+
+function openLightbox(src){
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxOverlay').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightboxOverlay').classList.remove('open');
+  document.getElementById('lightboxImg').src = '';
+}
+
+function setupShotZone(){
+  const zone = document.getElementById('shotZone');
+  const fileInput = document.getElementById('shotFileInput');
+  const modalOverlay = document.getElementById('inquiryModalOverlay');
+
+  zone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    if(e.target.files[0]) handleShotFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file) handleShotFile(file);
+  });
+
+  // 在整個 Modal 範圍內按 Ctrl+V 都能貼上，不用先點擊貼上區
+  modalOverlay.addEventListener('paste', e => {
+    const items = e.clipboardData ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.startsWith('image/')){
+        handleShotFile(item.getAsFile());
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+setupShotZone();
+
 async function deleteInquiry(){
-  const iq=inquiryIndex[currentInquiryId];if(!iq||!confirm('確定刪除這筆詢問與對話截圖？'))return;
-  const {error}=await sb.from('inquiries').delete().eq('id',iq.id);if(error){console.error(error);showToast('刪除失敗');return}
-  await removeStorageUrls([iq.screenshot_url],'post-screenshots');closeInquiryModal();showToast('詢問已刪除');await loadAll();
-  if(iq.parentType==='story-image'&&currentStoryDetailId)openStoryDetail(currentStoryDetailId);
-  if(iq.parentType==='platform'&&currentGroupDetailId)openGroupDetail(currentGroupDetailId);
+  if(!currentInquiryId) return;
+  if(!confirm('確定刪除這筆詢問記錄？')) return;
+  const inquiry = allInquiriesById[currentInquiryId];
+  const { error } = await sb.from('inquiries').delete().eq('id', currentInquiryId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+  const storageCleaned = await removeStorageUrls([inquiry?.screenshot_url], 'post-screenshots');
+  showToast(storageCleaned ? '已刪除' : '資料已刪除，但截圖清理失敗');
+  closeInquiryModal();
+  await loadAll();
+  refreshOpenDetailModals();
 }
 
-function openLightbox(src){if(!src)return;document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open')}
+/* ================= 限時動態 ================= */
+/*
+  V5 資料模型：
+  story_groups = 一整組限動（共用品牌／型號、日期、備註）
+  story_images = 組內每一張限動圖片
+  inquiries.story_image_id = 詢問指向某一張限動圖片
+  inquiries.story_source = 當日 / 精選（來源屬於詢問，不屬於限動本體）
 
-window.openGroupModal=openGroupModal;window.addPlatformInput=addPlatformInput;window.renderPlatformInputs=renderPlatformInputs;
-window.saveGroup=saveGroup;window.deleteGroup=deleteGroup;window.openGroupDetail=openGroupDetail;window.editCurrentGroup=editCurrentGroup;
-window.openTagModal=openTagModal;window.saveTagEdit=saveTagEdit;window.openStoryGroupModal=openStoryGroupModal;window.closeStoryGroupModal=closeStoryGroupModal;
-window.removePendingStoryFile=removePendingStoryFile;window.saveStoryGroup=saveStoryGroup;window.deleteStoryImageFully=deleteStoryImageFully;window.deleteStoryGroup=deleteStoryGroup;
-window.openStoryDetail=openStoryDetail;window.editCurrentStoryGroup=editCurrentStoryGroup;window.openInquiryModal=openInquiryModal;window.saveInquiry=saveInquiry;window.deleteInquiry=deleteInquiry;
-window.closeInquiryModal=closeInquiryModal;window.removeShot=removeShot;window.expandShot=expandShot;window.openLightbox=openLightbox;window.closeLightbox=closeLightbox;window.closeModal=closeModal;window.resetFilters=resetFilters;
+  注意：allStoryEntries 這個變數名稱刻意保留，讓既有上方統計／桑基圖／排行函式
+  不必重寫；每個元素現在代表「一整組限動」，inquiries 已在資料層攤平成全組加總。
+*/
+let allStoriesHighlights = []; // 舊版相容保留；V5 不再使用精選群組表
+let allStoryEntries = [];
+let currentStoryEntryId = null;   // 現在代表 story_group.id
+let currentStoryDetailId = null;  // 現在代表 story_group.id
+let pendingStoryImages = [];      // [{token, blob, previewUrl}]
+
+async function loadStories(){
+  const { data, error } = await sb
+    .from('story_groups')
+    .select(`
+      id, tag_id, note, story_date, created_at,
+      tags ( id, model, brand_id, brands ( id, name ) ),
+      story_images (
+        id, image_url, sort_order, created_at,
+        inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url, story_source )
+      )
+    `)
+    .order('story_date', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if(error){ console.error(error); showToast('限動讀取失敗'); return; }
+
+  allStoryEntries = (data || []).map(g => {
+    if(g.tags && g.tags.brands) g.tags.brand = g.tags.brands.name;
+    const images = (g.story_images || []).sort((a,b) =>
+      (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+      String(a.created_at || '').localeCompare(String(b.created_at || ''))
+    );
+    const inquiries = images.flatMap(img => img.inquiries || []);
+    const brandModel = g.tags ? `${g.tags.brand} ${g.tags.model}` : '未命名限動';
+    return {
+      ...g,
+      story_images: images,
+      inquiries,
+      brand_model_text: brandModel,
+      image_url: images[0]?.image_url || ''
+    };
+  });
+
+  rebuildStoryInquiryIndex();
+  renderStories();
+}
+
+function rebuildStoryInquiryIndex(){
+  allStoryEntries.forEach(group => {
+    (group.story_images || []).forEach(img => {
+      (img.inquiries || []).forEach(iq => { allInquiriesById[iq.id] = iq; });
+    });
+  });
+}
+
+function buildStoryTileHtml(group){
+  const count = (group.inquiries || []).length;
+  const images = group.story_images || [];
+  const cover = images[0]?.image_url || '';
+  return `
+    <div class="story-tile" onclick="openStoryDetail('${group.id}')">
+      <div class="tile-cover">
+        ${cover
+          ? `<img src="${cover}" />`
+          : `<div class="tile-cover-placeholder">尚無圖片</div>`}
+        ${count > 0 ? `<span class="tile-badge">💬 ${count}</span>` : ''}
+      </div>
+      <div class="story-tile-info">
+        <div class="story-tile-brand">${escapeHtml(group.brand_model_text)}</div>
+        <div class="story-group-meta">${images.length} 張限動</div>
+        ${group.note ? `<div class="tile-note">${escapeHtml(group.note)}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderStories(){
+  const list = document.getElementById('storyDailyList');
+  const empty = document.getElementById('storyDailyEmpty');
+  if(!list) return;
+
+  list.innerHTML = allStoryEntries.map(group => buildStoryTileHtml(group)).join('');
+  empty.style.display = allStoryEntries.length === 0 ? 'block' : 'none';
+
+  // 上方統計仍使用原本 renderStats()；只是每組限動現在提供一筆聚合資料
+  renderStats();
+}
+
+function renderStoryComboSuggestions(){
+  const brandInput = document.getElementById('storyTagBrand');
+  const modelInput = document.getElementById('storyTagModel');
+  const brandList = document.getElementById('storyBrandList');
+  const modelList = document.getElementById('storyModelList');
+  const uniqueBrands = [...new Set(allTags.map(t => t.brand))];
+
+  function refreshBrandList(){
+    const val = brandInput.value.trim().toLowerCase();
+    const matches = uniqueBrands.filter(b => !val || b.toLowerCase().includes(val));
+    brandList.innerHTML = matches.map(b => `<div class="combo-item">${escapeHtml(b)}</div>`).join('');
+    brandList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => {
+        brandInput.value = matches[i];
+        brandList.classList.remove('open');
+        refreshModelList();
+      };
+    });
+  }
+  function refreshModelList(){
+    const brandVal = brandInput.value.trim().toLowerCase();
+    const val = modelInput.value.trim().toLowerCase();
+    const models = [...new Set(allTags.filter(t => t.brand.toLowerCase() === brandVal).map(t => t.model))];
+    const matches = models.filter(m => !val || m.toLowerCase().includes(val));
+    modelList.innerHTML = matches.map(m => `<div class="combo-item">${escapeHtml(m)}</div>`).join('');
+    modelList.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { modelInput.value = matches[i]; modelList.classList.remove('open'); };
+    });
+  }
+
+  brandInput.oninput = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onfocus = () => { refreshBrandList(); brandList.classList.add('open'); };
+  brandInput.onblur = () => setTimeout(() => brandList.classList.remove('open'),150);
+  modelInput.oninput = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onfocus = () => { refreshModelList(); modelList.classList.add('open'); };
+  modelInput.onblur = () => setTimeout(() => modelList.classList.remove('open'),150);
+}
+
+function clearPendingStoryImages(){
+  pendingStoryImages.forEach(item => {
+    if(item.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(item.previewUrl);
+  });
+  pendingStoryImages = [];
+  renderPendingStoryImages();
+}
+
+function renderExistingStoryImages(){
+  const wrap = document.getElementById('storyExistingImages');
+  if(!wrap) return;
+  const group = allStoryEntries.find(x => x.id === currentStoryEntryId);
+  const images = group?.story_images || [];
+  if(images.length === 0){
+    wrap.innerHTML = '<div class="inquiry-empty">尚無已儲存圖片</div>';
+    return;
+  }
+  wrap.innerHTML = images.map((img,index) => `
+    <div class="story-editor-thumb">
+      <img src="${img.image_url}" onclick="openLightbox('${img.image_url}')" />
+      <button type="button" class="story-editor-remove" title="永久刪除這張限動" onclick="event.stopPropagation(); deleteStoryImageFully('${img.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function renderPendingStoryImages(){
+  const wrap = document.getElementById('storyPendingImages');
+  const title = document.getElementById('storyPendingTitle');
+  if(!wrap || !title) return;
+  title.style.display = pendingStoryImages.length ? 'flex' : 'none';
+  wrap.innerHTML = pendingStoryImages.map(item => `
+    <div class="story-editor-thumb">
+      <img src="${item.previewUrl}" onclick="openLightbox('${item.previewUrl}')" />
+      <button type="button" class="story-editor-remove" title="取消這張待新增圖片" onclick="event.stopPropagation(); removePendingStoryImage('${item.token}')">×</button>
+    </div>
+  `).join('');
+}
+
+function removePendingStoryImage(token){
+  const index = pendingStoryImages.findIndex(item => item.token === token);
+  if(index < 0) return;
+  const [item] = pendingStoryImages.splice(index,1);
+  if(item.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(item.previewUrl);
+  renderPendingStoryImages();
+}
+
+async function addPendingStoryFiles(files){
+  const valid = [...files].filter(file => file?.type?.startsWith('image/'));
+  if(!valid.length){ showToast('請選擇圖片檔案'); return; }
+  const status = document.getElementById('storyShotStatus');
+  status.textContent = `處理圖片中（0/${valid.length}）...`;
+  for(let i=0;i<valid.length;i++){
+    try{
+      const blob = await fileToWebpBlob(valid[i]);
+      pendingStoryImages.push({
+        token:`pending_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+        blob,
+        previewUrl:URL.createObjectURL(blob)
+      });
+      status.textContent = `處理圖片中（${i+1}/${valid.length}）...`;
+    }catch(e){
+      console.error(e);
+      showToast(`第 ${i+1} 張圖片處理失敗`);
+    }
+  }
+  renderPendingStoryImages();
+  status.textContent = pendingStoryImages.length ? `待新增 ${pendingStoryImages.length} 張圖片` : '';
+}
+
+function openStoryModal(id){
+  currentStoryEntryId = id || null;
+  document.getElementById('storyModalTitle').textContent = id ? '編輯限時動態' : '新增限時動態';
+  document.getElementById('deleteStoryBtn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('storyShotStatus').textContent = '';
+  clearPendingStoryImages();
+
+  const group = id ? allStoryEntries.find(x => x.id === id) : null;
+  document.getElementById('storyDate').value = group?.story_date || new Date().toISOString().slice(0,10);
+  document.getElementById('storyTagBrand').value = group?.tags?.brand || '';
+  document.getElementById('storyTagModel').value = group?.tags?.model || '';
+  document.getElementById('storyNote').value = group?.note || '';
+  renderStoryComboSuggestions();
+  renderExistingStoryImages();
+  renderPendingStoryImages();
+  document.getElementById('storyModalOverlay').classList.add('open');
+}
+
+function closeStoryModal(){
+  document.getElementById('storyModalOverlay').classList.remove('open');
+  clearPendingStoryImages();
+  currentStoryEntryId = null;
+}
+
+async function saveStoryEntry(){
+  const brand = document.getElementById('storyTagBrand').value.trim();
+  const model = document.getElementById('storyTagModel').value.trim();
+  const story_date = document.getElementById('storyDate').value || null;
+  const note = document.getElementById('storyNote').value.trim();
+  if(!brand || !model){ showToast('請填寫品牌和型號'); return; }
+
+  const existingGroup = currentStoryEntryId ? allStoryEntries.find(x => x.id === currentStoryEntryId) : null;
+  if(!existingGroup && pendingStoryImages.length === 0){ showToast('請至少加入一張限動圖片'); return; }
+  if(existingGroup && (existingGroup.story_images || []).length === 0 && pendingStoryImages.length === 0){
+    showToast('請至少保留或加入一張限動圖片');
+    return;
+  }
+
+  const tag_id = await upsertTag(brand,model);
+  if(!tag_id) return;
+
+  let groupId = currentStoryEntryId;
+  const wasNew = !groupId;
+  const status = document.getElementById('storyShotStatus');
+
+  if(groupId){
+    const { error } = await sb.from('story_groups').update({ tag_id, note, story_date }).eq('id',groupId);
+    if(error){ console.error(error); showToast('限動更新失敗'); return; }
+  } else {
+    const { data, error } = await sb.from('story_groups')
+      .insert({ tag_id, note, story_date })
+      .select('id').single();
+    if(error){ console.error(error); showToast('限動新增失敗'); return; }
+    groupId = data.id;
+  }
+
+  const existingCount = existingGroup?.story_images?.length || 0;
+  const uploadedUrls = [];
+  const insertedIds = [];
+  try{
+    for(let i=0;i<pendingStoryImages.length;i++){
+      status.textContent = `上傳圖片中（${i+1}/${pendingStoryImages.length}）...`;
+      const url = await uploadShotToStorage(pendingStoryImages[i].blob,'story-images');
+      if(!url) throw new Error('圖片上傳失敗');
+      uploadedUrls.push(url);
+      const { data, error } = await sb.from('story_images')
+        .insert({ story_group_id:groupId, image_url:url, sort_order:existingCount+i })
+        .select('id').single();
+      if(error) throw error;
+      insertedIds.push(data.id);
+    }
+  }catch(e){
+    console.error(e);
+    if(insertedIds.length) await sb.from('story_images').delete().in('id',insertedIds);
+    if(uploadedUrls.length) await removeStorageUrls(uploadedUrls,'story-images');
+    if(wasNew) await sb.from('story_groups').delete().eq('id',groupId);
+    status.textContent = '';
+    showToast('限動圖片儲存失敗，已回復本次新增');
+    return;
+  }
+
+  showToast('已儲存');
+  closeStoryModal();
+  await loadAll();
+}
+
+async function deleteStoryImageFully(imageId){
+  const group = allStoryEntries.find(g => (g.story_images || []).some(img => img.id === imageId));
+  const image = group?.story_images?.find(img => img.id === imageId);
+  if(!group || !image) return;
+  const inquiryCount = (image.inquiries || []).length;
+  const message = inquiryCount
+    ? `這張限動已有 ${inquiryCount} 筆詢問。刪除後會永久移除這張圖片、相關詢問與對話截圖，確定嗎？`
+    : '確定永久刪除這張限動圖片？';
+  if(!confirm(message)) return;
+
+  const inquiryScreenshotUrls = (image.inquiries || []).map(iq => iq.screenshot_url).filter(Boolean);
+  const { error } = await sb.from('story_images').delete().eq('id',imageId);
+  if(error){ console.error(error); showToast('圖片刪除失敗'); return; }
+
+  const [storyImageCleaned,inquiryImagesCleaned] = await Promise.all([
+    removeStorageUrls([image.image_url],'story-images'),
+    removeStorageUrls(inquiryScreenshotUrls,'post-screenshots')
+  ]);
+  showToast(storyImageCleaned && inquiryImagesCleaned ? '圖片已永久刪除' : '資料已刪除，但部分 Storage 檔案清理失敗');
+
+  const keepGroupId = group.id;
+  await loadAll();
+  if(document.getElementById('storyModalOverlay').classList.contains('open')){
+    currentStoryEntryId = keepGroupId;
+    renderExistingStoryImages();
+  }
+  if(currentStoryDetailId === keepGroupId){
+    const fresh = allStoryEntries.find(x => x.id === keepGroupId);
+    if(fresh) renderStoryDetailContent(fresh);
+  }
+}
+
+async function deleteStoryEntry(){
+  if(!currentStoryEntryId) return;
+  const group = allStoryEntries.find(g => g.id === currentStoryEntryId);
+  if(!group) return;
+  if(!confirm('確定永久刪除整組限時動態？組內所有圖片、詢問記錄與對話截圖都會一併刪除。')) return;
+
+  const storyImageUrls = (group.story_images || []).map(img => img.image_url).filter(Boolean);
+  const inquiryScreenshotUrls = (group.story_images || [])
+    .flatMap(img => img.inquiries || [])
+    .map(iq => iq.screenshot_url)
+    .filter(Boolean);
+
+  const { error } = await sb.from('story_groups').delete().eq('id',currentStoryEntryId);
+  if(error){ console.error(error); showToast('刪除失敗'); return; }
+
+  const [storyImagesCleaned,inquiryImagesCleaned] = await Promise.all([
+    removeStorageUrls(storyImageUrls,'story-images'),
+    removeStorageUrls(inquiryScreenshotUrls,'post-screenshots')
+  ]);
+  showToast(storyImagesCleaned && inquiryImagesCleaned ? '整組已刪除' : '資料已刪除，但部分 Storage 檔案清理失敗');
+  closeStoryModal();
+  await loadAll();
+}
+
+function setupStoryShotZone(){
+  const zone = document.getElementById('storyShotZone');
+  const fileInput = document.getElementById('storyShotFileInput');
+  const modalOverlay = document.getElementById('storyModalOverlay');
+
+  zone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    if(e.target.files?.length) addPendingStoryFiles(e.target.files);
+    fileInput.value = '';
+  });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    if(e.dataTransfer.files?.length) addPendingStoryFiles(e.dataTransfer.files);
+  });
+  modalOverlay.addEventListener('paste', e => {
+    const files = [...(e.clipboardData?.items || [])]
+      .filter(item => item.type?.startsWith('image/'))
+      .map(item => item.getAsFile())
+      .filter(Boolean);
+    if(files.length){
+      addPendingStoryFiles(files);
+      e.preventDefault();
+    }
+  });
+}
+setupStoryShotZone();
+
+function renderStoryDetailContent(group){
+  document.getElementById('storyDetailBrand').textContent = group.brand_model_text;
+  document.getElementById('storyDetailDate').textContent = group.story_date || '';
+  document.getElementById('storyDetailNote').textContent = group.note || '';
+  const wrap = document.getElementById('storyDetailImages');
+  const images = group.story_images || [];
+  if(images.length === 0){
+    wrap.innerHTML = '<div class="inquiry-empty">這組目前沒有圖片</div>';
+    return;
+  }
+  wrap.innerHTML = images.map((img,index) => {
+    const inquiries = img.inquiries || [];
+    return `
+      <article class="story-detail-card">
+        <div class="story-detail-image-wrap-v5" onclick="openLightbox('${img.image_url}')">
+          <img src="${img.image_url}" />
+          <span class="story-detail-image-index">第 ${index+1} 張</span>
+          <span class="story-detail-image-count">${inquiries.length} 詢問</span>
+        </div>
+        <div class="story-detail-card-body">
+          <div class="inquiry-list">${renderInquiryList(inquiries,'story-image',img.id)}</div>
+          <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null,'story-image','${img.id}')">+ 新增詢問記錄</button>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function openStoryDetail(id){
+  currentStoryDetailId = id;
+  const group = allStoryEntries.find(x => x.id === id);
+  if(!group) return;
+  renderStoryDetailContent(group);
+  document.getElementById('storyDetailOverlay').classList.add('open');
+}
+function closeStoryDetail(){
+  document.getElementById('storyDetailOverlay').classList.remove('open');
+  currentStoryDetailId = null;
+}
+function editCurrentStoryEntry(){
+  if(!currentStoryDetailId) return;
+  const id = currentStoryDetailId;
+  closeStoryDetail();
+  openStoryModal(id);
+}
+
+</script>
+<script>
+(function(){
+  const states = new Map();
+  let activeState = null;
+
+  function selectedText(select){
+    const option = select.options[select.selectedIndex];
+    return option ? option.textContent.trim() : '';
+  }
+
+  function syncState(state){
+    state.label.textContent = selectedText(state.select) || '請選擇';
+    state.button.title = state.label.textContent;
+  }
+
+  function syncAll(){
+    states.forEach(syncState);
+  }
+
+  function closeMenu(returnFocus){
+    if(!activeState) return;
+    const state = activeState;
+    activeState = null;
+    state.button.setAttribute('aria-expanded','false');
+    state.menu.classList.remove('open');
+    setTimeout(() => {
+      if(state.menu.parentNode) state.menu.remove();
+    }, 220);
+    if(returnFocus) state.button.focus({preventScroll:true});
+  }
+
+  function placeMenu(state){
+    if(!state.menu || !state.menu.isConnected) return;
+
+    const rect = state.button.getBoundingClientRect();
+    const gap = 8;
+    const viewportGap = 12;
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = document.documentElement.clientHeight;
+    const minWidth = Math.max(rect.width, 180);
+
+    state.menu.style.width = 'auto';
+    state.menu.style.minWidth = minWidth + 'px';
+    state.menu.style.maxWidth = Math.max(180, Math.min(Math.max(minWidth, 300), viewportWidth - viewportGap * 2)) + 'px';
+    state.menu.style.maxHeight = 'none';
+
+    const naturalHeight = Math.min(state.menu.scrollHeight || 320, 380);
+    const roomBelow = Math.max(0, viewportHeight - rect.bottom - viewportGap - gap);
+    const roomAbove = Math.max(0, rect.top - viewportGap - gap);
+    const minimumComfortHeight = Math.min(190, naturalHeight);
+
+    let side = 'bottom';
+    if(roomBelow < minimumComfortHeight && roomAbove > roomBelow){
+      side = 'top';
+    } else if(roomAbove >= naturalHeight && roomBelow < naturalHeight){
+      side = 'top';
+    }
+
+    const availableHeight = side === 'top' ? roomAbove : roomBelow;
+    const menuMaxHeight = Math.max(86, Math.min(380, availableHeight));
+    state.menu.style.maxHeight = menuMaxHeight + 'px';
+    state.menu.dataset.side = side;
+
+    const menuWidth = state.menu.getBoundingClientRect().width;
+    const menuHeight = Math.min(state.menu.scrollHeight, menuMaxHeight);
+    const preferredLeft = rect.left;
+    const left = Math.min(
+      Math.max(viewportGap, preferredLeft),
+      Math.max(viewportGap, viewportWidth - menuWidth - viewportGap)
+    );
+    const top = side === 'top'
+      ? Math.max(viewportGap, rect.top - gap - menuHeight)
+      : Math.min(viewportHeight - viewportGap - menuHeight, rect.bottom + gap);
+
+    state.menu.style.left = Math.round(left) + 'px';
+    state.menu.style.top = Math.round(Math.max(viewportGap, top)) + 'px';
+  }
+
+  function buildMenu(state){
+    const menu = document.createElement('div');
+    menu.className = 'glass-select-menu';
+    menu.setAttribute('role','listbox');
+    menu.tabIndex = -1;
+
+    Array.from(state.select.options).forEach((option, index) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'glass-select-option';
+      item.textContent = option.textContent;
+      item.dataset.value = option.value;
+      item.dataset.index = String(index);
+      item.setAttribute('role','option');
+      item.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+      if(option.selected) item.classList.add('is-selected');
+      if(option.disabled) item.disabled = true;
+      item.addEventListener('click', () => {
+        if(item.disabled) return;
+        state.select.value = option.value;
+        state.select.dispatchEvent(new Event('change',{bubbles:true}));
+        syncState(state);
+        closeMenu(true);
+      });
+      menu.appendChild(item);
+    });
+
+    menu.addEventListener('keydown', (event) => {
+      const options = Array.from(menu.querySelectorAll('.glass-select-option:not(:disabled)'));
+      const current = document.activeElement;
+      let index = options.indexOf(current);
+      if(event.key === 'ArrowDown'){
+        event.preventDefault();
+        options[Math.min(index + 1, options.length - 1)]?.focus();
+      } else if(event.key === 'ArrowUp'){
+        event.preventDefault();
+        options[Math.max(index - 1, 0)]?.focus();
+      } else if(event.key === 'Home'){
+        event.preventDefault(); options[0]?.focus();
+      } else if(event.key === 'End'){
+        event.preventDefault(); options[options.length - 1]?.focus();
+      } else if(event.key === 'Escape'){
+        event.preventDefault(); closeMenu(true);
+      }
+    });
+    return menu;
+  }
+
+  function openMenu(state){
+    if(activeState === state){ closeMenu(true); return; }
+    closeMenu(false);
+    syncState(state);
+    state.menu = buildMenu(state);
+    document.body.appendChild(state.menu);
+    activeState = state;
+    state.button.setAttribute('aria-expanded','true');
+    placeMenu(state);
+    requestAnimationFrame(() => {
+      placeMenu(state);
+      state.menu.classList.add('open');
+      const selected = state.menu.querySelector('.is-selected');
+      (selected || state.menu.querySelector('.glass-select-option:not(:disabled)'))?.focus({preventScroll:true});
+      selected?.scrollIntoView({block:'nearest'});
+    });
+  }
+
+  function enhanceSelect(select){
+    if(select.dataset.glassEnhanced === '1') return;
+    select.dataset.glassEnhanced = '1';
+
+    const rect = select.getBoundingClientRect();
+    const shell = document.createElement('div');
+    shell.className = 'glass-select-shell';
+    if(select.closest('.field') || select.closest('.platform-input-block')){
+      shell.classList.add('glass-select-fluid');
+    } else if(rect.width){
+      shell.style.width = Math.max(116, Math.min(rect.width, 240)) + 'px';
+    }
+
+    select.parentNode.insertBefore(shell, select);
+    shell.appendChild(select);
+    select.classList.add('glass-select-native');
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'glass-select-trigger';
+    button.setAttribute('aria-haspopup','listbox');
+    button.setAttribute('aria-expanded','false');
+    const label = document.createElement('span');
+    label.className = 'glass-select-label';
+    const chevron = document.createElement('span');
+    chevron.className = 'glass-select-chevron';
+    chevron.setAttribute('aria-hidden','true');
+    button.append(label, chevron);
+    shell.appendChild(button);
+
+    const state = {select,shell,button,label,menu:null};
+    states.set(select,state);
+    syncState(state);
+
+    button.addEventListener('click', () => openMenu(state));
+    button.addEventListener('keydown', (event) => {
+      if(['Enter',' ','ArrowDown','ArrowUp'].includes(event.key)){
+        event.preventDefault(); openMenu(state);
+      }
+    });
+    select.addEventListener('change', () => syncState(state));
+    new MutationObserver(() => syncState(state)).observe(select,{childList:true,subtree:true,attributes:true});
+  }
+
+  function enhanceAll(root){
+    (root || document).querySelectorAll('select').forEach(enhanceSelect);
+  }
+
+  document.addEventListener('pointerdown', (event) => {
+    if(!activeState) return;
+    if(activeState.shell.contains(event.target) || activeState.menu?.contains(event.target)) return;
+    closeMenu(false);
+  }, true);
+  document.addEventListener('keydown', event => {
+    if(event.key === 'Escape' && activeState) closeMenu(true);
+  });
+  let viewportRaf = 0;
+  function scheduleMenuPlacement(){
+    if(!activeState || viewportRaf) return;
+    viewportRaf = requestAnimationFrame(() => {
+      viewportRaf = 0;
+      if(activeState) placeMenu(activeState);
+    });
+  }
+  window.addEventListener('resize', scheduleMenuPlacement);
+  window.addEventListener('scroll', event => {
+    if(!activeState) return;
+    if(activeState.menu && (event.target === activeState.menu || activeState.menu.contains(event.target))) return;
+    scheduleMenuPlacement();
+  }, true);
+
+  function wrapAfter(name){
+    const original = window[name];
+    if(typeof original !== 'function' || original.__glassWrapped) return;
+    const wrapped = function(...args){
+      const result = original.apply(this,args);
+      Promise.resolve(result).finally(() => requestAnimationFrame(syncAll));
+      return result;
+    };
+    wrapped.__glassWrapped = true;
+    window[name] = wrapped;
+  }
+
+  function init(){
+    enhanceAll(document);
+    ['resetFilters','populateTagFilterOptions','populateModelFilterOptions','openGroupModal','openInquiryModal','openStoryModal','openTagModal'].forEach(wrapAfter);
+    new MutationObserver(mutations => {
+      mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+        if(node.nodeType === 1){
+          if(node.matches?.('select')) enhanceSelect(node);
+          enhanceAll(node);
+        }
+      }));
+    }).observe(document.body,{childList:true,subtree:true});
+    window.syncGlassSelects = syncAll;
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
+
 </script>
 </body>
 </html>
