@@ -1096,7 +1096,7 @@ body{
   opacity:.68;
   animation:refractiveDisc 38s ease-in-out infinite alternate;
 }
-body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(script){
+body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(.inquiry-floating-preview):not(script){
   position:relative;
   z-index:1;
   width:min(100%,1540px);
@@ -1792,7 +1792,7 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
 </div>
 
 <!-- ===== 內容項目詳情 Modal（點擊方塊後顯示完整貼文與詢問記錄） ===== -->
-<div class="modal-overlay" id="groupDetailOverlay">
+<div class="modal-overlay" id="groupDetailOverlay" onclick="if(event.target===this)closeGroupDetail()">
   <div class="modal" style="max-width:780px;">
     <div class="detail-header">
       <div id="detailTagRow" class="detail-tag-row"></div>
@@ -2824,8 +2824,8 @@ function positionInquiryPreview(target){
 
   const margin = 14;
   const gap = 10;
-  const maxWidth = Math.min(300, window.innerWidth - margin * 2);
-  const maxHeight = Math.min(430, window.innerHeight - margin * 2);
+  const maxWidth = Math.min(600, window.innerWidth * 0.48, window.innerWidth - margin * 2);
+  const maxHeight = Math.min(900, window.innerHeight * 0.92, window.innerHeight - margin * 2);
   const ratio = img.naturalWidth / img.naturalHeight;
   let width = Math.min(maxWidth, img.naturalWidth);
   let height = width / ratio;
@@ -2859,20 +2859,43 @@ function showInquiryPreview(target){
   const encoded = target && target.dataset ? target.dataset.previewSrc : '';
   if(!preview || !img || !encoded) return;
 
+  let src = '';
+  try{ src = decodeURIComponent(encoded); }
+  catch(_){ src = encoded; }
+  if(!src) return;
+
   activeInquiryPreviewTarget = target;
-  const src = decodeURIComponent(encoded);
   preview.classList.remove('open');
-  img.onload = () => {
-    if(activeInquiryPreviewTarget !== target) return;
+
+  let revealed = false;
+  const reveal = () => {
+    if(revealed || activeInquiryPreviewTarget !== target || !img.naturalWidth || !img.naturalHeight) return;
+    revealed = true;
     positionInquiryPreview(target);
-    requestAnimationFrame(() => preview.classList.add('open'));
+    requestAnimationFrame(() => {
+      if(activeInquiryPreviewTarget === target) preview.classList.add('open');
+    });
   };
-  if(img.src === src && img.complete && img.naturalWidth){
-    positionInquiryPreview(target);
-    requestAnimationFrame(() => preview.classList.add('open'));
-  } else {
-    img.src = src;
+
+  img.onload = reveal;
+  img.onerror = () => {
+    if(activeInquiryPreviewTarget === target) preview.classList.remove('open');
+  };
+
+  // Safari / browser cache may not reliably emit a fresh load event when the same URL
+  // is already decoded. Check complete immediately before and after assigning src,
+  // then use decode() + a short fallback check as additional cache-safe paths.
+  if(img.src !== src) img.src = src;
+  if(img.complete && img.naturalWidth) reveal();
+  if(typeof img.decode === 'function'){
+    img.decode().then(reveal).catch(() => {});
   }
+  requestAnimationFrame(() => {
+    if(img.complete && img.naturalWidth) reveal();
+  });
+  setTimeout(() => {
+    if(img.complete && img.naturalWidth) reveal();
+  }, 80);
 }
 
 function hideInquiryPreview(){
@@ -2886,6 +2909,19 @@ window.addEventListener('resize', () => {
   if(activeInquiryPreviewTarget) positionInquiryPreview(activeInquiryPreviewTarget);
 });
 
+// Dynamic inquiry rows can be rebuilt after filtering/editing. Delegate hover events from
+// document so screenshot preview does not depend on inline mouseenter handlers surviving re-render.
+document.addEventListener('pointerover', event => {
+  const target = event.target && event.target.closest ? event.target.closest('.inquiry-thumb-wrap') : null;
+  if(!target || target.contains(event.relatedTarget)) return;
+  showInquiryPreview(target);
+});
+document.addEventListener('pointerout', event => {
+  const target = event.target && event.target.closest ? event.target.closest('.inquiry-thumb-wrap') : null;
+  if(!target || target.contains(event.relatedTarget)) return;
+  hideInquiryPreview();
+});
+
 
 function renderInquiryList(inquiries, parentType, parentId){
   if(!inquiries || inquiries.length === 0){
@@ -2896,8 +2932,6 @@ function renderInquiryList(inquiries, parentType, parentId){
     const thumbHtml = iq.screenshot_url
       ? `<span class="inquiry-thumb-wrap" tabindex="0"
            data-preview-src="${encodeURIComponent(iq.screenshot_url)}"
-           onmouseenter="showInquiryPreview(this)"
-           onmouseleave="hideInquiryPreview()"
            onfocus="showInquiryPreview(this)"
            onblur="hideInquiryPreview()"
            onclick="event.stopPropagation(); openInquiryPreviewLightbox(this)">
