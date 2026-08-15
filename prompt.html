@@ -546,54 +546,56 @@
             const style = getSelectedItem("STYLES", "select-styles");
             const eyewear = document.getElementById("input-eyewear").value.trim();
 
-            const referenceRules = `【人物參考圖】
-將指定的人物參考圖作為人物身分、臉部、五官比例、骨架、髮型、年齡感、族裔特徵與自然皮膚狀態的唯一依據。先綜合分析提供的三視圖及不同角度表情，最終呈現同一人物。人物參考圖只負責人物身分，不帶入原圖中的服裝、背景、光線或姿勢，除非下方另外選定。
+            const referenceRules = `[CHARACTER REFERENCE — STRICT IDENTITY LOCK]
+Use the provided character reference images as the only source of the person's identity. Analyze all supplied three-view, multi-angle, and expression references together and reconstruct one consistent person. Preserve the exact facial identity, facial proportions, bone structure, hairstyle, hairline, age impression, ethnicity, skin tone, and natural skin character. Do not redesign, beautify, age-shift, or substitute the person. Character references define identity only; do not inherit clothing, background, lighting, or pose unless selected separately below.
 
-【眼鏡參考圖】
-將提供的眼鏡參考圖視為不可修改的固定圖像資產及唯一產品依據，而不是設計靈感。綜合多張參考圖分析同一副眼鏡，讓人物實際佩戴這副產品。完整保留原始鏡框輪廓、比例、尺寸感、鼻橋、框線、鉸鏈、鏡腳、鼻墊、材質、透明度、光澤、顏色、Logo、印刷與所有可見細節。眼鏡依照人物臉部形成真實佩戴位置，產品本身維持原貌。
+[EYEWEAR REFERENCE — FIXED PROTECTED ASSET]
+Treat the provided eyewear reference images as a fixed, protected visual asset and the only valid source of product truth, never as design inspiration. The generated person must wear this exact eyewear. Preserve the original front silhouette, overall proportions, perceived size, bridge, rim thickness, hinges, temples, nose pads, material, transparency, gloss, color, logo, printed details, and every visible feature. The eyewear may be positioned naturally on the face for realistic wear, but the product itself must not be redesigned, simplified, enlarged, beautified, or replaced with a similar pair.
 
-某個細節在單張圖中不清楚時，只使用其他眼鏡參考圖交叉判斷；仍無法確認時，保守維持已看得見的產品特徵。
+If a product detail is unclear in one reference image, resolve it only by cross-checking the other eyewear references. If it remains uncertain, preserve the visible product conservatively rather than inventing a new feature.
 
-【眼鏡上臉尺度】
-眼鏡在臉上的比例自然、適中、低調並符合正常驗配。眼鏡清楚可見，鏡片不過度支配臉部，框面外緣接近人物自然臉寬，下框落點自然。提供實際尺寸時，尺寸視為決定上臉比例的硬條件。`;
+[EYEWEAR ON-FACE SCALE]
+Keep the eyewear naturally fitted, moderate in size, and professionally proportioned to the face. The glasses must remain clearly visible without overpowering the face. The outer frame width should stay close to the subject's natural face width, and the lower rim should sit naturally. If actual product measurements are provided, treat them as hard constraints for on-face scale.`;
 
-            const composition = `生成一張 ${ratio} 比例的寫實人像照片。
+            const composition = `Generate a photorealistic portrait in a ${ratio} aspect ratio.
 
-【核心構圖】
-最終畫面始終聚焦在人物上腹部以上，主要呈現臉部、眼鏡、肩膀、手臂與上半身姿態。臀部、大腿、膝蓋及完整下半身保持在畫面外。人物臉部與眼鏡在畫面中要足夠大，能清楚檢視眼鏡。
+[CORE FRAMING]
+Keep the final image focused from the upper abdomen upward, primarily showing the face, eyewear, shoulders, arms, and upper-body gesture. Keep the hips, thighs, knees, and full lower body outside the frame. The face and eyewear must appear large enough for clear product inspection.
 
-人物置於中央 1:1 安全裁切區。原始 4:5 圖片之後裁切成 1:1 時，頭部、臉部、眼鏡、肩膀、手臂與姿勢重點仍完整保留。頭髮最高點到圖片頂部之間，保留約人物頭部高度三分之一的乾淨留白。
+Place the subject within a central 1:1 safe-crop zone so that a later crop from 4:5 to 1:1 still preserves the head, face, eyewear, shoulders, arms, and the key pose. Leave only a natural, moderate amount of headroom as normal photographic breathing space. Do not create a large blank band above the head and do not push the subject downward in the frame.
 
-所選姿勢只控制上半身動作、肩線、頭部角度、視線與表情；姿勢描述中的坐姿、走動或全身動作只用來建立姿態，不改變上腹部以上的鏡頭範圍。
+Keep the subject slightly above center, with visual emphasis on the face and eyewear. Maintain clear physical distance between the subject and the main wall, furniture, curtains, or decorative objects whenever the scene allows it, so the background recedes naturally and creates visible spatial depth rather than a cramped room feeling.
 
-【場景理解】
-所選場景是一個空間與氣氛方向。建築線條、空間布局、家具種類、背景細節與次要擺件可在每次生成時自然變化，同時維持該場景的地點、色調與視覺身分。背景作為人物與眼鏡的陪襯，保持自然層次與清楚空間感。`;
+The selected pose controls the upper-body gesture, shoulder line, head angle, gaze, expression, and camera relationship. Seated, walking, or full-body implications are used only to establish posture and must not expand the camera crop beyond the upper-abdomen-up framing.
 
-            const realism = `人物保留參考圖中的真實皮膚材質，包括自然毛孔、細微膚色差異、局部紋理、細紋與合理的不完美。皮膚具有真實厚度、立體感與符合光線方向的反應。
+[SCENE INTERPRETATION]
+Treat the selected scene as a direction for space, location, and atmosphere rather than a fixed prop inventory. Architectural lines, spatial layout, furniture choice, background details, and secondary objects may vary naturally from generation to generation while preserving the selected scene's visual identity. The background supports the person and eyewear with clear depth and hierarchy rather than competing with them.`;
 
-所選攝影風格可以改變色調、對比、顆粒、曝光與高光表現，但人物原有的五官、骨架、年齡感、皮膚紋理與真實特徵維持一致。眼鏡與場景物件保持真實材質、正確結構、合理比例與符合環境的反射。`;
+            const realism = `Skin should look natural, realistic, clean, healthy, and flattering. Preserve believable skin depth, fine natural texture, subtle tone variation, and realistic light response, but do not deliberately intensify pores, blemishes, roughness, dullness, beard shadow, fine lines, fatigue, or other imperfections. Keep real skin structure without beauty-filter smoothing, waxy skin, or a plastic appearance.
+
+The selected photographic style may change color, contrast, grain, exposure, highlights, and overall rendering character, but it must not alter the subject's identity, facial structure, age impression, or authentic skin character. Eyewear and scene materials must retain physically believable structure, scale, surface response, and reflections.`;
 
             sections = [
-                { title: "參考圖使用規則", text: referenceRules },
-                { title: "構圖與場景規則", text: composition },
-                { title: "人物與產品真實度", text: realism },
-                { title: "人物身分", text: appearance?.prompt_text || "" },
-                { title: "服裝", text: outfit?.prompt_text || "" },
-                { title: "場景與背景", text: scene?.prompt_text || "" },
-                { title: "姿勢與鏡頭角度", text: pose?.prompt_text || "" },
-                { title: "攝影風格", text: style?.prompt_text || "" }
+                { title: "Reference Rules", text: referenceRules },
+                { title: "Composition and Scene Rules", text: composition },
+                { title: "Realism Standards", text: realism },
+                { title: "Character Identity", text: appearance?.prompt_text || "" },
+                { title: "Outfit", text: outfit?.prompt_text || "" },
+                { title: "Scene and Background", text: scene?.prompt_text || "" },
+                { title: "Pose and Camera Angle", text: pose?.prompt_text || "" },
+                { title: "Photographic Style", text: style?.prompt_text || "" }
             ];
 
-            if (eyewear) sections.splice(3, 0, { title: "補充眼鏡細節", text: eyewear });
+            if (eyewear) sections.splice(3, 0, { title: "Additional Eyewear Details", text: eyewear });
             sections.push({
-                title: "輸出要求",
-                text: `輸出系統能生成的最高畫質寫實成品。優先順序為：眼鏡細節與能見度 > 人物身分與姿勢 > 場景。完整呈現指定人物、眼鏡產品、上腹部以上構圖、頭頂三分之一頭高留白及中央 1:1 安全裁切。人物皮膚、身體結構、眼鏡佩戴位置、材質反射與場景光線保持真實可信。輸出比例：${ratio}。`
+                title: "Output Requirements",
+                text: `Output the highest-quality photorealistic final image the system can produce. Priority order: eyewear detail and visibility > character identity and pose > scene. Preserve the specified person, the exact eyewear product, upper-abdomen-up framing, natural headroom, and the central 1:1 safe crop. Keep skin, body structure, eyewear placement, material reflections, and scene lighting physically believable. Output ratio: ${ratio}.`
             });
         } else {
             const layout = getSelectedItem("PRODUCT_LAYOUTS", "select-product-layouts");
             sections = [
-                { title: "靜物背景模式", text: layout?.prompt_text || "" },
-                { title: "輸出要求", text: `輸出系統能生成的最高畫質專業商業靜物攝影成品。輸出比例：${ratio}。` }
+                { title: "Still Life Background Mode", text: layout?.prompt_text || "" },
+                { title: "Output Requirements", text: `Output the highest-quality professional commercial still-life image the system can produce. Output ratio: ${ratio}.` }
             ];
         }
 
