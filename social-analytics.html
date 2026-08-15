@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>發文成效分析 | 和光堂 Glass v3</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23faf6ef'/%3E%3Cg%20fill='none'%20stroke='%23c9773f'%20stroke-width='3.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='20'%20cy='36'%20r='11'/%3E%3Ccircle%20cx='44'%20cy='36'%20r='11'/%3E%3Cpath%20d='M31%2034%20Q32%2029%2033%2034'/%3E%3Cpath%20d='M9%2033%20Q6%2030%209%2026'/%3E%3Cpath%20d='M55%2033%20Q58%2030%2055%2026'/%3E%3C/g%3E%3C/svg%3E" />
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script defer src="https://cdn.plot.ly/plotly-2.35.2.min.js" onload="window.plotlyReady=true;window.dispatchEvent(new Event('plotly-ready'))"></script>
 
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -1096,7 +1096,7 @@ body{
   opacity:.68;
   animation:refractiveDisc 38s ease-in-out infinite alternate;
 }
-body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(.inquiry-floating-preview):not(script){
+body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toast):not(.glass-select-menu):not(script){
   position:relative;
   z-index:1;
   width:min(100%,1540px);
@@ -1188,6 +1188,33 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
 }
 .stat-card-primary{ background:linear-gradient(145deg,rgba(255,252,248,.79),rgba(239,227,214,.43)) !important; }
 .filter-bar{ background:linear-gradient(135deg,rgba(255,255,255,.53),rgba(255,255,255,.27)) !important; overflow:visible !important; }
+
+/* ===== Performance guardrails =====
+   Repeated blurred cards + continuously animated full-screen layers are expensive to composite
+   while scrolling, especially once social embeds are present. Keep the overall glass look on
+   major panels/modals, but make repeated list tiles cheaper and freeze decorative background motion. */
+.group-tile,.story-tile,.stat-card{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(248,250,251,.72)) !important;
+}
+.group-tile,.story-tile{
+  content-visibility:auto;
+  contain-intrinsic-size:360px 420px;
+}
+.ambient-stage::before,.ambient-stage::after,
+.ambient-pearl,.ambient-shadow,.ambient-ribbon,.ambient-orb{
+  animation:none !important;
+}
+.platform-post-link{
+  margin-left:auto;
+  font-size:11px;
+  font-weight:600;
+  color:var(--ink-soft);
+  text-decoration:none;
+  white-space:nowrap;
+}
+.platform-post-link:hover{ color:var(--ink); text-decoration:underline; }
 
 /* ===== Animated modal / lightbox transitions ===== */
 .modal-overlay{
@@ -1546,122 +1573,6 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
   }
 }
 
-
-/* ===== V5：限動群組（僅調整限動區；上方 Dashboard / 桑基圖維持原樣） ===== */
-.story-group-meta{
-  margin-top:5px;
-  color:var(--ink-soft);
-  font-size:10px;
-}
-.story-editor-existing,
-.story-editor-pending,
-.story-detail-images{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:12px;
-}
-.story-editor-thumb,
-.story-detail-card{
-  min-width:0;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.82);
-  background:linear-gradient(145deg,rgba(255,255,255,.56),rgba(255,255,255,.28));
-  box-shadow:0 10px 28px rgba(65,57,49,.07),inset 0 1px 0 rgba(255,255,255,.84);
-  overflow:hidden;
-}
-.story-editor-thumb{
-  position:relative;
-  aspect-ratio:9/16;
-}
-.story-editor-thumb img,
-.story-detail-image-wrap-v5 img{
-  width:100%;
-  height:100%;
-  display:block;
-  object-fit:cover;
-}
-.story-editor-remove{
-  position:absolute;
-  top:7px;
-  right:7px;
-  width:28px;
-  height:28px;
-  border:1px solid rgba(255,255,255,.9);
-  border-radius:50%;
-  background:rgba(42,39,35,.72);
-  color:#fff;
-  font-size:18px;
-  line-height:1;
-  cursor:pointer;
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-}
-.story-editor-section-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin:10px 0 8px;
-  color:var(--ink-soft);
-  font-size:11px;
-  font-weight:700;
-}
-.story-detail-modal{
-  width:min(1080px,calc(100vw - 32px)) !important;
-  max-width:1080px !important;
-}
-.story-detail-images{
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-}
-.story-detail-card{
-  display:flex;
-  flex-direction:column;
-}
-.story-detail-image-wrap-v5{
-  position:relative;
-  aspect-ratio:9/16;
-  cursor:pointer;
-  background:rgba(255,255,255,.38);
-}
-.story-detail-image-index,
-.story-detail-image-count{
-  position:absolute;
-  bottom:8px;
-  padding:4px 9px;
-  border-radius:999px;
-  background:rgba(20,15,8,.70);
-  color:#fff;
-  font-size:10px;
-  font-weight:700;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-}
-.story-detail-image-index{ left:8px; }
-.story-detail-image-count{ right:8px; }
-.story-detail-card-body{
-  padding:10px;
-}
-.story-detail-card-body .inquiry-list{
-  margin-bottom:8px;
-}
-.story-source-badge{
-  font-size:11px;
-  padding:2px 8px;
-  border-radius:999px;
-  background:rgba(169,120,78,.12);
-  color:var(--accent-deep);
-  white-space:nowrap;
-}
-@media(max-width:720px){
-  .story-editor-existing,
-  .story-editor-pending{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-  .story-detail-images{
-    grid-template-columns:1fr;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -1809,9 +1720,15 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
 </div>
 
 <div class="story-block">
-  <h3 class="story-subtitle">限動組</h3>
+  <h3 class="story-subtitle">當日</h3>
   <div id="storyDailyList" class="story-grid"></div>
-  <div id="storyDailyEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有任何限時動態記錄。</div>
+  <div id="storyDailyEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有「當日」限時動態記錄。</div>
+</div>
+
+<div class="story-block">
+  <h3 class="story-subtitle">精選</h3>
+  <div id="storyHighlightGroups"></div>
+  <div id="storyHighlightEmpty" class="empty-state" style="display:none; padding:24px 0;">目前還沒有「精選」限時動態記錄。</div>
 </div>
 
 <!-- ===== 內容項目 Modal（新增/編輯） ===== -->
@@ -1914,57 +1831,53 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
 
 <!-- ===== 限時動態 新增/編輯 Modal ===== -->
 <div class="modal-overlay" id="storyModalOverlay">
-  <div class="modal" style="max-width:720px;">
+  <div class="modal" style="max-width:440px;">
     <h2 id="storyModalTitle">新增限時動態</h2>
 
     <div class="field">
-      <label>限動日期</label>
-      <input type="date" id="storyDate" />
+      <label>分類</label>
+      <select id="storyCategory" onchange="onStoryCategoryChange()">
+        <option value="當日">當日</option>
+        <option value="精選">精選</option>
+      </select>
+    </div>
+
+    <div class="field" id="storyHighlightField" style="display:none;">
+      <label>精選名稱</label>
+      <div class="combo">
+        <input type="text" id="storyHighlightName" placeholder="例如：鏡框特輯" autocomplete="off" />
+        <div class="combo-list" id="storyHighlightList"></div>
+      </div>
+      <div class="hint">輸入過的精選名稱會變成下拉建議，方便同一輯持續加入新項目</div>
     </div>
 
     <div class="field">
-      <label>品牌 + 型號標籤</label>
-      <div class="row2">
-        <div class="combo">
-          <input type="text" id="storyTagBrand" placeholder="品牌，例如 MYKITA" autocomplete="off" />
-          <div class="combo-list" id="storyBrandList"></div>
-        </div>
-        <div class="combo">
-          <input type="text" id="storyTagModel" placeholder="型號" autocomplete="off" />
-          <div class="combo-list" id="storyModelList"></div>
-        </div>
-      </div>
-      <div class="hint">與一般 PO 文共用同一套品牌／型號標籤；同型號仍可建立多組不同版本限動</div>
+      <label>品牌＋型號</label>
+      <input type="text" id="storyBrandModel" placeholder="例如：MYKITA EERO" list="storyBrandModelSuggestions" />
+      <datalist id="storyBrandModelSuggestions"></datalist>
     </div>
 
     <div class="field">
       <label>備註</label>
-      <textarea id="storyNote" placeholder="選填，方便自己標記這一組限動"></textarea>
+      <textarea id="storyNote" placeholder="選填，方便自己標記細節"></textarea>
     </div>
 
     <div class="field">
-      <label>限時動態圖片</label>
-      <div class="story-editor-section-title">
-        <span>已儲存圖片</span>
-        <span>每張圖右上角 × 會永久刪除資料庫與 Storage 檔案</span>
+      <label>限時動態截圖</label>
+      <div class="shot-zone" id="storyShotZone" tabindex="0">
+        <div id="storyShotEmpty" class="shot-empty">點擊選擇檔案、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上</div>
+        <img id="storyShotPreview" class="shot-preview" style="display:none;" />
+        <input type="file" id="storyShotFileInput" accept="image/*" style="display:none;" />
       </div>
-      <div id="storyExistingImages" class="story-editor-existing"></div>
-
-      <div class="story-editor-section-title" id="storyPendingTitle" style="display:none;">
-        <span>待新增圖片</span>
-        <span>尚未寫入資料庫</span>
-      </div>
-      <div id="storyPendingImages" class="story-editor-pending"></div>
-
-      <div class="shot-zone" id="storyShotZone" tabindex="0" style="margin-top:10px;">
-        <div class="shot-empty">點擊選擇多張圖片、拖曳圖片，或直接 <strong>Ctrl+V</strong> 貼上</div>
-        <input type="file" id="storyShotFileInput" accept="image/*" multiple style="display:none;" />
+      <div class="shot-actions" id="storyShotActions" style="display:none;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="triggerStoryShotFileSelect()">🔄 更換截圖</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandStoryShot()">🔍 放大檢視</button>
       </div>
       <div class="hint" id="storyShotStatus"></div>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-danger" id="deleteStoryBtn" style="display:none;" onclick="deleteStoryEntry()">刪除整組</button>
+      <button class="btn btn-danger" id="deleteStoryBtn" style="display:none;" onclick="deleteStoryEntry()">刪除</button>
       <div class="right">
         <button class="btn btn-ghost" onclick="closeStoryModal()">取消</button>
         <button class="btn btn-primary" onclick="saveStoryEntry()">儲存</button>
@@ -1973,23 +1886,48 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
   </div>
 </div>
 
-<!-- ===== 限時動態 詳情 Modal（同組多圖 + 各圖詢問記錄） ===== -->
+<!-- ===== 限時動態 詳情 Modal（圖 + 詢問記錄管理） ===== -->
 <div class="modal-overlay" id="storyDetailOverlay">
   <div class="modal story-detail-modal">
     <div class="detail-header">
-      <div>
-        <div id="storyDetailBrand" style="font-weight:700; font-size:15px;"></div>
-        <div id="storyDetailDate" class="hint" style="margin-top:4px;"></div>
-      </div>
+      <div id="storyDetailBrand" style="font-weight:700; font-size:15px;"></div>
       <div class="detail-header-actions">
         <button class="icon-btn" onclick="editCurrentStoryEntry()">編輯</button>
         <button class="icon-btn" onclick="closeStoryDetail()">✕ 關閉</button>
       </div>
     </div>
     <div id="storyDetailNote" class="group-note" style="margin-bottom:12px;"></div>
-    <div id="storyDetailImages" class="story-detail-images"></div>
+    <div class="story-detail-layout">
+      <div class="story-detail-image-wrap">
+        <img id="storyDetailImage" src="" onclick="openLightbox(document.getElementById('storyDetailImage').src)" />
+      </div>
+      <div class="story-detail-inquiries">
+        <div class="inquiry-list" id="storyDetailInquiryList"></div>
+        <button class="btn btn-ghost add-inquiry-btn" id="storyDetailAddInquiryBtn">+ 新增詢問記錄</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- ===== 精選 名稱編輯 Modal ===== -->
+<div class="modal-overlay" id="highlightModalOverlay">
+  <div class="modal" style="max-width:360px;">
+    <h2>編輯精選名稱</h2>
+    <div class="field">
+      <label>名稱</label>
+      <input type="text" id="editHighlightName" />
+    </div>
+    <div class="hint" style="margin-bottom:16px;">修改後，所有屬於此精選的項目會一併更新</div>
+    <div class="modal-footer">
+      <span></span>
+      <div class="right">
+        <button class="btn btn-ghost" onclick="closeHighlightModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveHighlightEdit()">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ===== 詢問截圖智慧預覽（固定於視窗，不受 Modal 裁切） ===== -->
 <div class="inquiry-floating-preview" id="inquiryFloatingPreview" aria-hidden="true">
@@ -2020,14 +1958,6 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
         <option value="留言">留言</option>
         <option value="私訊">私訊</option>
         <option value="到店">到店</option>
-      </select>
-    </div>
-
-    <div class="field" id="storySourceField" style="display:none;">
-      <label>限動詢問來源</label>
-      <select id="storySource">
-        <option value="當日">當日限動</option>
-        <option value="精選">從精選來的</option>
       </select>
     </div>
 
@@ -2073,7 +2003,7 @@ let editingTagId = null;
 let platformInputCounter = 0;
 let currentInquiryId = null;
 let currentPlatformPostId = null;
-let currentInquiryParentType = 'platform'; // 'platform' | 'story-image'
+let currentInquiryParentType = 'platform'; // 'platform' | 'story'
 let currentShotBlob = null;
 let currentShotChanged = false;
 let currentShotRemoved = false;
@@ -2082,6 +2012,11 @@ let existingShotUrl = null;
 window.addEventListener("supabase-ready", () => {
   sb = window.supabase;
   loadAll();
+});
+
+window.addEventListener('plotly-ready', () => {
+  // Plotly 改為 defer 後若比資料晚到，補畫一次圖表；若早已載入則 renderStats() 本身會直接使用。
+  if(sb && document.getElementById('rankChart')) renderStats();
 });
 
 function showToast(msg){
@@ -2093,8 +2028,9 @@ function showToast(msg){
 
 /* ================= 資料載入 ================= */
 async function loadAll(){
-  await loadTags();
-  await loadGroups();
+  // tags 與貼文群組彼此獨立，並行讀取可縮短首屏等待；
+  // 限動必須在 groups 之後，避免詢問索引被 rebuildInquiryIndex() 覆寫。
+  await Promise.all([loadTags(), loadGroups()]);
   await loadStories();
   populateTagFilterOptions();
 }
@@ -2115,7 +2051,7 @@ async function loadGroups(){
     .select(`
       id, post_type, note, created_at, tag_id, post_date,
       tags ( id, model, brand_id, brands ( id, name ) ),
-      platform_posts ( id, platform, post_url, inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url ) )
+      platform_posts ( id, platform, post_url, created_at, inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url ) )
     `);
 
   if(error){ console.error(error); showToast('讀取失敗，請檢查主控台'); return; }
@@ -2148,10 +2084,7 @@ function rebuildInquiryIndex(){
 
 /* ================= 標籤下拉來源（僅顯示仍被使用的） ================= */
 function usedTagIds(){
-  return new Set([
-    ...allGroups.map(g => g.tag_id),
-    ...(allStoryEntries || []).map(se => se.tag_id)
-  ].filter(Boolean));
+  return new Set(allGroups.map(g => g.tag_id).filter(Boolean));
 }
 
 function countInquiries(g){
@@ -2245,7 +2178,12 @@ function setupFilterBar(){
   document.getElementById('filterType').addEventListener('change', e => { filterState.postType = e.target.value; renderGroups(); });
   document.getElementById('filterPlatform').addEventListener('change', e => { filterState.platform = e.target.value; renderGroups(); });
   document.getElementById('filterHasInquiry').addEventListener('change', e => { filterState.hasInquiry = e.target.checked; renderGroups(); });
-  document.getElementById('filterSearch').addEventListener('input', e => { filterState.search = e.target.value; renderGroups(); });
+  let searchRenderTimer = null;
+  document.getElementById('filterSearch').addEventListener('input', e => {
+    filterState.search = e.target.value;
+    clearTimeout(searchRenderTimer);
+    searchRenderTimer = setTimeout(renderGroups, 140);
+  });
   document.getElementById('filterDateTarget').addEventListener('change', e => { filterState.dateTarget = e.target.value; renderGroups(); });
   document.getElementById('filterDateStart').addEventListener('change', e => { filterState.dateStart = e.target.value; renderGroups(); });
   document.getElementById('filterDateEnd').addEventListener('change', e => { filterState.dateEnd = e.target.value; renderGroups(); });
@@ -2285,7 +2223,7 @@ function filteredStoriesForStats(){
     const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
     if(filterState.hasInquiry && inquiries.length === 0) return false;
     if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'post'){
-      const d = se.story_date || (se.created_at ? se.created_at.slice(0,10) : '');
+      const d = se.created_at ? se.created_at.slice(0,10) : '';
       if(!d) return false;
       if(filterState.dateStart && d < filterState.dateStart) return false;
       if(filterState.dateEnd && d > filterState.dateEnd) return false;
@@ -2336,7 +2274,7 @@ function buildContentStats(){
       inquiries,
       total:inquiries.length,
       latest:latestInquiryDate(inquiries),
-      sortDate:se.story_date || (se.created_at ? se.created_at.slice(0,10) : '')
+      sortDate:se.created_at ? se.created_at.slice(0,10) : ''
     });
   });
 
@@ -2578,29 +2516,57 @@ function buildTagTypeHtml(g){
 }
 
 function buildPlatformsHtml(g){
-  return ['instagram','facebook'].map(p => {
-    const post = g.platform_posts.find(pp => pp.platform === p);
-    const label = p === 'instagram' ? 'Instagram' : 'Facebook';
+  const platformOrder = { instagram:0, facebook:1 };
+  const posts = [...(g.platform_posts || [])].sort((a,b) => {
+    const platformDiff = (platformOrder[a.platform] ?? 9) - (platformOrder[b.platform] ?? 9);
+    if(platformDiff) return platformDiff;
+    return String(a.created_at || '').localeCompare(String(b.created_at || ''));
+  });
+
+  const totals = posts.reduce((acc,post) => {
+    acc[post.platform] = (acc[post.platform] || 0) + 1;
+    return acc;
+  }, {});
+  const seen = {};
+
+  const postBoxes = posts.map(post => {
+    const p = post.platform;
+    seen[p] = (seen[p] || 0) + 1;
+    const label = p === 'instagram' ? 'Instagram' : p === 'facebook' ? 'Facebook' : p;
     const dotClass = p === 'instagram' ? 'ig' : 'fb';
-    if(post){
-      const embedContent = buildCompactEmbed(p, post.post_url);
-      const inquiriesHtml = renderInquiryList(post.inquiries || [], 'platform', post.id);
+    const ordinal = totals[p] > 1 ? ` · 第 ${seen[p]} 篇` : '';
+    const embedContent = buildCompactEmbed(p, post.post_url);
+    const inquiriesHtml = renderInquiryList(post.inquiries || [], 'platform', post.id);
+    const safePostUrl = safeExternalUrl(post.post_url);
+
+    return `
+      <div class="platform-box" data-platform-post-id="${post.id}">
+        <div class="platform-label">
+          <span class="dot ${dotClass}"></span>
+          <span>${label}${ordinal}</span>
+          ${safePostUrl ? `<a class="platform-post-link" href="${safePostUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">原貼文 ↗</a>` : ''}
+        </div>
+        <div class="embed-holder">${embedContent}</div>
+        <div class="inquiry-section">
+          <div class="inquiry-list">${inquiriesHtml}</div>
+          <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null, 'platform', '${post.id}')">+ 在這篇新增詢問</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  const emptyBoxes = ['instagram','facebook']
+    .filter(p => !totals[p])
+    .map(p => {
+      const label = p === 'instagram' ? 'Instagram' : 'Facebook';
+      const dotClass = p === 'instagram' ? 'ig' : 'fb';
       return `
         <div class="platform-box">
           <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
-          <div class="embed-holder">${embedContent}</div>
-          <div class="inquiry-section">
-            <div class="inquiry-list">${inquiriesHtml}</div>
-            <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null, 'platform', '${post.id}')">+ 新增詢問記錄</button>
-          </div>
+          <div class="platform-empty">尚未加入此平台貼文</div>
         </div>`;
-    }
-    return `
-      <div class="platform-box">
-        <div class="platform-label"><span class="dot ${dotClass}"></span>${label}</div>
-        <div class="platform-empty">尚未加入此平台貼文</div>
-      </div>`;
-  }).join('');
+    }).join('');
+
+  return postBoxes + emptyBoxes;
 }
 
 let currentDetailGroupId = null;
@@ -2610,12 +2576,15 @@ function openGroupDetail(id){
   if(!g) return;
   document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
   document.getElementById('detailNote').textContent = g.note || '';
-  document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
+  const detailPlatformRow = document.getElementById('detailPlatformRow');
+  detailPlatformRow.innerHTML = buildPlatformsHtml(g);
   document.getElementById('groupDetailOverlay').classList.add('open');
-  reInitEmbeds();
+  reInitEmbeds(detailPlatformRow);
 }
 function closeGroupDetail(){
   document.getElementById('groupDetailOverlay').classList.remove('open');
+  // 關閉後立即釋放 IG/FB iframe / XFBML 節點，避免反覆開啟後累積重型 embed。
+  document.getElementById('detailPlatformRow').innerHTML = '';
   currentDetailGroupId = null;
 }
 function editCurrentDetailGroup(){
@@ -2634,8 +2603,9 @@ function refreshOpenDetailModals(){
     if(g){
       document.getElementById('detailTagRow').innerHTML = buildTagTypeHtml(g);
       document.getElementById('detailNote').textContent = g.note || '';
-      document.getElementById('detailPlatformRow').innerHTML = buildPlatformsHtml(g);
-      reInitEmbeds();
+      const detailPlatformRow = document.getElementById('detailPlatformRow');
+      detailPlatformRow.innerHTML = buildPlatformsHtml(g);
+      reInitEmbeds(detailPlatformRow);
     } else {
       closeGroupDetail();
     }
@@ -2643,7 +2613,11 @@ function refreshOpenDetailModals(){
   if(currentStoryDetailId){
     const se = allStoryEntries.find(x => x.id === currentStoryDetailId);
     if(se){
-      renderStoryDetailContent(se);
+      document.getElementById('storyDetailBrand').textContent = se.brand_model_text;
+      document.getElementById('storyDetailNote').textContent = se.note || '';
+      document.getElementById('storyDetailImage').src = se.image_url;
+      document.getElementById('storyDetailInquiryList').innerHTML = renderInquiryList(se.inquiries || [], 'story', se.id);
+      document.getElementById('storyDetailAddInquiryBtn').onclick = () => openInquiryModal(null, 'story', se.id);
     } else {
       closeStoryDetail();
     }
@@ -2672,6 +2646,7 @@ function renderGroups(){
   }
   empty.style.display = 'none';
 
+  const fragment = document.createDocumentFragment();
   groups.forEach(g => {
     const tile = document.createElement('div');
     tile.className = 'group-tile';
@@ -2698,14 +2673,16 @@ function renderGroups(){
         <button class="icon-btn" onclick="openGroupModal('${g.id}')">編輯</button>
       </div>
     `;
-    wrap.appendChild(tile);
+    fragment.appendChild(tile);
   });
+  wrap.appendChild(fragment);
 
   renderStats();
   setupTileObserver();
 }
 
-/* 縮圖區塊「捲到看得見才載入」，避免一次載入大量 IG/FB embed 拖垮效能 */
+/* 縮圖只保留「視窗附近」的社群 embed。
+   舊版一旦載入就永不釋放，往下捲後會累積數十個 IG/FB iframe，造成越捲越卡。 */
 let tileObserver = null;
 function setupTileObserver(){
   if(tileObserver) tileObserver.disconnect();
@@ -2713,34 +2690,56 @@ function setupTileObserver(){
     entries.forEach(entry => {
       if(entry.isIntersecting){
         loadTileCover(entry.target);
-        tileObserver.unobserve(entry.target);
+      } else {
+        unloadTileCover(entry.target);
       }
     });
-  }, { rootMargin: '250px' });
+  }, { rootMargin: '220px 0px' });
   document.querySelectorAll('.tile-cover-lazy').forEach(el => tileObserver.observe(el));
 }
 
 function loadTileCover(el){
+  if(el.dataset.embedLoaded === '1') return;
   const g = allGroups.find(x => x.id === el.dataset.groupId);
   if(!g) return;
   const post = ['instagram','facebook']
-    .map(p => g.platform_posts.find(pp => pp.platform === p))
+    .map(p => (g.platform_posts || []).find(pp => pp.platform === p))
     .find(Boolean);
-  if(!post){ el.innerHTML = `<div class="tile-cover-placeholder">🏷️</div>`; return; }
-  const badge = el.querySelector('.tile-badge');
-  el.innerHTML = buildTileEmbed(post.platform, post.post_url);
-  if(badge) el.appendChild(badge);
-  reInitEmbeds();
+  if(!post){
+    el.innerHTML = `<div class="tile-cover-placeholder">🏷️</div>`;
+    return;
+  }
+  const inquiryCount = countInquiries(g);
+  el.innerHTML = `
+    ${buildTileEmbed(post.platform, post.post_url)}
+    ${inquiryCount > 0 ? `<span class="tile-badge">💬 ${inquiryCount}</span>` : ''}
+  `;
+  el.dataset.embedLoaded = '1';
+  reInitEmbeds(el);
+}
+
+function unloadTileCover(el){
+  if(el.dataset.embedLoaded !== '1') return;
+  const g = allGroups.find(x => x.id === el.dataset.groupId);
+  const inquiryCount = g ? countInquiries(g) : 0;
+  el.innerHTML = `
+    <div class="tile-embed-loading">載入中…</div>
+    ${inquiryCount > 0 ? `<span class="tile-badge">💬 ${inquiryCount}</span>` : ''}
+  `;
+  delete el.dataset.embedLoaded;
 }
 
 /* 直接用貼文網址組出輕量嵌入（無需再從嵌入碼裡解析網址） */
 function buildCompactEmbed(platform, postUrl){
   if(platform === 'instagram'){
-    const permalink = normalizeIgUrl(postUrl);
+    const safeUrl = safeExternalUrl(postUrl);
+    if(!safeUrl) return '';
+    const permalink = normalizeIgUrl(safeUrl);
     return `<iframe src="${permalink}embed/captioned/" width="100%" height="580" style="border:none;max-width:340px;display:block;margin:0 auto;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
   }
   if(platform === 'facebook'){
-    return `<div class="fb-post" data-href="${postUrl}" data-width="340"></div>`;
+    const safeUrl = safeExternalUrl(postUrl);
+    return safeUrl ? `<div class="fb-post" data-href="${safeUrl}" data-width="340"></div>` : '';
   }
   return '';
 }
@@ -2748,35 +2747,58 @@ function buildCompactEmbed(platform, postUrl){
 /* 方塊縮圖用的精簡版嵌入：IG用無caption的/embed/、FB隱藏文字內容，只留圖片本身 */
 function buildTileEmbed(platform, postUrl){
   if(platform === 'instagram'){
-    const permalink = normalizeIgUrl(postUrl);
+    const safeUrl = safeExternalUrl(postUrl);
+    if(!safeUrl) return '';
+    const permalink = normalizeIgUrl(safeUrl);
     return `<iframe src="${permalink}embed/" width="100%" height="100%" style="border:none;display:block;" scrolling="no" allowtransparent="true" loading="lazy"></iframe>`;
   }
   if(platform === 'facebook'){
-    return `<div class="fb-post" data-href="${postUrl}" data-width="280" data-show-text="false"></div>`;
+    const safeUrl = safeExternalUrl(postUrl);
+    return safeUrl ? `<div class="fb-post" data-href="${safeUrl}" data-width="280" data-show-text="false"></div>` : '';
   }
   return '';
 }
 
 function normalizeIgUrl(url){
-  let clean = url.split('?')[0];
+  let clean = String(url || '').split('?')[0];
   if(!clean.endsWith('/')) clean += '/';
   return clean;
 }
 
-function reInitEmbeds(){
-  // Facebook
-  if(!window.FB){
-    if(!document.getElementById('fb-root')){
-      const fbRoot = document.createElement('div');
-      fbRoot.id = 'fb-root';
-      document.body.appendChild(fbRoot);
-    }
+function safeExternalUrl(url){
+  try{
+    const parsed = new URL(String(url || ''));
+    return ['http:','https:'].includes(parsed.protocol) ? parsed.href : '';
+  }catch(_){
+    return '';
+  }
+}
+
+function reInitEmbeds(root){
+  const scope = root && root.querySelectorAll ? root : document;
+  if(!scope.querySelector('.fb-post')) return;
+
+  if(!document.getElementById('fb-root')){
+    const fbRoot = document.createElement('div');
+    fbRoot.id = 'fb-root';
+    document.body.appendChild(fbRoot);
+  }
+
+  if(window.FB){
+    // 只解析剛新增的區塊，不再每次重掃整份文件。
+    window.FB.XFBML.parse(scope);
+    return;
+  }
+
+  // SDK 載入期間可能同時有多張卡進入視窗；用固定 id 保證只載入一次。
+  if(!document.getElementById('facebook-jssdk')){
     const s = document.createElement('script');
+    s.id = 'facebook-jssdk';
     s.src = 'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v19.0';
     s.async = true;
+    s.defer = true;
+    s.onload = () => window.FB && window.FB.XFBML.parse(document);
     document.body.appendChild(s);
-  } else {
-    window.FB.XFBML.parse();
   }
 }
 
@@ -2882,14 +2904,10 @@ function renderInquiryList(inquiries, parentType, parentId){
            <img class="inquiry-thumb" src="${iq.screenshot_url}" />
          </span>`
       : '';
-    const sourceHtml = parentType === 'story-image'
-      ? `<span class="story-source-badge">${escapeHtml(iq.story_source === '精選' ? '精選' : '當日')}</span>`
-      : '';
     return `
     <div class="inquiry-row" onclick="openInquiryModal('${iq.id}', '${parentType}', '${parentId}')">
       ${thumbHtml}
       <span class="inquiry-date">${iq.inquiry_date ? escapeHtml(iq.inquiry_date) : '未填日期'}</span>
-      ${sourceHtml}
       <span class="inquiry-type-badge">${escapeHtml(iq.inquiry_type || '未分類')}</span>
       <span class="inquiry-note-preview">${iq.note ? escapeHtml(iq.note) : ''}</span>
     </div>
@@ -3114,7 +3132,6 @@ async function saveTagEdit(){
     .select('id').eq('brand_id', brandId).ilike('model', model).neq('id', editingTagId).maybeSingle();
   if(dupModel){
     await sb.from('posts_group').update({ tag_id: dupModel.id }).eq('tag_id', editingTagId);
-    await sb.from('story_groups').update({ tag_id: dupModel.id }).eq('tag_id', editingTagId);
     await sb.from('tags').delete().eq('id', editingTagId);
   } else {
     const { error } = await sb.from('tags').update({ model, brand_id: brandId }).eq('id', editingTagId);
@@ -3130,12 +3147,9 @@ async function saveTagEdit(){
 /* ================= 詢問記錄 Modal（新增/編輯共用） ================= */
 function openInquiryModal(inquiryId, parentType, parentId){
   currentInquiryId = inquiryId || null;
-  currentPlatformPostId = parentId; // 一般 PO 文為 platform_post_id；限動則為 story_image_id
+  currentPlatformPostId = parentId;
   currentInquiryParentType = parentType || 'platform';
   document.getElementById('deleteInquiryBtn').style.display = inquiryId ? 'inline-block' : 'none';
-
-  const isStoryImage = currentInquiryParentType === 'story-image';
-  document.getElementById('storySourceField').style.display = isStoryImage ? 'block' : 'none';
 
   // 重置截圖狀態
   currentShotBlob = null;
@@ -3149,7 +3163,6 @@ function openInquiryModal(inquiryId, parentType, parentId){
     document.getElementById('inquiryModalTitle').textContent = '編輯詢問記錄';
     document.getElementById('inquiryDate').value = iq.inquiry_date || '';
     document.getElementById('inquiryType').value = iq.inquiry_type || '留言';
-    document.getElementById('storySource').value = iq.story_source || '當日';
     document.getElementById('inquiryNote').value = iq.note || '';
     if(iq.screenshot_url){
       existingShotUrl = iq.screenshot_url;
@@ -3161,7 +3174,6 @@ function openInquiryModal(inquiryId, parentType, parentId){
     document.getElementById('inquiryModalTitle').textContent = '新增詢問記錄';
     document.getElementById('inquiryDate').value = new Date().toISOString().slice(0,10);
     document.getElementById('inquiryType').value = '留言';
-    document.getElementById('storySource').value = '當日';
     document.getElementById('inquiryNote').value = '';
     clearShotPreview();
   }
@@ -3178,9 +3190,6 @@ async function saveInquiry(){
   const inquiry_date = document.getElementById('inquiryDate').value || null;
   const inquiry_type = document.getElementById('inquiryType').value;
   const note = document.getElementById('inquiryNote').value.trim();
-  const story_source = currentInquiryParentType === 'story-image'
-    ? document.getElementById('storySource').value
-    : null;
 
   const oldScreenshotUrl = existingShotUrl;
   let uploadedNewUrl = null;
@@ -3195,16 +3204,16 @@ async function saveInquiry(){
     screenshot_url = uploadedUrl;
   }
 
-  const payload = { inquiry_date, inquiry_type, note, screenshot_url, story_source };
+  const payload = { inquiry_date, inquiry_type, note, screenshot_url };
   let saveError = null;
 
   if(currentInquiryId){
     const { error } = await sb.from('inquiries').update(payload).eq('id', currentInquiryId);
     saveError = error;
   } else {
-    const insertPayload = currentInquiryParentType === 'story-image'
-      ? { story_image_id: currentPlatformPostId, platform_post_id: null, ...payload }
-      : { platform_post_id: currentPlatformPostId, story_image_id: null, ...payload };
+    const insertPayload = currentInquiryParentType === 'story'
+      ? { story_entry_id: currentPlatformPostId, ...payload }
+      : { platform_post_id: currentPlatformPostId, ...payload };
     const { error } = await sb.from('inquiries').insert(insertPayload);
     saveError = error;
   }
@@ -3216,7 +3225,6 @@ async function saveInquiry(){
     return;
   }
 
-  // 截圖維持單張：成功換新圖後，把舊 Storage 檔案永久移除
   const oldFileCleaned = oldScreenshotUrl && oldScreenshotUrl !== screenshot_url
     ? await removeStorageUrls([oldScreenshotUrl], 'post-screenshots')
     : true;
@@ -3415,349 +3423,276 @@ async function deleteInquiry(){
 }
 
 /* ================= 限時動態 ================= */
-/*
-  V5 資料模型：
-  story_groups = 一整組限動（共用品牌／型號、日期、備註）
-  story_images = 組內每一張限動圖片
-  inquiries.story_image_id = 詢問指向某一張限動圖片
-  inquiries.story_source = 當日 / 精選（來源屬於詢問，不屬於限動本體）
-
-  注意：allStoryEntries 這個變數名稱刻意保留，讓既有上方統計／桑基圖／排行函式
-  不必重寫；每個元素現在代表「一整組限動」，inquiries 已在資料層攤平成全組加總。
-*/
-let allStoriesHighlights = []; // 舊版相容保留；V5 不再使用精選群組表
+let allStoriesHighlights = [];
 let allStoryEntries = [];
-let currentStoryEntryId = null;   // 現在代表 story_group.id
-let currentStoryDetailId = null;  // 現在代表 story_group.id
-let pendingStoryImages = [];      // [{token, blob, previewUrl}]
+let currentStoryEntryId = null;
+let currentStoryDetailId = null;
+let editingHighlightId = null;
+let currentStoryImageBlob = null;
+let currentStoryImageChanged = false;
+let existingStoryImageUrl = null;
 
 async function loadStories(){
+  const { data: highlights, error: e1 } = await sb.from('stories_highlights').select('*').order('name');
+  if(e1){ console.error(e1); }
+  allStoriesHighlights = highlights || [];
+
   const { data, error } = await sb
-    .from('story_groups')
+    .from('story_entries')
     .select(`
-      id, tag_id, note, story_date, created_at,
-      tags ( id, model, brand_id, brands ( id, name ) ),
-      story_images (
-        id, image_url, sort_order, created_at,
-        inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url, story_source )
-      )
+      id, category, highlight_id, brand_model_text, image_url, note, created_at,
+      stories_highlights ( id, name ),
+      inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url )
     `)
-    .order('story_date', { ascending: false })
     .order('created_at', { ascending: false });
 
-  if(error){ console.error(error); showToast('限動讀取失敗'); return; }
-
-  allStoryEntries = (data || []).map(g => {
-    if(g.tags && g.tags.brands) g.tags.brand = g.tags.brands.name;
-    const images = (g.story_images || []).sort((a,b) =>
-      (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
-      String(a.created_at || '').localeCompare(String(b.created_at || ''))
-    );
-    const inquiries = images.flatMap(img => img.inquiries || []);
-    const brandModel = g.tags ? `${g.tags.brand} ${g.tags.model}` : '未命名限動';
-    return {
-      ...g,
-      story_images: images,
-      inquiries,
-      brand_model_text: brandModel,
-      image_url: images[0]?.image_url || ''
-    };
-  });
-
+  if(error){ console.error(error); return; } // 資料表可能還沒建立，先安靜略過
+  allStoryEntries = data || [];
   rebuildStoryInquiryIndex();
   renderStories();
 }
 
 function rebuildStoryInquiryIndex(){
-  allStoryEntries.forEach(group => {
-    (group.story_images || []).forEach(img => {
-      (img.inquiries || []).forEach(iq => { allInquiriesById[iq.id] = iq; });
-    });
+  allStoryEntries.forEach(se => {
+    (se.inquiries || []).forEach(iq => { allInquiriesById[iq.id] = iq; });
   });
 }
 
-function buildStoryTileHtml(group){
-  const count = (group.inquiries || []).length;
-  const images = group.story_images || [];
-  const cover = images[0]?.image_url || '';
+function buildStoryTileHtml(se){
+  const count = (se.inquiries || []).length;
   return `
-    <div class="story-tile" onclick="openStoryDetail('${group.id}')">
+    <div class="story-tile" onclick="openStoryDetail('${se.id}')">
       <div class="tile-cover">
-        ${cover
-          ? `<img src="${cover}" />`
-          : `<div class="tile-cover-placeholder">尚無圖片</div>`}
+        <img src="${se.image_url}" />
         ${count > 0 ? `<span class="tile-badge">💬 ${count}</span>` : ''}
       </div>
       <div class="story-tile-info">
-        <div class="story-tile-brand">${escapeHtml(group.brand_model_text)}</div>
-        <div class="story-group-meta">${images.length} 張限動</div>
-        ${group.note ? `<div class="tile-note">${escapeHtml(group.note)}</div>` : ''}
+        <div class="story-tile-brand">${escapeHtml(se.brand_model_text)}</div>
+        ${se.note ? `<div class="tile-note">${escapeHtml(se.note)}</div>` : ''}
       </div>
     </div>
   `;
 }
 
 function renderStories(){
-  const list = document.getElementById('storyDailyList');
-  const empty = document.getElementById('storyDailyEmpty');
-  if(!list) return;
+  const dailyList = document.getElementById('storyDailyList');
+  const dailyEmpty = document.getElementById('storyDailyEmpty');
+  const highlightWrap = document.getElementById('storyHighlightGroups');
+  const highlightEmpty = document.getElementById('storyHighlightEmpty');
+  if(!dailyList) return; // HTML 還沒渲染完成時安全跳過
 
-  list.innerHTML = allStoryEntries.map(group => buildStoryTileHtml(group)).join('');
-  empty.style.display = allStoryEntries.length === 0 ? 'block' : 'none';
+  const daily = allStoryEntries.filter(se => se.category === '當日');
+  dailyList.innerHTML = daily.map(se => buildStoryTileHtml(se)).join('');
+  dailyEmpty.style.display = daily.length === 0 ? 'block' : 'none';
 
-  // 上方統計仍使用原本 renderStats()；只是每組限動現在提供一筆聚合資料
+  const highlightEntries = allStoryEntries.filter(se => se.category === '精選');
+  if(highlightEntries.length === 0){
+    highlightWrap.innerHTML = '';
+    highlightEmpty.style.display = 'block';
+  } else {
+    highlightEmpty.style.display = 'none';
+    const groups = {};
+    highlightEntries.forEach(se => {
+      const key = se.highlight_id || 'none';
+      if(!groups[key]){
+        groups[key] = { name: se.stories_highlights ? se.stories_highlights.name : '未命名精選', id: se.highlight_id, items: [] };
+      }
+      groups[key].items.push(se);
+    });
+    highlightWrap.innerHTML = Object.values(groups).map(grp => `
+      <div class="highlight-group">
+        <div class="highlight-header">
+          <span class="highlight-name">${escapeHtml(grp.name)}</span>
+          ${grp.id ? `<button class="icon-btn" onclick="openHighlightModal('${grp.id}')" title="編輯精選名稱">✎</button>` : ''}
+        </div>
+        <div class="story-grid">${grp.items.map(se => buildStoryTileHtml(se)).join('')}</div>
+      </div>
+    `).join('');
+  }
+
   renderStats();
 }
 
-function renderStoryComboSuggestions(){
-  const brandInput = document.getElementById('storyTagBrand');
-  const modelInput = document.getElementById('storyTagModel');
-  const brandList = document.getElementById('storyBrandList');
-  const modelList = document.getElementById('storyModelList');
-  const uniqueBrands = [...new Set(allTags.map(t => t.brand))];
+function populateBrandModelDatalist(){
+  const el = document.getElementById('storyBrandModelSuggestions');
+  if(!el) return;
+  el.innerHTML = allTags.map(t => `<option value="${escapeHtml(t.brand)} ${escapeHtml(t.model)}"></option>`).join('');
+}
 
-  function refreshBrandList(){
-    const val = brandInput.value.trim().toLowerCase();
-    const matches = uniqueBrands.filter(b => !val || b.toLowerCase().includes(val));
-    brandList.innerHTML = matches.map(b => `<div class="combo-item">${escapeHtml(b)}</div>`).join('');
-    brandList.querySelectorAll('.combo-item').forEach((el,i) => {
-      el.onclick = () => {
-        brandInput.value = matches[i];
-        brandList.classList.remove('open');
-        refreshModelList();
-      };
+function renderHighlightSuggestions(){
+  const input = document.getElementById('storyHighlightName');
+  const list = document.getElementById('storyHighlightList');
+  function refresh(){
+    const val = input.value.trim().toLowerCase();
+    const matches = allStoriesHighlights.filter(h => !val || h.name.toLowerCase().includes(val));
+    list.innerHTML = matches.map(h => `<div class="combo-item">${escapeHtml(h.name)}</div>`).join('');
+    list.querySelectorAll('.combo-item').forEach((el,i) => {
+      el.onclick = () => { input.value = matches[i].name; list.classList.remove('open'); };
     });
   }
-  function refreshModelList(){
-    const brandVal = brandInput.value.trim().toLowerCase();
-    const val = modelInput.value.trim().toLowerCase();
-    const models = [...new Set(allTags.filter(t => t.brand.toLowerCase() === brandVal).map(t => t.model))];
-    const matches = models.filter(m => !val || m.toLowerCase().includes(val));
-    modelList.innerHTML = matches.map(m => `<div class="combo-item">${escapeHtml(m)}</div>`).join('');
-    modelList.querySelectorAll('.combo-item').forEach((el,i) => {
-      el.onclick = () => { modelInput.value = matches[i]; modelList.classList.remove('open'); };
-    });
-  }
-
-  brandInput.oninput = () => { refreshBrandList(); brandList.classList.add('open'); };
-  brandInput.onfocus = () => { refreshBrandList(); brandList.classList.add('open'); };
-  brandInput.onblur = () => setTimeout(() => brandList.classList.remove('open'),150);
-  modelInput.oninput = () => { refreshModelList(); modelList.classList.add('open'); };
-  modelInput.onfocus = () => { refreshModelList(); modelList.classList.add('open'); };
-  modelInput.onblur = () => setTimeout(() => modelList.classList.remove('open'),150);
+  input.oninput = () => { refresh(); list.classList.add('open'); };
+  input.onfocus = () => { refresh(); list.classList.add('open'); };
+  input.onblur = () => setTimeout(()=>list.classList.remove('open'), 150);
 }
 
-function clearPendingStoryImages(){
-  pendingStoryImages.forEach(item => {
-    if(item.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(item.previewUrl);
-  });
-  pendingStoryImages = [];
-  renderPendingStoryImages();
-}
-
-function renderExistingStoryImages(){
-  const wrap = document.getElementById('storyExistingImages');
-  if(!wrap) return;
-  const group = allStoryEntries.find(x => x.id === currentStoryEntryId);
-  const images = group?.story_images || [];
-  if(images.length === 0){
-    wrap.innerHTML = '<div class="inquiry-empty">尚無已儲存圖片</div>';
-    return;
-  }
-  wrap.innerHTML = images.map((img,index) => `
-    <div class="story-editor-thumb">
-      <img src="${img.image_url}" onclick="openLightbox('${img.image_url}')" />
-      <button type="button" class="story-editor-remove" title="永久刪除這張限動" onclick="event.stopPropagation(); deleteStoryImageFully('${img.id}')">×</button>
-    </div>
-  `).join('');
-}
-
-function renderPendingStoryImages(){
-  const wrap = document.getElementById('storyPendingImages');
-  const title = document.getElementById('storyPendingTitle');
-  if(!wrap || !title) return;
-  title.style.display = pendingStoryImages.length ? 'flex' : 'none';
-  wrap.innerHTML = pendingStoryImages.map(item => `
-    <div class="story-editor-thumb">
-      <img src="${item.previewUrl}" onclick="openLightbox('${item.previewUrl}')" />
-      <button type="button" class="story-editor-remove" title="取消這張待新增圖片" onclick="event.stopPropagation(); removePendingStoryImage('${item.token}')">×</button>
-    </div>
-  `).join('');
-}
-
-function removePendingStoryImage(token){
-  const index = pendingStoryImages.findIndex(item => item.token === token);
-  if(index < 0) return;
-  const [item] = pendingStoryImages.splice(index,1);
-  if(item.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(item.previewUrl);
-  renderPendingStoryImages();
-}
-
-async function addPendingStoryFiles(files){
-  const valid = [...files].filter(file => file?.type?.startsWith('image/'));
-  if(!valid.length){ showToast('請選擇圖片檔案'); return; }
-  const status = document.getElementById('storyShotStatus');
-  status.textContent = `處理圖片中（0/${valid.length}）...`;
-  for(let i=0;i<valid.length;i++){
-    try{
-      const blob = await fileToWebpBlob(valid[i]);
-      pendingStoryImages.push({
-        token:`pending_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
-        blob,
-        previewUrl:URL.createObjectURL(blob)
-      });
-      status.textContent = `處理圖片中（${i+1}/${valid.length}）...`;
-    }catch(e){
-      console.error(e);
-      showToast(`第 ${i+1} 張圖片處理失敗`);
-    }
-  }
-  renderPendingStoryImages();
-  status.textContent = pendingStoryImages.length ? `待新增 ${pendingStoryImages.length} 張圖片` : '';
+function onStoryCategoryChange(){
+  const cat = document.getElementById('storyCategory').value;
+  document.getElementById('storyHighlightField').style.display = cat === '精選' ? 'block' : 'none';
 }
 
 function openStoryModal(id){
   currentStoryEntryId = id || null;
   document.getElementById('storyModalTitle').textContent = id ? '編輯限時動態' : '新增限時動態';
   document.getElementById('deleteStoryBtn').style.display = id ? 'inline-block' : 'none';
-  document.getElementById('storyShotStatus').textContent = '';
-  clearPendingStoryImages();
 
-  const group = id ? allStoryEntries.find(x => x.id === id) : null;
-  document.getElementById('storyDate').value = group?.story_date || new Date().toISOString().slice(0,10);
-  document.getElementById('storyTagBrand').value = group?.tags?.brand || '';
-  document.getElementById('storyTagModel').value = group?.tags?.model || '';
-  document.getElementById('storyNote').value = group?.note || '';
-  renderStoryComboSuggestions();
-  renderExistingStoryImages();
-  renderPendingStoryImages();
+  populateBrandModelDatalist();
+  renderHighlightSuggestions();
+
+  currentStoryImageBlob = null;
+  currentStoryImageChanged = false;
+  existingStoryImageUrl = null;
+  document.getElementById('storyShotStatus').textContent = '';
+
+  if(id){
+    const se = allStoryEntries.find(x => x.id === id);
+    document.getElementById('storyCategory').value = se.category;
+    document.getElementById('storyHighlightName').value = se.stories_highlights ? se.stories_highlights.name : '';
+    document.getElementById('storyBrandModel').value = se.brand_model_text || '';
+    document.getElementById('storyNote').value = se.note || '';
+    existingStoryImageUrl = se.image_url;
+    showStoryImagePreview(se.image_url);
+  } else {
+    document.getElementById('storyCategory').value = '當日';
+    document.getElementById('storyHighlightName').value = '';
+    document.getElementById('storyBrandModel').value = '';
+    document.getElementById('storyNote').value = '';
+    clearStoryImagePreview();
+  }
+  onStoryCategoryChange();
   document.getElementById('storyModalOverlay').classList.add('open');
 }
 
 function closeStoryModal(){
   document.getElementById('storyModalOverlay').classList.remove('open');
-  clearPendingStoryImages();
   currentStoryEntryId = null;
 }
 
-async function saveStoryEntry(){
-  const brand = document.getElementById('storyTagBrand').value.trim();
-  const model = document.getElementById('storyTagModel').value.trim();
-  const story_date = document.getElementById('storyDate').value || null;
-  const note = document.getElementById('storyNote').value.trim();
-  if(!brand || !model){ showToast('請填寫品牌和型號'); return; }
-
-  const existingGroup = currentStoryEntryId ? allStoryEntries.find(x => x.id === currentStoryEntryId) : null;
-  if(!existingGroup && pendingStoryImages.length === 0){ showToast('請至少加入一張限動圖片'); return; }
-  if(existingGroup && (existingGroup.story_images || []).length === 0 && pendingStoryImages.length === 0){
-    showToast('請至少保留或加入一張限動圖片');
-    return;
-  }
-
-  const tag_id = await upsertTag(brand,model);
-  if(!tag_id) return;
-
-  let groupId = currentStoryEntryId;
-  const wasNew = !groupId;
-  const status = document.getElementById('storyShotStatus');
-
-  if(groupId){
-    const { error } = await sb.from('story_groups').update({ tag_id, note, story_date }).eq('id',groupId);
-    if(error){ console.error(error); showToast('限動更新失敗'); return; }
-  } else {
-    const { data, error } = await sb.from('story_groups')
-      .insert({ tag_id, note, story_date })
-      .select('id').single();
-    if(error){ console.error(error); showToast('限動新增失敗'); return; }
-    groupId = data.id;
-  }
-
-  const existingCount = existingGroup?.story_images?.length || 0;
-  const uploadedUrls = [];
-  const insertedIds = [];
-  try{
-    for(let i=0;i<pendingStoryImages.length;i++){
-      status.textContent = `上傳圖片中（${i+1}/${pendingStoryImages.length}）...`;
-      const url = await uploadShotToStorage(pendingStoryImages[i].blob,'story-images');
-      if(!url) throw new Error('圖片上傳失敗');
-      uploadedUrls.push(url);
-      const { data, error } = await sb.from('story_images')
-        .insert({ story_group_id:groupId, image_url:url, sort_order:existingCount+i })
-        .select('id').single();
-      if(error) throw error;
-      insertedIds.push(data.id);
-    }
-  }catch(e){
-    console.error(e);
-    if(insertedIds.length) await sb.from('story_images').delete().in('id',insertedIds);
-    if(uploadedUrls.length) await removeStorageUrls(uploadedUrls,'story-images');
-    if(wasNew) await sb.from('story_groups').delete().eq('id',groupId);
-    status.textContent = '';
-    showToast('限動圖片儲存失敗，已回復本次新增');
-    return;
-  }
-
-  showToast('已儲存');
-  closeStoryModal();
-  await loadAll();
+async function upsertHighlight(name){
+  const { data: existing } = await sb.from('stories_highlights').select('id').eq('name', name).maybeSingle();
+  if(existing) return existing.id;
+  const { data, error } = await sb.from('stories_highlights').insert({ name }).select().single();
+  if(error){ console.error(error); showToast('精選名稱建立失敗'); return null; }
+  return data.id;
 }
 
-async function deleteStoryImageFully(imageId){
-  const group = allStoryEntries.find(g => (g.story_images || []).some(img => img.id === imageId));
-  const image = group?.story_images?.find(img => img.id === imageId);
-  if(!group || !image) return;
-  const inquiryCount = (image.inquiries || []).length;
-  const message = inquiryCount
-    ? `這張限動已有 ${inquiryCount} 筆詢問。刪除後會永久移除這張圖片、相關詢問與對話截圖，確定嗎？`
-    : '確定永久刪除這張限動圖片？';
-  if(!confirm(message)) return;
+async function saveStoryEntry(){
+  const category = document.getElementById('storyCategory').value;
+  const brand_model_text = document.getElementById('storyBrandModel').value.trim();
+  if(!brand_model_text){ showToast('請填寫品牌＋型號'); return; }
 
-  const inquiryScreenshotUrls = (image.inquiries || []).map(iq => iq.screenshot_url).filter(Boolean);
-  const { error } = await sb.from('story_images').delete().eq('id',imageId);
-  if(error){ console.error(error); showToast('圖片刪除失敗'); return; }
-
-  const [storyImageCleaned,inquiryImagesCleaned] = await Promise.all([
-    removeStorageUrls([image.image_url],'story-images'),
-    removeStorageUrls(inquiryScreenshotUrls,'post-screenshots')
-  ]);
-  showToast(storyImageCleaned && inquiryImagesCleaned ? '圖片已永久刪除' : '資料已刪除，但部分 Storage 檔案清理失敗');
-
-  const keepGroupId = group.id;
-  await loadAll();
-  if(document.getElementById('storyModalOverlay').classList.contains('open')){
-    currentStoryEntryId = keepGroupId;
-    renderExistingStoryImages();
+  let highlight_id = null;
+  if(category === '精選'){
+    const name = document.getElementById('storyHighlightName').value.trim();
+    if(!name){ showToast('請填寫精選名稱'); return; }
+    highlight_id = await upsertHighlight(name);
+    if(!highlight_id) return;
   }
-  if(currentStoryDetailId === keepGroupId){
-    const fresh = allStoryEntries.find(x => x.id === keepGroupId);
-    if(fresh) renderStoryDetailContent(fresh);
+
+  const oldImageUrl = existingStoryImageUrl;
+  let uploadedNewUrl = null;
+  let image_url = existingStoryImageUrl;
+  if(currentStoryImageChanged && currentStoryImageBlob){
+    document.getElementById('storyShotStatus').textContent = '上傳中...';
+    const uploaded = await uploadShotToStorage(currentStoryImageBlob, 'story-images');
+    if(!uploaded){ document.getElementById('storyShotStatus').textContent = ''; return; }
+    uploadedNewUrl = uploaded;
+    image_url = uploaded;
   }
+  if(!image_url){ showToast('請上傳限時動態截圖'); return; }
+
+  const note = document.getElementById('storyNote').value.trim();
+  const payload = { category, highlight_id, brand_model_text, image_url, note };
+  let saveError = null;
+
+  if(currentStoryEntryId){
+    const { error } = await sb.from('story_entries').update(payload).eq('id', currentStoryEntryId);
+    saveError = error;
+  } else {
+    const { error } = await sb.from('story_entries').insert(payload);
+    saveError = error;
+  }
+
+  if(saveError){
+    console.error(saveError);
+    if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+    showToast(currentStoryEntryId ? '更新失敗' : '新增失敗');
+    return;
+  }
+
+  const oldFileCleaned = oldImageUrl && oldImageUrl !== image_url
+    ? await removeStorageUrls([oldImageUrl], 'story-images')
+    : true;
+  showToast(oldFileCleaned ? '已儲存' : '資料已儲存，但舊圖片清理失敗');
+  closeStoryModal();
+  await loadStories();
 }
 
 async function deleteStoryEntry(){
   if(!currentStoryEntryId) return;
-  const group = allStoryEntries.find(g => g.id === currentStoryEntryId);
-  if(!group) return;
-  if(!confirm('確定永久刪除整組限時動態？組內所有圖片、詢問記錄與對話截圖都會一併刪除。')) return;
-
-  const storyImageUrls = (group.story_images || []).map(img => img.image_url).filter(Boolean);
-  const inquiryScreenshotUrls = (group.story_images || [])
-    .flatMap(img => img.inquiries || [])
+  if(!confirm('確定刪除這筆限時動態記錄？相關的詢問記錄也會一併刪除。')) return;
+  const storyEntry = allStoryEntries.find(se => se.id === currentStoryEntryId);
+  const inquiryScreenshotUrls = (storyEntry?.inquiries || [])
     .map(iq => iq.screenshot_url)
     .filter(Boolean);
-
-  const { error } = await sb.from('story_groups').delete().eq('id',currentStoryEntryId);
+  const { error } = await sb.from('story_entries').delete().eq('id', currentStoryEntryId);
   if(error){ console.error(error); showToast('刪除失敗'); return; }
-
-  const [storyImagesCleaned,inquiryImagesCleaned] = await Promise.all([
-    removeStorageUrls(storyImageUrls,'story-images'),
-    removeStorageUrls(inquiryScreenshotUrls,'post-screenshots')
+  const [storyImageCleaned, inquiryImagesCleaned] = await Promise.all([
+    removeStorageUrls([storyEntry?.image_url], 'story-images'),
+    removeStorageUrls(inquiryScreenshotUrls, 'post-screenshots')
   ]);
-  showToast(storyImagesCleaned && inquiryImagesCleaned ? '整組已刪除' : '資料已刪除，但部分 Storage 檔案清理失敗');
+  showToast(storyImageCleaned && inquiryImagesCleaned ? '已刪除' : '資料已刪除，但部分圖片清理失敗');
   closeStoryModal();
-  await loadAll();
+  await loadStories();
 }
 
+/* ---- 限時動態截圖上傳（獨立於詢問記錄截圖，共用轉檔邏輯） ---- */
+function showStoryImagePreview(src){
+  document.getElementById('storyShotEmpty').style.display = 'none';
+  const img = document.getElementById('storyShotPreview');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('storyShotActions').style.display = 'flex';
+}
+function clearStoryImagePreview(){
+  document.getElementById('storyShotEmpty').style.display = 'block';
+  const img = document.getElementById('storyShotPreview');
+  img.src = '';
+  img.style.display = 'none';
+  document.getElementById('storyShotActions').style.display = 'none';
+}
+function triggerStoryShotFileSelect(){
+  document.getElementById('storyShotFileInput').click();
+}
+function expandStoryShot(){
+  const img = document.getElementById('storyShotPreview');
+  if(img.src) openLightbox(img.src);
+}
+async function handleStoryImageFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')){ showToast('請選擇圖片檔案'); return; }
+  document.getElementById('storyShotStatus').textContent = '轉換中...';
+  try{
+    const webpBlob = await fileToWebpBlob(file);
+    currentStoryImageBlob = webpBlob;
+    currentStoryImageChanged = true;
+    const previewUrl = URL.createObjectURL(webpBlob);
+    showStoryImagePreview(previewUrl);
+    document.getElementById('storyShotStatus').textContent = `已轉換為 WebP（約 ${(webpBlob.size/1024).toFixed(0)} KB）`;
+  } catch(e){
+    console.error(e);
+    document.getElementById('storyShotStatus').textContent = '';
+    showToast('圖片處理失敗');
+  }
+}
 function setupStoryShotZone(){
   const zone = document.getElementById('storyShotZone');
   const fileInput = document.getElementById('storyShotFileInput');
@@ -3765,7 +3700,7 @@ function setupStoryShotZone(){
 
   zone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', e => {
-    if(e.target.files?.length) addPendingStoryFiles(e.target.files);
+    if(e.target.files[0]) handleStoryImageFile(e.target.files[0]);
     fileInput.value = '';
   });
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
@@ -3773,54 +3708,32 @@ function setupStoryShotZone(){
   zone.addEventListener('drop', e => {
     e.preventDefault();
     zone.classList.remove('dragover');
-    if(e.dataTransfer.files?.length) addPendingStoryFiles(e.dataTransfer.files);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file) handleStoryImageFile(file);
   });
   modalOverlay.addEventListener('paste', e => {
-    const files = [...(e.clipboardData?.items || [])]
-      .filter(item => item.type?.startsWith('image/'))
-      .map(item => item.getAsFile())
-      .filter(Boolean);
-    if(files.length){
-      addPendingStoryFiles(files);
-      e.preventDefault();
+    const items = e.clipboardData ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.startsWith('image/')){
+        handleStoryImageFile(item.getAsFile());
+        e.preventDefault();
+        break;
+      }
     }
   });
 }
 setupStoryShotZone();
 
-function renderStoryDetailContent(group){
-  document.getElementById('storyDetailBrand').textContent = group.brand_model_text;
-  document.getElementById('storyDetailDate').textContent = group.story_date || '';
-  document.getElementById('storyDetailNote').textContent = group.note || '';
-  const wrap = document.getElementById('storyDetailImages');
-  const images = group.story_images || [];
-  if(images.length === 0){
-    wrap.innerHTML = '<div class="inquiry-empty">這組目前沒有圖片</div>';
-    return;
-  }
-  wrap.innerHTML = images.map((img,index) => {
-    const inquiries = img.inquiries || [];
-    return `
-      <article class="story-detail-card">
-        <div class="story-detail-image-wrap-v5" onclick="openLightbox('${img.image_url}')">
-          <img src="${img.image_url}" />
-          <span class="story-detail-image-index">第 ${index+1} 張</span>
-          <span class="story-detail-image-count">${inquiries.length} 詢問</span>
-        </div>
-        <div class="story-detail-card-body">
-          <div class="inquiry-list">${renderInquiryList(inquiries,'story-image',img.id)}</div>
-          <button class="btn btn-ghost add-inquiry-btn" onclick="openInquiryModal(null,'story-image','${img.id}')">+ 新增詢問記錄</button>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-
+/* ---- 限時動態 詳情（圖 + 詢問記錄管理） ---- */
 function openStoryDetail(id){
   currentStoryDetailId = id;
-  const group = allStoryEntries.find(x => x.id === id);
-  if(!group) return;
-  renderStoryDetailContent(group);
+  const se = allStoryEntries.find(x => x.id === id);
+  if(!se) return;
+  document.getElementById('storyDetailBrand').textContent = se.brand_model_text;
+  document.getElementById('storyDetailNote').textContent = se.note || '';
+  document.getElementById('storyDetailImage').src = se.image_url;
+  document.getElementById('storyDetailInquiryList').innerHTML = renderInquiryList(se.inquiries || [], 'story', se.id);
+  document.getElementById('storyDetailAddInquiryBtn').onclick = () => openInquiryModal(null, 'story', se.id);
   document.getElementById('storyDetailOverlay').classList.add('open');
 }
 function closeStoryDetail(){
@@ -3834,6 +3747,26 @@ function editCurrentStoryEntry(){
   openStoryModal(id);
 }
 
+/* ---- 精選名稱編輯（改一筆，底下所有項目跟著變） ---- */
+function openHighlightModal(highlightId){
+  editingHighlightId = highlightId;
+  const h = allStoriesHighlights.find(x => x.id === highlightId);
+  document.getElementById('editHighlightName').value = h ? h.name : '';
+  document.getElementById('highlightModalOverlay').classList.add('open');
+}
+function closeHighlightModal(){
+  document.getElementById('highlightModalOverlay').classList.remove('open');
+  editingHighlightId = null;
+}
+async function saveHighlightEdit(){
+  const name = document.getElementById('editHighlightName').value.trim();
+  if(!name){ showToast('名稱不可留空'); return; }
+  const { error } = await sb.from('stories_highlights').update({ name }).eq('id', editingHighlightId);
+  if(error){ console.error(error); showToast('更新失敗（可能與既有精選名稱重複）'); return; }
+  showToast('精選名稱已更新');
+  closeHighlightModal();
+  await loadStories();
+}
 </script>
 <script>
 (function(){
@@ -4064,7 +3997,7 @@ function editCurrentStoryEntry(){
 
   function init(){
     enhanceAll(document);
-    ['resetFilters','populateTagFilterOptions','populateModelFilterOptions','openGroupModal','openInquiryModal','openStoryModal','openTagModal'].forEach(wrapAfter);
+    ['resetFilters','populateTagFilterOptions','populateModelFilterOptions','openGroupModal','openInquiryModal','openStoryModal','openTagModal','openHighlightModal'].forEach(wrapAfter);
     new MutationObserver(mutations => {
       mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
         if(node.nodeType === 1){
