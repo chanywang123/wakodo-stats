@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2215.6%22%20fill%3D%22%23fff%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214.2%22%20stroke-width%3D%221.1%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2211.9%22%20stroke-width%3D%220.8%22%2F%3E%3Cg%20stroke-width%3D%220.85%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211.0%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2220.8%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2219.6%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2212.4%22%20cy%3D%2219.1%22%20r%3D%224.4%22%2F%3E%3Ccircle%20cx%3D%2211.2%22%20cy%3D%2213.6%22%20r%3D%224.4%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2215.2%22%20r%3D%222.2%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
-  <title>和光堂戰情室 V14.3.1</title>
+  <title>和光堂戰情室 V14.3.0</title>
 
   <!-- ===== 外部套件（CDN）===== -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -202,40 +202,50 @@
     .source-tag.is-active { background:var(--primary-light); color:var(--primary); border-color:var(--primary); box-shadow: none; }
     .source-tag-dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
 
-    /* ===== 關鍵字分析專屬樣式 (V14.3.0 升級) ===== */
-    .kw-wrap { display:flex; align-items:flex-start; gap:14px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.05); flex-wrap:wrap; }
-    .kw-title { flex:0 0 auto; min-width:84px; padding-top:6px; color:var(--google-yellow); font-size:13px; font-weight:900; letter-spacing:.4px; }
-    .kw-tags { flex:1 1 720px; display:flex; flex-wrap:wrap; gap:8px; }
-    
-    /* 長尾關鍵字：實體玻璃膠囊 */
+    /* ===== Google 搜尋洞察 ===== */
+    .kw-insight-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:24px;
+    }
+    .kw-intent-card {
+      min-height:88px; padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.68);
+      border:1px solid rgba(0,0,0,.06); box-shadow:0 2px 8px rgba(0,0,0,.03);
+    }
+    .kw-intent-name { color:var(--text-secondary); font-size:12px; font-weight:900; letter-spacing:.2px; }
+    .kw-intent-value { margin-top:5px; font-size:24px; line-height:1; font-weight:950; color:var(--text-primary); }
+    .kw-intent-pct { margin-top:5px; color:var(--text-hint); font-size:11px; font-weight:800; }
+    .kw-note { color:var(--text-hint); font-size:11px; font-weight:700; line-height:1.5; }
+
+    .kw-panel { margin-top:24px; }
+    .kw-panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .kw-panel-title { font-size:13px; font-weight:950; color:var(--text-primary); }
+
+    .kw-topic-list { display:flex; flex-direction:column; gap:9px; }
+    .kw-topic-row { display:grid; grid-template-columns:minmax(130px,220px) 1fr 52px; align-items:center; gap:12px; }
+    .kw-topic-label { min-width:0; color:var(--text-secondary); font-size:12px; font-weight:850; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .kw-topic-track { position:relative; height:11px; border-radius:999px; background:rgba(0,0,0,.045); overflow:hidden; }
+    .kw-topic-fill { position:absolute; inset:0 auto 0 0; width:0; border-radius:999px; transition:width .42s cubic-bezier(.2,.8,.2,1); }
+    .kw-topic-count { text-align:right; color:var(--text-primary); font-size:12px; font-weight:950; }
+
+    .kw-raw-wrap { display:flex; flex-wrap:wrap; gap:8px; }
     .kw-pill {
-      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-      border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.6);
-      color: var(--text-primary); font-size: 13px; font-weight: 800; cursor: pointer; transition: .2s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02); user-select: none;
+      display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:8px;
+      border:1px solid rgba(0,0,0,.08); background:rgba(255,255,255,.7); color:var(--text-primary);
+      font-size:13px; font-weight:800; cursor:pointer; transition:.2s ease; box-shadow:0 2px 4px rgba(0,0,0,.02); user-select:none;
     }
-    .kw-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); background: #fff; }
-    .kw-pill.is-active { background: var(--google-yellow); color: #fff; border-color: var(--google-yellow); box-shadow: 0 4px 12px rgba(251,188,5,0.3); }
-    .kw-pill.is-active .kw-count { background: rgba(255,255,255,0.3); color: #fff; }
-    
-    /* 關鍵字文字防爆版截斷 */
-    .kw-text { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .kw-count { background: rgba(251,188,5,0.2); color: #d97706; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 900; transition: .2s; }
-    
-    /* 常見組合：層級式卡片 */
-    .kw-combo-card {
-      display: inline-flex; align-items: center; gap: 6px; padding: 6px;
-      border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); background: rgba(0,0,0,0.02);
-      cursor: pointer; transition: .2s ease; user-select: none;
-    }
-    .kw-combo-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); background: rgba(0,0,0,0.04); }
-    .kw-combo-card.is-active { background: rgba(251,188,5,0.1); border-color: rgba(251,188,5,0.3); }
-    .kw-combo-part {
-      background: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 800;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);
-      max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .kw-combo-plus { color: var(--text-hint); font-weight: 900; font-size: 12px; }
+    .kw-pill:hover { transform:translateY(-2px); box-shadow:0 6px 12px rgba(0,0,0,.06); background:#fff; }
+    .kw-pill.is-active { background:var(--google-yellow); color:#fff; border-color:var(--google-yellow); box-shadow:0 4px 12px rgba(251,188,5,.3); }
+    .kw-pill.is-active .kw-count { background:rgba(255,255,255,.3); color:#fff; }
+    .kw-text { max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .kw-count { background:rgba(251,188,5,.2); color:#d97706; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:900; transition:.2s; }
+    .kw-more-row { display:flex; justify-content:flex-end; margin-top:10px; }
+    .kw-more-btn { border:0; background:transparent; color:var(--primary); font-size:12px; font-weight:900; cursor:pointer; padding:4px 2px; }
+    .kw-more-btn:hover { text-decoration:underline; }
+
+    .kw-network-shell { position:relative; min-height:390px; border:1px solid rgba(0,0,0,.05); border-radius:16px; background:rgba(255,255,255,.42); overflow:hidden; }
+    #chartKeywordNetwork { width:100%; height:390px; }
+    .kw-network-empty { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; color:var(--text-hint); font-size:13px; font-weight:850; padding:20px; }
+    .kw-network-shell.is-empty .kw-network-empty { display:flex; }
+    .kw-network-shell.is-empty #chartKeywordNetwork { visibility:hidden; }
 
     /* 自訂捲軸 */
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -432,7 +442,7 @@
           <span class="glow-dot" style="width: 12px; height: 12px;"></span>
           <h1 class="h1" style="font-size: 32px;">和光堂戰情室</h1>
           <div class="title-meta">
-            <span class="ver-tag">V14.3.1</span>
+            <span class="ver-tag">V14.3.0</span>
             <span class="mono hint" id="lastDataDisp" style="font-weight: 800;">last data --/--/--</span>
             <a id="perfLink" href="performance.html" target="_blank" rel="noopener"
                style="font-size:12px;padding:4px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;background:#fff;color:var(--text-primary);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:0.2s;">觀看業績 ↗</a>
@@ -536,9 +546,14 @@
         <div class="section-head" onclick="toggleSection('secJourney')">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
             <h3 class="h3" style="font-size: 22px;">顧客旅程</h3>
-            <span class="hint" style="background:rgba(0,0,0,0.04);padding:6px 12px;border-radius:8px;font-weight:800;color:var(--text-primary);">認知源頭 ➜ 決策動機 ➜ 來店（僅多段旅程・前 10 大路徑）</span>
+            <span id="sankeyHint" class="hint" style="background:rgba(0,0,0,0.04);padding:6px 12px;border-radius:8px;font-weight:800;color:var(--text-primary);">完整消費路徑 ➜ 來店（多段旅程・精簡主幹）</span>
           </div>
           <div style="display:flex;align-items:center;gap:16px;">
+            <div class="ios-seg-group" id="segSankeyView" onclick="event.stopPropagation()">
+              <div class="ios-seg-pill"></div>
+              <div class="ios-seg-btn selected" onclick="setSankeyView('compact',this)">精簡</div>
+              <div class="ios-seg-btn" onclick="setSankeyView('full',this)">完整</div>
+            </div>
             <div class="ios-seg-group" id="segSankey" onclick="event.stopPropagation()">
               <div class="ios-seg-pill"></div>
               <div class="ios-seg-btn selected" onclick="setSankeyMode('all',this)">總覽</div>
@@ -591,27 +606,54 @@
             <div id="sharedSourceTags" class="source-tags"></div>
           </div>
 
-          <!-- 2.5 Google 關鍵字分析區 (V14.3.0 升級版) -->
+          <!-- 2.5 Google 搜尋洞察 -->
           <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,0.05);">
-            <div class="chart-label" style="margin-bottom:20px;font-size:14px;color:var(--google-yellow);">🔍 Google 搜尋關鍵字分析</div>
-            
-            <!-- 高頻關鍵字 (>=4) -->
-            <div class="seg-bar-wrap">
-              <div class="seg-bar-title">🔥 熱門搜尋 (出現 10 次以上)</div>
-              <div id="segBarKeywordTrack" class="seg-bar-track"></div>
-              <div id="segBarKeywordLegend" class="seg-bar-legend"></div>
+            <div class="chart-label" style="margin-bottom:6px;font-size:14px;color:var(--google-yellow);">🔍 Google 搜尋洞察</div>
+            <div class="kw-note" style="margin-bottom:18px;">搜尋意圖可重疊計算；搜尋主題與關聯圖僅做分析聚合，原始關鍵字仍完整保留。</div>
+
+            <div class="kw-panel" style="margin-top:0;">
+              <div class="kw-panel-head">
+                <div class="kw-panel-title">搜尋意圖</div>
+                <div class="kw-note">占「有填搜尋關鍵字」來店紀錄的比例</div>
+              </div>
+              <div id="keywordIntentCards" class="kw-insight-grid"></div>
             </div>
 
-            <!-- 長尾關鍵字 (<=3) -->
-            <div style="margin-bottom: 24px;">
-              <div class="seg-bar-title">🧩 長尾搜尋 (未滿10次的關鍵字，依次數與最新日期排序)</div>
-              <div id="longTailKeywords" style="max-height: 160px; overflow-y: auto; padding-right: 8px; display: flex; flex-wrap: wrap; gap: 8px;" class="custom-scrollbar"></div>
+            <div class="kw-panel">
+              <div class="kw-panel-head">
+                <div class="kw-panel-title">搜尋主題排行</div>
+                <div class="kw-note">相近搜尋語意合併後排行；同一筆同主題只計一次</div>
+              </div>
+              <div id="keywordTopicBars" class="kw-topic-list"></div>
             </div>
 
-            <!-- 常見組合 (層級式卡片) -->
-            <div>
-              <div class="seg-bar-title">🔗 常見搜尋組合</div>
-              <div id="comboKeywords" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            <div class="kw-panel">
+              <div class="kw-panel-head">
+                <div>
+                  <div class="kw-panel-title">實際搜尋詞</div>
+                  <div class="kw-note" style="margin-top:3px;">保留使用者原始輸入，可點擊套用精確篩選</div>
+                </div>
+                <div id="segKeywordRaw" class="ios-seg-group">
+                  <div class="ios-seg-pill"></div>
+                  <div class="ios-seg-btn selected" onclick="setKeywordRawView('popular',this)">熱門</div>
+                  <div class="ios-seg-btn" onclick="setKeywordRawView('recent',this)">近期長尾</div>
+                </div>
+              </div>
+              <div id="rawKeywordList" class="kw-raw-wrap"></div>
+              <div class="kw-more-row"><button id="keywordShowAllBtn" class="kw-more-btn" type="button" onclick="toggleKeywordShowAll()">查看全部關鍵字</button></div>
+            </div>
+
+            <div class="kw-panel">
+              <div class="kw-panel-head">
+                <div>
+                  <div class="kw-panel-title">搜尋關聯</div>
+                  <div class="kw-note" style="margin-top:3px;">同一筆搜尋紀錄出現 2 個以上不同主題時建立連線；預設只顯示重複至少 2 次的關聯</div>
+                </div>
+              </div>
+              <div id="keywordNetworkShell" class="kw-network-shell">
+                <div id="chartKeywordNetwork"></div>
+                <div class="kw-network-empty">目前篩選條件下，複合搜尋資料不足，尚無法形成穩定的主題關聯。</div>
+              </div>
             </div>
           </div>
 
@@ -786,11 +828,11 @@
 
   <script>
   /* =============================================================
-     和光堂戰情室 V14.3.1 (Local Date Range Fix)
+     和光堂戰情室 V14.3.0 (Liquid Glassmorphism + Keyword Analysis + Tooltip Fix + Combo Cards)
      ============================================================= */
 
   const CFG = Object.freeze({
-    VERSION: "14.3.1",
+    VERSION: "14.3.0",
     GATE_PASSWORD: "wakodo100",
     GATE_KEY: "wakodo_gate_ok",
     WIPE_PASSWORD: "628599",
@@ -822,7 +864,9 @@
       "熟客回購": "老客回購",
       "熟客未購": "老客-未購",
       "AI 推薦": "AI推薦",
-      "Google搜尋": "Google 搜尋"
+      "Google搜尋": "Google 搜尋",
+      "Instagram廣告": "Instagram 廣告",
+      "Facebook廣告": "Facebook 廣告"
     },
 
     INVALID_NAMES: ["現場客","調整客","現場顧客","看看客","電話客","諮詢客","住戶","無","不知","-","未知"],
@@ -844,7 +888,7 @@
     editingId: null, currentDetailId: null,
     editSeg: { cust: null, pay: true },
     editJourney: [],
-    touchMode: "first", sankeyMode: "all",
+    touchMode: "first", sankeyMode: "all", sankeyView: "compact", keywordRawView: "popular", keywordShowAll: false,
     subAdmins: [],
     sourceColors: {}, colorPoolIdx: 0
   };
@@ -857,11 +901,6 @@
   const s  = (v) => v == null ? "" : String(v);
   const arr = (v) => Array.isArray(v) ? v : [];
   const fmtTwd = (n) => { const x = Number(n); return Number.isFinite(x) ? x.toLocaleString("zh-TW") : "--"; };
-  // 日期欄位是門市本地日曆日，禁止經 UTC 轉換，否則台灣午夜會倒退一天。
-  const localYmd = (d) => {
-    if (!(d instanceof Date) || Number.isNaN(d.getTime())) return "";
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  };
 
   function getColor(tag){ return ST.sourceColors[tag] || "var(--text-hint)"; }
 
@@ -913,6 +952,69 @@
   function cleanTags(tags){
     const mapped = arr(tags).map(t => CFG.SOURCE_ALIAS[t] || t);
     return [...new Set(mapped)];
+  }
+
+
+  function splitSearchKeywords(raw){
+    return s(raw)
+      .split(/(?:\s*(?:\+|,|，|、|\/|;|；|\|)\s*|\s+-{3,}\s+)/)
+      .map(x => x.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+  }
+
+  function keywordKey(token){
+    return s(token).trim().toLowerCase().replace(/臺南/g, "台南");
+  }
+
+
+  const KW_TOPIC_COLORS = {
+    "地區眼鏡搜尋":"#4285F4", "一般眼鏡搜尋":"#5F6368", "和光堂品牌":"#34A853",
+    "蔡司／鏡片":"#2980B9", "品牌／型號":"#8E44AD", "驗光需求":"#FBBC05",
+    "推薦／評價":"#E67E22", "特殊配戴需求":"#EA4335", "配鏡需求":"#16A085",
+    "地區搜尋":"#A9CCE3", "其他搜尋":"#BDC3C7"
+  };
+
+  const KW_PATTERNS = {
+    local: /(台南|臺南|善化|新市|南科|附近|安南|永康|新營)/i,
+    recommend: /(推薦|評論|評價|口碑|心得|好的|專業)/i,
+    wakodo: /(和光堂|wakodo)/i,
+    lens: /(蔡司|zeiss|鏡片|隱形眼鏡|變色|多焦|漸進)/i,
+    brand: /(lindberg|mykita|999\.?9|four\s*nines|taylor|ic!?[\s.\-]*berlin|moscot|roav|classico|dita|masuda|native\s*sons|ray[\s-]*ban|cartier|gucci|montblanc|tvr|丸山|卡洛琳)/i,
+    exam: /(驗光|視力|度數|近視|老花|散光)/i,
+    pairing: /(配鏡|配眼鏡)/i,
+    special: /(無螺絲|不要夾頭|超大|運動用|運動眼鏡|兒童|小孩|偏光|墨鏡|太陽眼鏡|輕量|舒適|鼻墊|鏡框經銷商)/i,
+    eyewear: /(眼鏡|鏡框)/i
+  };
+
+  function keywordTopic(token){
+    const t = s(token);
+    if (KW_PATTERNS.wakodo.test(t)) return "和光堂品牌";
+    if (KW_PATTERNS.brand.test(t)) return "品牌／型號";
+    if (KW_PATTERNS.lens.test(t)) return "蔡司／鏡片";
+    if (KW_PATTERNS.local.test(t) && (KW_PATTERNS.eyewear.test(t) || KW_PATTERNS.pairing.test(t) || KW_PATTERNS.exam.test(t))) return "地區眼鏡搜尋";
+    if (KW_PATTERNS.exam.test(t)) return "驗光需求";
+    if (KW_PATTERNS.pairing.test(t)) return "配鏡需求";
+    if (KW_PATTERNS.recommend.test(t)) return "推薦／評價";
+    if (KW_PATTERNS.special.test(t)) return "特殊配戴需求";
+    if (KW_PATTERNS.eyewear.test(t)) return "一般眼鏡搜尋";
+    if (KW_PATTERNS.local.test(t)) return "地區搜尋";
+    return "其他搜尋";
+  }
+
+  function keywordIntentFlags(raw){
+    const t = s(raw);
+    return [
+      ["📍 地區搜尋", KW_PATTERNS.local.test(t)],
+      ["👓 驗光／配鏡", KW_PATTERNS.exam.test(t) || KW_PATTERNS.pairing.test(t)],
+      ["⭐ 推薦／評價", KW_PATTERNS.recommend.test(t)],
+      ["🏪 和光堂品牌", KW_PATTERNS.wakodo.test(t)],
+      ["🔬 鏡片需求", KW_PATTERNS.lens.test(t)],
+      ["🕶 品牌／型號", KW_PATTERNS.brand.test(t)]
+    ];
+  }
+
+  function escapeHtml(text){
+    return s(text).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   }
 
   function buildDynamicColors(){
@@ -1078,6 +1180,14 @@
     if (sankeyFirstBtn) sankeyFirstBtn.classList.add("selected");
     updateIosPill(sankeyGrp);
 
+    ST.sankeyView = "compact";
+    const sankeyViewGrp = $("segSankeyView");
+    qa(".ios-seg-btn", sankeyViewGrp).forEach(b => b.classList.remove("selected"));
+    const compactBtn = qa(".ios-seg-btn", sankeyViewGrp)[0];
+    if (compactBtn) compactBtn.classList.add("selected");
+    updateIosPill(sankeyViewGrp);
+    updateSankeyViewHint();
+
     ST.touchMode = "first";
     const convGrp = $("convTouchGroup");
     qa(".ios-seg-btn", convGrp).forEach(b => b.classList.remove("selected"));
@@ -1171,8 +1281,8 @@
     if (f.keyword) {
       const rawStr = s(v.search_keywords).trim();
       if (!rawStr) return false;
-      const parts = rawStr.split(/[+,,、，]+/).map(x => x.trim().toLowerCase()).filter(Boolean);
-      const targetKws = f.keyword.split(" + ").map(x => x.trim().toLowerCase());
+      const parts = splitSearchKeywords(rawStr).map(keywordKey);
+      const targetKws = f.keyword.split(" + ").map(keywordKey);
       // 必須包含組合中的「所有」關鍵字
       if (!targetKws.every(tk => parts.includes(tk))) return false;
     }
@@ -1194,8 +1304,8 @@
     if (!d) return false;
     if (ST.datePicker && ST.datePicker.selectedDates.length === 2){
       const [a, b] = ST.datePicker.selectedDates;
-      const aStr = localYmd(a);
-      const bStr = localYmd(b);
+      const aStr = a.toISOString().slice(0,10);
+      const bStr = b.toISOString().slice(0,10);
       if (d < aStr || d > bStr) return false;
     }
     const y = $("selYear") && $("selYear").value;
@@ -1259,118 +1369,211 @@
   };
   window.hideTooltip = () => { $("hoverPreview").style.display = "none"; };
 
-  /* ===== Google 關鍵字分析函式 (V14.3.0 升級版) ===== */
-  function updKeywordAnalysis() {
-    let totalKwCount = 0;
-    const kwMap = new Map();
-    const comboMap = new Map();
+  /* ===== Google 搜尋洞察 ===== */
+  window.setKeywordRawView = (mode, el) => {
+    ST.keywordRawView = mode === "recent" ? "recent" : "popular";
+    ST.keywordShowAll = false;
+    const grp = $("segKeywordRaw");
+    if (grp) {
+      qa(".ios-seg-btn", grp).forEach(b => b.classList.remove("selected"));
+      if (el) el.classList.add("selected");
+      updateIosPill(grp);
+    }
+    updKeywordAnalysis();
+  };
 
-    // 1. 資料清洗與統計
+  window.toggleKeywordShowAll = () => {
+    ST.keywordShowAll = !ST.keywordShowAll;
+    updKeywordAnalysis();
+  };
+
+  function buildKeywordNetworkLayout(nodes, edges){
+    const n = nodes.length;
+    const pos = nodes.map((_, i) => {
+      const a = (Math.PI * 2 * i / Math.max(1, n)) - Math.PI / 2;
+      return { x: Math.cos(a) * .72, y: Math.sin(a) * .72, vx: 0, vy: 0 };
+    });
+    const index = new Map(nodes.map((name, i) => [name, i]));
+    for (let iter = 0; iter < 180; iter++) {
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          let dx = pos[i].x - pos[j].x, dy = pos[i].y - pos[j].y;
+          let d2 = Math.max(.015, dx*dx + dy*dy), d = Math.sqrt(d2);
+          const f = .0026 / d2;
+          dx /= d; dy /= d;
+          pos[i].vx += dx * f; pos[i].vy += dy * f;
+          pos[j].vx -= dx * f; pos[j].vy -= dy * f;
+        }
+      }
+      edges.forEach(e => {
+        const i = index.get(e.a), j = index.get(e.b); if (i == null || j == null) return;
+        let dx = pos[j].x - pos[i].x, dy = pos[j].y - pos[i].y;
+        const d = Math.max(.04, Math.sqrt(dx*dx + dy*dy)); dx /= d; dy /= d;
+        const target = .55; const f = (d - target) * (.0022 + Math.log1p(e.count) * .00065);
+        pos[i].vx += dx*f; pos[i].vy += dy*f; pos[j].vx -= dx*f; pos[j].vy -= dy*f;
+      });
+      pos.forEach(p => {
+        p.vx += -p.x * .0008; p.vy += -p.y * .0008;
+        p.vx *= .83; p.vy *= .83;
+        p.x = Math.max(-.92, Math.min(.92, p.x + p.vx));
+        p.y = Math.max(-.88, Math.min(.88, p.y + p.vy));
+      });
+    }
+    return pos;
+  }
+
+  function renderKeywordNetwork(topicRows, topicCounts){
+    const shell = $("keywordNetworkShell");
+    const el = $("chartKeywordNetwork");
+    if (!shell || !el || !window.Plotly) return;
+
+    const edgeMap = new Map();
+    const nodeCoCount = new Map();
+    topicRows.forEach(topics => {
+      const u = [...new Set(topics)].filter(Boolean);
+      if (u.length < 2) return;
+      u.forEach(t => nodeCoCount.set(t, (nodeCoCount.get(t) || 0) + 1));
+      for (let i=0;i<u.length;i++) for (let j=i+1;j<u.length;j++) {
+        const pair = [u[i],u[j]].sort(); const key = pair.join("|||;");
+        edgeMap.set(key, { a:pair[0], b:pair[1], count:(edgeMap.get(key)?.count || 0) + 1 });
+      }
+    });
+
+    const allEdges = [...edgeMap.values()].sort((a,b)=>b.count-a.count);
+    const repeatedEdges = allEdges.filter(e => e.count >= 2);
+    const edges = repeatedEdges.length >= 2 ? repeatedEdges : allEdges;
+    const nodes = [...new Set(edges.flatMap(e => [e.a,e.b]))]
+      .sort((a,b)=>(nodeCoCount.get(b)||0)-(nodeCoCount.get(a)||0));
+
+    if (nodes.length < 2 || !edges.length) {
+      shell.classList.add("is-empty");
+      Plotly.purge(el);
+      return;
+    }
+    shell.classList.remove("is-empty");
+
+    const pos = buildKeywordNetworkLayout(nodes, edges);
+    const pmap = new Map(nodes.map((n,i)=>[n,pos[i]]));
+    const maxEdge = Math.max(...edges.map(e=>e.count),1);
+    const traces = edges.map((e, i) => {
+      const a=pmap.get(e.a), b=pmap.get(e.b);
+      return {
+        type:"scatter", mode:"lines", x:[a.x,b.x], y:[a.y,b.y],
+        line:{ width:1.2 + (e.count/maxEdge)*6.5, color:"rgba(66,133,244,.24)" },
+        hoverinfo:"text", text:[`${e.a} ↔ ${e.b}<br>共同出現 ${e.count} 筆`,`${e.a} ↔ ${e.b}<br>共同出現 ${e.count} 筆`],
+        showlegend:false
+      };
+    });
+
+    const maxNode = Math.max(...nodes.map(n=>nodeCoCount.get(n)||0),1);
+    traces.push({
+      type:"scatter", mode:"markers+text", x:nodes.map(n=>pmap.get(n).x), y:nodes.map(n=>pmap.get(n).y),
+      text:nodes, textposition:"top center", cliponaxis:false,
+      marker:{
+        size:nodes.map(n=>18 + Math.sqrt((nodeCoCount.get(n)||0)/maxNode)*25),
+        color:nodes.map(n=>KW_TOPIC_COLORS[n] || "#9AA0A6"),
+        line:{color:"rgba(255,255,255,.95)",width:2}, opacity:.94
+      },
+      customdata:nodes.map(n=>[nodeCoCount.get(n)||0, topicCounts.get(n)||0]),
+      hovertemplate:"<b>%{text}</b><br>出現在複合搜尋 %{customdata[0]} 筆<br>全部搜尋主題 %{customdata[1]} 筆<extra></extra>",
+      textfont:{size:12,color:"#444"}, showlegend:false
+    });
+
+    Plotly.react(el, traces, {
+      margin:{l:34,r:34,t:34,b:28}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
+      xaxis:{visible:false,range:[-1.08,1.08],fixedrange:true}, yaxis:{visible:false,range:[-1.05,1.05],fixedrange:true},
+      hoverlabel:{bgcolor:"rgba(255,255,255,.96)",bordercolor:"#ddd",font:{size:12,color:"#333"}},
+      showlegend:false
+    }, {displayModeBar:false,responsive:true});
+  }
+
+  function renderRawKeywordList(sortedAll, recentTail){
+    const box = $("rawKeywordList"); const btn = $("keywordShowAllBtn");
+    if (!box) return;
+    const base = ST.keywordRawView === "recent" ? recentTail : sortedAll;
+    const limit = ST.keywordRawView === "recent" ? 20 : 15;
+    const rows = ST.keywordShowAll ? base : base.slice(0, limit);
+    if (!rows.length) {
+      box.innerHTML = `<div class="kw-note" style="padding:6px 0;">目前沒有關鍵字紀錄</div>`;
+      if (btn) btn.style.display="none";
+      return;
+    }
+    box.innerHTML = rows.map(obj => {
+      const active = ST.filter.keyword && keywordKey(ST.filter.keyword) === obj.key ? "is-active" : "";
+      return `<button type="button" class="kw-pill ${active}" data-kw="${escapeHtml(obj.original)}" title="最近出現：${escapeHtml(obj.latestDate || '—')}"><span class="kw-text">${escapeHtml(obj.original)}</span><span class="kw-count">${obj.count}</span></button>`;
+    }).join("");
+    qa(".kw-pill", box).forEach(el => el.addEventListener("click", () => setKeywordFilter(el.dataset.kw || "")));
+    if (btn) {
+      btn.style.display = base.length > limit ? "inline-block" : "none";
+      btn.textContent = ST.keywordShowAll ? "收合關鍵字" : `查看全部關鍵字（${base.length}）`;
+    }
+  }
+
+  function updKeywordAnalysis() {
+    const kwMap = new Map();
+    const intentCounts = new Map();
+    const topicCounts = new Map();
+    const topicRawCounts = new Map();
+    const topicRows = [];
+    let keywordRows = 0;
+
     ST.filtered.forEach(v => {
       const rawStr = s(v.search_keywords).trim();
       if (!rawStr) return;
-
-      // 依據 + , ， 、 切割，保留空白
-      const parts = rawStr.split(/[+,,、，]+/).map(x => x.trim()).filter(Boolean);
-      if (!parts.length) return;
-
+      const parts = splitSearchKeywords(rawStr); if (!parts.length) return;
+      keywordRows++;
       const date = s(v.form_date);
-      const uniqueParts = [];
+      const seenKeys = new Set();
+      const rowTopics = new Set();
 
       parts.forEach(p => {
-        const lower = p.toLowerCase();
-        if (!uniqueParts.includes(lower)) uniqueParts.push(lower);
+        const key = keywordKey(p); if (!key) return;
+        if (!kwMap.has(key)) kwMap.set(key,{key,original:p,count:0,latestDate:date});
+        const obj = kwMap.get(key);
+        const isNewKey = !seenKeys.has(key);
+        if (isNewKey) { obj.count++; seenKeys.add(key); }
+        if (date > obj.latestDate) { obj.latestDate=date; obj.original=p; }
 
-        if (!kwMap.has(lower)) {
-          kwMap.set(lower, { original: p, count: 0, latestDate: date });
+        const topic = keywordTopic(p); rowTopics.add(topic);
+        if (isNewKey) {
+          if (!topicRawCounts.has(topic)) topicRawCounts.set(topic,new Map());
+          const tr = topicRawCounts.get(topic); tr.set(key,(tr.get(key)||0)+1);
         }
-        const obj = kwMap.get(lower);
-        obj.count++;
-        if (date > obj.latestDate) obj.latestDate = date;
-        totalKwCount++;
       });
 
-      // 統計常見組合 (大於1個詞)
-      if (uniqueParts.length > 1) {
-        uniqueParts.sort(); // 確保 A,B 和 B,A 算同一組
-        const displayCombo = uniqueParts.map(l => kwMap.get(l).original).join(" + ");
-        comboMap.set(displayCombo, (comboMap.get(displayCombo) || 0) + 1);
-      }
+      rowTopics.forEach(t=>topicCounts.set(t,(topicCounts.get(t)||0)+1));
+      topicRows.push([...rowTopics]);
+      keywordIntentFlags(rawStr).forEach(([label,hit]) => { if (hit) intentCounts.set(label,(intentCounts.get(label)||0)+1); });
     });
 
-    // 2. 分類高頻與長尾
-    const highFreq = [];
-    const lowFreq = [];
-    for (const obj of kwMap.values()) {
-      if (obj.count >= 10) highFreq.push(obj);
-      else lowFreq.push(obj);
+    const intentBox = $("keywordIntentCards");
+    if (intentBox) {
+      const labels=["📍 地區搜尋","👓 驗光／配鏡","⭐ 推薦／評價","🏪 和光堂品牌","🔬 鏡片需求","🕶 品牌／型號"];
+      intentBox.innerHTML = keywordRows ? labels.map(label => {
+        const count=intentCounts.get(label)||0, pct=(count/keywordRows*100).toFixed(1);
+        return `<div class="kw-intent-card"><div class="kw-intent-name">${label}</div><div class="kw-intent-value">${count.toLocaleString()}</div><div class="kw-intent-pct">${pct}% 的搜尋紀錄</div></div>`;
+      }).join("") : `<div class="kw-note">目前沒有 Google 搜尋關鍵字資料</div>`;
     }
 
-    // 排序
-    highFreq.sort((a, b) => b.count - a.count);
-    lowFreq.sort((a, b) => {
-      if (b.count !== a.count) return b.count - a.count;
-      return b.latestDate > a.latestDate ? 1 : -1; // 次數相同比日期
-    });
-
-    // 3. 渲染高頻 (Seg-bar)
-    const highFreqTotal = highFreq.reduce((sum, obj) => sum + obj.count, 0);
-    
-    const segRows = highFreq.map((obj, i) => ({
-      label: obj.original,
-      count: obj.count,
-      color: CFG.PURPOSE_COLORS[i % CFG.PURPOSE_COLORS.length],
-      active: ST.filter.keyword === obj.original
-    }));
-    renderSegBar('segBarKeywordTrack', 'segBarKeywordLegend', segRows, (label) => setKeywordFilter(label), highFreqTotal);
-
-    // 4. 渲染長尾 (Scrollable Box)
-    const ltContainer = $("longTailKeywords");
-    if (ltContainer) {
-      if (!lowFreq.length) {
-        ltContainer.innerHTML = `<div style="color:var(--text-hint); font-size:13px; font-weight:800; padding:6px 0;">無長尾關鍵字紀錄</div>`;
-      } else {
-        ltContainer.innerHTML = lowFreq.map(obj => {
-          const activeCls = ST.filter.keyword === obj.original ? 'is-active' : '';
-          const pct = ((obj.count / totalKwCount) * 100).toFixed(1);
-          const tip = `總數：${obj.count} 筆 (${pct}%)`;
-          return `
-            <div class="kw-pill ${activeCls}" onmouseenter="showTooltip(event, '${obj.original.replace(/'/g,"\\'")}', '${tip}')" onmouseleave="hideTooltip()" onmousemove="moveHoverPreview(event)" onclick="setKeywordFilter('${obj.original.replace(/'/g,"\\'")}')">
-              <span class="kw-text">${obj.original}</span>
-              <span class="kw-count">${obj.count}</span>
-            </div>
-          `;
-        }).join("");
-      }
+    const topicBox = $("keywordTopicBars");
+    if (topicBox) {
+      const rows=[...topicCounts.entries()].sort((a,b)=>b[1]-a[1]);
+      const max=Math.max(...rows.map(r=>r[1]),1);
+      topicBox.innerHTML = rows.length ? rows.map(([topic,count],i)=>{
+        const rawMap=topicRawCounts.get(topic)||new Map();
+        const examples=[...rawMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([key,c])=>`${kwMap.get(key)?.original||key} ${c}`).join("、");
+        const pct=(count/Math.max(1,keywordRows)*100).toFixed(1);
+        return `<div class="kw-topic-row" title="${escapeHtml(examples)}"><div class="kw-topic-label">${escapeHtml(topic)} <span style="color:var(--text-hint);font-weight:750;">${pct}%</span></div><div class="kw-topic-track"><div class="kw-topic-fill" data-width="${(count/max*100).toFixed(1)}" style="background:${KW_TOPIC_COLORS[topic] || CFG.PURPOSE_COLORS[i%CFG.PURPOSE_COLORS.length]};"></div></div><div class="kw-topic-count">${count}</div></div>`;
+      }).join("") : `<div class="kw-note">目前沒有可整理的搜尋主題</div>`;
+      requestAnimationFrame(()=>qa(".kw-topic-fill",topicBox).forEach(el=>el.style.width=(el.dataset.width||0)+"%"));
     }
 
-    // 5. 渲染常見組合 (層級式卡片)
-    const comboContainer = $("comboKeywords");
-    if (comboContainer) {
-      const sortedCombos = [...comboMap.entries()].sort((a, b) => b[1] - a[1]);
-      if (!sortedCombos.length) {
-        comboContainer.innerHTML = `<div style="color:var(--text-hint); font-size:13px; font-weight:800; padding:6px 0;">無組合紀錄</div>`;
-      } else {
-        comboContainer.innerHTML = sortedCombos.map(([comboStr, count], i) => {
-          const activeCls = ST.filter.keyword === comboStr ? 'is-active' : '';
-          const parts = comboStr.split(" + ");
-          
-          // 將組合內的每個詞變成獨立色塊
-          const partsHtml = parts.map((p, j) => {
-            const color = CFG.PURPOSE_COLORS[(i + j) % CFG.PURPOSE_COLORS.length];
-            return `<span class="kw-combo-part" style="color:${color};">${p}</span>`;
-          }).join(`<span class="kw-combo-plus">+</span>`);
-
-          return `
-            <div class="kw-combo-card ${activeCls}" onclick="setKeywordFilter('${comboStr.replace(/'/g,"\\'")}')">
-              ${partsHtml}
-              <span class="kw-count" style="margin-left: 4px;">${count}</span>
-            </div>
-          `;
-        }).join("");
-      }
-    }
+    const sortedAll=[...kwMap.values()].sort((a,b)=>b.count-a.count || (b.latestDate||"").localeCompare(a.latestDate||""));
+    const recentTail=sortedAll.filter(x=>x.count<10).sort((a,b)=>(b.latestDate||"").localeCompare(a.latestDate||"") || b.count-a.count);
+    renderRawKeywordList(sortedAll,recentTail);
+    renderKeywordNetwork(topicRows,topicCounts);
   }
+
 
   function applyFilter(){
     ST.limit = 20;
@@ -1627,15 +1830,16 @@
   }
 
   const SANKEY_END = "🎯 來店";
-  const SANKEY_TOP_N = 10;
   const DIRECT_TOP_N = 5;
-  const PFX_ORIGIN = "①";
-  const PFX_MOTIVE = "②";
+  const SANKEY_COMPACT_COVERAGE = 0.85;
+  const SANKEY_COMPACT_MIN_KEEP = 3;
+  const SANKEY_COMPACT_MAX_KEEP = 6;
+  const SANKEY_COMPACT_OTHER = "其他來源";
 
   function pathOf(v){
     const tags = cleanTags(v.source_tags);
     if (tags.length < 2) return null;
-    return { origin: tags[0], motive: tags[tags.length - 1] };
+    return tags;
   }
 
   function directListOf(visits){
@@ -1649,36 +1853,134 @@
     return { top, total };
   }
 
-  function buildSankeyData(visits){
+  function compactStagePlan(allPaths, maxSteps){
+    const stageCounts = Array.from({ length:maxSteps }, () => new Map());
+
+    allPaths.forEach(([key, cnt]) => {
+      const path = JSON.parse(key);
+      path.forEach((tag, step) => {
+        const map = stageCounts[step];
+        map.set(tag, (map.get(tag) || 0) + cnt);
+      });
+    });
+
+    return stageCounts.map((map, step) => {
+      const entries = [...map.entries()].sort((a,b) => (b[1]-a[1]) || a[0].localeCompare(b[0], "zh-Hant"));
+      const total = entries.reduce((sum, [,cnt]) => sum + cnt, 0);
+      const distinct = entries.length;
+      if (!distinct) return { keep:new Set(), other:[], total:0, keptCoverage:1, step };
+
+      const minKeep = Math.min(SANKEY_COMPACT_MIN_KEEP, distinct);
+      const maxKeep = Math.min(SANKEY_COMPACT_MAX_KEEP, distinct);
+      let keepCount = minKeep;
+      let cumulative = entries.slice(0, minKeep).reduce((sum, [,cnt]) => sum + cnt, 0);
+
+      while (keepCount < maxKeep && total > 0 && cumulative / total < SANKEY_COMPACT_COVERAGE){
+        cumulative += entries[keepCount][1];
+        keepCount++;
+      }
+
+      const keptEntries = entries.slice(0, keepCount);
+      const other = entries.slice(keepCount);
+      return {
+        keep: new Set(keptEntries.map(([tag]) => tag)),
+        other,
+        total,
+        keptCoverage: total ? cumulative / total : 1,
+        step
+      };
+    });
+  }
+
+  function buildSankeyData(visits, viewMode = "full"){
     const pathCount = new Map();
     visits.forEach(v => {
-      const p = pathOf(v); if (!p) return;
-      const key = p.origin + "||" + p.motive;
+      const path = pathOf(v); if (!path) return;
+      const key = JSON.stringify(path);
       pathCount.set(key, (pathCount.get(key) || 0) + 1);
     });
     if (!pathCount.size) return null;
 
-    const topPaths = [...pathCount.entries()].sort((a,b) => b[1] - a[1]).slice(0, SANKEY_TOP_N);
-    const nodeKeys = []; const nodeLabel = []; const nodeColor = []; const idxOf = new Map();
-    function addNode(key, label, color){
+    const allPaths = [...pathCount.entries()].sort((a,b) => b[1] - a[1]);
+    const maxSteps = Math.max(...allPaths.map(([key]) => JSON.parse(key).length));
+    const compact = viewMode === "compact";
+    const stagePlan = compact ? compactStagePlan(allPaths, maxSteps) : null;
+
+    const nodeKeys = []; const nodeLabel = []; const nodeColor = []; const nodeX = []; const nodeCustom = []; const idxOf = new Map();
+
+    function nodeInfo(tag, step, isOther){
+      if (!compact || !isOther) return `第 ${step + 1} 接觸`;
+      const plan = stagePlan[step];
+      const otherTotal = plan.other.reduce((sum, [,cnt]) => sum + cnt, 0);
+      const pct = plan.total ? (otherTotal / plan.total * 100) : 0;
+      const names = plan.other.map(([name]) => name);
+      const preview = names.slice(0, 6).join("、");
+      const suffix = names.length > 6 ? ` 等 ${names.length} 個來源` : "";
+      return `第 ${step + 1} 接觸｜${fmtTwd(otherTotal)} 人（${pct.toFixed(1)}%）<br>合併：${preview}${suffix}`;
+    }
+
+    function addNode(key, label, color, x, custom=""){
       if (idxOf.has(key)) return idxOf.get(key);
       const i = nodeKeys.length; idxOf.set(key, i);
-      nodeKeys.push(key); nodeLabel.push(label); nodeColor.push(color);
+      nodeKeys.push(key); nodeLabel.push(label); nodeColor.push(color); nodeX.push(x); nodeCustom.push(custom);
       return i;
     }
 
-    const sources = [], targets = [], values = [], linkColors = [];
-    topPaths.forEach(([key, cnt]) => {
-      const [origin, motive] = key.split("||");
-      const oColor = getColor(origin); const mColor = getColor(motive);
-      const oIdx = addNode(PFX_ORIGIN + origin, origin, oColor);
-      const mIdx = addNode(PFX_MOTIVE + motive, motive, mColor);
-      const eIdx = addNode(SANKEY_END, SANKEY_END, "var(--google-yellow)");
-      sources.push(oIdx); targets.push(mIdx); values.push(cnt); linkColors.push(hexToRgba(oColor, 0.40));
-      sources.push(mIdx); targets.push(eIdx); values.push(cnt); linkColors.push(hexToRgba(mColor, 0.40));
+    const linkMap = new Map();
+    function addLink(sourceIdx, targetIdx, value, color){
+      const key = sourceIdx + ">" + targetIdx;
+      const old = linkMap.get(key);
+      if (old) old.value += value;
+      else linkMap.set(key, { source: sourceIdx, target: targetIdx, value, color });
+    }
+
+    const endIdx = addNode(SANKEY_END, SANKEY_END, "var(--google-yellow)", 0.99, "完成來店");
+    allPaths.forEach(([key, cnt]) => {
+      const path = JSON.parse(key);
+      const displayPath = path.map((tag, step) => {
+        if (!compact) return tag;
+        return stagePlan[step].keep.has(tag) ? tag : SANKEY_COMPACT_OTHER;
+      });
+
+      const stageNodes = displayPath.map((tag, step) => {
+        const isOther = compact && tag === SANKEY_COMPACT_OTHER;
+        const nodeKey = `stage:${step}:${tag}`;
+        const color = isOther ? getColor("其他") : getColor(tag);
+        return addNode(nodeKey, tag, color, 0.01 + step * (0.98 / maxSteps), nodeInfo(tag, step, isOther));
+      });
+
+      for (let i = 0; i < stageNodes.length - 1; i++) {
+        const sourceTag = displayPath[i];
+        const sourceColor = sourceTag === SANKEY_COMPACT_OTHER ? getColor("其他") : getColor(sourceTag);
+        addLink(stageNodes[i], stageNodes[i + 1], cnt, hexToRgba(sourceColor, 0.40));
+      }
+      const lastTag = displayPath[displayPath.length - 1];
+      const lastColor = lastTag === SANKEY_COMPACT_OTHER ? getColor("其他") : getColor(lastTag);
+      addLink(stageNodes[stageNodes.length - 1], endIdx, cnt, hexToRgba(lastColor, 0.40));
     });
 
-    return { nodes: nodeLabel, nodeColors: nodeColor, sources, targets, values, linkColors };
+    const links = [...linkMap.values()];
+    const outgoing = new Map();
+    links.forEach(link => outgoing.set(link.source, (outgoing.get(link.source) || 0) + link.value));
+    const linkCustom = links.map(link => {
+      const total = outgoing.get(link.source) || 0;
+      const pct = total ? link.value / total * 100 : 0;
+      return `占此節點後續 ${pct.toFixed(1)}%`;
+    });
+
+    return {
+      nodes: nodeLabel,
+      nodeColors: nodeColor,
+      nodeX,
+      nodeCustom,
+      sources: links.map(x => x.source),
+      targets: links.map(x => x.target),
+      values: links.map(x => x.value),
+      linkColors: links.map(x => x.color),
+      linkCustom,
+      maxSteps,
+      viewMode
+    };
   }
 
   function hexToRgba(hex, a){
@@ -1690,15 +1992,24 @@
   function renderSankey(elId, visits){
     const el = $(elId);
     if (!el || typeof Plotly === "undefined") return;
-    const d = buildSankeyData(visits);
+    const d = buildSankeyData(visits, ST.sankeyView);
     if (!d){
       Plotly.purge(el); el.innerHTML = `<div class="sankey-empty">此條件下無足夠旅程資料</div>`; return;
     }
     el.innerHTML = "";
     const trace = {
       type:"sankey", orientation:"h", arrangement:"snap",
-      node:{ pad:18, thickness:20, line:{color:"#fff",width:1}, label:d.nodes, color:d.nodeColors, hovertemplate:"%{label}<br>%{value} 人<extra></extra>" },
-      link:{ source:d.sources, target:d.targets, value:d.values, color:d.linkColors, hovertemplate:"%{source.label} ➜ %{target.label}<br>%{value} 人<extra></extra>" }
+      node:{
+        pad:18, thickness:20, line:{color:"#fff",width:1},
+        label:d.nodes, color:d.nodeColors, x:d.nodeX,
+        customdata:d.nodeCustom,
+        hovertemplate:"%{label}<br>%{customdata}<br>%{value} 人<extra></extra>"
+      },
+      link:{
+        source:d.sources, target:d.targets, value:d.values, color:d.linkColors,
+        customdata:d.linkCustom,
+        hovertemplate:"%{source.label} ➜ %{target.label}<br>%{value} 人｜%{customdata}<extra></extra>"
+      }
     };
     let w = el.clientWidth;
     if (!w || w < 50) { const p = el.parentElement; w = (p && p.clientWidth) ? p.clientWidth - 24 : 900; }
@@ -1709,6 +2020,23 @@
       try { let w2 = el.clientWidth; if (w2 && w2 > 50) Plotly.relayout(el, { width:w2, height:420 }); Plotly.Plots.resize(el); } catch(e){}
     });
   }
+
+  function updateSankeyViewHint(){
+    const hint = $("sankeyHint");
+    if (!hint) return;
+    hint.textContent = ST.sankeyView === "compact"
+      ? "完整消費路徑 ➜ 來店（多段旅程・精簡主幹）"
+      : "完整消費路徑 ➜ 來店（多段旅程・全路徑彙總）";
+  }
+
+  window.setSankeyView = (mode, el) => {
+    if (!["compact","full"].includes(mode)) return;
+    ST.sankeyView = mode;
+    const grp = el ? el.parentElement : null;
+    if (grp) { qa(".ios-seg-btn", grp).forEach(b => b.classList.remove("selected")); if (el) el.classList.add("selected"); updateIosPill(grp); }
+    updateSankeyViewHint();
+    buildSankeyAll();
+  };
 
   window.setSankeyMode = (mode, el) => {
     ST.sankeyMode = mode;
@@ -2127,8 +2455,7 @@ ${v.search_keywords ? `
     let data = ST.raw;
     if (ST.exportPicker && ST.exportPicker.selectedDates.length === 2){
       const [a,b] = ST.exportPicker.selectedDates;
-      const aStr = localYmd(a), bStr = localYmd(b);
-      data = data.filter(v => { const d = s(v.form_date).slice(0,10); return d && d >= aStr && d <= bStr; });
+      data = data.filter(v => { const t = new Date(s(v.form_date).slice(0,10)).getTime(); return t >= a.setHours(0,0,0,0) && t <= b.setHours(23,59,59,999); });
     }
     const rows = data.map(v => {
       const o = {};
@@ -2185,7 +2512,7 @@ ${v.search_keywords ? `
 
   async function initMain(){
     setTimeout(() => {
-      updateIosPill($("segCust")); updateIosPill($("segPay")); updateIosPill($("segSankey")); updateIosPill($("convTouchGroup")); syncStoreUI();
+      updateIosPill($("segCust")); updateIosPill($("segPay")); updateIosPill($("segSankeyView")); updateIosPill($("segSankey")); updateIosPill($("convTouchGroup")); updateIosPill($("segKeywordRaw")); updateSankeyViewHint(); syncStoreUI();
     }, 100);
 
     if (window.flatpickr){
