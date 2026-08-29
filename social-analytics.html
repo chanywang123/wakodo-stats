@@ -1838,7 +1838,7 @@ body > :not(.ambient-stage):not(.modal-overlay):not(.lightbox-overlay):not(.toas
       <label>分類</label>
       <select id="storyCategory" onchange="onStoryCategoryChange()">
         <option value="當日">當日</option>
-        <option value="精選">精選</option>
+        <option value="精選" disabled>精選（目前未啟用）</option>
       </select>
     </div>
 
@@ -2223,7 +2223,7 @@ function filteredStoriesForStats(){
     const inquiries = (se.inquiries || []).filter(inquiryMatchesDate);
     if(filterState.hasInquiry && inquiries.length === 0) return false;
     if((filterState.dateStart || filterState.dateEnd) && filterState.dateTarget === 'post'){
-      const d = se.created_at ? se.created_at.slice(0,10) : '';
+      const d = se.story_date || (se.created_at ? se.created_at.slice(0,10) : '');
       if(!d) return false;
       if(filterState.dateStart && d < filterState.dateStart) return false;
       if(filterState.dateEnd && d > filterState.dateEnd) return false;
@@ -2274,7 +2274,7 @@ function buildContentStats(){
       inquiries,
       total:inquiries.length,
       latest:latestInquiryDate(inquiries),
-      sortDate:se.created_at ? se.created_at.slice(0,10) : ''
+      sortDate:se.story_date || (se.created_at ? se.created_at.slice(0,10) : '')
     });
   });
 
@@ -3246,7 +3246,11 @@ async function saveInquiry(){
     saveError = error;
   } else {
     const insertPayload = currentInquiryParentType === 'story'
-      ? { story_entry_id: currentPlatformPostId, ...payload }
+      ? {
+          story_image_id: currentPlatformPostId,
+          story_source: (allStoryEntries.find(se => se.id === currentPlatformPostId)?.category === '精選') ? '精選' : '當日',
+          ...payload
+        }
       : { platform_post_id: currentPlatformPostId, ...payload };
     const { error } = await sb.from('inquiries').insert(insertPayload);
     saveError = error;
@@ -3457,31 +3461,92 @@ async function deleteInquiry(){
 }
 
 /* ================= 限時動態 ================= */
-let allStoriesHighlights = [];
+/*
+  現行 Supabase schema：
+  story_groups (群組層：tag / note / story_date)
+    -> story_images (圖片層)
+      -> inquiries.story_image_id (詢問綁定到單張限動圖片)
+
+  舊前端曾查詢 stories_highlights / story_entries，但正式 DB 並無這兩張表。
+  為保留既有 UI 與統計介面，這裡把 story_groups + story_images 正規化成
+  allStoryEntries（每張圖片一筆 UI entry）；不搬移、不複製、不改寫既有資料。
+*/
+let allStoryGroups = [];
+let allStoriesHighlights = []; // 現行 DB 無 highlight table；保留變數避免其他 UI 參照失效
 let allStoryEntries = [];
-let currentStoryEntryId = null;
+let currentStoryEntryId = null; // 現在代表 story_images.id
+let currentStoryGroupId = null; // story_groups.id
 let currentStoryDetailId = null;
 let editingHighlightId = null;
 let currentStoryImageBlob = null;
 let currentStoryImageChanged = false;
 let existingStoryImageUrl = null;
 
+function storyTagLabel(group){
+  const tag = group && group.tags;
+  const brand = tag && tag.brands ? (tag.brands.name || '') : '';
+  const model = tag ? (tag.model || '') : '';
+  return [brand, model].filter(Boolean).join(' ').trim() || '未分類限動';
+}
+
+function normalizeStoryGroups(groups){
+  return (groups || []).flatMap(group => {
+    const label = storyTagLabel(group);
+    const images = [...(group.story_images || [])].sort((a,b) =>
+      (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0) ||
+      String(a.created_at || '').localeCompare(String(b.created_at || ''))
+    );
+    const groupImageCount = images.length;
+    return images.map(image => {
+      const inquiries = image.inquiries || [];
+      const source = inquiries.find(iq => iq.story_source === '精選') ? '精選' : '當日';
+      return {
+        id: image.id,
+        story_group_id: group.id,
+        tag_id: group.tag_id,
+        category: source,
+        highlight_id: null,
+        stories_highlights: null,
+        brand_model_text: label,
+        image_url: image.image_url,
+        note: group.note || '',
+        story_date: group.story_date || '',
+        created_at: image.created_at || group.created_at || '',
+        sort_order: image.sort_order || 0,
+        group_image_count: groupImageCount,
+        inquiries
+      };
+    });
+  }).sort((a,b) => {
+    const da = a.story_date || (a.created_at || '').slice(0,10);
+    const db = b.story_date || (b.created_at || '').slice(0,10);
+    return db.localeCompare(da) || (a.sort_order - b.sort_order);
+  });
+}
+
 async function loadStories(){
-  const { data: highlights, error: e1 } = await sb.from('stories_highlights').select('*').order('name');
-  if(e1){ console.error(e1); }
-  allStoriesHighlights = highlights || [];
-
   const { data, error } = await sb
-    .from('story_entries')
+    .from('story_groups')
     .select(`
-      id, category, highlight_id, brand_model_text, image_url, note, created_at,
-      stories_highlights ( id, name ),
-      inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url )
+      id, tag_id, note, story_date, created_at,
+      tags ( id, model, brand_id, brands ( id, name ) ),
+      story_images (
+        id, story_group_id, image_url, sort_order, created_at,
+        inquiries ( id, inquiry_date, inquiry_type, note, screenshot_url, story_source )
+      )
     `)
-    .order('created_at', { ascending: false });
+    .order('story_date', { ascending:false })
+    .order('created_at', { ascending:false });
 
-  if(error){ console.error(error); return; } // 資料表可能還沒建立，先安靜略過
-  allStoryEntries = data || [];
+  if(error){
+    console.error(error);
+    showToast('限時動態讀取失敗');
+    return;
+  }
+
+  allStoryGroups = data || [];
+  allStoriesHighlights = [];
+  allStoryEntries = normalizeStoryGroups(allStoryGroups);
   rebuildStoryInquiryIndex();
   renderStories();
 }
@@ -3494,6 +3559,7 @@ function rebuildStoryInquiryIndex(){
 
 function buildStoryTileHtml(se){
   const count = (se.inquiries || []).length;
+  const dateText = se.story_date ? se.story_date.replaceAll('-', '/') : '';
   return `
     <div class="story-tile" onclick="openStoryDetail('${se.id}')">
       <div class="tile-cover">
@@ -3502,6 +3568,7 @@ function buildStoryTileHtml(se){
       </div>
       <div class="story-tile-info">
         <div class="story-tile-brand">${escapeHtml(se.brand_model_text)}</div>
+        ${dateText ? `<div class="tile-note">${escapeHtml(dateText)}</div>` : ''}
         ${se.note ? `<div class="tile-note">${escapeHtml(se.note)}</div>` : ''}
       </div>
     </div>
@@ -3513,35 +3580,25 @@ function renderStories(){
   const dailyEmpty = document.getElementById('storyDailyEmpty');
   const highlightWrap = document.getElementById('storyHighlightGroups');
   const highlightEmpty = document.getElementById('storyHighlightEmpty');
-  if(!dailyList) return; // HTML 還沒渲染完成時安全跳過
+  if(!dailyList) return;
 
-  const daily = allStoryEntries.filter(se => se.category === '當日');
+  const daily = allStoryEntries.filter(se => se.category !== '精選');
   dailyList.innerHTML = daily.map(se => buildStoryTileHtml(se)).join('');
   dailyEmpty.style.display = daily.length === 0 ? 'block' : 'none';
 
+  // 現行 DB 沒有獨立精選群組表；若舊 inquiry.story_source 留有「精選」，
+  // 仍可顯示在同一個「精選」區塊，但不提供不存在的名稱編輯功能。
   const highlightEntries = allStoryEntries.filter(se => se.category === '精選');
   if(highlightEntries.length === 0){
     highlightWrap.innerHTML = '';
     highlightEmpty.style.display = 'block';
   } else {
     highlightEmpty.style.display = 'none';
-    const groups = {};
-    highlightEntries.forEach(se => {
-      const key = se.highlight_id || 'none';
-      if(!groups[key]){
-        groups[key] = { name: se.stories_highlights ? se.stories_highlights.name : '未命名精選', id: se.highlight_id, items: [] };
-      }
-      groups[key].items.push(se);
-    });
-    highlightWrap.innerHTML = Object.values(groups).map(grp => `
+    highlightWrap.innerHTML = `
       <div class="highlight-group">
-        <div class="highlight-header">
-          <span class="highlight-name">${escapeHtml(grp.name)}</span>
-          ${grp.id ? `<button class="icon-btn" onclick="openHighlightModal('${grp.id}')" title="編輯精選名稱">✎</button>` : ''}
-        </div>
-        <div class="story-grid">${grp.items.map(se => buildStoryTileHtml(se)).join('')}</div>
-      </div>
-    `).join('');
+        <div class="highlight-header"><span class="highlight-name">精選</span></div>
+        <div class="story-grid">${highlightEntries.map(se => buildStoryTileHtml(se)).join('')}</div>
+      </div>`;
   }
 
   renderStats();
@@ -3554,28 +3611,18 @@ function populateBrandModelDatalist(){
 }
 
 function renderHighlightSuggestions(){
-  const input = document.getElementById('storyHighlightName');
   const list = document.getElementById('storyHighlightList');
-  function refresh(){
-    const val = input.value.trim().toLowerCase();
-    const matches = allStoriesHighlights.filter(h => !val || h.name.toLowerCase().includes(val));
-    list.innerHTML = matches.map(h => `<div class="combo-item">${escapeHtml(h.name)}</div>`).join('');
-    list.querySelectorAll('.combo-item').forEach((el,i) => {
-      el.onclick = () => { input.value = matches[i].name; list.classList.remove('open'); };
-    });
-  }
-  input.oninput = () => { refresh(); list.classList.add('open'); };
-  input.onfocus = () => { refresh(); list.classList.add('open'); };
-  input.onblur = () => setTimeout(()=>list.classList.remove('open'), 150);
+  if(list) list.innerHTML = '';
 }
 
 function onStoryCategoryChange(){
-  const cat = document.getElementById('storyCategory').value;
-  document.getElementById('storyHighlightField').style.display = cat === '精選' ? 'block' : 'none';
+  const field = document.getElementById('storyHighlightField');
+  if(field) field.style.display = 'none';
 }
 
 function openStoryModal(id){
   currentStoryEntryId = id || null;
+  currentStoryGroupId = null;
   document.getElementById('storyModalTitle').textContent = id ? '編輯限時動態' : '新增限時動態';
   document.getElementById('deleteStoryBtn').style.display = id ? 'inline-block' : 'none';
 
@@ -3589,8 +3636,10 @@ function openStoryModal(id){
 
   if(id){
     const se = allStoryEntries.find(x => x.id === id);
-    document.getElementById('storyCategory').value = se.category;
-    document.getElementById('storyHighlightName').value = se.stories_highlights ? se.stories_highlights.name : '';
+    if(!se){ showToast('找不到這筆限時動態'); return; }
+    currentStoryGroupId = se.story_group_id;
+    document.getElementById('storyCategory').value = se.category === '精選' ? '精選' : '當日';
+    document.getElementById('storyHighlightName').value = '';
     document.getElementById('storyBrandModel').value = se.brand_model_text || '';
     document.getElementById('storyNote').value = se.note || '';
     existingStoryImageUrl = se.image_url;
@@ -3609,61 +3658,114 @@ function openStoryModal(id){
 function closeStoryModal(){
   document.getElementById('storyModalOverlay').classList.remove('open');
   currentStoryEntryId = null;
+  currentStoryGroupId = null;
 }
 
-async function upsertHighlight(name){
-  const { data: existing } = await sb.from('stories_highlights').select('id').eq('name', name).maybeSingle();
-  if(existing) return existing.id;
-  const { data, error } = await sb.from('stories_highlights').insert({ name }).select().single();
-  if(error){ console.error(error); showToast('精選名稱建立失敗'); return null; }
-  return data.id;
+async function resolveStoryTagId(label){
+  const value = (label || '').trim();
+  if(!value) return null;
+  const lower = value.toLowerCase();
+  const exact = allTags.find(t => `${t.brand} ${t.model}`.trim().toLowerCase() === lower);
+  if(exact) return exact.id;
+
+  const knownBrands = [...new Set(allTags.map(t => (t.brand || '').trim()).filter(Boolean))]
+    .sort((a,b) => b.length - a.length);
+  let brand = knownBrands.find(b => lower.startsWith(b.toLowerCase() + ' ')) || '';
+  let model = brand ? value.slice(brand.length).trim() : '';
+
+  if(!brand || !model){
+    const parts = value.split(/\s+/).filter(Boolean);
+    if(parts.length < 2){
+      showToast('品牌＋型號請至少包含品牌與型號');
+      return null;
+    }
+    brand = parts.shift();
+    model = parts.join(' ');
+  }
+  return await upsertTag(brand, model);
+}
+
+// 舊 schema 的 highlight API 已不存在。保留函式名稱，避免舊按鈕／呼叫造成 JS error。
+async function upsertHighlight(){
+  showToast('目前資料庫未啟用精選分類');
+  return null;
 }
 
 async function saveStoryEntry(){
   const category = document.getElementById('storyCategory').value;
-  const brand_model_text = document.getElementById('storyBrandModel').value.trim();
-  if(!brand_model_text){ showToast('請填寫品牌＋型號'); return; }
-
-  let highlight_id = null;
   if(category === '精選'){
-    const name = document.getElementById('storyHighlightName').value.trim();
-    if(!name){ showToast('請填寫精選名稱'); return; }
-    highlight_id = await upsertHighlight(name);
-    if(!highlight_id) return;
+    showToast('目前資料庫未啟用精選分類，請先使用「當日」');
+    return;
   }
+
+  const brandModel = document.getElementById('storyBrandModel').value.trim();
+  if(!brandModel){ showToast('請填寫品牌＋型號'); return; }
+  const tagId = await resolveStoryTagId(brandModel);
+  if(!tagId) return;
 
   const oldImageUrl = existingStoryImageUrl;
   let uploadedNewUrl = null;
-  let image_url = existingStoryImageUrl;
+  let imageUrl = existingStoryImageUrl;
   if(currentStoryImageChanged && currentStoryImageBlob){
     document.getElementById('storyShotStatus').textContent = '上傳中...';
     const uploaded = await uploadShotToStorage(currentStoryImageBlob, 'story-images');
     if(!uploaded){ document.getElementById('storyShotStatus').textContent = ''; return; }
     uploadedNewUrl = uploaded;
-    image_url = uploaded;
+    imageUrl = uploaded;
   }
-  if(!image_url){ showToast('請上傳限時動態截圖'); return; }
+  if(!imageUrl){ showToast('請上傳限時動態截圖'); return; }
 
   const note = document.getElementById('storyNote').value.trim();
-  const payload = { category, highlight_id, brand_model_text, image_url, note };
-  let saveError = null;
 
   if(currentStoryEntryId){
-    const { error } = await sb.from('story_entries').update(payload).eq('id', currentStoryEntryId);
-    saveError = error;
+    const se = allStoryEntries.find(x => x.id === currentStoryEntryId);
+    if(!se){ if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images'); showToast('找不到這筆限時動態'); return; }
+
+    const { error: groupError } = await sb.from('story_groups')
+      .update({ tag_id:tagId, note })
+      .eq('id', se.story_group_id);
+    if(groupError){
+      console.error(groupError);
+      if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+      showToast('更新失敗');
+      return;
+    }
+
+    if(imageUrl !== oldImageUrl){
+      const { error: imageError } = await sb.from('story_images')
+        .update({ image_url:imageUrl })
+        .eq('id', currentStoryEntryId);
+      if(imageError){
+        console.error(imageError);
+        if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+        showToast('圖片更新失敗');
+        return;
+      }
+    }
   } else {
-    const { error } = await sb.from('story_entries').insert(payload);
-    saveError = error;
+    const { data: group, error: groupError } = await sb.from('story_groups')
+      .insert({ tag_id:tagId, note })
+      .select('id')
+      .single();
+    if(groupError || !group){
+      console.error(groupError);
+      if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+      showToast('新增失敗');
+      return;
+    }
+
+    const { error: imageError } = await sb.from('story_images')
+      .insert({ story_group_id:group.id, image_url:imageUrl, sort_order:0 });
+    if(imageError){
+      console.error(imageError);
+      await sb.from('story_groups').delete().eq('id', group.id);
+      if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
+      showToast('圖片新增失敗');
+      return;
+    }
   }
 
-  if(saveError){
-    console.error(saveError);
-    if(uploadedNewUrl) await removeStorageUrls([uploadedNewUrl], 'story-images');
-    showToast(currentStoryEntryId ? '更新失敗' : '新增失敗');
-    return;
-  }
-
-  const oldFileCleaned = oldImageUrl && oldImageUrl !== image_url
+  const oldFileCleaned = oldImageUrl && oldImageUrl !== imageUrl
     ? await removeStorageUrls([oldImageUrl], 'story-images')
     : true;
   showToast(oldFileCleaned ? '已儲存' : '資料已儲存，但舊圖片清理失敗');
@@ -3673,15 +3775,24 @@ async function saveStoryEntry(){
 
 async function deleteStoryEntry(){
   if(!currentStoryEntryId) return;
-  if(!confirm('確定刪除這筆限時動態記錄？相關的詢問記錄也會一併刪除。')) return;
-  const storyEntry = allStoryEntries.find(se => se.id === currentStoryEntryId);
-  const inquiryScreenshotUrls = (storyEntry?.inquiries || [])
-    .map(iq => iq.screenshot_url)
-    .filter(Boolean);
-  const { error } = await sb.from('story_entries').delete().eq('id', currentStoryEntryId);
+  if(!confirm('確定刪除這張限時動態？綁定在這張圖片上的詢問記錄也會一併刪除。')) return;
+
+  const se = allStoryEntries.find(x => x.id === currentStoryEntryId);
+  if(!se){ showToast('找不到這筆限時動態'); return; }
+  const inquiryScreenshotUrls = (se.inquiries || []).map(iq => iq.screenshot_url).filter(Boolean);
+
+  let error = null;
+  if(se.group_image_count <= 1){
+    const res = await sb.from('story_groups').delete().eq('id', se.story_group_id);
+    error = res.error;
+  } else {
+    const res = await sb.from('story_images').delete().eq('id', currentStoryEntryId);
+    error = res.error;
+  }
   if(error){ console.error(error); showToast('刪除失敗'); return; }
+
   const [storyImageCleaned, inquiryImagesCleaned] = await Promise.all([
-    removeStorageUrls([storyEntry?.image_url], 'story-images'),
+    removeStorageUrls([se.image_url], 'story-images'),
     removeStorageUrls(inquiryScreenshotUrls, 'post-screenshots')
   ]);
   showToast(storyImageCleaned && inquiryImagesCleaned ? '已刪除' : '資料已刪除，但部分圖片清理失敗');
@@ -3704,9 +3815,7 @@ function clearStoryImagePreview(){
   img.style.display = 'none';
   document.getElementById('storyShotActions').style.display = 'none';
 }
-function triggerStoryShotFileSelect(){
-  document.getElementById('storyShotFileInput').click();
-}
+function triggerStoryShotFileSelect(){ document.getElementById('storyShotFileInput').click(); }
 function expandStoryShot(){
   const img = document.getElementById('storyShotPreview');
   if(img.src) openLightbox(img.src);
@@ -3764,7 +3873,7 @@ function openStoryDetail(id){
   const se = allStoryEntries.find(x => x.id === id);
   if(!se) return;
   document.getElementById('storyDetailBrand').textContent = se.brand_model_text;
-  document.getElementById('storyDetailNote').textContent = se.note || '';
+  document.getElementById('storyDetailNote').textContent = [se.story_date ? se.story_date.replaceAll('-', '/') : '', se.note || ''].filter(Boolean).join(' · ');
   document.getElementById('storyDetailImage').src = se.image_url;
   document.getElementById('storyDetailInquiryList').innerHTML = renderInquiryList(se.inquiries || [], 'story', se.id);
   document.getElementById('storyDetailAddInquiryBtn').onclick = () => openInquiryModal(null, 'story', se.id);
@@ -3781,26 +3890,14 @@ function editCurrentStoryEntry(){
   openStoryModal(id);
 }
 
-/* ---- 精選名稱編輯（改一筆，底下所有項目跟著變） ---- */
-function openHighlightModal(highlightId){
-  editingHighlightId = highlightId;
-  const h = allStoriesHighlights.find(x => x.id === highlightId);
-  document.getElementById('editHighlightName').value = h ? h.name : '';
-  document.getElementById('highlightModalOverlay').classList.add('open');
-}
+/* ---- 舊精選名稱 UI 相容 stub；現行 DB 沒有 stories_highlights ---- */
+function openHighlightModal(){ showToast('目前資料庫未啟用精選分類'); }
 function closeHighlightModal(){
-  document.getElementById('highlightModalOverlay').classList.remove('open');
+  const el = document.getElementById('highlightModalOverlay');
+  if(el) el.classList.remove('open');
   editingHighlightId = null;
 }
-async function saveHighlightEdit(){
-  const name = document.getElementById('editHighlightName').value.trim();
-  if(!name){ showToast('名稱不可留空'); return; }
-  const { error } = await sb.from('stories_highlights').update({ name }).eq('id', editingHighlightId);
-  if(error){ console.error(error); showToast('更新失敗（可能與既有精選名稱重複）'); return; }
-  showToast('精選名稱已更新');
-  closeHighlightModal();
-  await loadStories();
-}
+async function saveHighlightEdit(){ showToast('目前資料庫未啟用精選分類'); }
 </script>
 <script>
 (function(){
