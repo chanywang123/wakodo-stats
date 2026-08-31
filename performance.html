@@ -3,282 +3,397 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>業績儀表板</title>
-
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M7%2024.5H25%27%20stroke%3D%27%23334155%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27%20fill%3D%27none%27%20stroke%3D%27%2338bdf8%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ccircle%20cx%3D%278%27%20cy%3D%2722%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2713%27%20cy%3D%2717%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2717%27%20cy%3D%2719%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2711%27%20r%3D%271.8%27%20fill%3D%27%2338bdf8%27/%3E%3C/svg%3E">
-
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>業績儀表板｜和光堂</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%278%27%20fill%3D%27%23f7f5f1%27/%3E%3Cpath%20d%3D%27M7%2024.5H25%27%20stroke%3D%27%23c9c4bb%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M8%2022%20L13%2017%20L17%2019%20L23%2011%27%20fill%3D%27none%27%20stroke%3D%27%234f7ea7%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #ffffff; }
-    .glass-panel { background: rgba(30, 41, 59, 0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; }
-    .gradient-text { background: linear-gradient(45deg, #FF0088, #FF3EFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-    #mainChart { touch-action: none; }
-    .table-viewport { overflow: hidden; position: relative; }
-    
-    .zoom-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 180px;
-      height: 6px;
-      border-radius: 3px;
-      background: #334155;
-      outline: none;
+    :root{
+      --bg:#f5f3ef;
+      --card:rgba(255,255,255,.88);
+      --card-solid:#fff;
+      --text:#2d2b28;
+      --muted:#77736d;
+      --hint:#9a958d;
+      --line:#e7e2da;
+      --line-strong:#d8d2c8;
+      --linan:#4f7ea7;
+      --linan-soft:#eaf1f7;
+      --nanke:#6f9b83;
+      --nanke-soft:#eaf3ee;
+      --new:#c98a3d;
+      --new-soft:#fbf1e4;
+      --returning:#625f5b;
+      --auto:#557d9b;
+      --auto-soft:#edf4f8;
+      --manual:#b26a3d;
+      --manual-soft:#fbefe8;
+      --good:#477c62;
+      --bad:#b45e5e;
+      --shadow:0 12px 34px rgba(63,54,43,.07);
+      --radius:22px;
     }
-    .zoom-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #ffffff;
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 8% 4%, rgba(209,231,235,.55), transparent 27rem),
+        radial-gradient(circle at 92% 8%, rgba(244,226,196,.48), transparent 28rem),
+        radial-gradient(circle at 84% 84%, rgba(221,235,226,.42), transparent 30rem),
+        var(--bg);
+      padding-bottom:72px;
     }
-    .zoom-slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #ffffff;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+    .page-loader{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(245,243,239,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .24s ease,visibility .24s ease}
+    .page-loader.show{opacity:1;visibility:visible;pointer-events:auto}
+    .loader-card{display:flex;align-items:center;gap:12px;padding:13px 17px;border-radius:15px;background:rgba(255,255,255,.94);border:1px solid var(--line);box-shadow:var(--shadow);font-size:12px;color:var(--muted);font-weight:850}
+    .loader-ring{width:19px;height:19px;border:2.5px solid #e1ddd6;border-top-color:var(--linan);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    body.data-ready main>.page-head,body.data-ready main>section{animation:riseIn .42s cubic-bezier(.2,.7,.2,1) both}
+    body.data-ready main>section:nth-of-type(1){animation-delay:.03s}body.data-ready main>section:nth-of-type(2){animation-delay:.07s}body.data-ready main>section:nth-of-type(3){animation-delay:.11s}body.data-ready main>section:nth-of-type(4){animation-delay:.15s}body.data-ready main>section:nth-of-type(5){animation-delay:.19s}
+    .shell{width:min(1220px,calc(100% - 32px));margin:0 auto}
+    .topbar{
+      position:sticky;top:0;z-index:30;
+      background:rgba(245,243,239,.86);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid rgba(199,193,184,.55);
     }
+    .topbar-inner{height:70px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-mark{width:11px;height:11px;border-radius:50%;background:var(--linan);box-shadow:0 0 0 6px rgba(79,126,167,.11)}
+    .brand-title{font-weight:900;font-size:20px;letter-spacing:-.4px;white-space:nowrap}
+    .brand-sub{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
+    .nav-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:1px solid var(--line);background:#fff;color:var(--text);
+      border-radius:12px;padding:9px 13px;font-size:13px;font-weight:800;
+      display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      box-shadow:0 3px 10px rgba(55,47,37,.035);transition:.18s ease;
+    }
+    .btn:hover{transform:translateY(-1px);border-color:var(--line-strong);box-shadow:0 6px 16px rgba(55,47,37,.06)}
+    .btn-primary{background:var(--text);color:#fff;border-color:var(--text)}
+    .btn-primary:hover{background:#1f1e1b}
+    .btn-danger{color:var(--bad);background:#fff7f7;border-color:#edd4d4}
+    .admin-chip{padding:8px 11px;border-radius:999px;background:#edf5f0;color:var(--good);font-weight:900;font-size:12px;border:1px solid #d6e6dc}
+
+    main{padding-top:32px}
+    .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px;flex-wrap:wrap}
+    .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--hint);font-weight:900}
+    h1{margin:5px 0 0;font-size:34px;line-height:1.15;letter-spacing:-1.1px}
+    .page-desc{margin-top:8px;color:var(--muted);font-size:13px;font-weight:650}
+    .status-line{font-size:12px;color:var(--muted);font-weight:750;background:rgba(255,255,255,.72);padding:8px 11px;border:1px solid var(--line);border-radius:999px}
+
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.92);box-shadow:var(--shadow);border-radius:var(--radius);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .hero{padding:26px;margin-bottom:18px;overflow:hidden;position:relative}
+    .hero:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-110px;top:-130px;background:radial-gradient(circle,rgba(79,126,167,.13),transparent 68%);pointer-events:none}
+    .hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;position:relative;z-index:1;flex-wrap:wrap}
+    .period-label{font-size:13px;font-weight:900;color:var(--muted)}
+    .hero-title{font-size:13px;color:var(--hint);font-weight:900;margin-top:8px}
+    .hero-total{font-size:44px;font-weight:950;letter-spacing:-1.8px;margin-top:3px;line-height:1.1}
+    .growth{margin-top:9px;font-size:13px;font-weight:900;display:inline-flex;align-items:center;gap:6px}
+    .growth.up{color:var(--good)} .growth.down{color:var(--bad)} .growth.flat{color:var(--muted)}
+    .source-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid transparent}
+    .source-badge.auto{background:var(--auto-soft);color:var(--auto);border-color:#d6e5ee}
+    .source-badge.manual{background:var(--manual-soft);color:var(--manual);border-color:#f0d9cc}
+    .source-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+    .hero-source-note{max-width:360px;margin-top:9px;color:var(--muted);font-size:12px;line-height:1.6;text-align:right;font-weight:650}
+    .week-note-card{max-width:420px;margin-top:9px;padding:9px 11px;border-radius:11px;background:#fff8e9;border:1px solid #f0dfb9;color:#806d43;font-size:11px;line-height:1.55;font-weight:800}
+    .hero-actions{margin-top:13px;display:flex;justify-content:flex-end;gap:8px}
+    .hero-body{display:grid;grid-template-columns:minmax(350px,.92fr) minmax(0,1.55fr);gap:18px;margin-top:24px;position:relative;z-index:1;align-items:stretch}
+    .store-stack{display:flex;flex-direction:column;gap:12px}
+    .store-summary{padding:17px 18px;border-radius:18px;background:rgba(255,255,255,.72);border:1px solid rgba(220,215,207,.8);min-width:0}
+    .store-summary.linan-box{box-shadow:inset 3px 0 0 rgba(79,126,167,.62)}
+    .store-summary.nanke-box{box-shadow:inset 3px 0 0 rgba(111,155,131,.68)}
+    .store-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .store-name{font-size:14px;font-weight:950;display:flex;align-items:center;gap:7px}
+    .store-name:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+    .store-visit{font-size:11px;color:var(--muted);font-weight:850}
+    .store-total-line{display:flex;align-items:baseline;gap:9px;margin-top:7px;flex-wrap:wrap}
+    .store-total-amount{font-size:24px;font-weight:950;letter-spacing:-.45px}
+    .store-total-label{font-size:10px;color:var(--hint);font-weight:900}
+    .cust-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    .cust-item{padding:11px 12px;border-radius:13px;background:#faf9f7;border:1px solid #ebe6df;min-width:0}
+    .cust-label{font-size:10px;color:var(--hint);font-weight:900;margin-bottom:5px}
+    .cust-value-row{display:flex;align-items:center;justify-content:space-between;gap:7px;min-width:0}
+    .cust-value{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .delta{flex:0 0 auto;display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:950;padding:4px 6px;border-radius:999px;white-space:nowrap}
+    .delta.up{color:#3f76b5;background:#edf4fb;border:1px solid #d9e8f6}
+    .delta.down{color:#bd5656;background:#fbefef;border:1px solid #efdada}
+    .delta.flat{color:var(--muted);background:#f1efeb;border:1px solid #e6e1d9}
+    .hero-chart-panel{padding:17px 18px;border-radius:18px;background:rgba(255,255,255,.64);border:1px solid rgba(220,215,207,.78);min-width:0}
+    .hero-chart-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .hero-chart-title{font-size:15px;font-weight:950}
+    .hero-chart-desc{font-size:10px;color:var(--muted);font-weight:750;margin-top:3px}
+    .mini-chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .store-chart-card{border:1px solid #ebe6df;border-radius:14px;background:rgba(255,255,255,.78);padding:11px 11px 9px;min-width:0}
+    .store-chart-title{font-size:11px;font-weight:950;display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .store-chart-wrap{height:215px;margin-top:7px;position:relative}
+    .store-chart-wrap canvas{width:100%!important;height:100%!important}
+    .mini-legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:9.5px;color:var(--muted);font-weight:850;margin-top:7px}
+    .legend-bar{width:9px;height:7px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+    .legend-line{width:13px;height:0;border-top:2px solid currentColor;display:inline-block;margin-right:4px;vertical-align:middle}
+    .linan{color:var(--linan)} .nanke{color:var(--nanke)} .newc{color:var(--new)}
+
+    .section{margin-top:18px}
+    .section-card{padding:22px}
+    .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+    .section-title{font-size:19px;font-weight:950;letter-spacing:-.3px}
+    .section-desc{font-size:12px;color:var(--muted);font-weight:700;margin-top:4px}
+    .section-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+    .recent-scroll{position:relative}
+    .recent-scroll:before,.recent-scroll:after{content:"";position:absolute;left:0;right:8px;height:42px;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s ease}
+    .recent-scroll:before{top:0;background:linear-gradient(to bottom,rgba(250,249,247,.98),rgba(250,249,247,0))}
+    .recent-scroll:after{bottom:0;background:linear-gradient(to bottom,rgba(250,249,247,0),rgba(250,249,247,.98))}
+    .recent-scroll.scrolled:before{opacity:1}
+    .recent-scroll.has-overflow:not(.at-bottom):after{opacity:1}
+    .recent-list{display:flex;flex-direction:column;gap:8px;max-height:780px;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;scrollbar-width:thin;scrollbar-color:#d7d1c8 transparent}
+    .recent-list::-webkit-scrollbar{width:7px}.recent-list::-webkit-scrollbar-track{background:transparent}.recent-list::-webkit-scrollbar-thumb{background:#d7d1c8;border-radius:999px}
+    .recent-item{border-radius:16px;transition:box-shadow .22s ease}
+    .recent-item.open{box-shadow:0 12px 28px rgba(63,54,43,.055)}
+    .recent-row{
+      display:grid;grid-template-columns:148px minmax(155px,1.1fr) repeat(4,minmax(105px,.78fr)) 92px;
+      gap:12px;align-items:center;padding:14px 15px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.68);transition:background .2s ease,border-color .2s ease,transform .2s ease,border-radius .28s ease;cursor:pointer;
+    }
+    .recent-item.open .recent-row{background:#fff;border-color:var(--line-strong);border-radius:16px 16px 10px 10px}
+    .recent-row:hover{background:#fff;border-color:var(--line-strong);transform:translateY(-1px)}
+    .recent-period{font-size:13px;font-weight:950}.recent-sub{font-size:11px;color:var(--muted);font-weight:700;margin-top:4px}
+    .recent-total{font-size:19px;font-weight:950}.recent-growth{font-size:11px;font-weight:850;margin-top:3px}
+    .recent-note{font-size:10px;color:#806d43;font-weight:800;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}
+    .recent-cell-label{font-size:10px;color:var(--hint);font-weight:900;margin-bottom:3px}.recent-cell-value{font-size:14px;font-weight:900}
+    .recent-action{display:flex;justify-content:flex-end;align-items:center;gap:6px}
+    .recent-chevron{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--hint);background:#f4f1ec;transition:transform .28s ease,color .2s ease,background .2s ease}
+    .recent-item.open .recent-chevron{transform:rotate(180deg);color:var(--text);background:#ebe7e0}
+    .recent-detail{max-height:0;opacity:0;transform:translateY(-8px);overflow:hidden;pointer-events:none;transition:max-height .46s cubic-bezier(.2,.72,.2,1),opacity .25s ease,transform .32s ease}
+    .recent-item.open .recent-detail{max-height:2600px;opacity:1;transform:translateY(0);pointer-events:auto}
+    .recent-detail-inner{margin-top:2px;padding:18px;border:1px solid var(--line);border-top-color:#efeae3;border-radius:10px 10px 16px 16px;background:rgba(255,255,255,.72)}
+    .recent-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+    .recent-detail-title{font-size:18px;font-weight:950;letter-spacing:-.25px}.recent-detail-meta{display:flex;align-items:flex-end;flex-direction:column;gap:6px}
+    .recent-week-note{margin:0 0 14px;padding:12px 14px;border-radius:13px;background:#fff8e9;border:1px solid #f0dfb9;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+    .recent-week-note-label{font-size:10px;color:#9a8148;font-weight:950;letter-spacing:.08em;white-space:nowrap;padding-top:2px}
+    .recent-week-note-text{font-size:12px;line-height:1.7;color:#6f613f;font-weight:750;white-space:pre-wrap;overflow-wrap:anywhere}
+    .recent-detail .hero-body{margin-top:0}.recent-detail .store-chart-wrap{height:190px}
+    .tiny-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:9px;padding:7px 8px;font-size:11px;font-weight:900}
+    .tiny-btn:hover{color:var(--text);border-color:var(--line-strong)}
+
+    .insight-grid{display:grid;grid-template-columns:1.35fr .85fr;gap:18px}
+    .mini-card{padding:20px}
+    .bars{display:flex;flex-direction:column;gap:16px;margin-top:18px}
+    .bar-row{display:grid;grid-template-columns:88px 1fr 82px;gap:12px;align-items:center}
+    .bar-date{font-size:12px;font-weight:900;color:var(--muted)}
+    .dual-bars{display:flex;flex-direction:column;gap:5px}
+    .bar-track{height:8px;border-radius:999px;background:#efede9;overflow:hidden;position:relative}
+    .bar-fill{height:100%;border-radius:999px;transition:width .5s ease}.bar-fill.l{background:var(--linan)}.bar-fill.n{background:var(--nanke)}
+    .bar-values{font-size:11px;color:var(--muted);font-weight:800;text-align:right;line-height:1.55}
+    .bar-legend{display:flex;gap:14px;font-size:11px;color:var(--muted);font-weight:850;margin-top:14px}
+    .legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+
+    .share-block{margin-top:18px}.share-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:900;margin-bottom:7px}.share-track{height:18px;border-radius:999px;overflow:hidden;background:#efede9;display:flex}.share-seg{height:100%;transition:width .45s ease}.share-l{background:var(--linan)}.share-n{background:var(--nanke)}.share-new{background:var(--new)}.share-ret{background:var(--returning)}
+    .share-meta{margin-top:7px;font-size:11px;color:var(--muted);font-weight:750;display:flex;justify-content:space-between;gap:8px}
+
+    .seg{display:inline-flex;background:#efede9;padding:3px;border-radius:11px;border:1px solid #e6e1d9}.seg button{border:0;background:transparent;color:var(--muted);padding:7px 11px;border-radius:8px;font-size:11px;font-weight:900}.seg button.active{background:#fff;color:var(--text);box-shadow:0 2px 7px rgba(48,42,34,.07)}
+    .toggle{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:850;padding:7px 9px;background:#fff;border:1px solid var(--line);border-radius:9px}.toggle input{accent-color:var(--text)}
+    .chart-wrap{height:340px;margin-top:8px;position:relative}.chart-wrap canvas{width:100%!important;height:100%!important}
+
+    .history-list{display:flex;flex-direction:column;gap:9px}
+    .month-block{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:16px;overflow:hidden}
+    .month-head{display:grid;grid-template-columns:150px 1fr 1fr 1fr 36px;gap:12px;align-items:center;padding:14px 16px;cursor:pointer}
+    .month-head:hover{background:#fff}.month-name{font-size:14px;font-weight:950}.month-total{font-size:13px;font-weight:900;text-align:right}.month-sub{font-size:10px;color:var(--hint);font-weight:800;text-align:right;margin-top:2px}
+    .chev{transition:transform .28s ease;text-align:right;color:var(--hint)}.month-block.open .chev{transform:rotate(180deg)}
+    .month-body{max-height:0;opacity:0;overflow:hidden;border-top:0 solid var(--line);background:rgba(250,249,247,.84);transition:max-height .42s cubic-bezier(.2,.72,.2,1),opacity .24s ease,border-width .2s ease}.month-block.open .month-body{max-height:5200px;opacity:1;border-top-width:1px}
+    .week-line{display:grid;grid-template-columns:150px 90px repeat(5,minmax(92px,1fr)) 74px;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid #ece8e1;font-size:12px}.week-line:last-child{border-bottom:0}.week-line .num{text-align:right;font-weight:850}.week-note{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:11px}
+    .legacy-note{padding:11px 16px;border-top:1px dashed var(--line);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .corr-input{width:100px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;font-size:11px;text-align:right;color:var(--text);outline:none}.corr-input:focus{border-color:var(--linan)}
+
+    .empty{padding:28px;text-align:center;color:var(--hint);font-size:13px;font-weight:800;border:1px dashed var(--line-strong);border-radius:14px;background:rgba(255,255,255,.55)}
+
+    .modal{position:fixed;inset:0;z-index:70;background:rgba(30,29,27,.42);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal-card{width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 28px 70px rgba(35,30,24,.22)}
+    .modal-title{font-size:20px;font-weight:950}.modal-desc{font-size:12px;color:var(--muted);font-weight:700;margin-top:5px}.field{margin-top:16px}.field label{display:block;font-size:11px;color:var(--muted);font-weight:900;margin-bottom:6px}.input{width:100%;border:1px solid var(--line-strong);border-radius:11px;padding:11px 12px;background:#fff;color:var(--text);font-size:14px;outline:none}.input:focus{border-color:var(--linan);box-shadow:0 0 0 3px rgba(79,126,167,.1)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:11px}.store-box{border:1px solid var(--line);border-radius:15px;padding:13px;margin-top:14px}.store-box-title{font-size:12px;font-weight:950;margin-bottom:9px;display:flex;justify-content:space-between;gap:8px}.store-total{font-size:12px;font-weight:950}
+    .auto-baseline{margin-top:15px;padding:12px 13px;border-radius:13px;background:var(--auto-soft);border:1px solid #dbe7ee;color:#496d86;font-size:11px;line-height:1.65;font-weight:750}
+    .modal-actions{display:flex;gap:8px;margin-top:20px}.modal-actions .btn{flex:1}
+
+    .lock{position:fixed;inset:0;z-index:100;background:rgba(245,243,239,.96);display:none;align-items:center;justify-content:center;padding:20px}.lock.show{display:flex}.lock-card{width:min(390px,100%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow);text-align:center}.lock-icon{font-size:30px}.lock-title{font-size:20px;font-weight:950;margin-top:10px}.lock-desc{font-size:12px;color:var(--muted);margin-top:7px;font-weight:700}
+
+    @media(max-width:1000px){.hero-body{grid-template-columns:1fr}.mini-chart-grid{grid-template-columns:1fr 1fr}.recent-row{grid-template-columns:135px 1fr repeat(4,minmax(96px,.75fr)) 76px}.insight-grid{grid-template-columns:1fr}.month-head{grid-template-columns:130px 1fr 1fr 36px}.month-head .month-ret{display:none}.week-line{grid-template-columns:135px 78px repeat(3,minmax(88px,1fr))}.week-line .hide-md{display:none}}
+    @media(max-width:700px){.shell{width:min(100% - 20px,1220px)}.topbar-inner{height:auto;min-height:66px;padding:10px 0;align-items:flex-start}.brand-sub{display:none}.nav-actions .btn span{display:none}main{padding-top:20px}h1{font-size:28px}.hero{padding:18px}.hero-total{font-size:36px}.hero-source-note{text-align:left}.hero-actions{justify-content:flex-start}.hero-body{grid-template-columns:1fr}.mini-chart-grid{grid-template-columns:1fr}.cust-grid{grid-template-columns:1fr 1fr}.store-chart-wrap{height:205px}.recent-row{grid-template-columns:1fr 1fr;gap:8px}.recent-row>div:nth-child(1),.recent-row>div:nth-child(2){grid-column:auto}.recent-action{grid-column:2;justify-self:end}.recent-detail-inner{padding:14px}.recent-detail-meta{align-items:flex-start}.bar-row{grid-template-columns:70px 1fr 65px}.month-head{grid-template-columns:1fr 1fr 30px}.month-head .month-nanke,.month-head .month-ret{display:none}.week-line{grid-template-columns:1fr 72px 1fr}.week-line .hide-sm,.week-line .hide-md{display:none}.grid-2{grid-template-columns:1fr}.section-card,.mini-card{padding:16px}.chart-wrap{height:290px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
 </head>
-
-<body class="min-h-screen pb-10 relative">
-
-  <!-- 懸浮按鈕：全展開 / 全收折 -->
-  <div class="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
-    <button id="btnExpandAll" class="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="展開所有月份">
-      <i class="fas fa-expand-arrows-alt mb-1 text-blue-400 text-lg"></i>
-      <span class="text-[10px] leading-none font-bold text-slate-300">全展開</span>
-    </button>
-    <button id="btnCollapseAll" class="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-600 p-2 rounded-xl shadow-2xl shadow-black text-xs flex flex-col items-center justify-center w-14 h-14 transition backdrop-blur-sm" title="收折所有月份">
-      <i class="fas fa-compress-arrows-alt mb-1 text-slate-400 text-lg"></i>
-      <span class="text-[10px] leading-none font-bold text-slate-300">全收折</span>
-    </button>
-  </div>
-
-  <div id="lockScreen" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900">
-    <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full border border-slate-700">
-      <div class="mb-4 text-4xl">🔒</div>
-      <h2 class="text-xl font-bold mb-2 text-white">請輸入存取密碼</h2>
-      <p class="text-xs text-slate-400 mb-4">輸入密碼進入（僅供閱覽）</p>
-      <input type="password" id="accessPassword" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" autocomplete="current-password" />
-      <button id="btnEnter" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition">進入儀表板</button>
+<body>
+  <div id="pageLoader" class="page-loader" aria-live="polite"><div class="loader-card"><span class="loader-ring"></span><span id="loaderText">正在載入業績資料…</span></div></div>
+  <div id="lockScreen" class="lock">
+    <div class="lock-card">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">業績儀表板</div>
+      <div class="lock-desc">輸入密碼後即可檢視資料</div>
+      <input id="accessPassword" type="password" class="input" style="margin-top:18px" placeholder="Password" autocomplete="current-password" />
+      <button id="btnEnter" class="btn btn-primary" style="width:100%;margin-top:10px;padding:11px">進入儀表板</button>
     </div>
   </div>
 
-  <div id="adminLoginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm">
-    <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 relative">
-      <button id="btnCloseAdminLogin" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-      <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-user-shield text-green-400"></i> 管理員登入</h2>
-      <div class="space-y-4">
+  <div id="adminLoginModal" class="modal">
+    <div class="modal-card" style="max-width:390px">
+      <div class="modal-title">管理員登入</div>
+      <div class="modal-desc">登入後可確認、覆寫或移除每週正式業績</div>
+      <div class="field"><label>Email</label><input type="email" id="admEmail" class="input" /></div>
+      <div class="field"><label>Password</label><input type="password" id="admPwd" class="input" /></div>
+      <div class="modal-actions">
+        <button id="btnCloseAdminLogin" class="btn">取消</button>
+        <button id="btnAdminLogin" class="btn btn-primary">登入</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <div><div class="brand-title">和光堂業績儀表板</div><div class="brand-sub">Performance overview</div></div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i><span>客源分析</span></button>
+        <button id="btnLogin" class="btn"><i class="fas fa-user-shield"></i><span>管理員登入</span></button>
+        <button id="btnLogout" class="btn hidden"><i class="fas fa-sign-out-alt"></i><span>登出</span></button>
+        <span id="adminStatus" class="admin-chip hidden">✓ 管理模式</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">WAKODO / PERFORMANCE</div>
+        <h1>先看現在，再看趨勢</h1>
+        <div class="page-desc">每日資料持續累積；每週一自動整理前一個完整週（週一至週日），同週有手動資料時仍以手動資料為正式顯示。</div>
+      </div>
+      <div id="dataStatus" class="status-line">載入中…</div>
+    </div>
+
+    <section class="card hero">
+      <div class="hero-top">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Email</label>
-          <input type="email" id="admEmail" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-green-500 outline-none">
+          <div id="heroPeriod" class="period-label">最新完整週 --</div>
+          <div class="hero-title">完整週總業績</div>
+          <div id="kpiTotal" class="hero-total">--</div>
+          <div id="kpiGrowth" class="growth flat">--</div>
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Password</label>
-          <input type="password" id="admPwd" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-green-500 outline-none">
-        </div>
-        <button id="btnAdminLogin" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded transition">登入管理後台</button>
-        <p class="text-xs text-slate-400 text-center">可直接按 Enter 登入</p>
-      </div>
-    </div>
-  </div>
-
-  <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center gap-4">
-          <span class="text-xl font-bold gradient-text">和光堂戰情室</span>
-          <span class="px-2 py-0.5 rounded text-xs bg-blue-900 text-blue-200">業績版</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <button onclick="window.location.href='index.html'" class="text-slate-300 hover:text-white transition text-sm"><i class="fas fa-users mr-1"></i> 客源分析</button>
-          <button id="btnLogin" class="text-slate-300 hover:text-white transition text-sm"><i class="fas fa-sign-in-alt mr-1"></i> 管理員登入</button>
-          <button id="btnLogout" class="hidden text-red-400 hover:text-red-300 transition text-sm"><i class="fas fa-sign-out-alt mr-1"></i> 登出管理</button>
-          <div id="adminStatus" class="hidden px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs border border-green-800"><i class="fas fa-check-circle mr-1"></i>已授權</div>
+          <div style="display:flex;justify-content:flex-end"><span id="heroSource" class="source-badge auto"><span class="source-dot"></span>載入中</span></div>
+          <div id="heroSourceNote" class="hero-source-note">--</div>
+          <div id="heroWeekNote" class="week-note-card hidden"></div>
+          <div id="heroActions" class="hero-actions hidden"><button id="btnEditLatest" class="btn btn-primary"><i class="fas fa-pen"></i>確認／調整這一週</button></div>
         </div>
       </div>
-    </div>
-  </nav>
-
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="glass-panel p-5">
-        <p class="text-white text-xs mb-1">最新週總業績</p>
-        <h3 class="text-2xl font-bold text-white" id="kpiTotal">--</h3>
-        <div class="mt-2 text-xs flex items-center" id="kpiGrowthWrap"><span id="kpiGrowth" class="text-white">--</span></div>
-      </div>
-      <div class="glass-panel p-5">
-        <p class="text-white text-xs mb-1">最新週：臨安 / 南科</p>
-        <div class="flex items-end gap-2">
-          <span class="text-xl font-bold text-[#FF0088]" id="kpiLinan">--</span>
-          <span class="text-white">/</span>
-          <span class="text-xl font-bold text-[#FF3EFF]" id="kpiNanke">--</span>
-          <span class="text-white text-xs ml-1">萬</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-1" id="kpiNewReturning">新客 / 舊客：--</p>
-        <p class="text-xs text-white mt-1" id="kpiVisitCount">來客數：-- / -- 人</p>
-      </div>
-      <div id="btnAddData" class="hidden glass-panel p-5 flex-col justify-center items-center cursor-pointer hover:bg-slate-800/50 transition">
-        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-900/50"><i class="fas fa-plus text-white"></i></div>
-        <span class="text-sm font-medium text-blue-300">新增/更新本週</span>
-      </div>
-      <div id="btnAddPlaceholder" class="glass-panel p-5 flex flex-col justify-center items-center opacity-50 cursor-not-allowed">
-        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-2"><i class="fas fa-eye text-slate-400"></i></div>
-        <span class="text-sm font-medium text-slate-300">僅閱覽模式</span>
-        <span class="text-xs text-slate-400 mt-1">管理員登入後可編輯</span>
-      </div>
-    </div>
-
-    <div class="glass-panel p-6">
-      <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-        <div class="flex flex-wrap items-center gap-4">
-          <h2 class="text-lg font-bold text-white flex items-center"><i class="fas fa-chart-line mr-2 text-blue-400"></i> 雙店業績走勢</h2>
-          <div class="flex items-center gap-2 text-xs">
-            <button id="btnViewWeekly" class="px-3 py-1 rounded bg-blue-600 text-white transition">週視圖</button>
-            <button id="btnViewMonthly" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition">月視圖</button>
+      <div class="hero-body">
+        <div class="store-stack">
+          <div class="store-summary linan-box">
+            <div class="store-summary-head"><div class="store-name linan">臨安店</div><div id="heroLinanVisits" class="store-visit">-- 人來客</div></div>
+            <div class="store-total-line"><div id="kpiLinan" class="store-total-amount linan">--</div><div class="store-total-label">本週業績</div></div>
+            <div class="cust-grid">
+              <div class="cust-item"><div class="cust-label">新客</div><div class="cust-value-row"><span id="kpiLinanNew" class="cust-value newc">--</span><span id="deltaLinanNew" class="delta flat">--</span></div></div>
+              <div class="cust-item"><div class="cust-label">舊客</div><div class="cust-value-row"><span id="kpiLinanReturning" class="cust-value">--</span><span id="deltaLinanReturning" class="delta flat">--</span></div></div>
+            </div>
           </div>
-          <!-- 獨立的圖表開關 -->
-          <div class="flex flex-wrap items-center gap-3 ml-2 border-l border-slate-700 pl-4">
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF0088]">
-              <input type="checkbox" id="toggleLinanSales" checked class="w-3.5 h-3.5 accent-[#FF0088] cursor-pointer"> 臨安業績
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF3EFF]">
-              <input type="checkbox" id="toggleNankeSales" checked class="w-3.5 h-3.5 accent-[#FF3EFF] cursor-pointer"> 南科業績
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#00ffff]">
-              <input type="checkbox" id="toggleLinanVisits" class="w-3.5 h-3.5 accent-[#00ffff] cursor-pointer"> 臨安來客
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#39ff14]">
-              <input type="checkbox" id="toggleNankeVisits" class="w-3.5 h-3.5 accent-[#39ff14] cursor-pointer"> 南科來客
-            </label>
+          <div class="store-summary nanke-box">
+            <div class="store-summary-head"><div class="store-name nanke">南科店</div><div id="heroNankeVisits" class="store-visit">-- 人來客</div></div>
+            <div class="store-total-line"><div id="kpiNanke" class="store-total-amount nanke">--</div><div class="store-total-label">本週業績</div></div>
+            <div class="cust-grid">
+              <div class="cust-item"><div class="cust-label">新客</div><div class="cust-value-row"><span id="kpiNankeNew" class="cust-value newc">--</span><span id="deltaNankeNew" class="delta flat">--</span></div></div>
+              <div class="cust-item"><div class="cust-label">舊客</div><div class="cust-value-row"><span id="kpiNankeReturning" class="cust-value">--</span><span id="deltaNankeReturning" class="delta flat">--</span></div></div>
+            </div>
           </div>
         </div>
-        <div class="flex gap-3 items-center text-xs">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-search-minus text-white"></i>
-            <input type="range" id="zoomSlider" class="zoom-slider" min="0" max="100" value="0" />
-            <i class="fas fa-search-plus text-white"></i>
+        <div class="hero-chart-panel">
+          <div class="hero-chart-head"><div><div class="hero-chart-title">當週每日｜新舊客業績 × 來客數</div><div class="hero-chart-desc">依 index 客源資料拆成週一至週日；並列長條＝同一天的新客／舊客業績，細紅線＝每日分界，折線＝每日來客數；若週總額有手動覆寫，仍以上方手動數字為準。</div></div></div>
+          <div class="mini-chart-grid">
+            <div class="store-chart-card"><div class="store-chart-title"><span class="linan">臨安店</span><span id="linanChartWeek" style="color:var(--hint);font-size:9px">當週</span></div><div class="store-chart-wrap"><canvas id="linanMixChart"></canvas></div><div class="mini-legend"><span><i class="legend-bar" style="background:var(--new)"></i>新客業績</span><span><i class="legend-bar" style="background:#7d7973"></i>舊客業績</span><span class="linan"><i class="legend-line"></i>來客數</span></div></div>
+            <div class="store-chart-card"><div class="store-chart-title"><span class="nanke">南科店</span><span id="nankeChartWeek" style="color:var(--hint);font-size:9px">當週</span></div><div class="store-chart-wrap"><canvas id="nankeMixChart"></canvas></div><div class="mini-legend"><span><i class="legend-bar" style="background:var(--new)"></i>新客業績</span><span><i class="legend-bar" style="background:#7d7973"></i>舊客業績</span><span class="nanke"><i class="legend-line"></i>來客數</span></div></div>
           </div>
-          <button id="btnResetZoom" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition shadow border border-slate-600"><i class="fas fa-compress mr-1"></i>重置</button>
         </div>
       </div>
-      <div class="relative h-96 w-full"><canvas id="mainChart"></canvas></div>
-      <div class="mt-3 text-xs text-white flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <span><i class="fas fa-mouse-pointer mr-1"></i> 提示：左鍵拖曳可平移，滑鼠移到想看的位置後拉右上拉桿縮放</span>
-        <span id="dataStatus" class="text-white">載入中...</span>
-      </div>
-    </div>
+    </section>
 
-    <div class="glass-panel table-viewport overflow-hidden">
-      <div class="p-4 border-b border-slate-700/50 flex flex-col md:flex-row md:justify-between md:items-center gap-3 bg-slate-900/50">
-        <div class="flex items-center justify-between md:justify-start gap-3">
-          <h3 class="text-md font-bold text-white">📋 業績紀錄 (按月群組)</h3>
-          <span class="text-xs text-white" id="tableHint">目前為閱覽模式</span>
+    <section class="section card section-card">
+      <div class="section-head">
+        <div><div class="section-title">最近業績</div><div class="section-desc">首頁已顯示最新完整週，因此這裡從前一週開始；視窗可容納約一筆展開詳情＋兩筆收合週次，滑鼠移入此區後可獨立捲動。</div></div>
+        <div class="section-tools"><button id="btnAddData" class="btn btn-primary hidden"><i class="fas fa-plus"></i>新增／更新週資料</button></div>
+      </div>
+      <div class="recent-scroll"><div id="recentList" class="recent-list"></div></div>
+    </section>
+
+    <section class="section insight-grid">
+      <div class="card mini-card">
+        <div class="section-title">最近四週雙店比較</div>
+        <div class="section-desc">看近期量體，不讓大型曲線圖搶走首頁重點。</div>
+        <div id="fourWeekBars" class="bars"></div>
+        <div class="bar-legend"><span><i class="legend-dot" style="background:var(--linan)"></i>臨安</span><span><i class="legend-dot" style="background:var(--nanke)"></i>南科</span></div>
+      </div>
+      <div class="card mini-card">
+        <div class="section-title">最新完整週結構</div>
+        <div class="section-desc">門市占比與新舊客組成。</div>
+        <div class="share-block">
+          <div class="share-label"><span>門市占比</span><span id="storeSharePct">--</span></div>
+          <div class="share-track"><div id="shareLinan" class="share-seg share-l" style="width:50%"></div><div id="shareNanke" class="share-seg share-n" style="width:50%"></div></div>
+          <div class="share-meta"><span id="shareLinanText">臨安 --</span><span id="shareNankeText">南科 --</span></div>
+        </div>
+        <div class="share-block" style="margin-top:26px">
+          <div class="share-label"><span>新／舊客業績</span><span id="custSharePct">--</span></div>
+          <div class="share-track"><div id="shareNew" class="share-seg share-new" style="width:50%"></div><div id="shareReturning" class="share-seg share-ret" style="width:50%"></div></div>
+          <div class="share-meta"><span id="shareNewText">新客 --</span><span id="shareReturningText">舊客 --</span></div>
         </div>
       </div>
-      <!-- 加上 max-h-[70vh] 與 overflow-y-auto 讓表格內部可捲動，表頭吸頂 -->
-      <div class="overflow-x-auto overflow-y-auto max-h-[70vh] relative">
-        <table class="w-full text-sm text-left text-white">
-          <thead class="text-xs text-white uppercase text-center sticky top-0 z-30 shadow-lg ring-1 ring-slate-700">
-            <tr>
-              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-28">月份</th>
-              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-32">區間(週)</th>
-              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF0088]">臨安店</th>
-              <th colspan="2" class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 text-[#FF3EFF]">南科店</th>
-              <th rowspan="2" class="px-4 py-3 border-b border-r border-slate-700 bg-slate-800 w-24 text-center leading-tight">來客數<br><span class="text-[10px] text-white font-normal tracking-wider"><span class="text-[#00ffff]">臨安</span> / <span class="text-[#39ff14]">南科</span></span></th>
-              <th rowspan="2" class="px-4 py-3 border-b border-slate-700 bg-slate-800">備註檔期</th>
-            </tr>
-            <tr>
-              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">週變化</th>
-              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">總共</th>
-              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">週變化</th>
-              <th class="px-4 py-2 border-b border-r border-slate-700 bg-slate-800 font-normal">總共</th>
-            </tr>
-          </thead>
-          <tbody id="dataTableBody"></tbody>
-        </table>
-      </div>
-    </div>
+    </section>
 
+    <section class="section card section-card">
+      <div class="section-head">
+        <div><div class="section-title">長期趨勢</div><div class="section-desc">時間軸維持左舊右新；首頁預設只看最近 12 週。</div></div>
+        <div class="section-tools">
+          <div class="seg" id="viewSeg"><button data-view="weekly" class="active">週</button><button data-view="monthly">月</button></div>
+          <div class="seg" id="rangeSeg"><button data-range="12" class="active">12週</button><button data-range="24">24週</button><button data-range="all">全部</button></div>
+          <label class="toggle"><input type="checkbox" id="toggleLinanSales" checked />臨安</label>
+          <label class="toggle"><input type="checkbox" id="toggleNankeSales" checked />南科</label>
+          <label class="toggle"><input type="checkbox" id="toggleVisits" />來客</label>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+    </section>
+
+    <section class="section card section-card">
+      <div class="section-head">
+        <div><div class="section-title">歷史紀錄</div><div class="section-desc">月份與週次皆由新到舊；展開月份可看每週來源、業績與來客。</div></div>
+        <div class="section-tools"><button id="btnExpandAll" class="btn">全部展開</button><button id="btnCollapseAll" class="btn">全部收合</button></div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
   </main>
 
-  <div id="entryModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="entryModalBackdrop"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800 p-6 rounded-xl w-full max-w-md border border-slate-700 shadow-2xl">
-      <h3 class="text-xl font-bold mb-4 text-white" id="modalTitle">新增/編輯週業績</h3>
-
-      <form id="performanceForm" class="space-y-4">
+  <div id="entryModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-title" id="modalTitle">確認／調整週業績</div>
+      <div class="modal-desc">儲存後，該週改以手動資料為正式顯示；自動底稿仍保留作為比較。</div>
+      <form id="performanceForm">
         <input type="hidden" id="editId" />
-        <div>
-          <label class="block text-xs text-white mb-1">選擇週次（選該週任一天即可）</label>
-          <input type="date" id="inputDate" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none">
-          <p id="weekRangeDisplay" class="text-xs text-blue-400 mt-1 h-4"></p>
+        <div class="field"><label>選擇週次（選該週任一天即可）</label><input type="date" id="inputDate" class="input" /><div id="weekRangeDisplay" class="modal-desc" style="margin-top:5px"></div></div>
+        <div id="autoBaseline" class="auto-baseline">自動底稿載入中…</div>
+        <div class="store-box">
+          <div class="store-box-title"><span class="linan">臨安店</span><span id="linanTotal" class="store-total linan">$0</span></div>
+          <div class="grid-2"><div><label style="font-size:11px;color:var(--muted);font-weight:900">新客消費金額</label><input type="number" id="inputLinanNew" class="input" min="0" /></div><div><label style="font-size:11px;color:var(--muted);font-weight:900">舊客消費金額</label><input type="number" id="inputLinanReturning" class="input" min="0" /></div></div>
         </div>
-
-        <!-- 臨安店 -->
-        <div class="bg-slate-700/30 rounded-lg p-3 border border-slate-600/60">
-          <p class="text-xs font-bold text-[#FF0088] mb-2"><i class="fas fa-store mr-1"></i>臨安店</p>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs text-slate-300 mb-1">新客消費金額</label>
-              <input type="number" id="inputLinanNew" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-pink-500 outline-none text-right" placeholder="0" min="0">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-300 mb-1">舊客消費金額</label>
-              <input type="number" id="inputLinanReturning" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-pink-500 outline-none text-right" placeholder="0" min="0">
-            </div>
-          </div>
-          <div class="mt-2 flex items-center justify-between">
-            <span class="text-xs text-slate-400">臨安合計</span>
-            <span id="linanTotal" class="text-sm font-bold text-[#FF0088]">$0</span>
-          </div>
+        <div class="store-box">
+          <div class="store-box-title"><span class="nanke">南科店</span><span id="nankeTotal" class="store-total nanke">$0</span></div>
+          <div class="grid-2"><div><label style="font-size:11px;color:var(--muted);font-weight:900">新客消費金額</label><input type="number" id="inputNankeNew" class="input" min="0" /></div><div><label style="font-size:11px;color:var(--muted);font-weight:900">舊客消費金額</label><input type="number" id="inputNankeReturning" class="input" min="0" /></div></div>
         </div>
-
-        <!-- 南科店 -->
-        <div class="bg-slate-700/30 rounded-lg p-3 border border-slate-600/60">
-          <p class="text-xs font-bold text-[#FFB3FF] mb-2"><i class="fas fa-store mr-1"></i>南科店</p>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs text-slate-300 mb-1">新客消費金額</label>
-              <input type="number" id="inputNankeNew" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-purple-400 outline-none text-right" placeholder="0" min="0">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-300 mb-1">舊客消費金額</label>
-              <input type="number" id="inputNankeReturning" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-purple-400 outline-none text-right" placeholder="0" min="0">
-            </div>
-          </div>
-          <div class="mt-2 flex items-center justify-between">
-            <span class="text-xs text-slate-400">南科合計</span>
-            <span id="nankeTotal" class="text-sm font-bold text-[#FFB3FF]">$0</span>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs text-white mb-1">備註檔期說明</label>
-          <input type="text" id="inputNote" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="例：中秋連假">
-        </div>
-        <div class="pt-2 flex gap-3">
-          <button type="button" id="btnDeleteEntry" class="hidden flex-1 py-2 rounded bg-red-900/80 hover:bg-red-800 text-white transition border border-red-700">刪除</button>
-          <button type="button" id="btnCloseEntry" class="flex-1 py-2 rounded bg-slate-700 hover:bg-slate-600 text-white transition">取消</button>
-          <button type="submit" class="flex-1 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold transition">確認儲存</button>
-        </div>
+        <div class="field"><label>備註檔期說明</label><input id="inputNote" class="input" placeholder="例：父親節、連假" /></div>
+        <div class="modal-actions"><button type="button" id="btnDeleteEntry" class="btn btn-danger hidden">移除手動覆寫</button><button type="button" id="btnCloseEntry" class="btn">取消</button><button type="submit" class="btn btn-primary">儲存手動資料</button></div>
       </form>
     </div>
   </div>
@@ -294,997 +409,346 @@
     const FRONT_KEY  = "wakodo_perf_front_access_v3";
     const FRONT_TTL  = 10 * 24 * 60 * 60 * 1000;
 
-    let isAdmin = false;
-    let allData = [];
-    let allVisits = []; // 儲存客源資料以計算來客數
-    let allCorrections = {}; // key: "${year}_${month}" → { linan_correction, nanke_correction }
-    let performanceChart = null;
-    let chartXOriginal = null;
-
-    let hoverXValue = null;
-    let hoverXRatio = 0.5;
-
-    let chartViewMode = "weekly";
-    
-    // 讀取收折狀態
-    let expandedGroups = new Set(JSON.parse(localStorage.getItem('expandedGroups') || '[]'));
-
-    const dom = {
-      lockScreen: document.getElementById("lockScreen"),
-      accessPassword: document.getElementById("accessPassword"),
-      btnEnter: document.getElementById("btnEnter"),
-      adminLoginModal: document.getElementById("adminLoginModal"),
-      btnLogin: document.getElementById("btnLogin"),
-      btnLogout: document.getElementById("btnLogout"),
-      adminStatus: document.getElementById("adminStatus"),
-      btnAdminLogin: document.getElementById("btnAdminLogin"),
-      btnCloseAdminLogin: document.getElementById("btnCloseAdminLogin"),
-      admEmail: document.getElementById("admEmail"),
-      admPwd: document.getElementById("admPwd"),
-      btnAddData: document.getElementById("btnAddData"),
-      btnAddPlaceholder: document.getElementById("btnAddPlaceholder"),
-      tableHint: document.getElementById("tableHint"),
-      dataStatus: document.getElementById("dataStatus"),
-      btnResetZoom: document.getElementById("btnResetZoom"),
-      zoomSlider: document.getElementById("zoomSlider"),
-      tbody: document.getElementById("dataTableBody"),
-      entryModal: document.getElementById("entryModal"),
-      entryModalBackdrop: document.getElementById("entryModalBackdrop"),
-      btnCloseEntry: document.getElementById("btnCloseEntry"),
-      btnDeleteEntry: document.getElementById("btnDeleteEntry"),
-      performanceForm: document.getElementById("performanceForm"),
-      inputDate: document.getElementById("inputDate"),
-      inputLinanNew: document.getElementById("inputLinanNew"),
-      inputLinanReturning: document.getElementById("inputLinanReturning"),
-      inputNankeNew: document.getElementById("inputNankeNew"),
-      inputNankeReturning: document.getElementById("inputNankeReturning"),
-      inputNote: document.getElementById("inputNote"),
-      editId: document.getElementById("editId"),
-      weekRangeDisplay: document.getElementById("weekRangeDisplay"),
-      btnExpandAll: document.getElementById("btnExpandAll"),
-      btnCollapseAll: document.getElementById("btnCollapseAll"),
-      toggleLinanSales: document.getElementById("toggleLinanSales"),
-      toggleNankeSales: document.getElementById("toggleNankeSales"),
-      toggleLinanVisits: document.getElementById("toggleLinanVisits"),
-      toggleNankeVisits: document.getElementById("toggleNankeVisits")
+    const ST = {
+      isAdmin:false,
+      sales:[], visits:[], corrections:{},
+      effectiveWeeks:[], summaryWeeks:[], autoWeekMap:new Map(), manualWeekMap:new Map(),
+      chart:null, heroCharts:new Map(), recentCharts:new Map(), chartView:"weekly", chartRange:"12",
+      expanded:new Set(), expandedRecent:new Set(), pageLoaded:false
     };
 
-    function fmtTwd(n) {
-      return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(n || 0));
-    }
-    
-    function fmtNum(n) {
-      return Number(n || 0).toLocaleString();
-    }
+    const $ = (id) => document.getElementById(id);
+    const dom = {
+      loader:$('pageLoader'), loaderText:$('loaderText'), lock:$('lockScreen'), pass:$('accessPassword'), enter:$('btnEnter'),
+      loginModal:$('adminLoginModal'), login:$('btnLogin'), logout:$('btnLogout'), adminStatus:$('adminStatus'),
+      admEmail:$('admEmail'), admPwd:$('admPwd'), btnAdminLogin:$('btnAdminLogin'), btnCloseAdminLogin:$('btnCloseAdminLogin'),
+      dataStatus:$('dataStatus'), recentList:$('recentList'), historyList:$('historyList'), bars:$('fourWeekBars'),
+      entryModal:$('entryModal'), form:$('performanceForm'), editId:$('editId'), inputDate:$('inputDate'), baseline:$('autoBaseline'),
+      lNew:$('inputLinanNew'), lRet:$('inputLinanReturning'), nNew:$('inputNankeNew'), nRet:$('inputNankeReturning'), note:$('inputNote'),
+      btnDelete:$('btnDeleteEntry'), btnCloseEntry:$('btnCloseEntry'), btnAdd:$('btnAddData')
+    };
 
-    // ===== 日期工具 =====
-    function parseISODateLocal(dateStr){
-      const [y, m, d] = String(dateStr).split("-").map(Number);
-      const dt = new Date(y, (m || 1) - 1, d || 1);
-      dt.setHours(0,0,0,0);
-      return dt;
-    }
-    function toISODateLocal(dt){
-      const y = dt.getFullYear();
-      const m = String(dt.getMonth() + 1).padStart(2, "0");
-      const d = String(dt.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    }
-    function addDays(dt, days){
-      const x = new Date(dt);
-      x.setDate(x.getDate() + days);
-      x.setHours(0,0,0,0);
-      return x;
-    }
+    function fmtTwd(n){ return new Intl.NumberFormat('zh-TW',{style:'currency',currency:'TWD',maximumFractionDigits:0}).format(Number(n||0)); }
+    function fmtCompact(n){ const x=Number(n||0); return x>=10000?`${(x/10000).toFixed(x>=100000?1:2)}萬`:x.toLocaleString('zh-TW'); }
+    function pct(a,b){ const den=Number(b||0); return den?Number(a||0)/den*100:0; }
+    function parseISO(s){ const [y,m,d]=String(s||'').split('-').map(Number); const x=new Date(y,(m||1)-1,d||1); x.setHours(0,0,0,0); return x; }
+    function toISO(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; }
+    function weekRange(anyDate){ const d=parseISO(anyDate); const delta=(d.getDay()+6)%7; const start=addDays(d,-delta); return {start,end:addDays(start,6)}; }
+    function weekLabel(startIso){ const s=parseISO(startIso), e=addDays(s,6); return `${s.getMonth()+1}/${s.getDate()} – ${e.getMonth()+1}/${e.getDate()}`; }
+    function weekLabelLong(startIso){ const s=parseISO(startIso),e=addDays(s,6); return `${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} – ${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()}`; }
+    function getMajorMonth(startIso){ const s=parseISO(startIso); const counts={}; for(let i=0;i<7;i++){const d=addDays(s,i);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;counts[k]=(counts[k]||0)+1;} const key=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||b.localeCompare(a))[0]; const [year,month]=key.split('-').map(Number); return {year,month,key}; }
+    function escapeHtml(v){ return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+    function taipeiTodayIso(){ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()); const obj=Object.fromEntries(parts.map(x=>[x.type,x.value])); return `${obj.year}-${obj.month}-${obj.day}`; }
+    function summaryCutoffForDate(dateIso){ return toISO(weekRange(dateIso).start); }
+    function currentSummaryCutoff(){ return summaryCutoffForDate(taipeiTodayIso()); }
+    function setLoading(on,text='正在載入業績資料…'){ if(!dom.loader)return; if(dom.loaderText)dom.loaderText.textContent=text; dom.loader.classList.toggle('show',!!on); }
+    function revealPage(){ if(ST.pageLoaded)return; ST.pageLoaded=true; requestAnimationFrame(()=>document.body.classList.add('data-ready')); }
 
-    function getWeekRange(anyIsoDateStr){
-      const date = parseISODateLocal(anyIsoDateStr);
-      const day = date.getDay(); 
-      const deltaToMonday = (day + 6) % 7; 
-      const monday = addDays(date, -deltaToMonday);
-      const sunday = addDays(monday, 6);
-      return { start: monday, end: sunday };
-    }
+    function setFrontAccess(){ localStorage.setItem(FRONT_KEY,JSON.stringify({expire:Date.now()+FRONT_TTL})); }
+    function checkFrontAccess(){ try{const raw=localStorage.getItem(FRONT_KEY); if(!raw)return false; const obj=JSON.parse(raw); if(!obj?.expire||Date.now()>obj.expire)return false; setFrontAccess(); return true;}catch{return false;} }
+    function showAppOrLock(){ if(checkFrontAccess()){dom.lock.classList.remove('show');initApp();}else{dom.lock.classList.add('show');setTimeout(()=>dom.pass.focus(),50);} }
+    function unlock(){ if(dom.pass.value.trim()!==FRONT_PASS){ Swal.fire({icon:'error',title:'密碼錯誤',text:'請輸入正確密碼'}); return; } setFrontAccess(); dom.lock.classList.remove('show'); initApp(); }
 
-    function getMajorMonth(isoDateStr) {
-      const wkStart = parseISODateLocal(isoDateStr);
-      const counts = new Map();
-      for (let i = 0; i < 7; i++) {
-        const x = addDays(wkStart, i);
-        const key = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
-        counts.set(key, (counts.get(key) || 0) + 1);
-      }
-      let bestKey = null;
-      let bestDays = -1;
-      for (const [k, days] of counts.entries()) {
-        if (days > bestDays) { bestDays = days; bestKey = k; continue; }
-        if (days === bestDays && bestKey && k > bestKey) bestKey = k;
-      }
-      const [yy, mm] = String(bestKey).split("-");
-      return { year: Number(yy), month: Number(mm), key: bestKey };
-    }
-
-    function showWeekRangeText(isoDate) {
-      const r = getWeekRange(isoDate);
-      const s = r.start, e = r.end;
-      dom.weekRangeDisplay.textContent = `週期：${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ~ ${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()}`;
-      return r;
-    }
-
-    // ===== 計算來客數 =====
-    function getVisitCounts(startDate, endDate) {
-      let linan = 0, nanke = 0;
-      if (!startDate || !endDate) return { linan: '-', nanke: '-' };
-      
-      for (const v of allVisits) {
-        if (v.form_date >= startDate && v.form_date <= endDate) {
-          if (v.store_branch === "臨安店") linan++;
-          else if (v.store_branch === "南科店") nanke++;
-        }
-      }
-      return { linan, nanke };
-    }
-
-    // ===== 前台密碼門神 =====
-    function setFrontAccess() { localStorage.setItem(FRONT_KEY, JSON.stringify({ expire: Date.now() + FRONT_TTL })); }
-    function checkFrontAccess() {
-      const raw = localStorage.getItem(FRONT_KEY);
-      if (!raw) return false;
-      try {
-        const obj = JSON.parse(raw);
-        if (!obj?.expire || Date.now() > obj.expire) return false;
-        setFrontAccess(); // Rolling：每次有效開頁面自動延後10天
-        return true;
-      } catch { return false; }
-    }
-
-    if (checkFrontAccess()) {
-      dom.lockScreen.classList.add("hidden");
-      dom.lockScreen.classList.remove("flex");
-      initApp();
-    } else {
-      dom.lockScreen.classList.remove("hidden");
-      dom.lockScreen.classList.add("flex");
-      setTimeout(() => dom.accessPassword.focus(), 80);
-    }
-
-    dom.btnEnter.addEventListener("click", doFrontUnlock);
-    dom.accessPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") doFrontUnlock(); });
-    dom.btnLogin.addEventListener("click", openAdminLogin);
-    dom.btnCloseAdminLogin.addEventListener("click", closeAdminLogin);
-    dom.btnAdminLogin.addEventListener("click", loginSupabase);
-    dom.admEmail.addEventListener("keydown", (e) => { if (e.key === "Enter") loginSupabase(); });
-    dom.admPwd.addEventListener("keydown", (e) => { if (e.key === "Enter") loginSupabase(); });
-    dom.btnLogout.addEventListener("click", logoutSupabase);
-    dom.btnAddData.addEventListener("click", () => openModal(null));
-    dom.entryModalBackdrop.addEventListener("click", closeModal);
-    dom.btnCloseEntry.addEventListener("click", closeModal);
-    dom.btnDeleteEntry.addEventListener("click", handleDelete);
-    dom.performanceForm.addEventListener("submit", handleFormSubmit);
-    // 修正數字輸入框：blur 或 Enter 儲存
-    dom.tbody.addEventListener("change", async (e) => {
-      const input = e.target.closest("input[data-store]");
-      if (!input || !isAdmin) return;
-      const { year, month, store } = input.dataset;
-      await saveCorrection(year, month, store, input.value);
-    });
-    dom.tbody.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const input = e.target.closest("input[data-store]");
-        if (input) { input.blur(); }
-      }
-    });
-    ["inputLinanNew","inputLinanReturning","inputNankeNew","inputNankeReturning"].forEach(id => {
-      document.getElementById(id)?.addEventListener("input", updateModalTotals);
-    });
-
-    dom.btnExpandAll.addEventListener("click", () => {
-      const grouped = groupData(allData);
-      grouped.forEach(g => expandedGroups.add(g.key));
-      saveExpandedState();
-      renderTable();
-    });
-
-    dom.btnCollapseAll.addEventListener("click", () => {
-      expandedGroups.clear();
-      saveExpandedState();
-      renderTable();
-    });
-
-    dom.btnResetZoom.addEventListener("click", () => {
-      if (performanceChart?.resetZoom) {
-        performanceChart.resetZoom();
-        dom.zoomSlider.value = 0;
-        hoverXValue = null;
-        hoverXRatio = 0.5;
-      }
-    });
-
-    dom.zoomSlider.addEventListener("input", (e) => {
-      if (!performanceChart || !chartXOriginal) return;
-      const t = Number(e.target.value) / 100;
-      const origRange = chartXOriginal.max - chartXOriginal.min;
-      const minRange = origRange * 0.02;
-      const range = Math.max(minRange, origRange * (1 - t));
-      const xScale = performanceChart.scales.x;
-      const anchor = (hoverXValue != null) ? hoverXValue : (xScale.min + xScale.max) / 2;
-      const ratio = (hoverXValue != null) ? hoverXRatio : 0.5;
-      let min = anchor - ratio * range;
-      let max = min + range;
-      if (min < chartXOriginal.min) { min = chartXOriginal.min; max = min + range; }
-      if (max > chartXOriginal.max) { max = chartXOriginal.max; min = max - range; }
-      performanceChart.zoomScale("x", { min, max }, "none");
-    });
-
-    document.getElementById("btnViewWeekly").addEventListener("click", () => {
-      if (chartViewMode === "weekly") return;
-      chartViewMode = "weekly";
-      updateViewButtons();
-      renderChart();
-    });
-
-    document.getElementById("btnViewMonthly").addEventListener("click", () => {
-      if (chartViewMode === "monthly") return;
-      chartViewMode = "monthly";
-      updateViewButtons();
-      renderChart();
-    });
-
-    function updateViewButtons() {
-      const btnW = document.getElementById("btnViewWeekly");
-      const btnM = document.getElementById("btnViewMonthly");
-      if (chartViewMode === "weekly") {
-        btnW.className = "px-3 py-1 rounded bg-blue-600 text-white transition";
-        btnM.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition";
-      } else {
-        btnM.className = "px-3 py-1 rounded bg-blue-600 text-white transition";
-        btnW.className = "px-3 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition";
-      }
-    }
-
-    // 圖表開關事件 (使用 show/hide 觸發原生過場動畫)
-    const toggleMap = [
-      { el: dom.toggleLinanSales, index: 0 },
-      { el: dom.toggleNankeSales, index: 1 },
-      { el: dom.toggleLinanVisits, index: 2 },
-      { el: dom.toggleNankeVisits, index: 3 }
-    ];
-
-    toggleMap.forEach(item => {
-      item.el.addEventListener('change', (e) => {
-        if (!performanceChart) return;
-        if (e.target.checked) {
-          performanceChart.show(item.index);
-        } else {
-          performanceChart.hide(item.index);
-        }
-      });
-    });
-
-    function doFrontUnlock() {
-      const v = dom.accessPassword.value.trim();
-      if (v !== FRONT_PASS) {
-        Swal.fire({ icon: "error", title: "密碼錯誤", text: "請輸入正確密碼", background: "#1e293b", color: "#fff" });
-        return;
-      }
-      setFrontAccess();
-      dom.lockScreen.classList.add("hidden");
-      dom.lockScreen.classList.remove("flex");
-      initApp();
-    }
-
-    async function initApp() {
-      await checkAdminSession();
-      await refreshData();
-    }
-
-    async function checkAdminSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      isAdmin = !!session;
-      updateAdminUI();
-    }
-
-    function updateAdminUI() {
-      if (isAdmin) {
-        dom.btnLogin.classList.add("hidden");
-        dom.btnLogout.classList.remove("hidden");
-        dom.adminStatus.classList.remove("hidden");
-        dom.btnAddData.classList.remove("hidden");
-        dom.btnAddData.classList.add("flex");
-        dom.btnAddPlaceholder.classList.add("hidden");
-        dom.tableHint.textContent = "點擊列表可編輯";
-      } else {
-        dom.btnLogin.classList.remove("hidden");
-        dom.btnLogout.classList.add("hidden");
-        dom.adminStatus.classList.add("hidden");
-        dom.btnAddData.classList.add("hidden");
-        dom.btnAddData.classList.remove("flex");
-        dom.btnAddPlaceholder.classList.remove("hidden");
-        dom.tableHint.textContent = "目前為閱覽模式";
-      }
-      renderTable();
-    }
-
-    function openAdminLogin() {
-      dom.adminLoginModal.classList.remove("hidden");
-      dom.adminLoginModal.classList.add("flex");
-      setTimeout(() => dom.admEmail.focus(), 50);
-    }
-
-    function closeAdminLogin() {
-      dom.adminLoginModal.classList.add("hidden");
-      dom.adminLoginModal.classList.remove("flex");
-    }
-
-    async function loginSupabase() {
-      const email = dom.admEmail.value.trim();
-      const pwd = dom.admPwd.value.trim();
-      if (!email || !pwd) return;
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-      if (error) {
-        Swal.fire({ icon: "error", title: "登入失敗", text: error.message, background: "#1e293b", color: "#fff" });
-        return;
-      }
-      closeAdminLogin();
-      await checkAdminSession();
-      Swal.fire({ icon: "success", title: "管理員登入成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-    }
-
-    async function logoutSupabase() {
-      await supabase.auth.signOut();
-      await checkAdminSession();
-      Swal.fire({ icon: "info", title: "已登出管理", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-    }
-
-    // 抓取客源資料 (分頁抓取，確保資料完整)
-    async function fetchVisitsData() {
-      let data = [];
-      let page = 0;
-      const PAGE_SIZE = 1000;
-      while(true) {
-        const res = await supabase.from("visits").select("form_date, store_branch").range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-        if (res.error || !res.data || !res.data.length) break;
-        data = data.concat(res.data);
-        if (res.data.length < PAGE_SIZE) break;
+    async function fetchVisitsData(){
+      const rows=[]; let page=0; const size=1000;
+      while(true){
+        const res=await supabase.from('visits').select('form_date,store_branch,is_new_customer,amount').order('form_date',{ascending:true}).range(page*size,(page+1)*size-1);
+        if(res.error) throw res.error;
+        if(!res.data?.length) break;
+        rows.push(...res.data);
+        if(res.data.length<size) break;
         page++;
       }
-      return data;
+      return rows;
     }
 
-    async function refreshData() {
-      dom.dataStatus.textContent = "載入中...";
-      
-      const [salesRes, visitsData, corrRes] = await Promise.all([
-        supabase.from("sales_performance").select("*").order("year", { ascending: true }).order("month", { ascending: true }).order("week_start_date", { ascending: true }),
-        fetchVisitsData(),
-        supabase.from("monthly_corrections").select("*")
-      ]);
-
-      if (salesRes.error) {
-        console.error(salesRes.error);
-        dom.dataStatus.textContent = "載入失敗";
-        Swal.fire({ icon: "error", title: "載入失敗", text: salesRes.error.message, background: "#1e293b", color: "#fff" });
-        allData = [];
-      } else {
-        allData = salesRes.data || [];
-        allVisits = visitsData || [];
-        // 整理修正資料為 Map
-        allCorrections = {};
-        (corrRes.data || []).forEach(c => {
-          allCorrections[`${c.year}_${c.month}`] = c;
-        });
-        dom.dataStatus.textContent = `共 ${allData.length} 筆`;
-      }
-      
-      renderChart();
-      renderKPI();
-      renderTable();
-    }
-
-    function renderChart() {
-      const weeklyData = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
-      if (!weeklyData.length) {
-        if (performanceChart) performanceChart.destroy();
-        dom.dataStatus.textContent = "尚無週資料";
-        return;
-      }
-
-      let chartData, labels, linanData, nankeData, linanVisitsData, nankeVisitsData;
-
-      if (chartViewMode === "weekly") {
-        chartData = [...weeklyData].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
-        labels = chartData.map(d => {
-          const s = parseISODateLocal(d.week_start_date);
-          const e = addDays(s, 6);
-          return `${s.getMonth() + 1}/${s.getDate()}-${e.getMonth() + 1}/${e.getDate()}`;
-        });
-        linanData = chartData.map(d => Number(d.linan_amount || 0));
-        nankeData = chartData.map(d => Number(d.nanke_amount || 0));
-        
-        linanVisitsData = chartData.map(d => {
-          const c = getVisitCounts(d.week_start_date, d.week_end_date);
-          return c.linan === '-' ? 0 : c.linan;
-        });
-        nankeVisitsData = chartData.map(d => {
-          const c = getVisitCounts(d.week_start_date, d.week_end_date);
-          return c.nanke === '-' ? 0 : c.nanke;
-        });
-      } else {
-        const monthMap = {};
-        weeklyData.forEach(d => {
-          const major = getMajorMonth(d.week_start_date);
-          const key = major.key;
-          if (!monthMap[key]) {
-            monthMap[key] = { year: major.year, month: major.month, linan: 0, nanke: 0, linanVisits: 0, nankeVisits: 0, notes: [] };
-          }
-          monthMap[key].linan += Number(d.linan_amount || 0);
-          monthMap[key].nanke += Number(d.nanke_amount || 0);
-          
-          const counts = getVisitCounts(d.week_start_date, d.week_end_date);
-          monthMap[key].linanVisits += (counts.linan === '-' ? 0 : counts.linan);
-          monthMap[key].nankeVisits += (counts.nanke === '-' ? 0 : counts.nanke);
-
-          if (d.note) monthMap[key].notes.push(d.note);
-        });
-
-        chartData = Object.keys(monthMap).sort().map(k => ({
-          key: k, ...monthMap[k], noteStr: monthMap[k].notes.join("、") || null
-        }));
-        labels    = chartData.map(d => `${d.year}/${d.month}月`);
-        linanData = chartData.map(d => d.linan);
-        nankeData = chartData.map(d => d.nanke);
-        linanVisitsData = chartData.map(d => d.linanVisits);
-        nankeVisitsData = chartData.map(d => d.nankeVisits);
-      }
-
-      const maxSales = Math.max(...linanData, ...nankeData, 100000);
-      const maxVisits = Math.max(...linanVisitsData, ...nankeVisitsData, 10);
-
-      const ctx = document.getElementById("mainChart").getContext("2d");
-      if (performanceChart) performanceChart.destroy();
-      Chart.register(window.ChartZoom);
-
-      performanceChart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            { label: "臨安店", data: linanData, borderColor: "#FF0088", backgroundColor: "rgba(255, 0, 136, 0.12)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleLinanSales.checked },
-            { label: "南科店", data: nankeData, borderColor: "#FFB3FF", backgroundColor: "rgba(255, 179, 255, 0.10)", borderWidth: 2.2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y", hidden: !dom.toggleNankeSales.checked },
-            { label: "臨安來客數", data: linanVisitsData, borderColor: "#00ffff", backgroundColor: "rgba(0, 255, 255, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleLinanVisits.checked },
-            { label: "南科來客數", data: nankeVisitsData, borderColor: "#39ff14", backgroundColor: "rgba(57, 255, 20, 0.1)", borderWidth: 2, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, yAxisID: "y2", hidden: !dom.toggleNankeVisits.checked }
-          ]
-        },
-        options: {
-          responsive: true, 
-          maintainAspectRatio: false, 
-          interaction: { mode: "index", intersect: false },
-          animation: {
-            duration: 750,
-            easing: 'easeInOutQuart'
-          },
-          plugins: {
-            legend: { display: false }, // 關閉預設圖例，改用自訂 Checkbox
-            tooltip: {
-              backgroundColor: "rgba(15, 23, 42, 0.92)", titleColor: "#fff", bodyColor: "#ffffff", borderColor: "#334155", borderWidth: 1,
-              callbacks: {
-                label: (context) => {
-                  const label = context.dataset.label || "";
-                  const val = context.parsed.y ?? 0;
-                  let base = "";
-                  if (label.includes("來客數")) base = `${label}: ${val} 人`;
-                  else base = `${label}: ${fmtTwd(val)}`;
-                  
-                  const row = chartData[context.dataIndex] || {};
-                  const note = chartViewMode === "weekly" ? row.note : row.noteStr;
-                  return note ? `${base}（${note}）` : base;
-                }
-              }
-            },
-            zoom: { pan: { enabled: true, mode: "x" }, zoom: { wheel: { enabled: false }, pinch: { enabled: false }, mode: "x" } }
-          },
-          scales: {
-            y: { min: 0, suggestedMax: maxSales * 1.1, grid: { color: "#334155" }, ticks: { color: "#ffffff", callback: (v) => (v >= 10000 ? `${Math.round(v / 10000)}萬` : v) } },
-            y2: { min: 0, suggestedMax: maxVisits * 1.2, display: false, position: "right", grid: { drawOnChartArea: false } },
-            x:  { grid: { display: false }, ticks: { color: "#ffffff", maxTicksLimit: 10 } }
-          }
+    function buildAutoWeekMap(minWeekStart=null){
+      const map=new Map();
+      ST.visits.forEach(v=>{
+        if(!v.form_date) return;
+        const r=weekRange(v.form_date); const key=toISO(r.start);
+        if(minWeekStart && key < minWeekStart) return;
+        if(!map.has(key)) map.set(key,{week_start_date:key,week_end_date:toISO(r.end),linan_new:0,linan_returning:0,nanke_new:0,nanke_returning:0,linan_amount:0,nanke_amount:0,linan_visits:0,nanke_visits:0,source_type:'auto'});
+        const row=map.get(key); const amount=Number(v.amount||0); const isNew=v.is_new_customer!==false;
+        if(v.store_branch==='臨安店'){
+          row.linan_amount+=amount; row.linan_visits++;
+          if(isNew) row.linan_new+=amount; else row.linan_returning+=amount;
+        } else if(v.store_branch==='南科店'){
+          row.nanke_amount+=amount; row.nanke_visits++;
+          if(isNew) row.nanke_new+=amount; else row.nanke_returning+=amount;
         }
       });
-
-      if (performanceChart.getInitialScaleBounds) {
-        chartXOriginal = performanceChart.getInitialScaleBounds().x;
-      } else {
-        chartXOriginal = { min: performanceChart.scales.x.min, max: performanceChart.scales.x.max };
-      }
-
-      const canvas = performanceChart.canvas;
-      canvas.onmousemove = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const px = e.clientX - rect.left;
-        const area = performanceChart.chartArea;
-        if (px < area.left || px > area.right) return;
-        hoverXRatio = Math.min(1, Math.max(0, (px - area.left) / (area.right - area.left)));
-        hoverXValue = performanceChart.scales.x.getValueForPixel(px);
-      };
-      canvas.onmouseleave = () => { hoverXValue = null; hoverXRatio = 0.5; };
+      ST.autoWeekMap=map;
     }
 
-    function renderKPI() {
-      const elTotal = document.getElementById("kpiTotal"), elLinan = document.getElementById("kpiLinan"), elNanke = document.getElementById("kpiNanke"), elGrowth = document.getElementById("kpiGrowth"), wrap = document.getElementById("kpiGrowthWrap"), elVisit = document.getElementById("kpiVisitCount"), elNewRet = document.getElementById("kpiNewReturning");
-      const weeklyRows = allData.filter(d => d.period_type === "weekly" && d.week_start_date);
-      
-      if (!weeklyRows.length) {
-        elTotal.textContent = "--"; elLinan.textContent = "--"; elNanke.textContent = "--"; elGrowth.textContent = "--";
-        elVisit.textContent = "來客數：-- / -- 人";
-        elNewRet.textContent = "新客 / 舊客：--";
-        elGrowth.className = "text-white"; wrap.className = "mt-2 text-xs flex items-center"; return;
-      }
-
-      const sorted = [...weeklyRows].sort((a, b) => parseISODateLocal(a.week_start_date).getTime() - parseISODateLocal(b.week_start_date).getTime());
-      const latest = sorted[sorted.length - 1];
-      const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
-
-      const total = Number(latest.linan_amount || 0) + Number(latest.nanke_amount || 0);
-      elTotal.textContent = fmtTwd(total);
-      elLinan.textContent = (Number(latest.linan_amount || 0) / 10000).toFixed(1);
-      elNanke.textContent = (Number(latest.nanke_amount || 0) / 10000).toFixed(1);
-
-      // 新/舊客細分（若有資料才顯示）
-      const lNew = Number(latest.linan_new || 0), lRet = Number(latest.linan_returning || 0);
-      const nNew = Number(latest.nanke_new || 0), nRet = Number(latest.nanke_returning || 0);
-      const totalNew = lNew + nNew, totalRet = lRet + nRet;
-      if (totalNew > 0 || totalRet > 0) {
-        elNewRet.innerHTML = `新客 <span class="text-emerald-400 font-bold">${fmtTwd(totalNew)}</span> / 舊客 <span class="text-amber-300 font-bold">${fmtTwd(totalRet)}</span>`;
-      } else {
-        elNewRet.textContent = "新客 / 舊客：尚無細分資料";
-      }
-
-      // 計算最新週來客數
-      const counts = getVisitCounts(latest.week_start_date, latest.week_end_date);
-      elVisit.innerHTML = `來客數：<span class="text-[#00ffff]">${counts.linan}</span> / <span class="text-[#39ff14]">${counts.nanke}</span> 人`;
-
-      if (!prev || !(Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0))) {
-        wrap.className = "mt-2 text-xs flex items-center text-white"; elGrowth.className = "text-white"; elGrowth.textContent = "無上週比較資料"; return;
-      }
-
-      const prevTotal = Number(prev.linan_amount || 0) + Number(prev.nanke_amount || 0);
-      const growth = ((total - prevTotal) / prevTotal) * 100;
-      const up = growth >= 0;
-      const colorClass = up ? "text-emerald-400" : "text-rose-400";
-      wrap.className = `mt-2 text-xs flex items-center ${colorClass}`;
-      elGrowth.className = colorClass;
-      elGrowth.innerHTML = `${up ? '<i class="fas fa-arrow-up mr-1"></i>' : '<i class="fas fa-arrow-down mr-1"></i>'}${growth.toFixed(1)}% 較上週`;
+    function getVisitCounts(startIso,endIso){
+      let linan=0,nanke=0;
+      ST.visits.forEach(v=>{ if(v.form_date>=startIso&&v.form_date<=endIso){ if(v.store_branch==='臨安店')linan++; else if(v.store_branch==='南科店')nanke++; }});
+      return {linan,nanke};
     }
 
-    function saveExpandedState() {
-      localStorage.setItem('expandedGroups', JSON.stringify([...expandedGroups]));
+    function buildEffectiveWeeks(){
+      const manualRows=ST.sales.filter(r=>r.period_type==='weekly'&&r.week_start_date);
+      const minWeeklyStart=manualRows.length?manualRows.map(r=>r.week_start_date).sort()[0]:null;
+      buildAutoWeekMap(minWeeklyStart);
+      ST.manualWeekMap=new Map(manualRows.map(r=>[r.week_start_date,r]));
+      const keys=new Set([...ST.autoWeekMap.keys(),...ST.manualWeekMap.keys()]);
+      ST.effectiveWeeks=[...keys].map(key=>{
+        const auto=ST.autoWeekMap.get(key)||null;
+        const manual=ST.manualWeekMap.get(key)||null;
+        if(manual){
+          const counts=getVisitCounts(manual.week_start_date,manual.week_end_date||toISO(addDays(parseISO(manual.week_start_date),6)));
+          return {...manual,source_type:'manual',auto_baseline:auto,linan_visits:counts.linan,nanke_visits:counts.nanke};
+        }
+        const major=getMajorMonth(key);
+        return {...auto,id:null,period_type:'weekly',year:major.year,month:major.month,note:null,auto_baseline:auto};
+      }).sort((a,b)=>b.week_start_date.localeCompare(a.week_start_date));
+      const cutoff=currentSummaryCutoff();
+      ST.summaryWeeks=ST.effectiveWeeks.filter(r=>r.week_start_date<cutoff);
     }
 
-    window.toggleGroup = function(key) {
-      if (expandedGroups.has(key)) expandedGroups.delete(key);
-      else expandedGroups.add(key);
-      saveExpandedState();
-      renderTable();
-    };
-
-    // ===== 月修正數字 upsert =====
-    window.saveCorrection = async function(year, month, store, value) {
-      if (!isAdmin) return;
-      const corrKey = `${year}_${month}`;
-      const existing = allCorrections[corrKey] || {};
-      const payload = {
-        year: Number(year),
-        month: Number(month),
-        linan_correction: store === 'linan' ? (value === '' ? null : Number(value)) : (existing.linan_correction ?? null),
-        nanke_correction: store === 'nanke' ? (value === '' ? null : Number(value)) : (existing.nanke_correction ?? null),
-        updated_at: new Date().toISOString()
-      };
-      const { data, error } = await supabase
-        .from("monthly_corrections")
-        .upsert(payload, { onConflict: "year,month" })
-        .select()
-        .single();
-      if (error) {
-        console.error("修正數字儲存失敗", error);
-        Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
-      } else {
-        allCorrections[corrKey] = data;
+    function sourceBadge(row){ return row.source_type==='manual'?'<span class="source-badge manual"><span class="source-dot"></span>手動覆寫</span>':'<span class="source-badge auto"><span class="source-dot"></span>表單自動彙總</span>'; }
+    function totalOf(r){ return Number(r?.linan_amount||0)+Number(r?.nanke_amount||0); }
+    function newOf(r){ return Number(r?.linan_new||0)+Number(r?.nanke_new||0); }
+    function retOf(r){ return Number(r?.linan_returning||0)+Number(r?.nanke_returning||0); }
+    function growthBetween(curr,prev){ const a=totalOf(curr),b=totalOf(prev); return b?((a-b)/b*100):null; }
+    function growthHtml(g){ if(g==null||!Number.isFinite(g)) return '<span class="recent-growth" style="color:var(--muted)">無上週比較</span>'; const up=g>=0; return `<span class="recent-growth" style="color:${up?'var(--good)':'var(--bad)'}">${up?'▲':'▼'} ${Math.abs(g).toFixed(1)}%</span>`; }
+    function metricDelta(curr,prev){
+      const a=Number(curr||0), b=Number(prev||0);
+      if(b===0){ if(a>0)return {cls:'up',text:'▲ 新增'}; return {cls:'flat',text:'—'}; }
+      const g=(a-b)/b*100; if(Math.abs(g)<0.05)return {cls:'flat',text:'→ 0.0%'};
+      return {cls:g>0?'up':'down',text:`${g>0?'▲':'▼'} ${Math.abs(g).toFixed(1)}%`};
+    }
+    function setMetricDelta(id,curr,prev){ const el=$(id); if(!el)return; const d=metricDelta(curr,prev); el.className=`delta ${d.cls}`; el.textContent=d.text; }
+    function dailySeriesForWeek(startIso,store){
+      const start=parseISO(startIso); const end=toISO(addDays(start,6));
+      const rows=Array.from({length:7},(_,i)=>{const d=addDays(start,i);return {date:toISO(d),label:`${['一','二','三','四','五','六','日'][i]} ${d.getMonth()+1}/${d.getDate()}`,newAmount:0,returningAmount:0,visits:0};});
+      const byDate=new Map(rows.map(r=>[r.date,r]));
+      ST.visits.forEach(v=>{ if(!v.form_date||v.form_date<startIso||v.form_date>end||v.store_branch!==store)return; const day=byDate.get(v.form_date); if(!day)return; day.visits++; const amount=Number(v.amount||0); if(v.is_new_customer!==false)day.newAmount+=amount; else day.returningAmount+=amount; });
+      return rows;
+    }
+    function destroyChartMap(map){ map.forEach(chart=>{try{chart?.destroy?.();}catch{}}); map.clear(); }
+    const dayGroupSeparatorPlugin={
+      id:'dayGroupSeparator',
+      beforeDatasetsDraw(chart){
+        const {ctx,chartArea}=chart; const x=chart.scales?.x;
+        if(!ctx||!chartArea||!x||!Array.isArray(x.ticks)||x.ticks.length<2)return;
+        ctx.save();
+        ctx.strokeStyle='rgba(188,72,72,.32)';
+        ctx.lineWidth=.8;
+        for(let i=0;i<x.ticks.length-1;i++){
+          const a=x.getPixelForTick(i), b=x.getPixelForTick(i+1), mid=(a+b)/2;
+          ctx.beginPath(); ctx.moveTo(mid,chartArea.top); ctx.lineTo(mid,chartArea.bottom); ctx.stroke();
+        }
+        ctx.restore();
       }
     };
-
-    // ===== 資料群組化邏輯 (固定升冪：舊到新) =====
-    function groupData(data) {
-      const groups = {};
-      data.forEach(row => {
-        let y, m, groupKey, isHistorical;
-
-        if (row.period_type === "weekly" && row.week_start_date) {
-          const major = getMajorMonth(row.week_start_date);
-          y = major.year; m = major.month;
-        } else {
-          y = row.year; m = row.month;
-        }
-
-        // 歷史資料判定：2025年6月(含)以前
-        isHistorical = (y < 2025) || (y === 2025 && m <= 6);
-        groupKey = isHistorical ? "historical" : `${y}-${String(m).padStart(2, '0')}`;
-
-        if (!groups[groupKey]) {
-          groups[groupKey] = {
-            key: groupKey, isHistorical, year: y, month: m,
-            title: isHistorical ? "2025年6月以前 (歷史資料)" : `${y}/${m}月`,
-            rows: [], totalLinan: 0, totalNanke: 0,
-            totalLinanNew: 0, totalLinanReturning: 0,
-            totalNankeNew: 0, totalNankeReturning: 0,
-            totalLinanVisits: 0, totalNankeVisits: 0
-          };
-        }
-
-        groups[groupKey].rows.push(row);
-        groups[groupKey].totalLinan += Number(row.linan_amount || 0);
-        groups[groupKey].totalNanke += Number(row.nanke_amount || 0);
-        groups[groupKey].totalLinanNew += Number(row.linan_new || 0);
-        groups[groupKey].totalLinanReturning += Number(row.linan_returning || 0);
-        groups[groupKey].totalNankeNew += Number(row.nanke_new || 0);
-        groups[groupKey].totalNankeReturning += Number(row.nanke_returning || 0);
-        
-        const counts = getVisitCounts(row.week_start_date, row.week_end_date);
-        groups[groupKey].totalLinanVisits += (counts.linan === '-' ? 0 : counts.linan);
-        groups[groupKey].totalNankeVisits += (counts.nanke === '-' ? 0 : counts.nanke);
-      });
-
-      // 群組內按時間排序 (舊到新)
-      Object.values(groups).forEach(g => {
-        g.rows.sort((a, b) => {
-          const ta = a.week_start_date ? parseISODateLocal(a.week_start_date).getTime() : new Date(a.year, a.month-1, 1).getTime();
-          const tb = b.week_start_date ? parseISODateLocal(b.week_start_date).getTime() : new Date(b.year, b.month-1, 1).getTime();
-          return ta - tb;
-        });
-      });
-
-      // 群組間排序 (固定升冪：舊到新)
-      let groupArr = Object.values(groups);
-      groupArr.sort((a, b) => {
-        if (a.isHistorical && !b.isHistorical) return -1;
-        if (!a.isHistorical && b.isHistorical) return 1;
-        if (a.isHistorical && b.isHistorical) return 0;
-        const valA = a.year * 100 + a.month;
-        const valB = b.year * 100 + b.month;
-        return valA - valB;
-      });
-
-      return groupArr;
+    function buildDailyMixChart(map,key,canvasId,weekStart,store,lineColor){
+      if(typeof Chart==='undefined')return; const canvas=$(canvasId); if(!canvas)return; const old=map.get(key); if(old)old.destroy();
+      const rows=dailySeriesForWeek(weekStart,store);
+      const chart=new Chart(canvas.getContext('2d'),{type:'bar',data:{labels:rows.map(r=>r.label),datasets:[
+        {type:'bar',label:'新客業績',data:rows.map(r=>r.newAmount),backgroundColor:'rgba(201,138,61,.82)',borderWidth:0,borderRadius:4,categoryPercentage:.72,barPercentage:.82,yAxisID:'y',order:2},
+        {type:'bar',label:'舊客業績',data:rows.map(r=>r.returningAmount),backgroundColor:'rgba(98,95,91,.68)',borderWidth:0,borderRadius:4,categoryPercentage:.72,barPercentage:.82,yAxisID:'y',order:2},
+        {type:'line',label:'來客數',data:rows.map(r=>r.visits),borderColor:lineColor,backgroundColor:lineColor,borderWidth:2.2,tension:.28,pointRadius:2.5,pointHoverRadius:4,yAxisID:'y2',order:1}
+      ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:520,easing:'easeOutQuart'},interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(45,43,40,.94)',padding:10,callbacks:{label:(c)=>c.dataset.yAxisID==='y2'?`${c.dataset.label}: ${c.parsed.y} 人`:`${c.dataset.label}: ${fmtTwd(c.parsed.y)}`}}},scales:{x:{stacked:false,grid:{display:false},ticks:{color:'#9a958d',maxRotation:0,font:{size:9}}},y:{stacked:false,beginAtZero:true,grid:{color:'rgba(100,91,80,.07)'},ticks:{color:'#9a958d',font:{size:9},callback:v=>v>=10000?`${Math.round(v/10000)}萬`:v}},y2:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{color:lineColor,font:{size:9},precision:0,callback:v=>`${v}人`}}}},plugins:[dayGroupSeparatorPlugin]});
+      map.set(key,chart);
     }
 
-    // ===== 渲染表格 (PDF 佈局 + 來客數) =====
-    function renderTable() {
-      const grouped = groupData(allData);
-      dom.tbody.innerHTML = "";
-
-      grouped.forEach(group => {
-        const isExpanded = expandedGroups.has(group.key);
-        const rowCount = group.rows.length;
-
-        if (!isExpanded) {
-          // 收折狀態：顯示單列總計
-          const corrKey = `${group.year}_${group.month}`;
-          const corr = (!group.isHistorical && allCorrections[corrKey]) || {};
-          const linanCorr = corr.linan_correction;
-          const nankeCorr = corr.nanke_correction;
-
-          const hasLinanBreakdown = group.totalLinanNew > 0 || group.totalLinanReturning > 0;
-          const hasNankeBreakdown = group.totalNankeNew > 0 || group.totalNankeReturning > 0;
-
-          // 修正後欄位 HTML（管理員可編輯，一般使用者唯讀）
-          const corrField = (store, val, color) => {
-            if (group.isHistorical) return '';
-            if (isAdmin) {
-              return `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
-                <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
-                <input type="number"
-                  class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
-                  style="color:${color}"
-                  data-year="${group.year}" data-month="${group.month}" data-store="${store}"
-                  value="${val !== null && val !== undefined ? val : ''}"
-                  placeholder="輸入修正數字">
-              </div>`;
-            } else if (val !== null && val !== undefined) {
-              return `<div class="mt-2 pt-1.5 border-t border-slate-600/40">
-                <div class="text-[10px] text-slate-400 mb-0.5">修正後</div>
-                <div class="font-mono text-xs" style="color:${color}">${fmtNum(val)}</div>
-              </div>`;
-            }
-            return '';
-          };
-
-          const tr = document.createElement("tr");
-          tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer bg-slate-800/30";
-          tr.onclick = () => toggleGroup(group.key);
-          tr.innerHTML = `
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white">
-              <i class="fas fa-plus-square text-blue-400 mr-2"></i>${group.title}
-            </td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">共 ${rowCount} ${group.isHistorical ? '個月' : '週'}</td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50" onclick="event.stopPropagation()">
-              <div class="font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</div>
-              ${hasLinanBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalLinanNew)} / 舊 ${fmtNum(group.totalLinanReturning)}</div>` : ''}
-              ${corrField('linan', linanCorr, '#FF0088')}
-            </td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-            <td class="px-4 py-3 text-right border-r border-slate-700/50" onclick="event.stopPropagation()">
-              <div class="font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</div>
-              ${hasNankeBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalNankeNew)} / 舊 ${fmtNum(group.totalNankeReturning)}</div>` : ''}
-              ${corrField('nanke', nankeCorr, '#FFB3FF')}
-            </td>
-            <td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${group.totalLinanVisits}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${group.totalNankeVisits}</span></td>
-            <td class="px-4 py-3 text-center text-white">-</td>
-          `;
-          dom.tbody.appendChild(tr);
-        } else {
-          // 展開狀態
-          if (group.isHistorical) {
-            // 歷史資料：逐月顯示，無 rowspan
-            group.rows.forEach((row, i) => {
-              const tr = document.createElement("tr");
-              tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
-              
-              let monthCell = '';
-              if (i === 0) {
-                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white cursor-pointer hover:text-gray-300" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
-                  <i class="fas fa-minus-square text-blue-400 mr-2"></i>${row.year}/${row.month}月
-                </td>`;
-              } else {
-                monthCell = `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">${row.year}/${row.month}月</td>`;
-              }
-
-              tr.innerHTML = `
-                ${monthCell}
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 bg-black/40 text-white text-xs">無週資料</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-                <td class="px-4 py-3 text-right border-r border-slate-700/50 font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</td>
-                <td class="px-4 py-3 text-center border-r border-slate-700/50 text-white">-</td>
-                <td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>
-              `;
-              
-              if (isAdmin) {
-                tr.classList.add("cursor-pointer");
-                tr.onclick = (e) => { if (!e.target.closest('.fa-minus-square')) openModal(row); };
-              }
-              dom.tbody.appendChild(tr);
-            });
-          } else {
-            // 正常月份：使用 Rowspan 合併總計
-            group.rows.forEach((row, i) => {
-              const tr = document.createElement("tr");
-              tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
-
-              const s = parseISODateLocal(row.week_start_date);
-              const e = addDays(s, 6);
-              const periodStr = `${s.getMonth()+1}/${s.getDate()} - ${e.getMonth()+1}/${e.getDate()}`;
-              
-              // 計算該週來客數
-              const counts = getVisitCounts(row.week_start_date, row.week_end_date);
-
-              let html = '';
-              if (i === 0) {
-                html += `
-                  <td rowspan="${rowCount}" class="px-4 py-3 text-center border-r border-slate-700/50 font-bold text-white align-top pt-4 cursor-pointer hover:text-gray-300 bg-slate-800/10" onclick="event.stopPropagation(); toggleGroup('${group.key}')">
-                    <i class="fas fa-minus-square text-blue-400 mr-2"></i><br>${group.title}
-                  </td>
-                `;
-              }
-
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 text-white text-xs">${periodStr}</td>`;
-
-              // 臨安週變化 + 新/舊客細分
-              const linanNew = Number(row.linan_new || 0), linanRet = Number(row.linan_returning || 0);
-              const hasLinanBreakdown = linanNew > 0 || linanRet > 0;
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50">
-                <div class="font-mono text-[#FF0088]">${fmtNum(row.linan_amount)}</div>
-                ${hasLinanBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">新 ${fmtNum(linanNew)} / 舊 ${fmtNum(linanRet)}</div>` : ''}
-              </td>`;
-
-              if (i === 0) {
-                const corrKey2 = `${group.year}_${group.month}`;
-                const corr2 = allCorrections[corrKey2] || {};
-                const linanCorr2 = corr2.linan_correction;
-                const hasLBreakdown = group.totalLinanNew > 0 || group.totalLinanReturning > 0;
-                const linanCorrHtml = isAdmin
-                  ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
-                      <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
-                      <input type="number"
-                        class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
-                        style="color:#FF0088"
-                        data-year="${group.year}" data-month="${group.month}" data-store="linan"
-                        value="${linanCorr2 !== null && linanCorr2 !== undefined ? linanCorr2 : ''}"
-                        placeholder="輸入修正數字">
-                    </div>`
-                  : (linanCorr2 !== null && linanCorr2 !== undefined
-                      ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40"><div class="text-[10px] text-slate-400 mb-0.5">修正後</div><div class="font-mono text-xs text-[#FF0088]">${fmtNum(linanCorr2)}</div></div>`
-                      : '');
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 align-top pt-4 bg-slate-800/10" onclick="event.stopPropagation()">
-                  <div class="font-mono text-[#FF0088] font-bold">${fmtNum(group.totalLinan)}</div>
-                  ${hasLBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalLinanNew)} / 舊 ${fmtNum(group.totalLinanReturning)}</div>` : ''}
-                  ${linanCorrHtml}
-                </td>`;
-              }
-
-              // 南科週變化 + 新/舊客細分
-              const nankeNew = Number(row.nanke_new || 0), nankeRet = Number(row.nanke_returning || 0);
-              const hasNankeBreakdown = nankeNew > 0 || nankeRet > 0;
-              html += `<td class="px-4 py-3 text-right border-r border-slate-700/50">
-                <div class="font-mono text-[#FFB3FF]">${fmtNum(row.nanke_amount)}</div>
-                ${hasNankeBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">新 ${fmtNum(nankeNew)} / 舊 ${fmtNum(nankeRet)}</div>` : ''}
-              </td>`;
-
-              if (i === 0) {
-                const nankeCorr2 = (allCorrections[`${group.year}_${group.month}`] || {}).nanke_correction;
-                const hasNBreakdown = group.totalNankeNew > 0 || group.totalNankeReturning > 0;
-                const nankeCorrHtml = isAdmin
-                  ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40" onclick="event.stopPropagation()">
-                      <div class="text-[10px] text-slate-400 mb-1">修正後數字</div>
-                      <input type="number"
-                        class="w-full bg-slate-700/60 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono outline-none focus:ring-1 focus:ring-slate-500"
-                        style="color:#FFB3FF"
-                        data-year="${group.year}" data-month="${group.month}" data-store="nanke"
-                        value="${nankeCorr2 !== null && nankeCorr2 !== undefined ? nankeCorr2 : ''}"
-                        placeholder="輸入修正數字">
-                    </div>`
-                  : (nankeCorr2 !== null && nankeCorr2 !== undefined
-                      ? `<div class="mt-2 pt-1.5 border-t border-slate-600/40"><div class="text-[10px] text-slate-400 mb-0.5">修正後</div><div class="font-mono text-xs text-[#FFB3FF]">${fmtNum(nankeCorr2)}</div></div>`
-                      : '');
-                html += `<td rowspan="${rowCount}" class="px-4 py-3 text-right border-r border-slate-700/50 align-top pt-4 bg-slate-800/10" onclick="event.stopPropagation()">
-                  <div class="font-mono text-[#FFB3FF] font-bold">${fmtNum(group.totalNanke)}</div>
-                  ${hasNBreakdown ? `<div class="text-[10px] text-slate-400 mt-0.5">新 ${fmtNum(group.totalNankeNew)} / 舊 ${fmtNum(group.totalNankeReturning)}</div>` : ''}
-                  ${nankeCorrHtml}
-                </td>`;
-              }
-
-              // 來客數欄位
-              html += `<td class="px-4 py-3 text-center border-r border-slate-700/50 font-mono text-sm"><span class="text-[#00ffff]">${counts.linan}</span><span class="text-white mx-1">/</span><span class="text-[#39ff14]">${counts.nanke}</span></td>`;
-              
-              html += `<td class="px-4 py-3 text-center text-yellow-400 font-bold text-xs tracking-wide">${row.note || ''}</td>`;
-
-              tr.innerHTML = html;
-
-              if (isAdmin) {
-                tr.classList.add("cursor-pointer");
-                tr.onclick = (e) => {
-                  if (!e.target.closest('td[rowspan]')) openModal(row);
-                };
-              }
-              dom.tbody.appendChild(tr);
-            });
-          }
-        }
-      });
+    async function refreshData(){
+      dom.dataStatus.textContent='載入中…'; setLoading(true,'正在整理完整週業績…');
+      try{
+        const [salesRes,visits,corrRes]=await Promise.all([
+          supabase.from('sales_performance').select('*').order('year',{ascending:true}).order('month',{ascending:true}).order('week_start_date',{ascending:true}),
+          fetchVisitsData(),
+          supabase.from('monthly_corrections').select('*')
+        ]);
+        if(salesRes.error) throw salesRes.error;
+        ST.sales=salesRes.data||[]; ST.visits=visits||[]; ST.corrections={};
+        (corrRes.data||[]).forEach(c=>ST.corrections[`${c.year}_${c.month}`]=c);
+        buildEffectiveWeeks();
+        const latestFormDate=ST.visits.reduce((m,v)=>v.form_date&&v.form_date>m?v.form_date:m,'');
+        const latestSummary=ST.summaryWeeks[0];
+        dom.dataStatus.textContent=`表單資料至 ${latestFormDate?latestFormDate.replaceAll('-','/'): '--'} ・ 完整週至 ${latestSummary?.week_end_date?latestSummary.week_end_date.replaceAll('-','/'):'--'} ・ 每週一更新`;
+        renderAll(); revealPage();
+      }catch(err){ console.error(err); dom.dataStatus.textContent='載入失敗'; Swal.fire({icon:'error',title:'載入失敗',text:err.message||String(err)}); }
+      finally{ setLoading(false); }
     }
 
-    function openModal(row) {
-      if (!isAdmin) return;
-      dom.entryModal.classList.remove("hidden");
-      dom.performanceForm.reset();
-      updateModalTotals();
+    function renderAll(){ renderHero(); renderHeroMixCharts(); renderBars(); renderShare(); renderChart(); updateAdminUI(); }
 
-      if (row) {
-        dom.editId.value = row.id;
-        dom.inputDate.value = row.week_start_date || "";
-        // 若有新/舊客細分資料，直接填入；否則將舊有總額放入舊客欄位做為預設
-        const lNew = Number(row.linan_new || 0), lRet = Number(row.linan_returning || 0);
-        const nNew = Number(row.nanke_new || 0), nRet = Number(row.nanke_returning || 0);
-        dom.inputLinanNew.value = lNew;
-        dom.inputLinanReturning.value = (lNew === 0 && lRet === 0) ? (row.linan_amount ?? 0) : lRet;
-        dom.inputNankeNew.value = nNew;
-        dom.inputNankeReturning.value = (nNew === 0 && nRet === 0) ? (row.nanke_amount ?? 0) : nRet;
-        dom.inputNote.value = row.note ?? "";
-        dom.btnDeleteEntry.classList.remove("hidden");
-        if (row.week_start_date) showWeekRangeText(row.week_start_date);
-      } else {
-        dom.editId.value = "";
-        const today = new Date().toISOString().slice(0, 10);
-        dom.inputDate.value = today;
-        dom.btnDeleteEntry.classList.add("hidden");
-        showWeekRangeText(today);
+    function renderHero(){
+      const latest=ST.summaryWeeks[0]; const prev=ST.summaryWeeks[1];
+      if(!latest){ ['kpiTotal','kpiLinan','kpiNanke','kpiLinanNew','kpiLinanReturning','kpiNankeNew','kpiNankeReturning'].forEach(id=>$(id)&&($(id).textContent='--')); return; }
+      $('heroPeriod').textContent=`最新完整週 ${weekLabelLong(latest.week_start_date)}`;
+      $('kpiTotal').textContent=fmtTwd(totalOf(latest));
+      $('kpiLinan').textContent=fmtTwd(latest.linan_amount); $('kpiNanke').textContent=fmtTwd(latest.nanke_amount);
+      $('kpiLinanNew').textContent=fmtCompact(latest.linan_new); $('kpiLinanReturning').textContent=fmtCompact(latest.linan_returning);
+      $('kpiNankeNew').textContent=fmtCompact(latest.nanke_new); $('kpiNankeReturning').textContent=fmtCompact(latest.nanke_returning);
+      $('heroLinanVisits').textContent=`${Number(latest.linan_visits||0)} 人來客`; $('heroNankeVisits').textContent=`${Number(latest.nanke_visits||0)} 人來客`;
+      if(prev){
+        setMetricDelta('deltaLinanNew',latest.linan_new,prev.linan_new);
+        setMetricDelta('deltaLinanReturning',latest.linan_returning,prev.linan_returning);
+        setMetricDelta('deltaNankeNew',latest.nanke_new,prev.nanke_new);
+        setMetricDelta('deltaNankeReturning',latest.nanke_returning,prev.nanke_returning);
+      }else ['deltaLinanNew','deltaLinanReturning','deltaNankeNew','deltaNankeReturning'].forEach(id=>{const el=$(id);if(el){el.className='delta flat';el.textContent='無上週';}});
+      const g=growthBetween(latest,prev); const ge=$('kpiGrowth'); ge.className=`growth ${g==null?'flat':g>=0?'up':'down'}`; ge.innerHTML=g==null?'無上週比較資料':`${g>=0?'▲':'▼'} ${Math.abs(g).toFixed(1)}% 較上週`;
+      $('heroSource').className=`source-badge ${latest.source_type}`; $('heroSource').innerHTML=`<span class="source-dot"></span>${latest.source_type==='manual'?'手動覆寫':'表單自動彙總'}`;
+      if(latest.source_type==='manual'){
+        const auto=latest.auto_baseline; const autoTotal=auto?totalOf(auto):0; const diff=totalOf(latest)-autoTotal;
+        $('heroSourceNote').textContent=auto?`此完整週已人工確認。表單自動底稿 ${fmtTwd(autoTotal)}，與手動資料相差 ${diff>=0?'+':''}${fmtTwd(diff)}。`:'此完整週已人工確認；此週沒有可比較的客源表單自動底稿。';
+      }else $('heroSourceNote').textContent='此為最近一個已結束完整週，數字由客源表單自動彙總；管理員若輸入手動資料，仍以手動資料為準。';
+      const noteEl=$('heroWeekNote'); const note=String(latest.note||'').trim(); noteEl.classList.toggle('hidden',!note); noteEl.innerHTML=note?`<b>備註</b>　${escapeHtml(note)}`:'';
+      $('btnEditLatest').onclick=()=>openModal(latest); $('heroActions').classList.toggle('hidden',!ST.isAdmin);
+    }
+
+    function renderHeroMixCharts(){
+      const r=ST.summaryWeeks[0]; if(!r){destroyChartMap(ST.heroCharts);return;}
+      $('linanChartWeek').textContent=weekLabel(r.week_start_date); $('nankeChartWeek').textContent=weekLabel(r.week_start_date);
+      buildDailyMixChart(ST.heroCharts,'linan','linanMixChart',r.week_start_date,'臨安店','#4f7ea7');
+      buildDailyMixChart(ST.heroCharts,'nanke','nankeMixChart',r.week_start_date,'南科店','#6f9b83');
+    }
+
+    function recentStoreSummaryHtml(r,prev,store){
+      const isL=store==='linan'; const storeName=isL?'臨安店':'南科店'; const box=isL?'linan-box':'nanke-box'; const color=isL?'linan':'nanke';
+      const amount=Number(r[`${store}_amount`]||0), visits=Number(r[`${store}_visits`]||0), newAmt=Number(r[`${store}_new`]||0), retAmt=Number(r[`${store}_returning`]||0);
+      const newD=prev?metricDelta(newAmt,prev[`${store}_new`]):{cls:'flat',text:'無上週'}; const retD=prev?metricDelta(retAmt,prev[`${store}_returning`]):{cls:'flat',text:'無上週'};
+      return `<div class="store-summary ${box}"><div class="store-summary-head"><div class="store-name ${color}">${storeName}</div><div class="store-visit">${visits} 人來客</div></div><div class="store-total-line"><div class="store-total-amount ${color}">${fmtTwd(amount)}</div><div class="store-total-label">完整週業績</div></div><div class="cust-grid"><div class="cust-item"><div class="cust-label">新客</div><div class="cust-value-row"><span class="cust-value newc">${fmtCompact(newAmt)}</span><span class="delta ${newD.cls}">${newD.text}</span></div></div><div class="cust-item"><div class="cust-label">舊客</div><div class="cust-value-row"><span class="cust-value">${fmtCompact(retAmt)}</span><span class="delta ${retD.cls}">${retD.text}</span></div></div></div></div>`;
+    }
+    function recentDetailHtml(r,prev){
+      const safe=r.week_start_date.replaceAll('-',''); const note=String(r.note||'').trim();
+      return `<div class="recent-detail"><div class="recent-detail-inner"><div class="recent-detail-head"><div><div class="period-label">完整週 ${weekLabelLong(r.week_start_date)}</div><div class="recent-detail-title">${fmtTwd(totalOf(r))}</div>${growthHtml(growthBetween(r,prev))}</div><div class="recent-detail-meta">${sourceBadge(r)}</div></div><div class="recent-week-note"><div class="recent-week-note-label">當週備註</div><div class="recent-week-note-text">${note?escapeHtml(note):'<span style="color:var(--hint);font-weight:700">本週尚未填寫備註</span>'}</div></div><div class="hero-body"><div class="store-stack">${recentStoreSummaryHtml(r,prev,'linan')}${recentStoreSummaryHtml(r,prev,'nanke')}</div><div class="hero-chart-panel"><div class="hero-chart-head"><div><div class="hero-chart-title">當週每日｜新舊客業績 × 來客數</div><div class="hero-chart-desc">圖表固定讀取 index 客源資料的該週每日紀錄；同一天的新客／舊客採並列長條，細紅線區隔每日；若本週有手動覆寫，上方週總額仍以手動資料為準。</div></div></div><div class="mini-chart-grid"><div class="store-chart-card"><div class="store-chart-title"><span class="linan">臨安店</span><span style="color:var(--hint);font-size:9px">${weekLabel(r.week_start_date)}</span></div><div class="store-chart-wrap"><canvas id="recent-${safe}-linan"></canvas></div><div class="mini-legend"><span><i class="legend-bar" style="background:var(--new)"></i>新客業績</span><span><i class="legend-bar" style="background:#7d7973"></i>舊客業績</span><span class="linan"><i class="legend-line"></i>來客數</span></div></div><div class="store-chart-card"><div class="store-chart-title"><span class="nanke">南科店</span><span style="color:var(--hint);font-size:9px">${weekLabel(r.week_start_date)}</span></div><div class="store-chart-wrap"><canvas id="recent-${safe}-nanke"></canvas></div><div class="mini-legend"><span><i class="legend-bar" style="background:var(--new)"></i>新客業績</span><span><i class="legend-bar" style="background:#7d7973"></i>舊客業績</span><span class="nanke"><i class="legend-line"></i>來客數</span></div></div></div></div></div></div></div>`;
+    }
+    function destroyRecentWeekCharts(week){ const safe=week.replaceAll('-',''); for(const store of ['linan','nanke']){const key=`${safe}-${store}`;const c=ST.recentCharts.get(key);if(c){c.destroy();ST.recentCharts.delete(key);}} }
+    function renderRecentWeekCharts(week){ const r=ST.summaryWeeks.find(x=>x.week_start_date===week); if(!r)return; const safe=week.replaceAll('-',''); buildDailyMixChart(ST.recentCharts,`${safe}-linan`,`recent-${safe}-linan`,week,'臨安店','#4f7ea7'); buildDailyMixChart(ST.recentCharts,`${safe}-nanke`,`recent-${safe}-nanke`,week,'南科店','#6f9b83'); }
+    function updateRecentScrollState(){ const list=dom.recentList,shell=list?.closest('.recent-scroll'); if(!list||!shell)return; const has=list.scrollHeight>list.clientHeight+2; shell.classList.toggle('has-overflow',has); shell.classList.toggle('scrolled',list.scrollTop>4); shell.classList.toggle('at-bottom',!has||list.scrollTop+list.clientHeight>=list.scrollHeight-4); }
+    function renderRecent(){
+      destroyChartMap(ST.recentCharts);
+      const rows=ST.summaryWeeks.slice(1,9); if(!rows.length){dom.recentList.innerHTML='<div class="empty">目前沒有更早的完整週資料</div>';updateRecentScrollState();return;}
+      dom.recentList.innerHTML=rows.map((r,i)=>{
+        const prev=ST.summaryWeeks[i+2]; const auto=r.auto_baseline; let autoNote=''; const note=String(r.note||'').trim(); const open=ST.expandedRecent.has(r.week_start_date);
+        if(r.source_type==='manual'&&auto){ const diff=totalOf(r)-totalOf(auto); autoNote=`自動底稿 ${fmtCompact(totalOf(auto))} ・ 差異 ${diff>=0?'+':''}${fmtCompact(diff)}`; }
+        return `<div class="recent-item ${open?'open':''}" data-week-item="${r.week_start_date}"><div class="recent-row" data-toggle-week="${r.week_start_date}" role="button" tabindex="0" aria-expanded="${open?'true':'false'}"><div><div class="recent-period">${weekLabel(r.week_start_date)}</div><div class="recent-sub">${sourceBadge(r)}</div></div><div><div class="recent-total">${fmtTwd(totalOf(r))}</div>${growthHtml(growthBetween(r,prev))}${autoNote?`<div class="recent-sub">${autoNote}</div>`:''}${note?`<div class="recent-note">備註：${escapeHtml(note)}</div>`:''}</div><div><div class="recent-cell-label">臨安 · 新客</div><div class="recent-cell-value newc">${fmtCompact(r.linan_new)}</div></div><div><div class="recent-cell-label">臨安 · 舊客</div><div class="recent-cell-value">${fmtCompact(r.linan_returning)}</div></div><div><div class="recent-cell-label">南科 · 新客</div><div class="recent-cell-value newc">${fmtCompact(r.nanke_new)}</div></div><div><div class="recent-cell-label">南科 · 舊客</div><div class="recent-cell-value">${fmtCompact(r.nanke_returning)}</div></div><div class="recent-action">${ST.isAdmin?`<button class="tiny-btn" data-edit-week="${r.week_start_date}">${r.source_type==='manual'?'編輯':'確認'}</button>`:''}<span class="recent-chevron">⌄</span></div></div>${recentDetailHtml(r,prev)}</div>`;
+      }).join('');
+      const toggle=(row)=>{ const week=row.dataset.toggleWeek,item=row.closest('.recent-item'); if(!item)return; const opening=!item.classList.contains('open'); item.classList.toggle('open',opening); row.setAttribute('aria-expanded',opening?'true':'false'); if(opening){ST.expandedRecent.add(week);requestAnimationFrame(()=>{renderRecentWeekCharts(week);updateRecentScrollState();});}else{ST.expandedRecent.delete(week);destroyRecentWeekCharts(week);requestAnimationFrame(updateRecentScrollState);} };
+      dom.recentList.querySelectorAll('[data-toggle-week]').forEach(row=>{row.addEventListener('click',e=>{if(e.target.closest('[data-edit-week]'))return;toggle(row);});row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(row);}});});
+      dom.recentList.querySelectorAll('[data-edit-week]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); const r=ST.effectiveWeeks.find(x=>x.week_start_date===btn.dataset.editWeek); openModal(r); }));
+      dom.recentList.onscroll=updateRecentScrollState;
+      ST.expandedRecent.forEach(week=>requestAnimationFrame(()=>renderRecentWeekCharts(week)));
+      requestAnimationFrame(updateRecentScrollState);
+    }
+
+    function renderBars(){
+      const rows=ST.summaryWeeks.slice(0,4); if(!rows.length){dom.bars.innerHTML='<div class="empty">尚無資料</div>';return;}
+      const max=Math.max(...rows.flatMap(r=>[Number(r.linan_amount||0),Number(r.nanke_amount||0)]),1);
+      dom.bars.innerHTML=rows.map(r=>`<div class="bar-row"><div class="bar-date">${weekLabel(r.week_start_date)}</div><div class="dual-bars"><div class="bar-track"><div class="bar-fill l" style="width:${pct(r.linan_amount,max)}%"></div></div><div class="bar-track"><div class="bar-fill n" style="width:${pct(r.nanke_amount,max)}%"></div></div></div><div class="bar-values"><span class="linan">${fmtCompact(r.linan_amount)}</span><br><span class="nanke">${fmtCompact(r.nanke_amount)}</span></div></div>`).join('');
+    }
+
+    function renderShare(){
+      const r=ST.summaryWeeks[0]; if(!r)return; const total=totalOf(r),newTotal=newOf(r),retTotal=retOf(r); const lp=pct(r.linan_amount,total),np=100-lp,newp=pct(newTotal,newTotal+retTotal),retp=100-newp;
+      $('shareLinan').style.width=`${lp}%`; $('shareNanke').style.width=`${np}%`; $('storeSharePct').textContent=`${lp.toFixed(0)}% / ${np.toFixed(0)}%`; $('shareLinanText').textContent=`臨安 ${fmtCompact(r.linan_amount)}`; $('shareNankeText').textContent=`南科 ${fmtCompact(r.nanke_amount)}`;
+      $('shareNew').style.width=`${newp}%`; $('shareReturning').style.width=`${retp}%`; $('custSharePct').textContent=`${newp.toFixed(0)}% / ${retp.toFixed(0)}%`; $('shareNewText').textContent=`新客 ${fmtCompact(newTotal)}`; $('shareReturningText').textContent=`舊客 ${fmtCompact(retTotal)}`;
+    }
+
+    function monthlyFromWeeks(weeks){ const map={}; [...weeks].sort((a,b)=>a.week_start_date.localeCompare(b.week_start_date)).forEach(r=>{const m=getMajorMonth(r.week_start_date);if(!map[m.key])map[m.key]={key:m.key,year:m.year,month:m.month,linan:0,nanke:0,visits:0};map[m.key].linan+=Number(r.linan_amount||0);map[m.key].nanke+=Number(r.nanke_amount||0);map[m.key].visits+=Number(r.linan_visits||0)+Number(r.nanke_visits||0);});return Object.values(map).sort((a,b)=>a.key.localeCompare(b.key)); }
+
+    function renderChart(){
+      if(typeof Chart==='undefined') return;
+      let labels=[],l=[],n=[],visits=[];
+      if(ST.chartView==='weekly'){
+        let data=[...ST.summaryWeeks].sort((a,b)=>a.week_start_date.localeCompare(b.week_start_date));
+        if(ST.chartRange!=='all') data=data.slice(-Number(ST.chartRange));
+        labels=data.map(r=>weekLabel(r.week_start_date)); l=data.map(r=>Number(r.linan_amount||0)); n=data.map(r=>Number(r.nanke_amount||0)); visits=data.map(r=>Number(r.linan_visits||0)+Number(r.nanke_visits||0));
+      }else{
+        let data=monthlyFromWeeks(ST.summaryWeeks); if(ST.chartRange!=='all'){const months=ST.chartRange==='24'?6:3;data=data.slice(-months);} labels=data.map(r=>`${r.year}/${r.month}`);l=data.map(r=>r.linan);n=data.map(r=>r.nanke);visits=data.map(r=>r.visits);
       }
-      updateModalTotals();
+      if(ST.chart)ST.chart.destroy(); const ctx=$('mainChart').getContext('2d');
+      ST.chart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+        {label:'臨安店',data:l,borderColor:'#4f7ea7',backgroundColor:'rgba(79,126,167,.08)',borderWidth:2.4,tension:.34,pointRadius:2.5,pointHoverRadius:5,yAxisID:'y',hidden:!$('toggleLinanSales').checked},
+        {label:'南科店',data:n,borderColor:'#6f9b83',backgroundColor:'rgba(111,155,131,.08)',borderWidth:2.4,tension:.34,pointRadius:2.5,pointHoverRadius:5,yAxisID:'y',hidden:!$('toggleNankeSales').checked},
+        {label:'總來客',data:visits,borderColor:'#a08f76',backgroundColor:'rgba(160,143,118,.06)',borderDash:[5,5],borderWidth:1.8,tension:.25,pointRadius:2,yAxisID:'y2',hidden:!$('toggleVisits').checked}
+      ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(45,43,40,.94)',padding:12,callbacks:{label:(c)=>c.dataset.yAxisID==='y2'?`${c.dataset.label}: ${c.parsed.y} 人`:`${c.dataset.label}: ${fmtTwd(c.parsed.y)}`}}},scales:{x:{grid:{display:false},ticks:{color:'#8d877e',maxTicksLimit:10,font:{size:11}}},y:{beginAtZero:true,grid:{color:'rgba(100,91,80,.08)'},ticks:{color:'#8d877e',callback:v=>v>=10000?`${Math.round(v/10000)}萬`:v}},y2:{beginAtZero:true,display:false,position:'right',grid:{drawOnChartArea:false}}}}});
     }
 
-    function updateModalTotals() {
-      const lNew = Number(dom.inputLinanNew?.value || 0);
-      const lRet = Number(dom.inputLinanReturning?.value || 0);
-      const nNew = Number(dom.inputNankeNew?.value || 0);
-      const nRet = Number(dom.inputNankeReturning?.value || 0);
-      const ltEl = document.getElementById("linanTotal");
-      const ntEl = document.getElementById("nankeTotal");
-      if (ltEl) ltEl.textContent = fmtTwd(lNew + lRet);
-      if (ntEl) ntEl.textContent = fmtTwd(nNew + nRet);
+    function buildMonthGroups(){ const groups={}; ST.summaryWeeks.forEach(r=>{const m=getMajorMonth(r.week_start_date);if(!groups[m.key])groups[m.key]={key:m.key,year:m.year,month:m.month,rows:[],linan:0,nanke:0,new:0,ret:0,visits:0};const g=groups[m.key];g.rows.push(r);g.linan+=Number(r.linan_amount||0);g.nanke+=Number(r.nanke_amount||0);g.new+=newOf(r);g.ret+=retOf(r);g.visits+=Number(r.linan_visits||0)+Number(r.nanke_visits||0);});Object.values(groups).forEach(g=>g.rows.sort((a,b)=>b.week_start_date.localeCompare(a.week_start_date)));return Object.values(groups).sort((a,b)=>b.key.localeCompare(a.key)); }
+
+    function renderHistory(){
+      const groups=buildMonthGroups(); const legacy=ST.sales.filter(r=>r.period_type==='monthly').sort((a,b)=>(b.year*100+b.month)-(a.year*100+a.month));
+      let html=groups.map(g=>{
+        const corr=ST.corrections[`${g.year}_${g.month}`]||{}; const corrParts=[]; if(corr.linan_correction!=null)corrParts.push(`臨安修正 ${fmtTwd(corr.linan_correction)}`); if(corr.nanke_correction!=null)corrParts.push(`南科修正 ${fmtTwd(corr.nanke_correction)}`);
+        const open=ST.expanded.has(g.key);
+        return `<div class="month-block ${open?'open':''}" data-month="${g.key}"><div class="month-head" data-toggle-month="${g.key}"><div><div class="month-name">${g.year}/${g.month}月</div><div class="recent-sub">${g.rows.length} 週・${g.visits} 人</div></div><div><div class="month-total linan">${fmtTwd(g.linan)}</div><div class="month-sub">臨安</div></div><div class="month-nanke"><div class="month-total nanke">${fmtTwd(g.nanke)}</div><div class="month-sub">南科</div></div><div class="month-ret"><div class="month-total">${fmtTwd(g.new+g.ret)}</div><div class="month-sub">月總業績</div></div><div class="chev">⌄</div></div><div class="month-body">${g.rows.map(r=>`<div class="week-line"><div><b>${weekLabel(r.week_start_date)}</b><div class="recent-sub">${sourceBadge(r)}</div></div><div class="num">${fmtCompact(totalOf(r))}</div><div class="num linan">${fmtCompact(r.linan_amount)}</div><div class="num nanke">${fmtCompact(r.nanke_amount)}</div><div class="num hide-sm newc">${fmtCompact(newOf(r))}</div><div class="num hide-md">${fmtCompact(retOf(r))}</div><div class="num hide-md">${Number(r.linan_visits||0)+Number(r.nanke_visits||0)}人</div><div>${ST.isAdmin?`<button class="tiny-btn" data-edit-week="${r.week_start_date}">${r.source_type==='manual'?'編輯':'確認'}</button>`:''}</div>${r.note?`<div class="week-note" style="grid-column:1 / -1">備註：${escapeHtml(r.note)}</div>`:''}</div>`).join('')}${renderCorrectionRow(g,corr,corrParts)}</div></div>`;
+      }).join('');
+      if(legacy.length){ html+=`<div style="margin:18px 2px 8px;font-size:12px;color:var(--hint);font-weight:900;letter-spacing:.08em">2025/06 以前・歷史月資料</div>`; html+=legacy.map(r=>`<div class="month-block"><div class="month-head" style="cursor:default"><div><div class="month-name">${r.year}/${r.month}月</div><div class="recent-sub">歷史月資料</div></div><div><div class="month-total linan">${fmtTwd(r.linan_amount)}</div><div class="month-sub">臨安</div></div><div class="month-nanke"><div class="month-total nanke">${fmtTwd(r.nanke_amount)}</div><div class="month-sub">南科</div></div><div class="month-ret"><div class="month-total">${fmtTwd(Number(r.linan_amount||0)+Number(r.nanke_amount||0))}</div><div class="month-sub">月總業績</div></div><div></div></div>${r.note?`<div class="legacy-note"><span>${r.note}</span></div>`:''}</div>`).join(''); }
+      dom.historyList.innerHTML=html||'<div class="empty">目前沒有歷史資料</div>';
+      dom.historyList.querySelectorAll('[data-toggle-month]').forEach(el=>el.addEventListener('click',()=>{const key=el.dataset.toggleMonth,block=el.closest('.month-block');const opening=!block.classList.contains('open');block.classList.toggle('open',opening);opening?ST.expanded.add(key):ST.expanded.delete(key);}));
+      dom.historyList.querySelectorAll('[data-edit-week]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const r=ST.effectiveWeeks.find(x=>x.week_start_date===btn.dataset.editWeek);openModal(r);}));
+      dom.historyList.querySelectorAll('[data-corr]').forEach(inp=>inp.addEventListener('change',()=>saveCorrection(inp.dataset.year,inp.dataset.month,inp.dataset.corr,inp.value)));
     }
 
-    function closeModal() { dom.entryModal.classList.add("hidden"); }
-
-    async function handleDelete() {
-      const id = dom.editId.value;
-      if (!id) return;
-
-      const result = await Swal.fire({
-        title: '確定要刪除嗎？',
-        text: "刪除後將無法復原！",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#334155',
-        confirmButtonText: '是的，刪除',
-        cancelButtonText: '取消',
-        background: '#1e293b',
-        color: '#fff'
-      });
-
-      if (result.isConfirmed) {
-        const { error } = await supabase.from('sales_performance').delete().eq('id', id);
-        if (error) {
-          Swal.fire({ icon: "error", title: "刪除失敗", text: error.message, background: "#1e293b", color: "#fff" });
-        } else {
-          closeModal();
-          Swal.fire({ icon: "success", title: "已刪除", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-          await refreshData();
-        }
-      }
+    function renderCorrectionRow(g,corr,corrParts){
+      if(!ST.isAdmin&&!corrParts.length)return '';
+      if(ST.isAdmin) return `<div class="legacy-note"><span>月總修正（保留既有功能，不影響每週手動／自動來源判定）</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label>臨安 <input class="corr-input" type="number" data-corr="linan" data-year="${g.year}" data-month="${g.month}" value="${corr.linan_correction??''}" placeholder="未修正"></label><label>南科 <input class="corr-input" type="number" data-corr="nanke" data-year="${g.year}" data-month="${g.month}" value="${corr.nanke_correction??''}" placeholder="未修正"></label></span></div>`;
+      return `<div class="legacy-note"><span>月總修正</span><span>${corrParts.join('・')}</span></div>`;
     }
 
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-      if (!isAdmin) return;
-
-      const dateIso = dom.inputDate.value;
-      if (!dateIso) return;
-
-      const r = getWeekRange(dateIso);
-      const major = getMajorMonth(toISODateLocal(r.start));
-
-      const lNew = Number(dom.inputLinanNew.value || 0);
-      const lRet = Number(dom.inputLinanReturning.value || 0);
-      const nNew = Number(dom.inputNankeNew.value || 0);
-      const nRet = Number(dom.inputNankeReturning.value || 0);
-
-      const payload = {
-        period_type: "weekly",
-        year: major.year,
-        month: major.month,
-        week_start_date: toISODateLocal(r.start),
-        week_end_date: toISODateLocal(r.end),
-        linan_new: lNew,
-        linan_returning: lRet,
-        linan_amount: lNew + lRet,
-        nanke_new: nNew,
-        nanke_returning: nRet,
-        nanke_amount: nNew + nRet,
-        note: (dom.inputNote.value || "").trim() || null,
-        updated_at: new Date().toISOString()
-      };
-
-      const id = (dom.editId.value || "").trim();
-      let error = null;
-
-      if (id) {
-        const res = await supabase.from("sales_performance").update(payload).eq("id", id);
-        error = res.error;
-      } else {
-        const res = await supabase.from("sales_performance").insert([payload]);
-        error = res.error;
-      }
-
-      if (error) {
-        Swal.fire({ icon: "error", title: "儲存失敗", text: error.message, background: "#1e293b", color: "#fff" });
-        return;
-      }
-
-      closeModal();
-      Swal.fire({ icon: "success", title: "儲存成功", timer: 900, showConfirmButton: false, background: "#1e293b", color: "#fff" });
-      await refreshData();
+    async function saveCorrection(year,month,store,value){
+      if(!ST.isAdmin)return; const key=`${year}_${month}`; const existing=ST.corrections[key]||{};
+      const payload={year:Number(year),month:Number(month),linan_correction:store==='linan'?(value===''?null:Number(value)):(existing.linan_correction??null),nanke_correction:store==='nanke'?(value===''?null:Number(value)):(existing.nanke_correction??null),updated_at:new Date().toISOString()};
+      const res=await supabase.from('monthly_corrections').upsert(payload,{onConflict:'year,month'}).select().single();
+      if(res.error){Swal.fire({icon:'error',title:'修正數字儲存失敗',text:res.error.message});return;} ST.corrections[key]=res.data; renderHistory();
     }
+
+    function updateAdminUI(){
+      dom.login.classList.toggle('hidden',ST.isAdmin); dom.logout.classList.toggle('hidden',!ST.isAdmin); dom.adminStatus.classList.toggle('hidden',!ST.isAdmin); dom.btnAdd.classList.toggle('hidden',!ST.isAdmin); $('heroActions').classList.toggle('hidden',!ST.isAdmin||!ST.summaryWeeks.length);
+      renderRecent(); renderHistory();
+    }
+
+    async function checkAdminSession(){ const {data:{session}}=await supabase.auth.getSession(); ST.isAdmin=!!session; updateAdminUI(); }
+    async function loginSupabase(){ const email=dom.admEmail.value.trim(),password=dom.admPwd.value.trim(); if(!email||!password)return; const {error}=await supabase.auth.signInWithPassword({email,password}); if(error){Swal.fire({icon:'error',title:'登入失敗',text:error.message});return;} dom.loginModal.classList.remove('show'); await checkAdminSession(); Swal.fire({icon:'success',title:'管理員登入成功',timer:900,showConfirmButton:false}); }
+    async function logoutSupabase(){ await supabase.auth.signOut(); await checkAdminSession(); }
+
+    function autoForWeek(startIso){ return ST.autoWeekMap.get(startIso)||{week_start_date:startIso,week_end_date:toISO(addDays(parseISO(startIso),6)),linan_new:0,linan_returning:0,nanke_new:0,nanke_returning:0,linan_amount:0,nanke_amount:0,linan_visits:0,nanke_visits:0}; }
+    function updateBaseline(startIso){ const a=autoForWeek(startIso); dom.baseline.innerHTML=`<b>客源表單自動底稿</b><br>臨安：新客 ${fmtTwd(a.linan_new)}／舊客 ${fmtTwd(a.linan_returning)}，南科：新客 ${fmtTwd(a.nanke_new)}／舊客 ${fmtTwd(a.nanke_returning)}<br>來客數：臨安 ${a.linan_visits||0}／南科 ${a.nanke_visits||0} 人。`; return a; }
+    function fillInputs(row){ dom.lNew.value=Number(row.linan_new||0);dom.lRet.value=Number(row.linan_returning||0);dom.nNew.value=Number(row.nanke_new||0);dom.nRet.value=Number(row.nanke_returning||0);updateModalTotals(); }
+    function updateModalTotals(){ $('linanTotal').textContent=fmtTwd(Number(dom.lNew.value||0)+Number(dom.lRet.value||0));$('nankeTotal').textContent=fmtTwd(Number(dom.nNew.value||0)+Number(dom.nRet.value||0)); }
+    function showWeekRange(dateIso){ const r=weekRange(dateIso);$('weekRangeDisplay').textContent=`週期：${weekLabelLong(toISO(r.start))}`;return r; }
+
+    function openModal(row){
+      if(!ST.isAdmin)return; dom.form.reset(); const isManual=row?.source_type==='manual'; dom.editId.value=isManual?(row.id||''):''; const date=row?.week_start_date||(ST.summaryWeeks[0]?.week_start_date||toISO(addDays(parseISO(currentSummaryCutoff()),-7))); dom.inputDate.value=date; const r=showWeekRange(date); const start=toISO(r.start); const auto=updateBaseline(start); fillInputs(isManual?row:auto); dom.note.value=isManual?(row.note||''):''; dom.btnDelete.classList.toggle('hidden',!isManual); $('modalTitle').textContent=isManual?'編輯手動覆寫':'確認／調整週業績'; dom.entryModal.classList.add('show');
+    }
+    function closeModal(){dom.entryModal.classList.remove('show');}
+
+    async function handleDelete(){
+      const id=dom.editId.value.trim(); if(!id)return;
+      const result=await Swal.fire({icon:'warning',title:'移除手動覆寫？',text:'移除後，這一週將重新顯示客源表單自動加總資料；原始客源表單不會被刪除。',showCancelButton:true,confirmButtonText:'移除覆寫',cancelButtonText:'取消',confirmButtonColor:'#b45e5e'});
+      if(!result.isConfirmed)return; const {error}=await supabase.from('sales_performance').delete().eq('id',id); if(error){Swal.fire({icon:'error',title:'移除失敗',text:error.message});return;} closeModal(); await refreshData(); Swal.fire({icon:'success',title:'已恢復自動彙總',timer:1000,showConfirmButton:false});
+    }
+
+    async function handleSubmit(e){
+      e.preventDefault(); if(!ST.isAdmin)return; const date=dom.inputDate.value; if(!date)return; const r=weekRange(date),start=toISO(r.start),end=toISO(r.end),major=getMajorMonth(start);
+      const lNew=Number(dom.lNew.value||0),lRet=Number(dom.lRet.value||0),nNew=Number(dom.nNew.value||0),nRet=Number(dom.nRet.value||0);
+      const payload={period_type:'weekly',year:major.year,month:major.month,week_start_date:start,week_end_date:end,linan_new:lNew,linan_returning:lRet,linan_amount:lNew+lRet,nanke_new:nNew,nanke_returning:nRet,nanke_amount:nNew+nRet,note:dom.note.value.trim()||null,updated_at:new Date().toISOString()};
+      const explicitId=dom.editId.value.trim(); const existing=ST.manualWeekMap.get(start); const id=explicitId||(existing?.id||''); let res;
+      if(id) res=await supabase.from('sales_performance').update(payload).eq('id',id); else res=await supabase.from('sales_performance').insert([payload]);
+      if(res.error){Swal.fire({icon:'error',title:'儲存失敗',text:res.error.message});return;} closeModal(); await refreshData(); Swal.fire({icon:'success',title:'手動資料已儲存',timer:950,showConfirmButton:false});
+    }
+
+    async function initApp(){ setLoading(true,'正在連線業績資料…'); await checkAdminSession(); await refreshData(); }
+
+    dom.enter.addEventListener('click',unlock); dom.pass.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+    dom.login.addEventListener('click',()=>dom.loginModal.classList.add('show')); dom.btnCloseAdminLogin.addEventListener('click',()=>dom.loginModal.classList.remove('show')); dom.loginModal.addEventListener('click',e=>{if(e.target===dom.loginModal)dom.loginModal.classList.remove('show');});
+    dom.btnAdminLogin.addEventListener('click',loginSupabase); dom.admPwd.addEventListener('keydown',e=>{if(e.key==='Enter')loginSupabase();}); dom.logout.addEventListener('click',logoutSupabase);
+    dom.btnAdd.addEventListener('click',()=>openModal(null)); dom.btnCloseEntry.addEventListener('click',closeModal); dom.entryModal.addEventListener('click',e=>{if(e.target===dom.entryModal)closeModal();}); dom.btnDelete.addEventListener('click',handleDelete); dom.form.addEventListener('submit',handleSubmit);
+    [dom.lNew,dom.lRet,dom.nNew,dom.nRet].forEach(el=>el.addEventListener('input',updateModalTotals));
+    dom.inputDate.addEventListener('change',()=>{const r=showWeekRange(dom.inputDate.value);const start=toISO(r.start);const existing=ST.manualWeekMap.get(start);dom.editId.value=existing?.id||'';dom.btnDelete.classList.toggle('hidden',!existing);const auto=updateBaseline(start);fillInputs(existing?{...existing,source_type:'manual'}:auto);dom.note.value=existing?.note||'';$('modalTitle').textContent=existing?'編輯手動覆寫':'確認／調整週業績';});
+    $('btnExpandAll').addEventListener('click',()=>{dom.historyList.querySelectorAll('.month-block[data-month]').forEach(block=>{block.classList.add('open');ST.expanded.add(block.dataset.month);});}); $('btnCollapseAll').addEventListener('click',()=>{dom.historyList.querySelectorAll('.month-block[data-month]').forEach(block=>block.classList.remove('open'));ST.expanded.clear();});
+    $('viewSeg').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ST.chartView=btn.dataset.view;$('viewSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));renderChart();}));
+    $('rangeSeg').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ST.chartRange=btn.dataset.range;$('rangeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));renderChart();}));
+    ['toggleLinanSales','toggleNankeSales','toggleVisits'].forEach(id=>$(id).addEventListener('change',renderChart));
+    window.addEventListener('resize',()=>requestAnimationFrame(updateRecentScrollState));
+
+    showAppOrLock();
   </script>
 </body>
 </html>
