@@ -293,6 +293,7 @@
     .tag-purpose { background:rgba(0,0,0,0.04); color:var(--text-secondary); margin:2px; border: 1px solid rgba(0,0,0,0.05); }
     .tag-store-a { background:rgba(66,133,244,0.15); color:var(--store-a); }
     .tag-store-b { background:rgba(52,168,83,0.15); color:var(--store-b); }
+    .tag-service { background:rgba(66,133,244,0.07); color:var(--google-blue); border:1px solid rgba(66,133,244,.28); margin-left:6px; }
     .jwrap { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
     .jbadge { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; color:#fff; background:var(--c,var(--text-hint)); white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .jbadge .jarrow { color:rgba(255,255,255,0.8); margin:0 2px; font-weight:900; }
@@ -514,6 +515,16 @@
               </div>
             </div>
 
+            <!-- iOS Style Segmented Control: 客服來源 -->
+            <div class="filter-group" style="padding: 6px; background: rgba(0,0,0,0.02); border: none; box-shadow: none;">
+              <span class="seg-label" style="margin: 0 8px;">客服</span>
+              <div class="ios-seg-group" id="segService">
+                <div class="ios-seg-pill"></div>
+                <div class="ios-seg-btn selected" onclick="setSegFilter('service',null,this)">全部</div>
+                <div class="ios-seg-btn" onclick="setSegFilter('service',true,this)">客服</div>
+              </div>
+            </div>
+
             <div class="filter-group" style="flex:1;min-width:200px;background:rgba(0,0,0,0.02);border:none;box-shadow:none;">
               <span style="color:var(--text-secondary);font-size:16px;">🔍</span>
               <input id="qSearch" placeholder="搜尋姓名、備註、客源…多詞用空白隔開" style="flex:1;font-size:15px;" onkeyup="if(event.key==='Enter')applyFilter()">
@@ -546,7 +557,7 @@
         <div class="section-head" onclick="toggleSection('secJourney')">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
             <h3 class="h3" style="font-size: 22px;">顧客旅程</h3>
-            <span id="sankeyHint" class="hint" style="background:rgba(0,0,0,0.04);padding:6px 12px;border-radius:8px;font-weight:800;color:var(--text-primary);">完整消費路徑 ➜ 來店（多段旅程・精簡主幹）</span>
+            <span id="sankeyHint" class="hint" style="background:rgba(0,0,0,0.04);padding:6px 12px;border-radius:8px;font-weight:800;color:var(--text-primary);">完整消費路徑 ➜ 來店（單一＋多段旅程・精簡主幹）</span>
           </div>
           <div style="display:flex;align-items:center;gap:16px;">
             <div class="ios-seg-group" id="segSankeyView" onclick="event.stopPropagation()">
@@ -570,7 +581,7 @@
           </div>
           <!-- 直接來店的客群（無其他路徑）清單 -->
           <div class="direct-block">
-            <div class="direct-title" style="font-size: 16px;">直接來店的客群（無其他路徑）<span class="direct-sub" style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.05);">只填了單一來源的顧客・前 5 名</span></div>
+            <div class="direct-title" style="font-size: 16px;">單一來源客群排行<span class="direct-sub" style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.05);">桑基圖中的單一來源客群・前 5 名</span></div>
             <div id="directList" class="direct-list"></div>
           </div>
         </div>
@@ -738,6 +749,13 @@
             </div>
           </div>
         </div>
+        <div class="field"><label class="field-label">客服來源</label>
+          <div class="ios-seg-group" id="segEditService" style="width:220px;">
+            <div class="ios-seg-pill"></div>
+            <div class="ios-seg-btn selected" onclick="setEditService(false,this)">否</div>
+            <div class="ios-seg-btn" onclick="setEditService(true,this)">是</div>
+          </div>
+        </div>
         <div class="field" id="boxAmount"><label class="field-label">消費金額 (TWD) <span class="req">*</span></label><input id="mAmount" type="number" class="input" placeholder="請輸入金額（需大於 0）"></div>
         <div class="field" style="display:flex;gap:16px;align-items:flex-end;">
           <div style="flex:1;"><label class="field-label">姓名 <span class="req">*</span></label><input id="mName" class="input" placeholder="顧客姓名"></div>
@@ -876,17 +894,17 @@
       {k:"gender",n:"性別"},{k:"age_range",n:"年齡"},{k:"is_local",n:"台南住戶"},
       {k:"source_tags",n:"客源旅程"},{k:"visit_purposes",n:"目的"},{k:"search_keywords",n:"關鍵字"},
       {k:"detail_desc",n:"備註"},{k:"is_new_customer",n:"新客"},{k:"amount",n:"金額"},
-      {k:"has_purchased",n:"有消費"}
+      {k:"has_purchased",n:"有消費"},{k:"is_customer_service",n:"客服來源"}
     ]
   });
 
   const ST = {
     raw: [], filtered: [], limit: 20, store: "全部",
-    filter: { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, keyword:null },
+    filter: { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, service:null, keyword:null },
     datePicker: null, exportPicker: null,
     isAdmin: false, adminRole: null,
     editingId: null, currentDetailId: null,
-    editSeg: { cust: null, pay: true },
+    editSeg: { cust: null, pay: true, service: false },
     editJourney: [],
     touchMode: "first", sankeyMode: "all", sankeyView: "compact", keywordRawView: "popular", keywordShowAll: false,
     subAdmins: [],
@@ -1113,6 +1131,7 @@
   window.setSegFilter = (dim, val, el) => {
     if (dim === "cust") ST.filter.cust = (val === true) ? "new" : (val === false) ? "old" : null;
     if (dim === "pay")  ST.filter.pay  = (val === true) ? "paid" : (val === false) ? "unpaid" : null;
+    if (dim === "service") ST.filter.service = (val === true) ? true : null;
     const grp = el.parentElement;
     qa(".ios-seg-btn", grp).forEach(b => b.classList.remove("selected"));
     if (el) el.classList.add("selected");
@@ -1150,8 +1169,10 @@
   };
 
   window.resetSeg = (dim) => {
-    const grpId = dim === "cust" ? "segCust" : "segPay";
-    if (dim === "cust") ST.filter.cust = null; else ST.filter.pay = null;
+    const grpId = dim === "cust" ? "segCust" : dim === "pay" ? "segPay" : "segService";
+    if (dim === "cust") ST.filter.cust = null;
+    else if (dim === "pay") ST.filter.pay = null;
+    else ST.filter.service = null;
     const grp = $(grpId);
     const btns = qa(".ios-seg-btn", grp);
     btns.forEach(b => b.classList.remove("selected"));
@@ -1161,11 +1182,11 @@
   };
 
   window.clearFilter = () => {
-    ST.filter = { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, keyword:null };
+    ST.filter = { source:[], purpose:[], gender:null, age:null, cust:null, pay:null, service:null, keyword:null };
     ST.store = "全部";
     syncStoreUI();
 
-    ["segCust","segPay"].forEach(grpId => {
+    ["segCust","segPay","segService"].forEach(grpId => {
       const grp = $(grpId);
       const btns = qa(".ios-seg-btn", grp);
       btns.forEach(b => b.classList.remove("selected"));
@@ -1255,6 +1276,7 @@
     if (ST.filter.age)     chips.push(`<span class="chip" onclick="setAgeFilter('${ST.filter.age}')">年齡：${ST.filter.age} ✕</span>`);
     if (ST.filter.cust)    chips.push(`<span class="chip" onclick="resetSeg('cust')">${ST.filter.cust==='new'?'新客':'老客'} ✕</span>`);
     if (ST.filter.pay)     chips.push(`<span class="chip" onclick="resetSeg('pay')">${ST.filter.pay==='paid'?'有消費':'未消費'} ✕</span>`);
+    if (ST.filter.service) chips.push(`<span class="chip" onclick="resetSeg('service')">客服來源 ✕</span>`);
     if (ST.filter.keyword) chips.push(`<span class="chip" style="border-color:var(--google-yellow);color:var(--google-yellow);" onclick="setKeywordFilter('${ST.filter.keyword.replace(/'/g,"\\'")}')">關鍵字：${ST.filter.keyword} ✕</span>`);
     
     if (chips.length) {
@@ -1276,6 +1298,7 @@
     if (f.cust === "old" && v.is_new_customer) return false;
     if (f.pay === "paid" && !(Number(v.amount) > 0)) return false;
     if (f.pay === "unpaid" && Number(v.amount) > 0) return false;
+    if (f.service && v.is_customer_service !== true) return false;
     
     // 關鍵字單選過濾邏輯
     if (f.keyword) {
@@ -1838,7 +1861,7 @@
 
   function pathOf(v){
     const tags = cleanTags(v.source_tags);
-    if (tags.length < 2) return null;
+    if (!tags.length) return null;
     return tags;
   }
 
@@ -1904,7 +1927,9 @@
     const allPaths = [...pathCount.entries()].sort((a,b) => b[1] - a[1]);
     const maxSteps = Math.max(...allPaths.map(([key]) => JSON.parse(key).length));
     const compact = viewMode === "compact";
-    const stagePlan = compact ? compactStagePlan(allPaths, maxSteps) : null;
+    // 精簡模式的主幹仍只由多段旅程決定，避免大量單一來源改變原本的精簡結果。
+    const multiPaths = allPaths.filter(([key]) => JSON.parse(key).length >= 2);
+    const stagePlan = compact && multiPaths.length ? compactStagePlan(multiPaths, maxSteps) : null;
 
     const nodeKeys = []; const nodeLabel = []; const nodeColor = []; const nodeX = []; const nodeCustom = []; const idxOf = new Map();
 
@@ -1938,7 +1963,7 @@
     allPaths.forEach(([key, cnt]) => {
       const path = JSON.parse(key);
       const displayPath = path.map((tag, step) => {
-        if (!compact) return tag;
+        if (!compact || path.length === 1 || !stagePlan) return tag;
         return stagePlan[step].keep.has(tag) ? tag : SANKEY_COMPACT_OTHER;
       });
 
@@ -2025,8 +2050,8 @@
     const hint = $("sankeyHint");
     if (!hint) return;
     hint.textContent = ST.sankeyView === "compact"
-      ? "完整消費路徑 ➜ 來店（多段旅程・精簡主幹）"
-      : "完整消費路徑 ➜ 來店（多段旅程・全路徑彙總）";
+      ? "完整消費路徑 ➜ 來店（單一＋多段旅程・精簡主幹）"
+      : "完整消費路徑 ➜ 來店（單一＋多段旅程・全路徑彙總）";
   }
 
   window.setSankeyView = (mode, el) => {
@@ -2096,10 +2121,11 @@
       const cust = v.is_new_customer ? '<span class="tag tag-new">新客</span>' : '<span class="tag tag-old">老客</span>';
       const pay = paid ? `<span class="tag tag-paid">NT$${fmtTwd(v.amount)}</span>` : '<span class="tag tag-none">未消費</span>';
       const purposes = arr(v.visit_purposes).map(p=>`<span class="tag tag-purpose">${p}</span>`).join("");
+      const serviceTag = v.is_customer_service === true ? '<span class="tag tag-service">客服</span>' : '';
       return `<tr onclick="showDetail('${v.id}')" onmouseenter="showPreview(event,'${v.id}')" onmouseleave="hidePreview()" class="flight-row-enter" style="animation-delay: ${i * 30}ms;">
         <td class="mono">${s(v.form_date).slice(0,10)}</td>
         <td><span class="tag ${v.store_branch==='臨安店'?'tag-store-a':'tag-store-b'}">${s(v.store_branch)}</span></td>
-        <td>${maskName(v.customer_name)}</td>
+        <td>${maskName(v.customer_name)}${serviceTag}</td>
         <td>${cust}</td><td>${pay}</td>
         <td class="mono hint">${s(v.gender)||'-'} / ${s(v.age_range)||'-'}</td>
         <td><div class="jwrap">${journeyBadges(v.source_tags)||'<span class="hint">-</span>'}</div></td>
@@ -2184,6 +2210,7 @@
     const ga = $("grpAge"); if (ga) ga.innerHTML = CFG.AGES.map(a => `<div class="radio-btn" onclick="selectRadio('grpAge','${a}',this)">${a}</div>`).join("");
     const gs = $("grpSource"); if (gs) gs.innerHTML = CFG.SOURCES.map(src => `<div class="chk-btn" data-val="${src}" onclick="hEditSrc('${src.replace(/'/g,"\\'")}',this)">${src}</div>`).join("");
     const gp = $("grpPurpose"); if (gp) gp.innerHTML = CFG.PURPOSES.map(p => `<div class="chk-btn" data-val="${p}" onclick="this.classList.toggle('checked')">${p}</div>`).join("");
+    const svcGrp = $("segEditService"); if (svcGrp) { const btns=qa(".ios-seg-btn",svcGrp); btns.forEach(b=>b.classList.remove("selected")); btns[0]&&btns[0].classList.add("selected"); ST.editSeg.service=false; updateIosPill(svcGrp); }
   }
 
   window.openAddModal = () => { $("addModal").classList.add("show"); };
@@ -2209,6 +2236,10 @@
     ST.editSeg.pay = val; const grp = el.parentElement;
     qa(".ios-seg-btn", grp).forEach(b => b.classList.remove("selected")); el && el.classList.add("selected"); updateIosPill(grp);
     $("boxAmount") && ($("boxAmount").style.display = val ? "" : "none");
+  };
+  window.setEditService = (val, el) => {
+    ST.editSeg.service = !!val; const grp = el.parentElement;
+    qa(".ios-seg-btn", grp).forEach(b => b.classList.remove("selected")); el && el.classList.add("selected"); updateIosPill(grp);
   };
 
   window.hEditSrc = (src, el) => {
@@ -2244,6 +2275,8 @@
     updateIosPill(cGrp);
 
     const pGrp = $("segEditPay"); setEditPay(Number(v.amount) > 0, qa(".ios-seg-btn", pGrp)[Number(v.amount)>0?0:1]);
+    const svcGrp = $("segEditService"), svcBtns = qa(".ios-seg-btn", svcGrp);
+    ST.editSeg.service = v.is_customer_service === true; svcBtns.forEach(b=>b.classList.remove("selected")); svcBtns[ST.editSeg.service?1:0]&&svcBtns[ST.editSeg.service?1:0].classList.add("selected"); updateIosPill(svcGrp);
     
     selectRadioByValue("grpGender", v.gender); selectRadioByValue("grpAge", v.age_range);
     ST.editJourney = cleanTags(v.source_tags).filter(t => t !== "老客回購" && t !== "老客-未購");
@@ -2256,8 +2289,8 @@
     const date = $("mDate").value; const store = $("mStore").value; let name = s($("mName").value).trim() || "未留資料";
     const isLocal = $("mTainan").checked; const gender = $("grpGender").dataset.value || ""; const age = $("grpAge").dataset.value || "";
     const pay = ST.editSeg.pay; const amount = pay ? Number($("mAmount").value || 0) : 0;
-    const purposes = qa("#grpPurpose .chk-btn.checked").map(b => b.dataset.val); const keyword = s($("mKeyword").value).trim();
-    let sources = [...ST.editJourney]; const isNew = ST.editSeg.cust;
+    const purposes = qa("#grpPurpose .chk-btn.checked").map(b => b.dataset.val); const keyword = s($("mKeyword").value).trim(); const detailText = s($("mDetail").value);
+    const sourceBase = [...ST.editJourney]; let sources = [...sourceBase]; const isNew = ST.editSeg.cust; const isService = ST.editSeg.service === true;
 
     if (!date){ alert("請選擇日期"); return; } if (!gender){ alert("請選擇性別"); return; } if (!age){ alert("請選擇年齡層"); return; }
     if (!sources.length){ alert("請至少選一個客源"); return; } if (!purposes.length){ alert("請至少選一個目的"); return; }
@@ -2272,10 +2305,34 @@
     const btn = $("btnSave"); btn && (btn.disabled = true, btn.innerText = "儲存中...");
     try {
       if (ST.editingId){
-        const payload = { form_date: date, store_branch: store, customer_name: name, gender, age_range: age, is_local: isLocal, source_tags: sources, visit_purposes: purposes, search_keywords: keyword, detail_desc: s($("mDetail").value), amount, has_purchased: amount > 0, is_new_customer: isNew === null ? null : isNew, updated_at: new Date().toISOString() };
-        const { error } = await window.supabase.from("visits").update(payload).eq("id", ST.editingId); if (error) throw error;
+        const original = ST.raw.find(x => String(x.id) === String(ST.editingId));
+        const originalSourceBase = original ? cleanTags(original.source_tags).filter(t => t !== "老客回購" && t !== "老客-未購") : [];
+        const sameArray = (a,b) => a.length === b.length && a.every((v,i) => v === b[i]);
+        const sameSet = (a,b) => { const aa=[...a].sort(), bb=[...b].sort(); return sameArray(aa,bb); };
+        const nonServiceUnchanged = !!original
+          && date === s(original.form_date).slice(0,10)
+          && store === s(original.store_branch)
+          && name === s(original.customer_name)
+          && gender === s(original.gender)
+          && age === s(original.age_range)
+          && isLocal === !!original.is_local
+          && sameArray(sourceBase, originalSourceBase)
+          && sameSet(purposes, arr(original.visit_purposes))
+          && keyword === s(original.search_keywords).trim()
+          && detailText === s(original.detail_desc)
+          && amount === Number(original.amount || 0)
+          && (isNew === null ? original.is_new_customer == null : isNew === original.is_new_customer);
+
+        if (nonServiceUnchanged){
+          if ((original.is_customer_service === true) !== isService){
+            const { error } = await window.supabase.from("visits").update({ is_customer_service:isService, updated_at:new Date().toISOString() }).eq("id", ST.editingId); if (error) throw error;
+          }
+        } else {
+          const payload = { form_date: date, store_branch: store, customer_name: name, gender, age_range: age, is_local: isLocal, source_tags: sources, visit_purposes: purposes, search_keywords: keyword, detail_desc: detailText, amount, has_purchased: amount > 0, is_new_customer: isNew === null ? null : isNew, is_customer_service: isService, updated_at: new Date().toISOString() };
+          const { error } = await window.supabase.from("visits").update(payload).eq("id", ST.editingId); if (error) throw error;
+        }
       } else {
-        const { error } = await window.supabase.rpc("submit_visit_v9", { p_date: date, p_store: store, p_name: name, p_gender: gender, p_age: age, p_is_local: isLocal, p_sources: sources, p_purposes: purposes, p_keywords: keyword, p_detail: s($("mDetail").value), p_is_new_customer: isNew === null ? null : isNew, p_amount: amount, p_ad_source_detail: keyword });
+        const { error } = await window.supabase.rpc("submit_visit_v10", { p_date: date, p_store: store, p_name: name, p_gender: gender, p_age: age, p_is_local: isLocal, p_sources: sources, p_purposes: purposes, p_keywords: keyword, p_detail: detailText, p_is_new_customer: isNew === null ? null : isNew, p_amount: amount, p_ad_source_detail: keyword, p_has_purchased: pay, p_is_customer_service: isService });
         if (error) throw error;
       }
       closeAddModal(); ST.editingId = null; await fetchAllData(); alert("✅ 儲存成功");
@@ -2317,6 +2374,7 @@
         <h2 style="font-size: 28px; font-weight: 900; margin-bottom: 8px; color: var(--text-primary);">${maskName(v.customer_name)}</h2>
         <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); font-weight: 700;">
           <span class="tag ${v.store_branch==='臨安店'?'tag-store-a':'tag-store-b'}">${s(v.store_branch)}</span>
+          ${v.is_customer_service === true ? '<span class="tag tag-service">客服</span>' : ''}
           <span>${s(v.form_date).slice(0,10)} • ${s(v.gender)||'-'} / ${s(v.age_range)||'-'}</span>
         </div>
       </div>
@@ -2485,9 +2543,10 @@ ${v.search_keywords ? `
         const list = res.data; let ok = 0, fail = 0; const errs = [];
         for (let i = 0; i < list.length; i++){
           const row = list[i]; const d = s(row["form_date"] || row["日期"]).slice(0,10); const n = s(row["customer_name"] || row["姓名"]).trim(); const amt = Number(row["amount"] || row["金額"] || 0) || 0;
-          const payload = { p_date: d, p_store: row["store_branch"] || row["分店"] || "臨安店", p_name: CFG.INVALID_NAMES.includes(n) || !n ? "未留資料" : n, p_gender: row["gender"] || row["性別"] || "", p_age: row["age_range"] || row["年齡"] || "", p_is_local: /是|true|1/i.test(s(row["is_local"] || row["台南住戶"])), p_sources: s(row["source_tags"] || row["客源旅程"] || "").replace(/[\[\]"]/g,"").split(/[,，]/).map(x=>x.trim()).filter(Boolean), p_purposes: s(row["visit_purposes"] || row["目的"] || "").replace(/[\[\]"]/g,"").split(/[,，]/).map(x=>x.trim()).filter(Boolean), p_keywords: row["search_keywords"] || row["關鍵字"] || "", p_detail: row["detail_desc"] || row["備註"] || "", p_is_new_customer: /是|true|1|新/i.test(s(row["is_new_customer"] || row["新客"])), p_amount: amt, p_ad_source_detail: row["search_keywords"] || row["關鍵字"] || "" };
+          const serviceRaw = s(row["is_customer_service"] || row["客服來源"] || "").trim();
+          const payload = { p_date: d, p_store: row["store_branch"] || row["分店"] || "臨安店", p_name: CFG.INVALID_NAMES.includes(n) || !n ? "未留資料" : n, p_gender: row["gender"] || row["性別"] || "", p_age: row["age_range"] || row["年齡"] || "", p_is_local: /是|true|1/i.test(s(row["is_local"] || row["台南住戶"])), p_sources: s(row["source_tags"] || row["客源旅程"] || "").replace(/[\[\]"]/g,"").split(/[,，]/).map(x=>x.trim()).filter(Boolean), p_purposes: s(row["visit_purposes"] || row["目的"] || "").replace(/[\[\]"]/g,"").split(/[,，]/).map(x=>x.trim()).filter(Boolean), p_keywords: row["search_keywords"] || row["關鍵字"] || "", p_detail: row["detail_desc"] || row["備註"] || "", p_is_new_customer: /是|true|1|新/i.test(s(row["is_new_customer"] || row["新客"])), p_amount: amt, p_ad_source_detail: row["search_keywords"] || row["關鍵字"] || "", p_has_purchased: amt > 0, p_is_customer_service: /^(是|true|1|客服)$/i.test(serviceRaw) };
           status.innerText = `匯入中 ${i+1} / ${list.length}（成功 ${ok}・失敗 ${fail}）`; progress.style.width = Math.round((i+1)/list.length*100) + "%";
-          try { const { error } = await window.supabase.rpc("submit_visit_v9", payload); if (error) throw error; ok++; } catch (err){ fail++; errs.push(`第 ${i+2} 列（${n||"未留資料"}）：${err.message||err}`); }
+          try { const { error } = await window.supabase.rpc("submit_visit_v10", payload); if (error) throw error; ok++; } catch (err){ fail++; errs.push(`第 ${i+2} 列（${n||"未留資料"}）：${err.message||err}`); }
         }
         status.innerText = `完成：成功 ${ok} 筆・失敗 ${fail} 筆`;
         if (errs.length){ errLog.classList.remove("hidden"); errLog.innerHTML = errs.join("<br>"); }

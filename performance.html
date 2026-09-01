@@ -414,7 +414,7 @@
       sales:[], visits:[], corrections:{},
       effectiveWeeks:[], summaryWeeks:[], autoWeekMap:new Map(), manualWeekMap:new Map(),
       chart:null, heroCharts:new Map(), recentCharts:new Map(), chartView:"weekly", chartRange:"12",
-      expanded:new Set(), expandedRecent:new Set(), pageLoaded:false
+      expanded:new Set(), expandedRecent:new Set(), pageLoaded:false, editSnapshot:null
     };
 
     const $ = (id) => document.getElementById(id);
@@ -693,8 +693,8 @@
     }
 
     async function saveCorrection(year,month,store,value){
-      if(!ST.isAdmin)return; const key=`${year}_${month}`; const existing=ST.corrections[key]||{};
-      const payload={year:Number(year),month:Number(month),linan_correction:store==='linan'?(value===''?null:Number(value)):(existing.linan_correction??null),nanke_correction:store==='nanke'?(value===''?null:Number(value)):(existing.nanke_correction??null),updated_at:new Date().toISOString()};
+      if(!ST.isAdmin)return; const key=`${year}_${month}`; const field=store==='linan'?'linan_correction':'nanke_correction';
+      const payload={year:Number(year),month:Number(month),[field]:value===''?null:Number(value),updated_at:new Date().toISOString()};
       const res=await supabase.from('monthly_corrections').upsert(payload,{onConflict:'year,month'}).select().single();
       if(res.error){Swal.fire({icon:'error',title:'修正數字儲存失敗',text:res.error.message});return;} ST.corrections[key]=res.data; renderHistory();
     }
@@ -715,7 +715,7 @@
     function showWeekRange(dateIso){ const r=weekRange(dateIso);$('weekRangeDisplay').textContent=`週期：${weekLabelLong(toISO(r.start))}`;return r; }
 
     function openModal(row){
-      if(!ST.isAdmin)return; dom.form.reset(); const isManual=row?.source_type==='manual'; dom.editId.value=isManual?(row.id||''):''; const date=row?.week_start_date||(ST.summaryWeeks[0]?.week_start_date||toISO(addDays(parseISO(currentSummaryCutoff()),-7))); dom.inputDate.value=date; const r=showWeekRange(date); const start=toISO(r.start); const auto=updateBaseline(start); fillInputs(isManual?row:auto); dom.note.value=isManual?(row.note||''):''; dom.btnDelete.classList.toggle('hidden',!isManual); $('modalTitle').textContent=isManual?'編輯手動覆寫':'確認／調整週業績'; dom.entryModal.classList.add('show');
+      if(!ST.isAdmin)return; dom.form.reset(); const date=row?.week_start_date||(ST.summaryWeeks[0]?.week_start_date||toISO(addDays(parseISO(currentSummaryCutoff()),-7))); dom.inputDate.value=date; const r=showWeekRange(date); const start=toISO(r.start); const existing=ST.manualWeekMap.get(start)||null; const auto=updateBaseline(start); const base=existing||auto; dom.editId.value=existing?.id||''; fillInputs(base); ST.editSnapshot={start,linan_new:Number(base.linan_new||0),linan_returning:Number(base.linan_returning||0),nanke_new:Number(base.nanke_new||0),nanke_returning:Number(base.nanke_returning||0)}; dom.note.value=existing?.note||''; dom.btnDelete.classList.toggle('hidden',!existing); $('modalTitle').textContent=existing?'編輯手動覆寫':'確認／調整週業績'; dom.entryModal.classList.add('show');
     }
     function closeModal(){dom.entryModal.classList.remove('show');}
 
@@ -727,9 +727,14 @@
 
     async function handleSubmit(e){
       e.preventDefault(); if(!ST.isAdmin)return; const date=dom.inputDate.value; if(!date)return; const r=weekRange(date),start=toISO(r.start),end=toISO(r.end),major=getMajorMonth(start);
-      const lNew=Number(dom.lNew.value||0),lRet=Number(dom.lRet.value||0),nNew=Number(dom.nNew.value||0),nRet=Number(dom.nRet.value||0);
+      let lNew=Number(dom.lNew.value||0),lRet=Number(dom.lRet.value||0),nNew=Number(dom.nNew.value||0),nRet=Number(dom.nRet.value||0);
+      const snap=ST.editSnapshot; const linanChanged=!snap||snap.start!==start||lNew!==Number(snap.linan_new||0)||lRet!==Number(snap.linan_returning||0); const nankeChanged=!snap||snap.start!==start||nNew!==Number(snap.nanke_new||0)||nRet!==Number(snap.nanke_returning||0);
+      const currentRes=await supabase.from('sales_performance').select('*').eq('period_type','weekly').eq('week_start_date',start).order('updated_at',{ascending:false}).limit(1);
+      if(currentRes.error){Swal.fire({icon:'error',title:'儲存失敗',text:currentRes.error.message});return;} const current=currentRes.data?.[0]||null;
+      if(current&&!linanChanged){lNew=Number(current.linan_new||0);lRet=Number(current.linan_returning||0);}
+      if(current&&!nankeChanged){nNew=Number(current.nanke_new||0);nRet=Number(current.nanke_returning||0);}
       const payload={period_type:'weekly',year:major.year,month:major.month,week_start_date:start,week_end_date:end,linan_new:lNew,linan_returning:lRet,linan_amount:lNew+lRet,nanke_new:nNew,nanke_returning:nRet,nanke_amount:nNew+nRet,note:dom.note.value.trim()||null,updated_at:new Date().toISOString()};
-      const explicitId=dom.editId.value.trim(); const existing=ST.manualWeekMap.get(start); const id=explicitId||(existing?.id||''); let res;
+      const id=current?.id||dom.editId.value.trim()||''; let res;
       if(id) res=await supabase.from('sales_performance').update(payload).eq('id',id); else res=await supabase.from('sales_performance').insert([payload]);
       if(res.error){Swal.fire({icon:'error',title:'儲存失敗',text:res.error.message});return;} closeModal(); await refreshData(); Swal.fire({icon:'success',title:'手動資料已儲存',timer:950,showConfirmButton:false});
     }
@@ -741,7 +746,7 @@
     dom.btnAdminLogin.addEventListener('click',loginSupabase); dom.admPwd.addEventListener('keydown',e=>{if(e.key==='Enter')loginSupabase();}); dom.logout.addEventListener('click',logoutSupabase);
     dom.btnAdd.addEventListener('click',()=>openModal(null)); dom.btnCloseEntry.addEventListener('click',closeModal); dom.entryModal.addEventListener('click',e=>{if(e.target===dom.entryModal)closeModal();}); dom.btnDelete.addEventListener('click',handleDelete); dom.form.addEventListener('submit',handleSubmit);
     [dom.lNew,dom.lRet,dom.nNew,dom.nRet].forEach(el=>el.addEventListener('input',updateModalTotals));
-    dom.inputDate.addEventListener('change',()=>{const r=showWeekRange(dom.inputDate.value);const start=toISO(r.start);const existing=ST.manualWeekMap.get(start);dom.editId.value=existing?.id||'';dom.btnDelete.classList.toggle('hidden',!existing);const auto=updateBaseline(start);fillInputs(existing?{...existing,source_type:'manual'}:auto);dom.note.value=existing?.note||'';$('modalTitle').textContent=existing?'編輯手動覆寫':'確認／調整週業績';});
+    dom.inputDate.addEventListener('change',()=>{const r=showWeekRange(dom.inputDate.value);const start=toISO(r.start);const existing=ST.manualWeekMap.get(start)||null;dom.editId.value=existing?.id||'';dom.btnDelete.classList.toggle('hidden',!existing);const auto=updateBaseline(start);const base=existing||auto;fillInputs(base);ST.editSnapshot={start,linan_new:Number(base.linan_new||0),linan_returning:Number(base.linan_returning||0),nanke_new:Number(base.nanke_new||0),nanke_returning:Number(base.nanke_returning||0)};dom.note.value=existing?.note||'';$('modalTitle').textContent=existing?'編輯手動覆寫':'確認／調整週業績';});
     $('btnExpandAll').addEventListener('click',()=>{dom.historyList.querySelectorAll('.month-block[data-month]').forEach(block=>{block.classList.add('open');ST.expanded.add(block.dataset.month);});}); $('btnCollapseAll').addEventListener('click',()=>{dom.historyList.querySelectorAll('.month-block[data-month]').forEach(block=>block.classList.remove('open'));ST.expanded.clear();});
     $('viewSeg').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ST.chartView=btn.dataset.view;$('viewSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));renderChart();}));
     $('rangeSeg').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ST.chartRange=btn.dataset.range;$('rangeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));renderChart();}));
