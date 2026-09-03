@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2059.02%2059.02%22%3E%3Crect%20width%3D%2259.02%22%20height%3D%2259.02%22%20rx%3D%2212%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20fill%3D%22%23231815%22%20d%3D%22M29.51%2C59.02C13.24%2C59.02%2C0%2C45.78%2C0%2C29.51S13.24%2C0%2C29.51%2C0s29.51%2C13.24%2C29.51%2C29.51-13.24%2C29.51-29.51%2C29.51ZM29.51%2C2.5C14.62%2C2.5%2C2.5%2C14.62%2C2.5%2C29.51s12.12%2C27.01%2C27.01%2C27.01%2C27.01-12.12%2C27.01-27.01S44.4%2C2.5%2C29.51%2C2.5Z%22%2F%3E%3Cpath%20fill%3D%22%23231815%22%20d%3D%22M29.51%2C55.07c-14.09%2C0-25.56-11.47-25.56-25.56S15.42%2C3.95%2C29.51%2C3.95s25.56%2C11.47%2C25.56%2C25.56-11.47%2C25.56-25.56%2C25.56ZM29.51%2C4.89C15.93%2C4.89%2C4.89%2C15.93%2C4.89%2C29.51s11.05%2C24.62%2C24.62%2C24.62%2C24.62-11.05%2C24.62-24.62S43.09%2C4.89%2C29.51%2C4.89Z%22%2F%3E%3Cpath%20fill%3D%22%23231815%22%20d%3D%22M46.5%2C29.65c.37-.32.72-.66%2C1.03-1.03%2C1.38-1.61%2C2.08-3.76%2C2.03-5.89-.08-2.14-.96-4.23-2.43-5.79-1.16-1.23-2.69-2.11-4.33-2.51-.34-.28-.69-.55-1.04-.8-.72-.53-1.47-1-2.23-1.45-1.15-.65-2.32-1.26-3.58-1.73-.12-.13-.25-.26-.38-.38-1.58-1.45-3.69-2.3-5.83-2.32-2.12-.02-4.28.7-5.85%2C2.12-1.41%2C1.23-2.39%2C2.9-2.79%2C4.68-.36-.12-.73-.22-1.11-.29-2.07-.41-4.3.02-6.13%2C1.11-1.82%2C1.11-3.22%2C2.91-3.86%2C4.95-.5%2C1.61-.52%2C3.37-.07%2C5-.08.43-.14.87-.19%2C1.3-.11.89-.15%2C1.77-.17%2C2.66%2C0%2C1.32.04%2C2.64.25%2C3.96-.05.17-.11.34-.15.52-.49%2C2.08-.2%2C4.35.83%2C6.22%2C1.02%2C1.86%2C2.71%2C3.39%2C4.72%2C4.07%2C1.8.64%2C3.78.67%2C5.56.11.09.48.22.96.39%2C1.43.71%2C1.99%2C2.22%2C3.68%2C4.09%2C4.7%2C1.89%2C1%2C4.15%2C1.28%2C6.23.78%2C1.64-.4%2C3.16-1.28%2C4.33-2.5.41-.15.82-.32%2C1.22-.5.82-.36%2C1.6-.78%2C2.37-1.21%2C1.14-.67%2C2.25-1.39%2C3.28-2.24.17-.04.35-.08.52-.14%2C2.04-.65%2C3.84-2.05%2C4.92-3.9%2C1.07-1.83%2C1.53-4.06%2C1.08-6.13-.37-1.84-1.33-3.54-2.7-4.78ZM38.92%2C13.22c.6.34%2C1.21.66%2C1.83.96-.86%2C0-1.72.12-2.55.36-.2-.84-.53-1.65-.97-2.4.55.38%2C1.11.74%2C1.69%2C1.08ZM36.03%2C21.16c-.83%2C1.35-2.1%2C2.37-3.56%2C3-.21-2.94%2C1.15-5.92%2C3.56-7.49.4-.28.81-.51%2C1.25-.7.19%2C1.8-.27%2C3.65-1.25%2C5.19ZM10.72%2C27.24c.42.75.95%2C1.44%2C1.56%2C2.04-.63.59-1.18%2C1.27-1.62%2C2.02.06-.67.1-1.33.12-2%2C0-.69-.01-1.38-.06-2.07ZM38.8%2C45.79c-.59.35-1.17.72-1.75%2C1.11.43-.75.75-1.55.96-2.39.83.24%2C1.7.36%2C2.57.36-.6.29-1.19.6-1.77.92ZM32.54%2C34.75c2.66%2C1.29%2C4.56%2C3.95%2C4.71%2C6.82.04.48.03.96-.02%2C1.43-1.66-.73-3.03-2.05-3.87-3.67-.75-1.39-1.01-3-.82-4.58ZM42.84%2C43.31c-1.49.49-3.12.49-4.63.05.06-.63.06-1.26-.03-1.88-.26-2.09-1.29-4.06-2.84-5.44-.81-.71-1.76-1.26-2.76-1.61.33-2.12%2C1.45-4.16%2C3.27-5.49-1.75.99-3.1%2C2.71-3.72%2C4.68-.06.2-.12.41-.16.62-.73-.2-1.48-.29-2.23-.27.76.07%2C1.49.24%2C2.18.51-.35%2C1.75-.15%2C3.61.6%2C5.26.85%2C1.94%2C2.48%2C3.51%2C4.42%2C4.4.03.01.05.02.08.03-.74%2C2.77-2.98%2C5.12-5.81%2C5.72-1.8.45-3.75.22-5.41-.62-1.67-.84-3-2.29-3.75-4.02-.2-.45-.35-.91-.46-1.38%2C1.81-.8%2C3.33-2.22%2C4.14-3.96-1%2C1.62-2.54%2C2.77-4.25%2C3.39-.45-3.08.98-6.47%2C3.78-8.23-1.81.86-3.28%2C2.48-4.04%2C4.4-.51%2C1.28-.68%2C2.69-.53%2C4.07-1.71.44-3.54.36-5.14-.34-3.53-1.41-5.66-5.5-4.7-9.14.35-1.53%2C1.18-2.93%2C2.33-4%2C.51.37%2C1.05.7%2C1.63.94%2C1.93.85%2C4.15.97%2C6.12.34%2C1.03-.34%2C1.98-.87%2C2.8-1.55%2C1.66%2C1.37%2C2.83%2C3.38%2C3.04%2C5.62.05-2.01-.74-4.04-2.11-5.59-.14-.16-.29-.31-.45-.46.54-.53%2C1.01-1.12%2C1.37-1.78-.44.62-.97%2C1.15-1.55%2C1.61-1.32-1.19-3.03-1.98-4.83-2.18-2.1-.27-4.29.33-6.04%2C1.54-.02.02-.04.03-.07.05-2-2.06-2.87-5.18-1.94-7.92.54-1.78%2C1.73-3.33%2C3.31-4.33%2C1.57-1.01%2C3.5-1.41%2C5.37-1.17.38.04.75.12%2C1.11.23-.21%2C2%2C.28%2C4.06%2C1.42%2C5.65-.94-1.7-1.19-3.65-.86-5.47%2C3.02%2C1.11%2C5.34%2C4.15%2C5.43%2C7.57.19-2-.45-4.09-1.71-5.72-.9-1.18-2.14-2.1-3.53-2.67.47-1.66%2C1.42-3.16%2C2.78-4.19%2C2.96-2.39%2C7.57-2.24%2C10.27.37%2C1.17%2C1.05%2C1.98%2C2.46%2C2.35%2C3.99-.57.26-1.12.57-1.62.96-1.68%2C1.27-2.88%2C3.14-3.3%2C5.17-.21%2C1.06-.21%2C2.15-.02%2C3.2-2%2C.77-4.33.81-6.39-.1%2C1.73%2C1.02%2C3.89%2C1.34%2C5.91.89.21-.05.42-.1.62-.17.19.73.49%2C1.43.88%2C2.07-.32-.69-.53-1.41-.64-2.14%2C1.69-.57%2C3.21-1.67%2C4.26-3.15%2C1.26-1.7%2C1.81-3.9%2C1.61-6.02%2C0-.03%2C0-.05-.01-.08%2C2.77-.74%2C5.92.03%2C7.85%2C2.18%2C1.29%2C1.34%2C2.06%2C3.14%2C2.16%2C5%2C.11%2C1.87-.49%2C3.74-1.61%2C5.26-.28.39-.61.75-.96%2C1.08-1.63-1.17-3.65-1.77-5.59-1.57%2C1.93.03%2C3.73.78%2C5.14%2C1.95-2.45%2C1.92-6.09%2C2.38-9.03.83%2C1.65%2C1.14%2C3.78%2C1.61%2C5.83%2C1.31%2C1.37-.2%2C2.68-.76%2C3.81-1.58%2C1.23%2C1.24%2C2.07%2C2.83%2C2.29%2C4.54.59%2C3.76-1.83%2C7.68-5.44%2C8.72ZM13.98%2C29.39c1.48-1.05%2C3.31-1.55%2C5.14-1.45%2C1.58.07%2C3.09.67%2C4.36%2C1.64-2.47%2C1.62-5.73%2C1.89-8.27.56-.43-.21-.84-.46-1.22-.75Z%22%2F%3E%3C%2Fsvg%3E" />
+  <title>WAKODO HUB｜和光堂行銷企劃部｜營運儀表板</title>
+  <style>
+    :root{
+      --blue:#4285F4;
+      --green:#34A853;
+      --yellow:#FBBC05;
+      --red:#EA4335;
+      --ink:#252525;
+      --muted:#6f716f;
+      --line:rgba(34,34,34,.09);
+      --shell:rgba(255,255,255,.84);
+      --shadow:0 16px 42px rgba(45,49,55,.10);
+      --radius:22px;
+      --orange:#F97316;
+      --glow-blue:rgba(66,133,244,.26);
+      --glow-green:rgba(52,168,83,.24);
+      --glow-orange:rgba(249,115,22,.24);
+      --glow-yellow:rgba(251,188,5,.26);
+    }
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0}
+    body{
+      overflow:hidden;
+      color:var(--ink);
+      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+      background:
+        radial-gradient(circle at 8% 6%,rgba(66,133,244,.13),transparent 31%),
+        radial-gradient(circle at 88% 15%,rgba(52,168,83,.10),transparent 31%),
+        radial-gradient(circle at 74% 94%,rgba(251,188,5,.11),transparent 34%),
+        #f3f4f5;
+    }
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+
+    /* ===== Single gate ===== */
+    #hubGate{
+      position:fixed;inset:0;z-index:10000;
+      display:flex;align-items:center;justify-content:center;
+      padding:24px;background:rgba(244,245,246,.82);
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    }
+    .gate-card{
+      width:min(440px,100%);padding:32px;
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:28px;box-shadow:0 26px 72px rgba(31,35,41,.17);
+    }
+    .gate-brand{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+    .gate-brand-mark{
+      width:40px;height:40px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+      background:#fff;border:1px solid var(--line);
+      box-shadow:0 5px 16px rgba(0,0,0,.06);
+    }
+    .gate-brand-name{font-size:13px;font-weight:900;letter-spacing:.8px}
+    .gate-title{font-size:29px;font-weight:900;letter-spacing:-.8px;margin:0 0 8px}
+    .gate-desc{margin:0 0 22px;color:var(--muted);font-size:14px;line-height:1.65;font-weight:650}
+    .gate-input{
+      width:100%;height:52px;padding:0 16px;border-radius:14px;border:1.5px solid var(--line);
+      background:#fff;color:var(--ink);outline:none;font-size:16px;font-weight:800;letter-spacing:.8px;
+      transition:.18s ease;
+    }
+    .gate-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(66,133,244,.11)}
+    .gate-input.error{border-color:var(--red);box-shadow:0 0 0 4px rgba(234,67,53,.09)}
+    .gate-btn{
+      width:100%;height:50px;margin-top:14px;border:0;border-radius:14px;
+      background:var(--blue);color:#fff;font-size:15px;font-weight:900;
+      box-shadow:0 8px 22px rgba(66,133,244,.26);transition:.18s ease;
+    }
+    .gate-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+    .gate-error{display:none;margin-top:12px;color:var(--red);font-size:13px;font-weight:800;text-align:center}
+    .gate-foot{margin-top:14px;text-align:center;color:#9aa0a6;font-size:11px;font-weight:700}
+
+    /* ===== Shell ===== */
+    #hubApp{height:100%;display:grid;grid-template-rows:76px minmax(0,1fr)}
+    .topbar{
+      height:64px;margin:12px 14px 0;padding:9px 13px 9px 17px;
+      display:grid;grid-template-columns:minmax(360px,1.2fr) auto minmax(190px,1fr);align-items:center;gap:14px;
+      background:var(--shell);border:1px solid rgba(255,255,255,.94);border-radius:22px;
+      box-shadow:var(--shadow);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+      position:relative;z-index:50;
+    }
+    .hub-brand{display:flex;align-items:center;gap:11px;min-width:0}
+    .hub-logo{
+      width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;
+      background:transparent;border:0;overflow:visible;box-shadow:none;
+    }
+    .hub-logo svg,.gate-brand-mark svg{width:100%;height:100%;display:block}
+    .hub-logo .wakodo-mark{padding:0}
+    .gate-brand-mark .wakodo-mark{padding:4px}
+    .hub-brand-copy{min-width:0}
+    .hub-brand-copy strong{display:block;font-size:16px;line-height:1.1;font-weight:900;white-space:nowrap}
+    .hub-brand-copy span{display:block;margin-top:4px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.35px;white-space:nowrap}
+
+    .tabs{
+      position:relative;
+      display:flex;align-items:center;justify-content:center;gap:2px;
+      padding:5px;border-radius:16px;
+      background:rgba(70,74,80,.08);
+      border:1px solid rgba(255,255,255,.70);
+      box-shadow:
+        inset 0 2px 6px rgba(28,32,38,.13),
+        inset 0 -1px 0 rgba(255,255,255,.76),
+        0 0 0 1px rgba(66,133,244,.05);
+      isolation:isolate;
+    }
+    .tabs::before{
+      content:"";position:absolute;inset:-3px;border-radius:19px;z-index:-2;pointer-events:none;
+      box-shadow:0 0 13px rgba(66,133,244,.18),0 0 25px rgba(66,133,244,.10);
+      animation:tabsBreath 2.8s ease-in-out infinite;
+    }
+    @keyframes tabsBreath{
+      0%,100%{opacity:.52;filter:blur(.1px)}
+      50%{opacity:1;filter:blur(.4px)}
+    }
+    .tab-slider{
+      position:absolute;left:5px;top:5px;height:calc(100% - 10px);width:0;
+      border-radius:12px;z-index:1;pointer-events:none;
+      background:linear-gradient(180deg,rgba(255,255,255,.93),rgba(255,255,255,.76));
+      border:1px solid rgba(255,255,255,.96);
+      box-shadow:
+        0 7px 16px rgba(37,43,51,.14),
+        0 2px 5px rgba(37,43,51,.09),
+        inset 0 1px 0 rgba(255,255,255,1),
+        inset 0 -1px 0 rgba(255,255,255,.48);
+      backdrop-filter:blur(14px) saturate(1.18);
+      -webkit-backdrop-filter:blur(14px) saturate(1.18);
+      transition:left .34s cubic-bezier(.22,.85,.28,1.08),width .34s cubic-bezier(.22,.85,.28,1.08);
+    }
+    .tab{
+      position:relative;z-index:2;
+      border:0;background:transparent;color:#656a70;border-radius:11px;
+      min-height:40px;padding:8px 15px;font-size:13px;font-weight:860;white-space:nowrap;
+      display:inline-flex;align-items:center;gap:8px;
+      transform:translateY(0) scale(1);
+      transition:color .20s ease,transform .28s cubic-bezier(.22,.85,.28,1.08),text-shadow .22s ease;
+      box-shadow:none;
+    }
+    .tab:hover{color:#35393d}
+    .tab.active{
+      background:transparent;box-shadow:none;
+      transform:translateY(-1.5px) scale(1.055);
+      text-shadow:0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(66,133,244,.14);
+    }
+    .tab-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px;opacity:.66;transition:transform .28s ease,opacity .22s ease,box-shadow .22s ease}
+    .tab.active .tab-dot{opacity:1;transform:scale(1.28);box-shadow:0 0 0 3px rgba(255,255,255,.64)}
+    .tab[data-view="customer"] .tab-dot{background:var(--blue)}
+    .tab[data-view="performance"] .tab-dot{background:var(--green)}
+    .tab[data-view="marketing"] .tab-dot{background:var(--orange)}
+    .tab[data-view="social"] .tab-dot{background:var(--yellow)}
+    .tab[data-view="customer"].active{color:#2f6fd8}
+    .tab[data-view="performance"].active{color:#188038}
+    .tab[data-view="marketing"].active{color:#d97706}
+    .tab[data-view="social"].active{color:#a86d00}
+
+
+    .actions{display:flex;justify-content:flex-end;align-items:center;gap:8px}
+    .status-pill{
+      display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;
+      background:rgba(52,168,83,.08);border:1px solid rgba(52,168,83,.14);color:#188038;
+      font-size:10px;font-weight:900;white-space:nowrap;
+    }
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+    .action-btn{
+      width:38px;height:38px;padding:0;border-radius:11px;border:1px solid var(--line);
+      background:#fff;color:#5f6368;display:grid;place-items:center;font-size:16px;font-weight:900;
+      transition:.18s ease;box-shadow:0 2px 7px rgba(0,0,0,.035);
+    }
+    .action-btn:hover{color:var(--ink);transform:translateY(-1px);box-shadow:0 5px 12px rgba(0,0,0,.07)}
+    .action-btn.logout:hover{color:var(--red)}
+
+    .workspace{
+      min-height:0;position:relative;margin:12px 14px 14px;border-radius:24px;overflow:hidden;
+      background:#fff;border:1px solid rgba(255,255,255,.95);box-shadow:var(--shadow);
+    }
+    .view{position:absolute;inset:0;background:#fff;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease}
+    .view.active{opacity:1;visibility:visible;pointer-events:auto}
+    .view iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    .loading{
+      position:absolute;inset:0;z-index:4;display:grid;place-items:center;background:#fff;color:var(--muted);
+      font-size:13px;font-weight:850;
+    }
+    .loading-inner{text-align:center}
+    .spinner{width:30px;height:30px;margin:0 auto 12px;border:3px solid #e9eaec;border-top-color:var(--blue);border-radius:50%;animation:spin .75s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .toast{
+      position:fixed;left:50%;bottom:24px;z-index:2000;transform:translate(-50%,16px);
+      opacity:0;pointer-events:none;padding:10px 14px;border-radius:11px;background:#202124;color:#fff;
+      box-shadow:0 10px 30px rgba(0,0,0,.2);font-size:12px;font-weight:800;transition:.2s ease;
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+
+    @media(max-width:1050px){
+      .topbar{grid-template-columns:auto minmax(0,1fr) auto}
+      .hub-brand-copy span,.status-pill{display:none}
+      .tabs{justify-content:flex-start;overflow-x:auto;scrollbar-width:none}
+      .tabs::-webkit-scrollbar{display:none}
+      .tab{padding:8px 12px}
+    }
+    @media(max-width:720px){
+      #hubApp{grid-template-rows:68px minmax(0,1fr)}
+      .topbar{height:60px;margin:8px 8px 0;padding:7px 9px;gap:8px;border-radius:18px}
+      .workspace{margin:8px;border-radius:20px}
+      .hub-brand-copy{display:none}
+      .hub-logo{width:38px;height:38px;flex-basis:38px}
+      .tabs{gap:3px;padding:3px}
+      .tab{min-height:38px;padding:7px 10px;font-size:12px}
+      .tab-dot{display:none}
+      .action-btn.open-new{display:none}
+    }
+    @media(max-width:500px){
+      .topbar{grid-template-columns:auto minmax(0,1fr) auto}
+      .action-btn.reload{display:none}
+      .tab{padding:7px 8px;font-size:11px}
+    }
+  </style>
+</head>
+<body>
+  <div id="hubGate">
+    <div class="gate-card">
+      <div class="gate-brand">
+        <div class="gate-brand-mark"><svg class="wakodo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.02 59.02" role="img" aria-label="WAKODO"><path fill="#231815" d="M29.51,59.02C13.24,59.02,0,45.78,0,29.51S13.24,0,29.51,0s29.51,13.24,29.51,29.51-13.24,29.51-29.51,29.51ZM29.51,2.5C14.62,2.5,2.5,14.62,2.5,29.51s12.12,27.01,27.01,27.01,27.01-12.12,27.01-27.01S44.4,2.5,29.51,2.5Z"/><path fill="#231815" d="M29.51,55.07c-14.09,0-25.56-11.47-25.56-25.56S15.42,3.95,29.51,3.95s25.56,11.47,25.56,25.56-11.47,25.56-25.56,25.56ZM29.51,4.89C15.93,4.89,4.89,15.93,4.89,29.51s11.05,24.62,24.62,24.62,24.62-11.05,24.62-24.62S43.09,4.89,29.51,4.89Z"/><path fill="#231815" d="M46.5,29.65c.37-.32.72-.66,1.03-1.03,1.38-1.61,2.08-3.76,2.03-5.89-.08-2.14-.96-4.23-2.43-5.79-1.16-1.23-2.69-2.11-4.33-2.51-.34-.28-.69-.55-1.04-.8-.72-.53-1.47-1-2.23-1.45-1.15-.65-2.32-1.26-3.58-1.73-.12-.13-.25-.26-.38-.38-1.58-1.45-3.69-2.3-5.83-2.32-2.12-.02-4.28.7-5.85,2.12-1.41,1.23-2.39,2.9-2.79,4.68-.36-.12-.73-.22-1.11-.29-2.07-.41-4.3.02-6.13,1.11-1.82,1.11-3.22,2.91-3.86,4.95-.5,1.61-.52,3.37-.07,5-.08.43-.14.87-.19,1.3-.11.89-.15,1.77-.17,2.66,0,1.32.04,2.64.25,3.96-.05.17-.11.34-.15.52-.49,2.08-.2,4.35.83,6.22,1.02,1.86,2.71,3.39,4.72,4.07,1.8.64,3.78.67,5.56.11.09.48.22.96.39,1.43.71,1.99,2.22,3.68,4.09,4.7,1.89,1,4.15,1.28,6.23.78,1.64-.4,3.16-1.28,4.33-2.5.41-.15.82-.32,1.22-.5.82-.36,1.6-.78,2.37-1.21,1.14-.67,2.25-1.39,3.28-2.24.17-.04.35-.08.52-.14,2.04-.65,3.84-2.05,4.92-3.9,1.07-1.83,1.53-4.06,1.08-6.13-.37-1.84-1.33-3.54-2.7-4.78ZM38.92,13.22c.6.34,1.21.66,1.83.96-.86,0-1.72.12-2.55.36-.2-.84-.53-1.65-.97-2.4.55.38,1.11.74,1.69,1.08ZM36.03,21.16c-.83,1.35-2.1,2.37-3.56,3-.21-2.94,1.15-5.92,3.56-7.49.4-.28.81-.51,1.25-.7.19,1.8-.27,3.65-1.25,5.19ZM10.72,27.24c.42.75.95,1.44,1.56,2.04-.63.59-1.18,1.27-1.62,2.02.06-.67.1-1.33.12-2,0-.69-.01-1.38-.06-2.07ZM38.8,45.79c-.59.35-1.17.72-1.75,1.11.43-.75.75-1.55.96-2.39.83.24,1.7.36,2.57.36-.6.29-1.19.6-1.77.92ZM32.54,34.75c2.66,1.29,4.56,3.95,4.71,6.82.04.48.03.96-.02,1.43-1.66-.73-3.03-2.05-3.87-3.67-.75-1.39-1.01-3-.82-4.58ZM42.84,43.31c-1.49.49-3.12.49-4.63.05.06-.63.06-1.26-.03-1.88-.26-2.09-1.29-4.06-2.84-5.44-.81-.71-1.76-1.26-2.76-1.61.33-2.12,1.45-4.16,3.27-5.49-1.75.99-3.1,2.71-3.72,4.68-.06.2-.12.41-.16.62-.73-.2-1.48-.29-2.23-.27.76.07,1.49.24,2.18.51-.35,1.75-.15,3.61.6,5.26.85,1.94,2.48,3.51,4.42,4.4.03.01.05.02.08.03-.74,2.77-2.98,5.12-5.81,5.72-1.8.45-3.75.22-5.41-.62-1.67-.84-3-2.29-3.75-4.02-.2-.45-.35-.91-.46-1.38,1.81-.8,3.33-2.22,4.14-3.96-1,1.62-2.54,2.77-4.25,3.39-.45-3.08.98-6.47,3.78-8.23-1.81.86-3.28,2.48-4.04,4.4-.51,1.28-.68,2.69-.53,4.07-1.71.44-3.54.36-5.14-.34-3.53-1.41-5.66-5.5-4.7-9.14.35-1.53,1.18-2.93,2.33-4,.51.37,1.05.7,1.63.94,1.93.85,4.15.97,6.12.34,1.03-.34,1.98-.87,2.8-1.55,1.66,1.37,2.83,3.38,3.04,5.62.05-2.01-.74-4.04-2.11-5.59-.14-.16-.29-.31-.45-.46.54-.53,1.01-1.12,1.37-1.78-.44.62-.97,1.15-1.55,1.61-1.32-1.19-3.03-1.98-4.83-2.18-2.1-.27-4.29.33-6.04,1.54-.02.02-.04.03-.07.05-2-2.06-2.87-5.18-1.94-7.92.54-1.78,1.73-3.33,3.31-4.33,1.57-1.01,3.5-1.41,5.37-1.17.38.04.75.12,1.11.23-.21,2,.28,4.06,1.42,5.65-.94-1.7-1.19-3.65-.86-5.47,3.02,1.11,5.34,4.15,5.43,7.57.19-2-.45-4.09-1.71-5.72-.9-1.18-2.14-2.1-3.53-2.67.47-1.66,1.42-3.16,2.78-4.19,2.96-2.39,7.57-2.24,10.27.37,1.17,1.05,1.98,2.46,2.35,3.99-.57.26-1.12.57-1.62.96-1.68,1.27-2.88,3.14-3.3,5.17-.21,1.06-.21,2.15-.02,3.2-2,.77-4.33.81-6.39-.1,1.73,1.02,3.89,1.34,5.91.89.21-.05.42-.1.62-.17.19.73.49,1.43.88,2.07-.32-.69-.53-1.41-.64-2.14,1.69-.57,3.21-1.67,4.26-3.15,1.26-1.7,1.81-3.9,1.61-6.02,0-.03,0-.05-.01-.08,2.77-.74,5.92.03,7.85,2.18,1.29,1.34,2.06,3.14,2.16,5,.11,1.87-.49,3.74-1.61,5.26-.28.39-.61.75-.96,1.08-1.63-1.17-3.65-1.77-5.59-1.57,1.93.03,3.73.78,5.14,1.95-2.45,1.92-6.09,2.38-9.03.83,1.65,1.14,3.78,1.61,5.83,1.31,1.37-.2,2.68-.76,3.81-1.58,1.23,1.24,2.07,2.83,2.29,4.54.59,3.76-1.83,7.68-5.44,8.72ZM13.98,29.39c1.48-1.05,3.31-1.55,5.14-1.45,1.58.07,3.09.67,4.36,1.64-2.47,1.62-5.73,1.89-8.27.56-.43-.21-.84-.46-1.22-.75Z"/></svg></div>
+        <div class="gate-brand-name">WAKODO HUB</div>
+      </div>
+      <h1 class="gate-title">和光堂行銷企劃部｜營運儀表板</h1>
+      <p class="gate-desc">客源、業績、行銷開支與社群發文成效集中在同一個入口。登入後切換各頁面不需要再次輸入密碼。</p>
+      <input id="hubPassword" class="gate-input" type="password" placeholder="輸入入口密碼" autocomplete="current-password" />
+      <button id="hubEnter" class="gate-btn" type="button">進入 WAKODO HUB</button>
+      <div id="hubGateError" class="gate-error">密碼錯誤，請重新輸入</div>
+      <div class="gate-foot">此裝置 48 小時內免重複輸入；可隨時由右上角登出</div>
+    </div>
+  </div>
+
+  <div id="hubApp" class="hidden">
+    <header class="topbar">
+      <div class="hub-brand">
+        <div class="hub-logo"><svg class="wakodo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.02 59.02" role="img" aria-label="WAKODO"><path fill="#231815" d="M29.51,59.02C13.24,59.02,0,45.78,0,29.51S13.24,0,29.51,0s29.51,13.24,29.51,29.51-13.24,29.51-29.51,29.51ZM29.51,2.5C14.62,2.5,2.5,14.62,2.5,29.51s12.12,27.01,27.01,27.01,27.01-12.12,27.01-27.01S44.4,2.5,29.51,2.5Z"/><path fill="#231815" d="M29.51,55.07c-14.09,0-25.56-11.47-25.56-25.56S15.42,3.95,29.51,3.95s25.56,11.47,25.56,25.56-11.47,25.56-25.56,25.56ZM29.51,4.89C15.93,4.89,4.89,15.93,4.89,29.51s11.05,24.62,24.62,24.62,24.62-11.05,24.62-24.62S43.09,4.89,29.51,4.89Z"/><path fill="#231815" d="M46.5,29.65c.37-.32.72-.66,1.03-1.03,1.38-1.61,2.08-3.76,2.03-5.89-.08-2.14-.96-4.23-2.43-5.79-1.16-1.23-2.69-2.11-4.33-2.51-.34-.28-.69-.55-1.04-.8-.72-.53-1.47-1-2.23-1.45-1.15-.65-2.32-1.26-3.58-1.73-.12-.13-.25-.26-.38-.38-1.58-1.45-3.69-2.3-5.83-2.32-2.12-.02-4.28.7-5.85,2.12-1.41,1.23-2.39,2.9-2.79,4.68-.36-.12-.73-.22-1.11-.29-2.07-.41-4.3.02-6.13,1.11-1.82,1.11-3.22,2.91-3.86,4.95-.5,1.61-.52,3.37-.07,5-.08.43-.14.87-.19,1.3-.11.89-.15,1.77-.17,2.66,0,1.32.04,2.64.25,3.96-.05.17-.11.34-.15.52-.49,2.08-.2,4.35.83,6.22,1.02,1.86,2.71,3.39,4.72,4.07,1.8.64,3.78.67,5.56.11.09.48.22.96.39,1.43.71,1.99,2.22,3.68,4.09,4.7,1.89,1,4.15,1.28,6.23.78,1.64-.4,3.16-1.28,4.33-2.5.41-.15.82-.32,1.22-.5.82-.36,1.6-.78,2.37-1.21,1.14-.67,2.25-1.39,3.28-2.24.17-.04.35-.08.52-.14,2.04-.65,3.84-2.05,4.92-3.9,1.07-1.83,1.53-4.06,1.08-6.13-.37-1.84-1.33-3.54-2.7-4.78ZM38.92,13.22c.6.34,1.21.66,1.83.96-.86,0-1.72.12-2.55.36-.2-.84-.53-1.65-.97-2.4.55.38,1.11.74,1.69,1.08ZM36.03,21.16c-.83,1.35-2.1,2.37-3.56,3-.21-2.94,1.15-5.92,3.56-7.49.4-.28.81-.51,1.25-.7.19,1.8-.27,3.65-1.25,5.19ZM10.72,27.24c.42.75.95,1.44,1.56,2.04-.63.59-1.18,1.27-1.62,2.02.06-.67.1-1.33.12-2,0-.69-.01-1.38-.06-2.07ZM38.8,45.79c-.59.35-1.17.72-1.75,1.11.43-.75.75-1.55.96-2.39.83.24,1.7.36,2.57.36-.6.29-1.19.6-1.77.92ZM32.54,34.75c2.66,1.29,4.56,3.95,4.71,6.82.04.48.03.96-.02,1.43-1.66-.73-3.03-2.05-3.87-3.67-.75-1.39-1.01-3-.82-4.58ZM42.84,43.31c-1.49.49-3.12.49-4.63.05.06-.63.06-1.26-.03-1.88-.26-2.09-1.29-4.06-2.84-5.44-.81-.71-1.76-1.26-2.76-1.61.33-2.12,1.45-4.16,3.27-5.49-1.75.99-3.1,2.71-3.72,4.68-.06.2-.12.41-.16.62-.73-.2-1.48-.29-2.23-.27.76.07,1.49.24,2.18.51-.35,1.75-.15,3.61.6,5.26.85,1.94,2.48,3.51,4.42,4.4.03.01.05.02.08.03-.74,2.77-2.98,5.12-5.81,5.72-1.8.45-3.75.22-5.41-.62-1.67-.84-3-2.29-3.75-4.02-.2-.45-.35-.91-.46-1.38,1.81-.8,3.33-2.22,4.14-3.96-1,1.62-2.54,2.77-4.25,3.39-.45-3.08.98-6.47,3.78-8.23-1.81.86-3.28,2.48-4.04,4.4-.51,1.28-.68,2.69-.53,4.07-1.71.44-3.54.36-5.14-.34-3.53-1.41-5.66-5.5-4.7-9.14.35-1.53,1.18-2.93,2.33-4,.51.37,1.05.7,1.63.94,1.93.85,4.15.97,6.12.34,1.03-.34,1.98-.87,2.8-1.55,1.66,1.37,2.83,3.38,3.04,5.62.05-2.01-.74-4.04-2.11-5.59-.14-.16-.29-.31-.45-.46.54-.53,1.01-1.12,1.37-1.78-.44.62-.97,1.15-1.55,1.61-1.32-1.19-3.03-1.98-4.83-2.18-2.1-.27-4.29.33-6.04,1.54-.02.02-.04.03-.07.05-2-2.06-2.87-5.18-1.94-7.92.54-1.78,1.73-3.33,3.31-4.33,1.57-1.01,3.5-1.41,5.37-1.17.38.04.75.12,1.11.23-.21,2,.28,4.06,1.42,5.65-.94-1.7-1.19-3.65-.86-5.47,3.02,1.11,5.34,4.15,5.43,7.57.19-2-.45-4.09-1.71-5.72-.9-1.18-2.14-2.1-3.53-2.67.47-1.66,1.42-3.16,2.78-4.19,2.96-2.39,7.57-2.24,10.27.37,1.17,1.05,1.98,2.46,2.35,3.99-.57.26-1.12.57-1.62.96-1.68,1.27-2.88,3.14-3.3,5.17-.21,1.06-.21,2.15-.02,3.2-2,.77-4.33.81-6.39-.1,1.73,1.02,3.89,1.34,5.91.89.21-.05.42-.1.62-.17.19.73.49,1.43.88,2.07-.32-.69-.53-1.41-.64-2.14,1.69-.57,3.21-1.67,4.26-3.15,1.26-1.7,1.81-3.9,1.61-6.02,0-.03,0-.05-.01-.08,2.77-.74,5.92.03,7.85,2.18,1.29,1.34,2.06,3.14,2.16,5,.11,1.87-.49,3.74-1.61,5.26-.28.39-.61.75-.96,1.08-1.63-1.17-3.65-1.77-5.59-1.57,1.93.03,3.73.78,5.14,1.95-2.45,1.92-6.09,2.38-9.03.83,1.65,1.14,3.78,1.61,5.83,1.31,1.37-.2,2.68-.76,3.81-1.58,1.23,1.24,2.07,2.83,2.29,4.54.59,3.76-1.83,7.68-5.44,8.72ZM13.98,29.39c1.48-1.05,3.31-1.55,5.14-1.45,1.58.07,3.09.67,4.36,1.64-2.47,1.62-5.73,1.89-8.27.56-.43-.21-.84-.46-1.22-.75Z"/></svg></div>
+        <div class="hub-brand-copy">
+          <strong>和光堂行銷企劃部｜營運儀表板</strong>
+          <span>WAKODO HUB</span>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="WAKODO HUB 功能切換">
+        <div class="tab-slider" aria-hidden="true"></div>
+        <button class="tab active" type="button" data-view="customer"><span class="tab-dot"></span>客源分析</button>
+        <button class="tab" type="button" data-view="performance"><span class="tab-dot"></span>業績分析</button>
+        <button class="tab" type="button" data-view="marketing"><span class="tab-dot"></span>行銷開支分析</button>
+        <button class="tab" type="button" data-view="social"><span class="tab-dot"></span>社群發文成效分析</button>
+      </nav>
+
+      <div class="actions">
+        <span class="status-pill"><span class="status-dot"></span>已登入</span>
+        <button id="openCurrent" class="action-btn open-new" type="button" title="在新分頁開啟目前功能">↗</button>
+        <button id="reloadCurrent" class="action-btn reload" type="button" title="重新整理目前功能">↻</button>
+        <button id="hubLogout" class="action-btn logout" type="button" title="登出 WAKODO HUB">⏻</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="view active" data-view-panel="customer">
+        <div class="loading"><div class="loading-inner"><div class="spinner"></div>正在載入客源分析…</div></div>
+        <iframe title="客源分析" loading="eager"></iframe>
+      </section>
+      <section class="view" data-view-panel="performance">
+        <div class="loading"><div class="loading-inner"><div class="spinner"></div>正在載入業績分析…</div></div>
+        <iframe title="業績分析"></iframe>
+      </section>
+      <section class="view" data-view-panel="marketing">
+        <div class="loading"><div class="loading-inner"><div class="spinner"></div>正在載入行銷開支分析…</div></div>
+        <iframe title="行銷開支分析"></iframe>
+      </section>
+      <section class="view" data-view-panel="social">
+        <div class="loading"><div class="loading-inner"><div class="spinner"></div>正在載入社群發文成效分析…</div></div>
+        <iframe title="社群發文成效分析"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <div id="hubToast" class="toast"></div>
+
+  <script>
+    const HUB = Object.freeze({
+      PASSWORD: "wakodo100",
+      KEY: "wakodo_hub_access_v1",
+      SESSION_KEY: "wakodo_hub_session_v1",
+      TTL: 48 * 60 * 60 * 1000,
+      PAGES: {
+        customer: { label: "客源分析", src: "index.html" },
+        performance: { label: "業績分析", src: "performance.html" },
+        marketing: { label: "行銷開支分析", src: "marketing.html" },
+        social: { label: "社群發文成效分析", src: "social-analytics.html" }
+      }
+    });
+
+    const state = { active: "customer", loaded: new Set() };
+    const $ = id => document.getElementById(id);
+    const qa = sel => Array.from(document.querySelectorAll(sel));
+
+    function showToast(text){
+      const el = $("hubToast");
+      el.textContent = text;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 1600);
+    }
+
+    function readHubAccess(){
+      try{
+        if (sessionStorage.getItem(HUB.SESSION_KEY) === "1") {
+          return { ok:true, expire:Date.now() + HUB.TTL };
+        }
+        const raw = localStorage.getItem(HUB.KEY);
+        if (!raw) return { ok:false, expire:0 };
+        const data = JSON.parse(raw);
+        if (!data || !Number(data.expire) || Date.now() >= Number(data.expire)){
+          localStorage.removeItem(HUB.KEY);
+          return { ok:false, expire:0 };
+        }
+        return { ok:true, expire:Number(data.expire) };
+      }catch{
+        return { ok:false, expire:0 };
+      }
+    }
+
+    function grantChildAccess(expire){
+      const now = Date.now();
+      const sharedExpire = Number(expire) > now ? Number(expire) : now + HUB.TTL;
+      try{
+        /* index.html：48 小時時間戳機制 */
+        const indexGrantedAt = sharedExpire - HUB.TTL;
+        sessionStorage.setItem("wakodo_gate_ok", "1");
+        localStorage.setItem("wakodo_gate_ok_time", String(indexGrantedAt));
+
+        /* performance.html：JSON expire 機制 */
+        localStorage.setItem("wakodo_perf_front_access_v3", JSON.stringify({ expire:sharedExpire }));
+
+        /* marketing.html：JSON expire 機制 */
+        localStorage.setItem("wakodo_mkt_access_v3", JSON.stringify({ expire:sharedExpire }));
+      }catch(err){
+        console.warn("WAKODO HUB 無法同步子頁登入狀態", err);
+      }
+    }
+
+    function clearAllAccess(){
+      try{
+        sessionStorage.removeItem(HUB.SESSION_KEY);
+        localStorage.removeItem(HUB.KEY);
+        sessionStorage.removeItem("wakodo_gate_ok");
+        localStorage.removeItem("wakodo_gate_ok_time");
+        localStorage.removeItem("wakodo_perf_front_access_v3");
+        localStorage.removeItem("wakodo_mkt_access_v3");
+      }catch{}
+    }
+
+    function enterHub(){
+      const input = $("hubPassword");
+      const err = $("hubGateError");
+      if (input.value !== HUB.PASSWORD){
+        input.classList.add("error");
+        err.style.display = "block";
+        input.value = "";
+        input.focus();
+        return;
+      }
+      const expire = Date.now() + HUB.TTL;
+      sessionStorage.setItem(HUB.SESSION_KEY, "1");
+      localStorage.setItem(HUB.KEY, JSON.stringify({ expire }));
+      grantChildAccess(expire);
+      input.classList.remove("error");
+      err.style.display = "none";
+      showHub();
+    }
+
+    function showHub(){
+      const access = readHubAccess();
+      if (!access.ok) return showGate();
+      grantChildAccess(access.expire);
+      $("hubGate").style.display = "none";
+      $("hubApp").classList.remove("hidden");
+      const target = normalizeHash(location.hash);
+      switchView(target, false);
+    }
+
+    function showGate(){
+      $("hubApp").classList.add("hidden");
+      $("hubGate").style.display = "flex";
+      setTimeout(() => $("hubPassword").focus(), 0);
+    }
+
+    function normalizeHash(hash){
+      const key = String(hash || "").replace(/^#/, "");
+      return HUB.PAGES[key] ? key : "customer";
+    }
+
+    function loadView(name){
+      if (state.loaded.has(name)) return;
+      const panel = document.querySelector(`[data-view-panel="${name}"]`);
+      if (!panel) return;
+      const frame = panel.querySelector("iframe");
+      const loading = panel.querySelector(".loading");
+      frame.addEventListener("load", () => {
+        if (loading) loading.style.display = "none";
+        /* 子頁載入時可能自行延長原本的記住期限，HUB 再同步回目前 HUB 權限 */
+        const access = readHubAccess();
+        if (access.ok) grantChildAccess(access.expire);
+      }, { once:true });
+      frame.src = HUB.PAGES[name].src;
+      state.loaded.add(name);
+    }
+
+    function syncTabSlider(name=state.active, scrollIntoView=false){
+      const tabs = document.querySelector(".tabs");
+      const slider = document.querySelector(".tab-slider");
+      const active = document.querySelector(`.tab[data-view="${name}"]`);
+      if (!tabs || !slider || !active) return;
+      slider.style.width = active.offsetWidth + "px";
+      slider.style.left = active.offsetLeft + "px";
+      if (scrollIntoView && typeof active.scrollIntoView === "function") {
+        active.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"center" });
+      }
+    }
+
+    function switchView(name, updateHash=true){
+      if (!HUB.PAGES[name]) name = "customer";
+      state.active = name;
+      qa(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.view === name));
+      requestAnimationFrame(() => syncTabSlider(name, true));
+      qa(".view").forEach(panel => panel.classList.toggle("active", panel.dataset.viewPanel === name));
+      loadView(name);
+      if (updateHash && location.hash !== `#${name}`) history.replaceState(null, "", `#${name}`);
+      document.title = `${HUB.PAGES[name].label}｜WAKODO HUB`;
+    }
+
+    qa(".tab").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+    $("hubEnter").addEventListener("click", enterHub);
+    $("hubPassword").addEventListener("keydown", e => { if (e.key === "Enter") enterHub(); });
+    $("hubPassword").addEventListener("input", () => { $("hubPassword").classList.remove("error"); $("hubGateError").style.display = "none"; });
+
+    $("reloadCurrent").addEventListener("click", () => {
+      const panel = document.querySelector(`[data-view-panel="${state.active}"]`);
+      const frame = panel && panel.querySelector("iframe");
+      const loading = panel && panel.querySelector(".loading");
+      if (!frame || !frame.src) return;
+      if (loading) loading.style.display = "grid";
+      try{ frame.contentWindow.location.reload(); }
+      catch{ frame.src = frame.src; }
+      setTimeout(() => { if (loading) loading.style.display = "none"; }, 2500);
+    });
+
+    $("openCurrent").addEventListener("click", () => {
+      const page = HUB.PAGES[state.active];
+      if (page) window.open(page.src, "_blank", "noopener");
+    });
+
+    $("hubLogout").addEventListener("click", () => {
+      clearAllAccess();
+      state.loaded.forEach(name => {
+        const panel = document.querySelector(`[data-view-panel="${name}"]`);
+        const frame = panel && panel.querySelector("iframe");
+        const loading = panel && panel.querySelector(".loading");
+        if (frame) frame.removeAttribute("src");
+        if (loading) loading.style.display = "grid";
+      });
+      state.loaded.clear();
+      $("hubPassword").value = "";
+      showGate();
+      showToast("已登出 WAKODO HUB");
+    });
+
+    window.addEventListener("hashchange", () => {
+      if (readHubAccess().ok) switchView(normalizeHash(location.hash), false);
+    });
+
+    window.addEventListener("resize", () => {
+      requestAnimationFrame(() => syncTabSlider(state.active, false));
+    });
+
+    window.addEventListener("load", () => {
+      const access = readHubAccess();
+      if (access.ok) showHub();
+      else showGate();
+      requestAnimationFrame(() => syncTabSlider(state.active, false));
+    });
+  </script>
+</body>
+</html>
