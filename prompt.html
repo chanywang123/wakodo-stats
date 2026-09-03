@@ -304,7 +304,7 @@
         </div>
         <div class="status-wrap">
             <span id="status">連線中…</span>
-            <button class="btn btn-small" type="button" onclick="reloadData()">重新載入</button>
+            <button class="btn btn-small" type="button" onclick="reloadData()">重新載入資料</button>
         </div>
     </header>
 
@@ -489,6 +489,7 @@
     let draggedIndex = null;
     let fullPromptText = "";
     let currentPreviewSections = [];
+    const WORKSPACE_STATE_KEY = "wakoPromptWorkspaceStateV1";
 
     window.showToast = function(message) {
         const toast = document.getElementById("toast");
@@ -547,7 +548,7 @@
             const eyewear = document.getElementById("input-eyewear").value.trim();
 
             const referenceRules = `[CHARACTER REFERENCE — STRICT IDENTITY LOCK]
-Use the provided character reference images as the only source of the person's identity. Analyze all supplied three-view, multi-angle, and expression references together and reconstruct one consistent person. Preserve the exact facial identity, facial proportions, bone structure, hairstyle, hairline, age impression, ethnicity, skin tone, and natural skin character. Do not redesign, beautify, age-shift, or substitute the person. Character references define identity only; do not inherit clothing, background, lighting, or pose unless selected separately below.
+Use the provided character reference images as the only source of the person's identity. Analyze all supplied three-view, multi-angle, and expression references together and reconstruct one consistent person. Preserve the exact facial identity, facial proportions, bone structure, hairstyle, hairline, ethnicity, skin tone, and natural skin character. Match the subject's apparent age exactly as shown in the reference images, but do not age the person up, harden the facial features, deepen expression lines, increase facial hollowness, or shift the person toward a more mature, tired, stern, or weathered appearance than the source images. Do not redesign, beautify, age-shift, or substitute the person. Character references define identity only; do not inherit clothing, background, lighting, or pose unless selected separately below.
 
 [EYEWEAR REFERENCE — FIXED PROTECTED ASSET]
 Treat the provided eyewear reference images as a fixed, protected visual asset and the only valid source of product truth, never as design inspiration. The generated person must wear this exact eyewear. Preserve the original front silhouette, overall proportions, perceived size, bridge, rim thickness, hinges, temples, nose pads, material, transparency, gloss, color, logo, printed details, and every visible feature. The eyewear may be positioned naturally on the face for realistic wear, but the product itself must not be redesigned, simplified, enlarged, beautified, or replaced with a similar pair.
@@ -571,9 +572,9 @@ The selected pose controls the upper-body gesture, shoulder line, head angle, ga
 [SCENE INTERPRETATION]
 Treat the selected scene as a direction for space, location, and atmosphere rather than a fixed prop inventory. Architectural lines, spatial layout, furniture choice, background details, and secondary objects may vary naturally from generation to generation while preserving the selected scene's visual identity. The background supports the person and eyewear with clear depth and hierarchy rather than competing with them.`;
 
-            const realism = `Skin should look natural, realistic, clean, healthy, and flattering. Preserve believable skin depth, fine natural texture, subtle tone variation, and realistic light response, but do not deliberately intensify pores, blemishes, roughness, dullness, beard shadow, fine lines, fatigue, or other imperfections. Keep real skin structure without beauty-filter smoothing, waxy skin, or a plastic appearance.
+            const realism = `Skin should look natural, realistic, healthy, clean, fresh, and flattering. Preserve believable skin depth, fine natural texture, subtle tonal variation, and realistic light response while keeping the complexion lively, even, and well-rested. Do not deliberately intensify pores, blemishes, under-eye darkness, beard shadow, roughness, dullness, facial hollowness, deep lines, fatigue, or other aging cues. Keep real skin structure without beauty-filter smoothing, waxy skin, or a plastic appearance, but also avoid gritty, harsh, tired, or prematurely aged rendering.
 
-The selected photographic style may change color, contrast, grain, exposure, highlights, and overall rendering character, but it must not alter the subject's identity, facial structure, age impression, or authentic skin character. Eyewear and scene materials must retain physically believable structure, scale, surface response, and reflections.`;
+The selected photographic style may change color, contrast, grain, exposure, highlights, and overall rendering character, but it must not alter the subject's identity, facial structure, apparent age, or authentic skin character. Eyewear and scene materials must retain physically believable structure, scale, surface response, and reflections.`;
 
             sections = [
                 { title: "Reference Rules", text: referenceRules },
@@ -604,6 +605,7 @@ The selected photographic style may change color, contrast, grain, exposure, hig
         document.getElementById("promptOutput").value = fullPromptText;
         renderPreviewSections();
         updateSelectionSummaries();
+        saveWorkspaceState();
     };
 
     function renderPreviewSections() {
@@ -762,9 +764,87 @@ The selected photographic style may change color, contrast, grain, exposure, hig
         }
     };
 
-    window.reloadData = function() { loadData(); };
+    function captureWorkspaceState() {
+        return {
+            mode: currentMode,
+            gender: currentGender,
+            ratio: document.getElementById("select-ratio")?.value || "4:5",
+            eyewear: document.getElementById("input-eyewear")?.value || "",
+            selections: {
+                appearances: document.getElementById("select-appearances")?.value || "",
+                outfits: document.getElementById("select-outfits")?.value || "",
+                scenes: document.getElementById("select-scenes")?.value || "",
+                poses: document.getElementById("select-poses")?.value || "",
+                styles: document.getElementById("select-styles")?.value || "",
+                productLayouts: document.getElementById("select-product-layouts")?.value || ""
+            }
+        };
+    }
 
-    async function loadData() {
+    function saveWorkspaceState(state = captureWorkspaceState()) {
+        try {
+            sessionStorage.setItem(WORKSPACE_STATE_KEY, JSON.stringify(state));
+        } catch (error) {
+            console.warn("工作台狀態暫存失敗", error);
+        }
+    }
+
+    function readWorkspaceState() {
+        try {
+            const raw = sessionStorage.getItem(WORKSPACE_STATE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            console.warn("工作台狀態讀取失敗", error);
+            return null;
+        }
+    }
+
+    function setSelectValueIfAvailable(selectId, value) {
+        if (!value) return;
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        if ([...select.options].some(option => option.value === value)) select.value = value;
+    }
+
+    function restoreWorkspaceState(state) {
+        if (!state || typeof state !== "object") {
+            refreshAllSelects();
+            return;
+        }
+
+        currentMode = state.mode === "product" ? "product" : "model";
+        currentGender = state.gender === "male" ? "male" : "female";
+
+        document.getElementById("mode-model").classList.toggle("active", currentMode === "model");
+        document.getElementById("mode-product").classList.toggle("active", currentMode === "product");
+        document.getElementById("section-model").hidden = currentMode !== "model";
+        document.getElementById("section-product").hidden = currentMode !== "product";
+        document.getElementById("gender-toolbar").style.visibility = currentMode === "model" ? "visible" : "hidden";
+        document.getElementById("btn-female").classList.toggle("active", currentGender === "female");
+        document.getElementById("btn-male").classList.toggle("active", currentGender === "male");
+
+        const ratio = document.getElementById("select-ratio");
+        if (state.ratio && [...ratio.options].some(option => option.value === state.ratio)) ratio.value = state.ratio;
+        document.getElementById("input-eyewear").value = typeof state.eyewear === "string" ? state.eyewear : "";
+
+        refreshAllSelects(false);
+        const selections = state.selections || {};
+        setSelectValueIfAvailable("select-appearances", selections.appearances);
+        setSelectValueIfAvailable("select-outfits", selections.outfits);
+        setSelectValueIfAvailable("select-scenes", selections.scenes);
+        setSelectValueIfAvailable("select-poses", selections.poses);
+        setSelectValueIfAvailable("select-styles", selections.styles);
+        setSelectValueIfAvailable("select-product-layouts", selections.productLayouts);
+    }
+
+    window.reloadData = async function() {
+        const state = captureWorkspaceState();
+        saveWorkspaceState(state);
+        await loadData({ state, notifyReload: true });
+    };
+
+    async function loadData({ state = null, notifyReload = false } = {}) {
+        const workspaceState = state || readWorkspaceState();
         setStatus("載入資料中…", "var(--muted)");
         const { data, error } = await supabase.from("wako_prompts").select("*");
         if (error) {
@@ -787,8 +867,9 @@ The selected photographic style may change color, contrast, grain, exposure, hig
         });
 
         setStatus("雲端同步完成", "var(--success)");
-        refreshAllSelects();
+        restoreWorkspaceState(workspaceState);
         window.generatePrompt();
+        if (notifyReload) window.showToast("資料已重新載入，工作台設定已保留");
     }
 
     function setStatus(text, color) {
